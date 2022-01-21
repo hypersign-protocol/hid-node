@@ -1,11 +1,20 @@
 accounts:
   - name: alice
-    coins: ["20000token", "200000000stake"]
+    coins: ["20000uatom", "200000000stake"]
   - name: bob
-    coins: ["10000token", "100000000stake"]
+    coins: ["10000uatom", "100000000stake"]
 validator:
   name: alice
   staked: "100000000stake"
+host:
+  rpc: ":26657"
+  p2p: ":26656"
+  prof: ":6061"
+  grpc: ":9095"
+  grpc-web: ":9093"
+  api: ":1318"
+  frontend: ":8081"
+  dev-ui: ":12346"
 client:
   openapi:
     path: "docs/static/openapi.yml"
@@ -13,4 +22,4 @@ client:
     path: "vue/src/store"
 faucet:
   name: bob
-  coins: ["5token", "100000stake"]
+  coins: ["5uatom", "100000stake"]

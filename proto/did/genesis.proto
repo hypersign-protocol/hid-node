@@ -1,0 +1,14 @@
+syntax = "proto3";
+package hypersignprotocol.hidnode.did;
+
+import "gogoproto/gogo.proto";
+import "did/params.proto";
+// this line is used by starport scaffolding # genesis/proto/import
+
+option go_package = "github.com/hypersign-protocol/hid-node/x/did/types";
+
+// GenesisState defines the did module's genesis state.
+message GenesisState {
+  Params params = 1 [(gogoproto.nullable) = false];
+  // this line is used by starport scaffolding # genesis/proto/state
+}

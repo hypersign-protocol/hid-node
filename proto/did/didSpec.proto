@@ -1,0 +1,11 @@
+syntax = "proto3";
+package hypersignprotocol.hidnode.did;
+option go_package = "github.com/hypersign-protocol/hid-node/x/did/types";
+
+message DidSpec {
+  string creator = 1;
+  uint64 id = 2;
+  string did = 3;
+  string didDocString = 4; 
+  string createdAt = 5;
+}
