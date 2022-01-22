@@ -93,9 +93,6 @@ import (
 	didmodule "github.com/hypersign-protocol/hid-node/x/did"
 	didmodulekeeper "github.com/hypersign-protocol/hid-node/x/did/keeper"
 	didmoduletypes "github.com/hypersign-protocol/hid-node/x/did/types"
-	hidnodemodule "github.com/hypersign-protocol/hid-node/x/hidnode"
-	hidnodemodulekeeper "github.com/hypersign-protocol/hid-node/x/hidnode/keeper"
-	hidnodemoduletypes "github.com/hypersign-protocol/hid-node/x/hidnode/types"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 )
 
@@ -146,7 +143,6 @@ var (
 		evidence.AppModuleBasic{},
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
-		hidnodemodule.AppModuleBasic{},
 		didmodule.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
@@ -217,7 +213,6 @@ type App struct {
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
 
-	HidnodeKeeper hidnodemodulekeeper.Keeper
 
 	DidKeeper didmodulekeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
@@ -256,7 +251,6 @@ func New(
 		minttypes.StoreKey, distrtypes.StoreKey, slashingtypes.StoreKey,
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey, feegrant.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
-		hidnodemoduletypes.StoreKey,
 		didmoduletypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
@@ -356,14 +350,6 @@ func New(
 		&stakingKeeper, govRouter,
 	)
 
-	app.HidnodeKeeper = *hidnodemodulekeeper.NewKeeper(
-		appCodec,
-		keys[hidnodemoduletypes.StoreKey],
-		keys[hidnodemoduletypes.MemStoreKey],
-		app.GetSubspace(hidnodemoduletypes.ModuleName),
-	)
-	hidnodeModule := hidnodemodule.NewAppModule(appCodec, app.HidnodeKeeper, app.AccountKeeper, app.BankKeeper)
-
 	app.DidKeeper = *didmodulekeeper.NewKeeper(
 		appCodec,
 		keys[didmoduletypes.StoreKey],
@@ -410,7 +396,6 @@ func New(
 		ibc.NewAppModule(app.IBCKeeper),
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
-		hidnodeModule,
 		didModule,
 		// this line is used by starport scaffolding # stargate/app/appModule
 	)
@@ -446,7 +431,6 @@ func New(
 		genutiltypes.ModuleName,
 		evidencetypes.ModuleName,
 		ibctransfertypes.ModuleName,
-		hidnodemoduletypes.ModuleName,
 		didmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	)
@@ -470,7 +454,6 @@ func New(
 		evidence.NewAppModule(app.EvidenceKeeper),
 		ibc.NewAppModule(app.IBCKeeper),
 		transferModule,
-		hidnodeModule,
 		didModule,
 		// this line is used by starport scaffolding # stargate/app/appModule
 	)
@@ -659,7 +642,6 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(crisistypes.ModuleName)
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
-	paramsKeeper.Subspace(hidnodemoduletypes.ModuleName)
 	paramsKeeper.Subspace(didmoduletypes.ModuleName)
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
 

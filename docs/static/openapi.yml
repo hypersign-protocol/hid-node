@@ -11851,6 +11851,9 @@ paths:
           description: A successful response.
           schema:
             type: object
+            properties:
+              didDoc:
+                type: string
         default:
           description: An unexpected error response.
           schema:
@@ -19840,6 +19843,9 @@ definitions:
     description: Params defines the parameters for the module.
   hypersignprotocol.hidnode.did.QueryDidsResponse:
     type: object
+    properties:
+      didDoc:
+        type: string
   hypersignprotocol.hidnode.did.QueryParamsResponse:
     type: object
     properties:
