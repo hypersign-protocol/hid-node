@@ -30,7 +30,7 @@ To stop the blockchain, navigate to the terminal window where the blockchain is 
 
 ## Module Creation
 
-Once we have scaffolded the chain using `starport`, a default module is always created. In our case, it will be `x/hidnode`. We can delete this module and its dependent files and folders, since it's not necessary.
+Once we have scaffolded the chain using `starport`, a default module is always created if we scaffolded the chain without the `--no-module` flag. In our case, it will be `x/hidnode`. We can delete this module and its dependent files and folders, since it's not necessary.
 
 Creating the module `did` is as follows:
 
