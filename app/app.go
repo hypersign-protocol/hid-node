@@ -90,6 +90,9 @@ import (
 
 	"github.com/hypersign-protocol/hid-node/docs"
 
+	didmodule "github.com/hypersign-protocol/hid-node/x/did"
+	didmodulekeeper "github.com/hypersign-protocol/hid-node/x/did/keeper"
+	didmoduletypes "github.com/hypersign-protocol/hid-node/x/did/types"
 	hidnodemodule "github.com/hypersign-protocol/hid-node/x/hidnode"
 	hidnodemodulekeeper "github.com/hypersign-protocol/hid-node/x/hidnode/keeper"
 	hidnodemoduletypes "github.com/hypersign-protocol/hid-node/x/hidnode/types"
@@ -144,6 +147,7 @@ var (
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
 		hidnodemodule.AppModuleBasic{},
+		didmodule.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
 
@@ -214,6 +218,8 @@ type App struct {
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
 
 	HidnodeKeeper hidnodemodulekeeper.Keeper
+
+	DidKeeper didmodulekeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// mm is the module manager
@@ -251,6 +257,7 @@ func New(
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey, feegrant.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		hidnodemoduletypes.StoreKey,
+		didmoduletypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -357,6 +364,14 @@ func New(
 	)
 	hidnodeModule := hidnodemodule.NewAppModule(appCodec, app.HidnodeKeeper, app.AccountKeeper, app.BankKeeper)
 
+	app.DidKeeper = *didmodulekeeper.NewKeeper(
+		appCodec,
+		keys[didmoduletypes.StoreKey],
+		keys[didmoduletypes.MemStoreKey],
+		app.GetSubspace(didmoduletypes.ModuleName),
+	)
+	didModule := didmodule.NewAppModule(appCodec, app.DidKeeper, app.AccountKeeper, app.BankKeeper)
+
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
 	// Create static IBC router, add transfer route, then set and seal it
@@ -396,6 +411,7 @@ func New(
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
 		hidnodeModule,
+		didModule,
 		// this line is used by starport scaffolding # stargate/app/appModule
 	)
 
@@ -431,6 +447,7 @@ func New(
 		evidencetypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		hidnodemoduletypes.ModuleName,
+		didmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	)
 
@@ -454,6 +471,7 @@ func New(
 		ibc.NewAppModule(app.IBCKeeper),
 		transferModule,
 		hidnodeModule,
+		didModule,
 		// this line is used by starport scaffolding # stargate/app/appModule
 	)
 	app.sm.RegisterStoreDecoders()
@@ -642,6 +660,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
 	paramsKeeper.Subspace(hidnodemoduletypes.ModuleName)
+	paramsKeeper.Subspace(didmoduletypes.ModuleName)
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
 
 	return paramsKeeper

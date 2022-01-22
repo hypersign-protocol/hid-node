@@ -1,23 +1,24 @@
 syntax = "proto3";
-package hypersignprotocol.hidnode.hidnode;
+package hypersignprotocol.hidnode.did;
 
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
-import "hidnode/params.proto";
+import "did/params.proto";
+import "did/didSpec.proto";
 // this line is used by starport scaffolding # 1
 
-option go_package = "github.com/hypersign-protocol/hid-node/x/hidnode/types";
+option go_package = "github.com/hypersign-protocol/hid-node/x/did/types";
 
 // Query defines the gRPC querier service.
 service Query {
   // Parameters queries the parameters of the module.
   rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
-    option (google.api.http).get = "/hypersignprotocol/hidnode/hidnode/params";
+    option (google.api.http).get = "/hypersignprotocol/hidnode/did/params";
   }
   // Queries a list of Dids items.
 	rpc Dids(QueryDidsRequest) returns (QueryDidsResponse) {
-		option (google.api.http).get = "/hypersign-protocol/hidnode/hidnode/dids";
+		option (google.api.http).get = "/hypersign-protocol/hidnode/did/{did}";
 	}
 
 // this line is used by starport scaffolding # 2
@@ -33,12 +34,11 @@ message QueryParamsResponse {
 }
 
 message QueryDidsRequest {
+  string did = 1;
 }
 
 message QueryDidsResponse {
-  string did = 1;
-  string didDocString = 2;
-  string createdAt = 3;
+  string didDoc = 1;
 }
 
 // this line is used by starport scaffolding # 3
