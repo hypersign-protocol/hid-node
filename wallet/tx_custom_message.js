@@ -4,15 +4,15 @@ const {
   SigningStargateClient,
 } = require("@cosmjs/stargate");
 
-// Note: The following tx.js being reffered here follows old javascript
+// Note: The following tx.js being reffered here follows old javascript: vue/src/store/generated/hypersign-protocol/hid-node/hypersignprotocol.hidnode.did/module/types/did/tx.js
 // The refactore tx.js file is the `wallet` folder of this repo
-const { MsgCreateDID } =  require("vue/src/store/generated/hypersign-protocol/hid-node/hypersignprotocol.hidnode.did/module/types/did/tx.js");
+const { MsgCreateDID } =  require("./tx.js");
 
 const runfn = async () => {
     const myRegistry = new Registry(defaultRegistryTypes);
     myRegistry.register("/hypersignprotocol.hidnode.did.MsgCreateDID", MsgCreateDID); // Replace with your own type URL and Msg class
     const mnemonic = // Replace with your own mnemonic
-    "cactus rail narrow minute human cannon mother subway decide endless vicious boss sister claw lawn swap orbit have end van rose alcohol wire diary";
+    "crystal marble excuse boil vendor festival subject grape spatial absorb jaguar keep harbor pass argue fame easy borrow slide exhaust honey clutch attitude slab";
 
     // Inside an async function...
     // const signer = await DirectSecp256k1HdWallet.fromMnemonic(
@@ -36,9 +36,9 @@ const runfn = async () => {
     const message = {
     typeUrl: "/hypersignprotocol.hidnode.did.MsgCreateDID", // Same as above
     value: MsgCreateDID.fromPartial({
-        did: "did:hs:0f49341a-20ef-43d1-bc93-de30993e6456",
-        didDocString: "{\"@context\":[\"https://www.w312.org/ns/did/v1\",\"https://w3id.org/security/v1\",\"https://schema.org\"],\"@type\":\"https://schema.org/Person\",\"id\":\"did:hs:0f49341a-20ef-43d1-bc93-de30993e6c51\",\"name\":\"Vishwas\",\"publicKey\":[{\"@context\":\"https://w3id.org/security/v2\",\"id\":\"did:hs:0f49341a-20ef-43d1-bc93-de30993e6c51#z6MkjAwRoZNV1oifLPb2GzLatZ7sVxY5jZ16xYTTAgSgCqQQ\",\"type\":\"Ed25519VerificationKey2018\",\"publicKeyBase58\":\"5igPDK83gGECDtkKbRNk3TZsgPGEKfkkGXYXLQUfHcd2\"}],\"authentication\":[\"did:hs:0f49341a-20ef-43d1-bc93-de30993e6c51#z6MkjAwRoZNV1oifLPb2GzLatZ7sVxY5jZ16xYTTAgSgCqQQ\"],\"assertionMethod\":[\"did:hs:0f49341a-20ef-43d1-bc93-de30993e6c51#z6MkjAwRoZNV1oifLPb2GzLatZ7sVxY5jZ16xYTTAgSgCqQQ\"],\"keyAgreement\":[\"did:hs:0f49341a-20ef-43d1-bc93-de30993e6c51#z6MkjAwRoZNV1oifLPb2GzLatZ7sVxY5jZ16xYTTAgSgCqQQ\"],\"capabilityInvocation\":[\"did:hs:0f49341a-20ef-43d1-bc93-de30993e6c51#z6MkjAwRoZNV1oifLPb2GzLatZ7sVxY5jZ16xYTTAgSgCqQQ\"],\"created\":\"2021-04-06T14:13:14.018Z\",\"updated\":\"2021-04-06T14:13:14.018Z\"}",
-        createdAt: "2021-04-06T14:13:14.018Z",
+        did: "did:hs:1f49341a-20ef-43d1-bc93-de30993e6456",
+        didDocString: "{\"@context\":[\"https://www.w3123.org/ns/did/v1\",\"https://w3id.org/security/v1\",\"https://schema.org\"],\"@type\":\"https://schema.org/Person\",\"id\":\"did:hs:0f49341a-20ef-43d1-bc93-de30993e6c51\",\"name\":\"Vishwas\",\"publicKey\":[{\"@context\":\"https://w3id.org/security/v2\",\"id\":\"did:hs:0f49341a-20ef-43d1-bc93-de30993e6c51#z6MkjAwRoZNV1oifLPb2GzLatZ7sVxY5jZ16xYTTAgSgCqQQ\",\"type\":\"Ed25519VerificationKey2018\",\"publicKeyBase58\":\"5igPDK83gGECDtkKbRNk3TZsgPGEKfkkGXYXLQUfHcd2\"}],\"authentication\":[\"did:hs:0f49341a-20ef-43d1-bc93-de30993e6c51#z6MkjAwRoZNV1oifLPb2GzLatZ7sVxY5jZ16xYTTAgSgCqQQ\"],\"assertionMethod\":[\"did:hs:0f49341a-20ef-43d1-bc93-de30993e6c51#z6MkjAwRoZNV1oifLPb2GzLatZ7sVxY5jZ16xYTTAgSgCqQQ\"],\"keyAgreement\":[\"did:hs:0f49341a-20ef-43d1-bc93-de30993e6c51#z6MkjAwRoZNV1oifLPb2GzLatZ7sVxY5jZ16xYTTAgSgCqQQ\"],\"capabilityInvocation\":[\"did:hs:0f49341a-20ef-43d1-bc93-de30993e6c51#z6MkjAwRoZNV1oifLPb2GzLatZ7sVxY5jZ16xYTTAgSgCqQQ\"],\"created\":\"2021-04-06T14:13:14.018Z\",\"updated\":\"2021-04-06T14:13:14.018Z\"}",
+        createdAt: "2022-04-06T14:13:14.018Z",
         creator: myAddress,
     }),
     };
@@ -49,7 +49,7 @@ const runfn = async () => {
         amount: "1",
         },
     ],
-    gas: "1000000000",
+    gas: "162000",
     };
 
     // Inside an async function...
