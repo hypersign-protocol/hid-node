@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"encoding/binary"
+	"log"
 
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -49,8 +50,13 @@ func (k Keeper) AppendDID(ctx sdk.Context, didSpec types.DidSpec) uint64 {
 	// Marshal the post into bytes
 	appendedValue := k.cdc.MustMarshal(&didSpec)
 	// Insert the post bytes using post ID as a key
-
-	store.Set(utils.UnsafeStrToBytes(didSpec.Did), appendedValue)
+	log.Println(appendedValue)
+	// TODO: Instead of `appendedValue`, we are using `didSpec.DidDocString` as the second parameter
+	// so that during querying of DID, we recieve the DidDocString in the correct format
+	// However, we need to look into it further
+	// Instead of `didSpec.Id`, we are using 'didSpec.Did' as the first parameter and
+	// 'didSpec.DidDocString' as the second parameter
+	store.Set(utils.UnsafeStrToBytes(didSpec.Did), utils.UnsafeStrToBytes(didSpec.DidDocString))
 	// Update the post count
 	k.SetDidCount(ctx, count+1)
 	return count
