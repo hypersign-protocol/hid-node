@@ -14,16 +14,16 @@ option go_package = "github.com/hypersign-protocol/hid-node/x/did/types";
 service Query {
   // Parameters queries the parameters of the module.
   rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
-    option (google.api.http).get = "/hypersignprotocol/hidnode/did/params";
+    option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/params";
   }
   // Queries a list of Dids items.
 	rpc Dids(QueryDidsRequest) returns (QueryDidsResponse) {
-		option (google.api.http).get = "/hypersign-protocol/hidnode/did/{did}";
+		option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/did/{did}";
 	}
 
 // Queries a list of GetSchema items.
 	rpc GetSchema(QuerySchemaRequest) returns (QuerySchemaResponse) {
-		option (google.api.http).get = "/hypersign-protocol/hidnode/did/schema/{schemaId}";
+		option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/schema/{schemaId}";
 	}
 
 // this line is used by starport scaffolding # 2
