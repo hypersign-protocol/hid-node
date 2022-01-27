@@ -1,0 +1,10 @@
+syntax = "proto3";
+package hypersignprotocol.hidnode.did;
+option go_package = "github.com/hypersign-protocol/hid-node/x/did/types";
+
+message Schema {
+  string creator = 1;
+  uint64 id = 2;
+  string schemaID = 3;
+  string schemaStr = 4;
+}

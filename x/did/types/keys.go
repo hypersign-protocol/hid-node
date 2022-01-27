@@ -22,6 +22,11 @@ const (
 	DidCountKey = "Did-count-"
 )
 
+const (
+	SchemaKey      = "Schema-value-"
+	SchemaCountKey = "Schema-count-"
+)
+
 func KeyPrefix(p string) []byte {
 	return []byte(p)
 }
