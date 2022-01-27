@@ -11985,6 +11985,39 @@ paths:
           type: string
       tags:
         - Query
+  /hypersign-protocol/hidnode/ssi/schema_count:
+    get:
+      summary: Queries a list of SchemaCount items.
+      operationId: HypersignprotocolHidnodeDidSchemaCount
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              count:
+                type: string
+                format: uint64
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      tags:
+        - Query
   /ibc/apps/transfer/v1/denom_traces:
     get:
       summary: DenomTraces queries all denomination traces.
@@ -19935,6 +19968,12 @@ definitions:
         description: params holds all the parameters of this module.
         type: object
     description: QueryParamsResponse is response type for the Query/Params RPC method.
+  hypersignprotocol.hidnode.did.QuerySchemaCountResponse:
+    type: object
+    properties:
+      count:
+        type: string
+        format: uint64
   hypersignprotocol.hidnode.did.QuerySchemaResponse:
     type: object
     properties:
