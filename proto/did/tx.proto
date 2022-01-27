@@ -8,6 +8,7 @@ option go_package = "github.com/hypersign-protocol/hid-node/x/did/types";
 // Msg defines the Msg service.
 service Msg {
       rpc CreateDID(MsgCreateDID) returns (MsgCreateDIDResponse);
+  rpc CreateSchema(MsgCreateSchema) returns (MsgCreateSchemaResponse);
 // this line is used by starport scaffolding # proto/tx/rpc
 }
 
@@ -19,6 +20,16 @@ message MsgCreateDID {
 }
 
 message MsgCreateDIDResponse {
+  uint64 id = 1;
+}
+
+message MsgCreateSchema {
+  string creator = 1;
+  string schemaID = 2;
+  string schemaStr = 3;
+}
+
+message MsgCreateSchemaResponse {
   uint64 id = 1;
 }
 

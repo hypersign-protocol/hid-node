@@ -21,6 +21,11 @@ service Query {
 		option (google.api.http).get = "/hypersign-protocol/hidnode/did/{did}";
 	}
 
+// Queries a list of GetSchema items.
+	rpc GetSchema(QuerySchemaRequest) returns (QuerySchemaResponse) {
+		option (google.api.http).get = "/hypersign-protocol/hidnode/did/schema/{schemaId}";
+	}
+
 // this line is used by starport scaffolding # 2
 }
 
@@ -39,6 +44,14 @@ message QueryDidsRequest {
 
 message QueryDidsResponse {
   string didDoc = 1;
+}
+
+message QuerySchemaRequest {
+  string schemaId = 1;
+}
+
+message QuerySchemaResponse {
+  string schema = 1;
 }
 
 // this line is used by starport scaffolding # 3
