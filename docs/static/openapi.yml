@@ -11879,6 +11879,39 @@ paths:
           type: string
       tags:
         - Query
+  /hypersign-protocol/hidnode/ssi/did_count:
+    get:
+      summary: Queries a list of DidCount items.
+      operationId: HypersignprotocolHidnodeDidDidCount
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              count:
+                type: string
+                format: uint64
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      tags:
+        - Query
   /hypersign-protocol/hidnode/ssi/params:
     get:
       summary: Parameters queries the parameters of the module.
@@ -19884,6 +19917,12 @@ definitions:
   hypersignprotocol.hidnode.did.Params:
     type: object
     description: Params defines the parameters for the module.
+  hypersignprotocol.hidnode.did.QueryDidCountResponse:
+    type: object
+    properties:
+      count:
+        type: string
+        format: uint64
   hypersignprotocol.hidnode.did.QueryDidsResponse:
     type: object
     properties:

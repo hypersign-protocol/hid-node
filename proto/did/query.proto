@@ -26,6 +26,11 @@ service Query {
 		option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/schema/{schemaId}";
 	}
 
+// Queries a list of DidCount items.
+	rpc DidCount(QueryDidCountRequest) returns (QueryDidCountResponse) {
+		option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/did_count";
+	}
+
 // this line is used by starport scaffolding # 2
 }
 
@@ -52,6 +57,13 @@ message QuerySchemaRequest {
 
 message QuerySchemaResponse {
   string schema = 1;
+}
+
+message QueryDidCountRequest {
+}
+
+message QueryDidCountResponse {
+  uint64 count = 1;
 }
 
 // this line is used by starport scaffolding # 3
