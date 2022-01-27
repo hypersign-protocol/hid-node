@@ -19,3 +19,6 @@ release/
 .idea/
 .vscode/
 .DS_Store
+
+wallet/node_modules
+
