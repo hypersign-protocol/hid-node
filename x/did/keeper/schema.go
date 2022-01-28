@@ -43,9 +43,14 @@ func (k Keeper) AppendSchema(ctx sdk.Context, schema types.Schema) uint64 {
 	schema.Id = count
 	// Get the store
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.SchemaKey))
+	storeComplete := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.SchemaCompleteKey))
 
 	// TODO: Follow x/did/keeper/didSpec.go
 	store.Set(utils.UnsafeStrToBytes(schema.SchemaID), utils.UnsafeStrToBytes(schema.SchemaStr))
+
+	// Store the complete Schema structure as value
+	appendedValue := k.cdc.MustMarshal(&schema)
+	storeComplete.Set(utils.UnsafeStrToBytes(schema.SchemaID), appendedValue)
 	// Update the post count
 	k.SetSchemaCount(ctx, count+1)
 	return count

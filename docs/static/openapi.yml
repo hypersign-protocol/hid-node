@@ -11842,44 +11842,7 @@ paths:
           type: boolean
       tags:
         - Query
-  '/hypersign-protocol/hidnode/did/schema/{schemaId}':
-    get:
-      summary: Queries a list of GetSchema items.
-      operationId: HypersignprotocolHidnodeDidGetSchema
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              schema:
-                type: string
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    '@type':
-                      type: string
-                  additionalProperties: {}
-      parameters:
-        - name: schemaId
-          in: path
-          required: true
-          type: string
-      tags:
-        - Query
-  '/hypersign-protocol/hidnode/did/{did}':
+  '/hypersign-protocol/hidnode/ssi/did/{did}':
     get:
       summary: Queries a list of Dids items.
       operationId: HypersignprotocolHidnodeDidDids
@@ -11916,7 +11879,40 @@ paths:
           type: string
       tags:
         - Query
-  /hypersignprotocol/hidnode/did/params:
+  /hypersign-protocol/hidnode/ssi/did_count:
+    get:
+      summary: Queries a list of DidCount items.
+      operationId: HypersignprotocolHidnodeDidDidCount
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              count:
+                type: string
+                format: uint64
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      tags:
+        - Query
+  /hypersign-protocol/hidnode/ssi/params:
     get:
       summary: Parameters queries the parameters of the module.
       operationId: HypersignprotocolHidnodeDidParams
@@ -11950,6 +11946,204 @@ paths:
                     '@type':
                       type: string
                   additionalProperties: {}
+      tags:
+        - Query
+  '/hypersign-protocol/hidnode/ssi/schema/{schemaId}':
+    get:
+      summary: Queries a list of GetSchema items.
+      operationId: HypersignprotocolHidnodeDidGetSchema
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              schema:
+                type: string
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: schemaId
+          in: path
+          required: true
+          type: string
+      tags:
+        - Query
+  /hypersign-protocol/hidnode/ssi/schema_count:
+    get:
+      summary: Queries a list of SchemaCount items.
+      operationId: HypersignprotocolHidnodeDidSchemaCount
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              count:
+                type: string
+                format: uint64
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      tags:
+        - Query
+  /hypersign-protocol/hidnode/ssi/schemas:
+    get:
+      summary: Queries a list of Schemas items.
+      operationId: HypersignprotocolHidnodeDidSchemas
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              schemas:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    creator:
+                      type: string
+                    id:
+                      type: string
+                      format: uint64
+                    schemaID:
+                      type: string
+                    schemaStr:
+                      type: string
+              pagination:
+                type: object
+                properties:
+                  nextKey:
+                    type: string
+                    format: byte
+                    title: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.countTotal
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
       tags:
         - Query
   /ibc/apps/transfer/v1/denom_traces:
@@ -19884,6 +20078,12 @@ definitions:
   hypersignprotocol.hidnode.did.Params:
     type: object
     description: Params defines the parameters for the module.
+  hypersignprotocol.hidnode.did.QueryDidCountResponse:
+    type: object
+    properties:
+      count:
+        type: string
+        format: uint64
   hypersignprotocol.hidnode.did.QueryDidsResponse:
     type: object
     properties:
@@ -19896,10 +20096,70 @@ definitions:
         description: params holds all the parameters of this module.
         type: object
     description: QueryParamsResponse is response type for the Query/Params RPC method.
+  hypersignprotocol.hidnode.did.QuerySchemaCountResponse:
+    type: object
+    properties:
+      count:
+        type: string
+        format: uint64
   hypersignprotocol.hidnode.did.QuerySchemaResponse:
     type: object
     properties:
       schema:
+        type: string
+  hypersignprotocol.hidnode.did.QuerySchemasResponse:
+    type: object
+    properties:
+      schemas:
+        type: array
+        items:
+          type: object
+          properties:
+            creator:
+              type: string
+            id:
+              type: string
+              format: uint64
+            schemaID:
+              type: string
+            schemaStr:
+              type: string
+      pagination:
+        type: object
+        properties:
+          nextKey:
+            type: string
+            format: byte
+            title: |-
+              next_key is the key to be passed to PageRequest.key to
+              query the next page most efficiently
+          total:
+            type: string
+            format: uint64
+            title: >-
+              total is total number of results available if
+              PageRequest.count_total
+
+              was set, its value is undefined otherwise
+        description: |-
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
+                   repeated Bar results = 1;
+                   PageResponse page = 2;
+           }
+  hypersignprotocol.hidnode.did.Schema:
+    type: object
+    properties:
+      creator:
+        type: string
+      id:
+        type: string
+        format: uint64
+      schemaID:
+        type: string
+      schemaStr:
         type: string
   ibc.applications.transfer.v1.DenomTrace:
     type: object

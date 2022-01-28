@@ -6,6 +6,8 @@ import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 import "did/params.proto";
 import "did/didSpec.proto";
+import "did/schema.proto";
+
 // this line is used by starport scaffolding # 1
 
 option go_package = "github.com/hypersign-protocol/hid-node/x/did/types";
@@ -14,16 +16,31 @@ option go_package = "github.com/hypersign-protocol/hid-node/x/did/types";
 service Query {
   // Parameters queries the parameters of the module.
   rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
-    option (google.api.http).get = "/hypersignprotocol/hidnode/did/params";
+    option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/params";
   }
   // Queries a list of Dids items.
 	rpc Dids(QueryDidsRequest) returns (QueryDidsResponse) {
-		option (google.api.http).get = "/hypersign-protocol/hidnode/did/{did}";
+		option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/did/{did}";
 	}
 
 // Queries a list of GetSchema items.
 	rpc GetSchema(QuerySchemaRequest) returns (QuerySchemaResponse) {
-		option (google.api.http).get = "/hypersign-protocol/hidnode/did/schema/{schemaId}";
+		option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/schema/{schemaId}";
+	}
+
+// Queries a list of DidCount items.
+	rpc DidCount(QueryDidCountRequest) returns (QueryDidCountResponse) {
+		option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/did_count";
+	}
+
+// Queries a list of SchemaCount items.
+	rpc SchemaCount(QuerySchemaCountRequest) returns (QuerySchemaCountResponse) {
+		option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/schema_count";
+	}
+
+// Queries a list of Schemas items.
+	rpc Schemas(QuerySchemasRequest) returns (QuerySchemasResponse) {
+		option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/schemas";
 	}
 
 // this line is used by starport scaffolding # 2
@@ -52,6 +69,29 @@ message QuerySchemaRequest {
 
 message QuerySchemaResponse {
   string schema = 1;
+}
+
+message QueryDidCountRequest {
+}
+
+message QueryDidCountResponse {
+  uint64 count = 1;
+}
+
+message QuerySchemaCountRequest {
+}
+
+message QuerySchemaCountResponse {
+  uint64 count = 1;
+}
+
+message QuerySchemasRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QuerySchemasResponse {
+  repeated Schema schemas = 1;
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
 // this line is used by starport scaffolding # 3

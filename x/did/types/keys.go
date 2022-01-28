@@ -24,6 +24,7 @@ const (
 
 const (
 	SchemaKey      = "Schema-value-"
+	SchemaCompleteKey = "Schema-complete-"
 	SchemaCountKey = "Schema-count-"
 )
 
