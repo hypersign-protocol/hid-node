@@ -1,0 +1,49 @@
+syntax = "proto3";
+package hypersignprotocol.hidnode.ssi;
+
+// this line is used by starport scaffolding # proto/tx/import
+
+option go_package = "github.com/hypersign-protocol/hid-node/x/ssi/types";
+
+// Msg defines the Msg service.
+service Msg {
+      rpc CreateDID(MsgCreateDID) returns (MsgCreateDIDResponse);
+// this line is used by starport scaffolding # proto/tx/rpc
+}
+
+message MsgCreateDID {
+  DidDocStruct didDocString = 1;
+  repeated SignInfo signatures = 2;
+  string creator = 3;
+}
+
+message DidDocStruct {
+  repeated string context = 1;
+  string type = 2;
+  string id = 3;
+  string name = 4;
+  repeated PublicKeyStruct publicKey = 5;
+  repeated string authentication = 6;
+  repeated string assertionMethod = 7;
+  repeated string keyAgreement = 8;
+  repeated string capabilityInvocation = 9;
+  string created = 10;
+  string updated = 11;
+}
+
+message PublicKeyStruct {
+  string context = 1;
+  string id = 2;
+  string type = 3;
+  string publicKeyBase58 = 4;
+}
+
+message MsgCreateDIDResponse {
+  uint64 id = 1;
+}
+
+message SignInfo {
+  string verification_method_id = 1;
+  string signature = 2;
+}
+// this line is used by starport scaffolding # proto/tx/message
