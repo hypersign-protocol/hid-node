@@ -17,11 +17,10 @@ func CmdCreateDID() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create-did [did] [did-doc-string] [verification-method-id]",
 		Short: "Registers the DidDocString",
-		Args:  cobra.ExactArgs(3),
+		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			argDid := args[0]
-			argDidDocString := args[1]
-			verificationMethodId := args[2]
+			argDidDocString := args[0]
+			verificationMethodId := args[1]
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -50,10 +49,9 @@ func CmdCreateDID() *cobra.Command {
 			}
 
 			msg := types.MsgCreateDID{
-				Did:          argDid,
 				DidDocString: &didDoc,
 				Signatures:   []*types.SignInfo{&signInfo},
-				Creator: clientCtx.GetFromAddress().String(),
+				Creator:      clientCtx.GetFromAddress().String(),
 			}
 
 			if err := msg.ValidateBasic(); err != nil {

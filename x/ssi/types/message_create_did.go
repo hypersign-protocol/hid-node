@@ -10,7 +10,6 @@ var _ sdk.Msg = &MsgCreateDID{}
 
 func NewMsgCreateDID(did string, didDocString *DidDocStruct) *MsgCreateDID {
 	return &MsgCreateDID{
-		Did:          did,
 		DidDocString: didDocString,
 	}
 }
@@ -101,7 +100,8 @@ func (msg *DidDocStruct) GetSignBytes() []byte {
 }
 
 func (msg *MsgCreateDID) ValidateBasic() error {
-	if msg.Did == "" {
+	did := msg.GetDidDocString().GetId()
+	if did == "" {
 		return ErrBadRequestIsRequired.Wrap("DID")
 	}
 	return nil

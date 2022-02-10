@@ -12,10 +12,9 @@ service Msg {
 }
 
 message MsgCreateDID {
-  string did = 1;
-  DidDocStruct didDocString = 2;
-  repeated SignInfo signatures = 3;
-  string creator = 4;
+  DidDocStruct didDocString = 1;
+  repeated SignInfo signatures = 2;
+  string creator = 3;
 }
 
 message DidDocStruct {

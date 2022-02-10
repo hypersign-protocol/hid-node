@@ -54,7 +54,7 @@ func (k Keeper) AppendDID(ctx sdk.Context, didSpec types.Did) uint64 {
 	binary.BigEndian.PutUint64(byteKey, didSpec.Id)
 	// Marshal the post into bytes
 	didDocString := k.cdc.MustMarshal(didSpec.DidDocString)
-	store.Set(utils.UnsafeStrToBytes(didSpec.Did), didDocString)
+	store.Set(utils.UnsafeStrToBytes(didSpec.DidDocString.Id), didDocString)
 	// Update the post count
 	k.SetDidCount(ctx, count+1)
 	return count

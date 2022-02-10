@@ -14,10 +14,10 @@ func (k msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*t
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	didMsg := msg.GetDidDocString()
-
+	did := msg.GetDidDocString().GetId()
 	// Checks if the DID has a valid format
-	if !utils.IsValidDid(msg.Did) {
-		return nil, types.ErrBadRequestIsNotDid.Wrap(msg.Did)
+	if !utils.IsValidDid(did) {
+		return nil, types.ErrBadRequestIsNotDid.Wrap(did)
 	}
 
 	// Checks if the DidDoc is a valid format
@@ -32,12 +32,11 @@ func (k msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*t
 	}
 
 	// Checks if the DID is already present in the store
-	if k.HasDid(ctx, msg.Did) {
-		return nil, sdkerrors.Wrap(types.ErrDidDocExists, fmt.Sprintf("DID already exists %s", msg.Did))
+	if k.HasDid(ctx, did) {
+		return nil, sdkerrors.Wrap(types.ErrDidDocExists, fmt.Sprintf("DID already exists %s", did))
 	}
 
 	var didSpec = types.Did{
-		Did:          msg.Did,
 		DidDocString: msg.DidDocString,
 	}
 	// Add a DID to the store and get back the ID
