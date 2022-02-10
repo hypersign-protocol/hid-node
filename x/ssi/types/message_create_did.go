@@ -8,7 +8,7 @@ const TypeMsgCreateDID = "create_did"
 
 var _ sdk.Msg = &MsgCreateDID{}
 
-func NewMsgCreateDID(did string, didDocString *DidDocStruct) *MsgCreateDID {
+func NewMsgCreateDID(did string, didDocString *DidDocStructCreateDID) *MsgCreateDID {
 	return &MsgCreateDID{
 		DidDocString: didDocString,
 	}
@@ -56,7 +56,7 @@ func (msg *MsgCreateDID) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{creator}
 }
 
-func (msg *DidDocStruct) GetSigners() []Signer {
+func (msg *DidDocStructCreateDID) GetSigners() []Signer {
 	// TODO: Implemt this when working on the updated DidDoc standard
 	// if len(msg.Controller) > 0 {
 	// 	result := make([]Signer, len(msg.Controller))
@@ -95,7 +95,7 @@ func (msg *MsgCreateDID) GetSignBytes() []byte {
 	return ModuleCdc.MustMarshal(msg)
 }
 
-func (msg *DidDocStruct) GetSignBytes() []byte {
+func (msg *DidDocStructCreateDID) GetSignBytes() []byte {
 	return ModuleCdc.MustMarshal(msg)
 }
 

@@ -6,5 +6,5 @@ import "ssi/v1/tx.proto";
 
 message Did {
   uint64 id = 1;
-  DidDocStruct didDocString = 2;
+  DidDocStructCreateDID didDocString = 2;
 }

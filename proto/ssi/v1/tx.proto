@@ -12,12 +12,12 @@ service Msg {
 }
 
 message MsgCreateDID {
-  DidDocStruct didDocString = 1;
+  DidDocStructCreateDID didDocString = 1;
   repeated SignInfo signatures = 2;
   string creator = 3;
 }
 
-message DidDocStruct {
+message DidDocStructCreateDID {
   repeated string context = 1;
   string type = 2;
   string id = 3;
@@ -46,4 +46,3 @@ message SignInfo {
   string verification_method_id = 1;
   string signature = 2;
 }
-// this line is used by starport scaffolding # proto/tx/message

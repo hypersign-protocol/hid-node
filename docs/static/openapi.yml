@@ -19795,7 +19795,7 @@ definitions:
     description: >-
       MsgCreateVestingAccountResponse defines the Msg/CreateVestingAccount
       response type.
-  hypersignprotocol.hidnode.ssi.DidDocStruct:
+  hypersignprotocol.hidnode.ssi.DidDocStructCreateDID:
     type: object
     properties:
       context:

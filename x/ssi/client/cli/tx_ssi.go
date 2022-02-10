@@ -28,7 +28,7 @@ func CmdCreateDID() *cobra.Command {
 			}
 
 			// Unmarshal DidDocString
-			var didDoc types.DidDocStruct
+			var didDoc types.DidDocStructCreateDID
 			err = clientCtx.Codec.UnmarshalJSON([]byte(argDidDocString), &didDoc)
 			if err != nil {
 				return err
