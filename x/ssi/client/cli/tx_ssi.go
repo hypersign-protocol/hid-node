@@ -15,7 +15,7 @@ const VerKeyFlag = "ver-key"
 
 func CmdCreateDID() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "create-did [did] [did-doc-string] [verification-method-id]",
+		Use:   "create-did [did-doc-string] [verification-method-id]",
 		Short: "Registers the DidDocString",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
