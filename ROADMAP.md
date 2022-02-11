@@ -38,3 +38,12 @@
 
 - [ ] _Web3 compatibility  (user should be able to metamask to create DID)_ ?????
 - [ ] _Figure out how did RPCs can be called web3?_ ?????
+
+
+## Future Release
+
+- [ ] Hyperledger aeris compatibility with  Hypersign network
+- [ ] Web3 js & Metamask compatibility with Hypersign network 
+- [ ] 
+
+
