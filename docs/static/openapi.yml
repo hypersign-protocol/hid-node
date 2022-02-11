@@ -19795,7 +19795,53 @@ definitions:
     description: >-
       MsgCreateVestingAccountResponse defines the Msg/CreateVestingAccount
       response type.
-  hypersignprotocol.hidnode.ssi.DidDocStruct:
+  hypersignprotocol.hidnode.ssi.DidDocStructCreateDID:
+    type: object
+    properties:
+      context:
+        type: array
+        items:
+          type: string
+      type:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      publicKey:
+        type: array
+        items:
+          type: object
+          properties:
+            context:
+              type: string
+            id:
+              type: string
+            type:
+              type: string
+            publicKeyBase58:
+              type: string
+      authentication:
+        type: array
+        items:
+          type: string
+      assertionMethod:
+        type: array
+        items:
+          type: string
+      keyAgreement:
+        type: array
+        items:
+          type: string
+      capabilityInvocation:
+        type: array
+        items:
+          type: string
+      created:
+        type: string
+      updated:
+        type: string
+  hypersignprotocol.hidnode.ssi.DidDocStructUpdateDID:
     type: object
     properties:
       context:
@@ -19847,6 +19893,11 @@ definitions:
       id:
         type: string
         format: uint64
+  hypersignprotocol.hidnode.ssi.MsgUpdateDIDResponse:
+    type: object
+    properties:
+      updateId:
+        type: string
   hypersignprotocol.hidnode.ssi.Params:
     type: object
     description: Params defines the parameters for the module.

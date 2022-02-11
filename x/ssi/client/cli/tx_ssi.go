@@ -28,7 +28,7 @@ func CmdCreateDID() *cobra.Command {
 			}
 
 			// Unmarshal DidDocString
-			var didDoc types.DidDocStruct
+			var didDoc types.DidDocStructCreateDID
 			err = clientCtx.Codec.UnmarshalJSON([]byte(argDidDocString), &didDoc)
 			if err != nil {
 				return err
@@ -57,6 +57,60 @@ func CmdCreateDID() *cobra.Command {
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), &msg)
+		},
+	}
+
+	flags.AddTxFlagsToCmd(cmd)
+	cmd.Flags().String(VerKeyFlag, "", "Base64 encoded ed25519 private key to sign identity message with. ")
+	return cmd
+}
+
+func CmdUpdateDID() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "update-did [did-doc-string] [verification-method-id]",
+		Short: "Updates the DID",
+		Args:  cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			argDidDocString := args[0]
+			argVerificationMethodId := args[1]
+
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			// Unmarshal DidDocString
+			var didDoc types.DidDocStructUpdateDID
+			err = clientCtx.Codec.UnmarshalJSON([]byte(argDidDocString), &didDoc)
+			if err != nil {
+				return err
+			}
+
+			verKeyPriv, err := getVerKey(cmd, clientCtx)
+			if err != nil {
+				return err
+			}
+
+			// // Build identity message
+			signBytes := didDoc.GetSignBytes()
+			signatureBytes := ed25519.Sign(verKeyPriv, signBytes)
+
+			signInfo := types.SignInfo{
+				VerificationMethodId: argVerificationMethodId,
+				Signature:            base64.StdEncoding.EncodeToString(signatureBytes),
+			}
+
+			msg := types.MsgUpdateDID{
+				Creator:      clientCtx.GetFromAddress().String(),
+				DidDocString: &didDoc,
+				Signatures:   []*types.SignInfo{&signInfo},
+			}
+
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), &msg)
 		},
 	}

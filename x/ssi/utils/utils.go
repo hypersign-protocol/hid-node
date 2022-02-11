@@ -17,7 +17,7 @@ func IsValidDid(did string) bool {
 }
 
 // Checks whether the ID in the DidDoc is a valid string
-func IsValidDidDocID(didDoc *types.DidDocStruct) bool {
+func IsValidDidDocID(didDoc *types.DidDocStructCreateDID) bool {
 	return strings.HasPrefix(didDoc.GetId(), did_prefix)
 }
 
@@ -32,7 +32,7 @@ func IsValidDIDArray(didArray []string) bool {
 }
 
 // Checks whether the DidDoc string is valid
-func IsValidDidDoc(didDoc *types.DidDocStruct) string {
+func IsValidDidDoc(didDoc *types.DidDocStructCreateDID) string {
 	didArrayMap := map[string][]string{
 		"authentication":       didDoc.GetAuthentication(),
 		"assertionMethod":      didDoc.GetAssertionMethod(),

@@ -8,7 +8,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-
 func getVerKey(cmd *cobra.Command, clientCtx client.Context) (ed25519.PrivateKey, error) {
 	// Try getting from arg
 	verKeyPrivBase64, err := cmd.Flags().GetString(VerKeyFlag)

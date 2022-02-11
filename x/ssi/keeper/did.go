@@ -5,6 +5,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/hypersign-protocol/hid-node/utils"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 )
@@ -30,6 +31,25 @@ func (k Keeper) HasDid(ctx sdk.Context, id string) bool {
 	return store.Has(utils.UnsafeStrToBytes(id))
 }
 
+// Retrieves the DID from the store
+func (k Keeper) GetDid(ctx *sdk.Context, id string) (*types.DidDocStructCreateDID, error) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidKey))
+
+	if !k.HasDid(*ctx, id) {
+		return nil, sdkerrors.ErrNotFound
+	}
+
+	// TODO: Currently, we can interchange DidDocStructCreateDID with DidDocStructUpdateDID
+	// as they are similar. They need to have a similar Interface
+	var value types.DidDocStructCreateDID
+	var bytes = store.Get([]byte(id))
+	if err := k.cdc.Unmarshal(bytes, &value); err != nil {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidType, err.Error())
+	}
+
+	return &value, nil
+}
+
 func (k Keeper) SetDidCount(ctx sdk.Context, count uint64) {
 	// Get the store using storeKey (which is "blog") and PostCountKey (which is "Post-count-")
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.DidCountKey))
@@ -42,19 +62,23 @@ func (k Keeper) SetDidCount(ctx sdk.Context, count uint64) {
 	store.Set(byteKey, bz)
 }
 
+// SetDid set a specific did in the store
+func (k Keeper) SetDid(ctx sdk.Context, did types.Did) error {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidKey))
+	b := k.cdc.MustMarshal(&did)
+	store.Set([]byte(did.Id), b)
+	return nil
+}
+
 func (k Keeper) AppendDID(ctx sdk.Context, didSpec types.Did) uint64 {
 	// Get the current number of posts in the store
 	count := k.GetDidCount(ctx)
-	// Assign an ID to the post based on the number of posts in the store
-	didSpec.Id = count
 	// Get the store
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.DidKey))
 	// Convert the post ID into bytes
-	byteKey := make([]byte, 8)
-	binary.BigEndian.PutUint64(byteKey, didSpec.Id)
 	// Marshal the post into bytes
-	didDocString := k.cdc.MustMarshal(didSpec.DidDocString)
-	store.Set(utils.UnsafeStrToBytes(didSpec.DidDocString.Id), didDocString)
+	didDocString := k.cdc.MustMarshal(&didSpec)
+	store.Set(utils.UnsafeStrToBytes(didSpec.Id), didDocString)
 	// Update the post count
 	k.SetDidCount(ctx, count+1)
 	return count
