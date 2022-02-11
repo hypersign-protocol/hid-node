@@ -44,6 +44,7 @@
 
 - [ ] Hyperledger aeris compatibility with  Hypersign network
 - [ ] Web3 js & Metamask compatibility with Hypersign network 
-- [ ] 
+- [ ] Develop a stateless very light weight client for hyerpsign entwork for developers just like testRPC in ethereum
+- [ ] Hypersign SSI playground using webassembly 
 
 
