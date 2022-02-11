@@ -8,6 +8,7 @@ option go_package = "github.com/hypersign-protocol/hid-node/x/ssi/types";
 // Msg defines the Msg service.
 service Msg {
       rpc CreateDID(MsgCreateDID) returns (MsgCreateDIDResponse);
+  rpc UpdateDID(MsgUpdateDID) returns (MsgUpdateDIDResponse);
 // this line is used by starport scaffolding # proto/tx/rpc
 }
 
@@ -18,6 +19,20 @@ message MsgCreateDID {
 }
 
 message DidDocStructCreateDID {
+  repeated string context = 1;
+  string type = 2;
+  string id = 3;
+  string name = 4;
+  repeated PublicKeyStruct publicKey = 5;
+  repeated string authentication = 6;
+  repeated string assertionMethod = 7;
+  repeated string keyAgreement = 8;
+  repeated string capabilityInvocation = 9;
+  string created = 10;
+  string updated = 11;
+}
+
+message DidDocStructUpdateDID {
   repeated string context = 1;
   string type = 2;
   string id = 3;
@@ -46,3 +61,15 @@ message SignInfo {
   string verification_method_id = 1;
   string signature = 2;
 }
+
+message MsgUpdateDID {
+  DidDocStructUpdateDID didDocString = 1;
+  repeated SignInfo signatures = 2;
+  string creator = 3;
+}
+
+message MsgUpdateDIDResponse {
+  string updateId = 1;
+}
+
+// this line is used by starport scaffolding # proto/tx/message

@@ -6,8 +6,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	utils "github.com/hypersign-protocol/hid-node/x/ssi/utils"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
+	utils "github.com/hypersign-protocol/hid-node/x/ssi/utils"
 )
 
 func (k msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*types.MsgCreateDIDResponse, error) {
@@ -24,8 +24,8 @@ func (k msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*t
 	didDocCheck := utils.IsValidDidDoc(msg.DidDocString)
 	if didDocCheck != "" {
 		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, didDocCheck)
-	}  
-	
+	}
+
 	// Signature check
 	if err := k.VerifySignature(&ctx, didMsg, didMsg.GetSigners(), msg.GetSignatures()); err != nil {
 		return nil, err
@@ -37,7 +37,17 @@ func (k msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*t
 	}
 
 	var didSpec = types.Did{
-		DidDocString: msg.DidDocString,
+		Context: 	  didMsg.GetContext(),
+		Type: 		  didMsg.GetType(),
+		Id: 		  didMsg.GetId(),
+		Name: 		  didMsg.GetName(),
+		PublicKey:    didMsg.GetPublicKey(),
+		Authentication: didMsg.GetAuthentication(),
+		AssertionMethod: didMsg.GetAssertionMethod(),
+		KeyAgreement: didMsg.GetKeyAgreement(),
+		CapabilityInvocation: didMsg.GetCapabilityInvocation(),
+		Created: 	  didMsg.GetCreated(),
+		Updated: 	  didMsg.GetUpdated(),
 	}
 	// Add a DID to the store and get back the ID
 	id := k.AppendDID(ctx, didSpec)

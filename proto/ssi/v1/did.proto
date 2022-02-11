@@ -5,6 +5,15 @@ option go_package = "github.com/hypersign-protocol/hid-node/x/ssi/types";
 import "ssi/v1/tx.proto";
 
 message Did {
-  uint64 id = 1;
-  DidDocStructCreateDID didDocString = 2;
+  repeated string context = 1;
+  string type = 2;
+  string id = 3;
+  string name = 4;
+  repeated PublicKeyStruct publicKey = 5;
+  repeated string authentication = 6;
+  repeated string assertionMethod = 7;
+  repeated string keyAgreement = 8;
+  repeated string capabilityInvocation = 9;
+  string created = 10;
+  string updated = 11;
 }
