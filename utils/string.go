@@ -2,6 +2,7 @@ package utils
 
 import (
 	"reflect"
+	"strings"
 	"unsafe"
 )
 
@@ -23,4 +24,14 @@ func UnsafeStrToBytes(s string) []byte {
 // from a map.
 func UnsafeBytesToStr(b []byte) string {
 	return *(*string)(unsafe.Pointer(&b))
+}
+
+func ExtractIDFromSchema(id string) string {
+	// Seperate `id` with seperator `;`
+	extract_list := strings.Split(id, ";")
+
+	// Second element of extract_list has the id.
+	// Split that element with seperator `=`
+	id_val := strings.Split(extract_list[1], "=")[1]
+	return id_val
 }

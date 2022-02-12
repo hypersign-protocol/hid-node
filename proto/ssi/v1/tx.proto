@@ -5,10 +5,13 @@ package hypersignprotocol.hidnode.ssi;
 
 option go_package = "github.com/hypersign-protocol/hid-node/x/ssi/types";
 
+import "ssi/v1/schema.proto";
+
 // Msg defines the Msg service.
 service Msg {
       rpc CreateDID(MsgCreateDID) returns (MsgCreateDIDResponse);
   rpc UpdateDID(MsgUpdateDID) returns (MsgUpdateDIDResponse);
+  rpc CreateSchema(MsgCreateSchema) returns (MsgCreateSchemaResponse);
 // this line is used by starport scaffolding # proto/tx/rpc
 }
 
@@ -70,6 +73,16 @@ message MsgUpdateDID {
 
 message MsgUpdateDIDResponse {
   string updateId = 1;
+}
+
+message MsgCreateSchema {
+  string creator = 1;
+  Schema schema = 2;
+  repeated SignInfo signatures = 3;
+}
+
+message MsgCreateSchemaResponse {
+  uint64 id = 1;
 }
 
 // this line is used by starport scaffolding # proto/tx/message

@@ -20,6 +20,9 @@ const (
 const (
 	DidKey      = "Did-value-"
 	DidCountKey = "Did-count-"
+
+	SchemaKey      = "Schema-value-"
+	SchemaCountKey = "Schema-count-"
 )
 
 func KeyPrefix(p string) []byte {
