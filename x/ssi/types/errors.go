@@ -16,4 +16,6 @@ var (
 	ErrInvalidPublicKey           = sdkerrors.Register(ModuleName, 106, "invalid public key")
 	ErrInvalidSignature           = sdkerrors.Register(ModuleName, 107, "invalid signature detected")
 	ErrDidDocNotFound             = sdkerrors.Register(ModuleName, 108, "DID Doc not found")
+	ErrSchemaExists               = sdkerrors.Register(ModuleName, 109, "Schema already exists")
+	ErrInvalidSchemaID            = sdkerrors.Register(ModuleName, 110, "Invalid schema Id")
 )

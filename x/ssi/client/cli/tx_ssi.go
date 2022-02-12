@@ -119,3 +119,56 @@ func CmdUpdateDID() *cobra.Command {
 	cmd.Flags().String(VerKeyFlag, "", "Base64 encoded ed25519 private key to sign identity message with. ")
 	return cmd
 }
+
+func CmdCreateSchema() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "create-schema [schema] [verification-method-id]",
+		Short: "Broadcast message createSchema",
+		Args:  cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			argSchema := args[0]
+			argVerificationMethodId := args[1]
+
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			// Unmarshal Schema
+			var schema types.Schema
+			err = clientCtx.Codec.UnmarshalJSON([]byte(argSchema), &schema)
+			if err != nil {
+				return err
+			}
+
+			verKeyPriv, err := getVerKey(cmd, clientCtx)
+			if err != nil {
+				return err
+			}
+
+			signBytes := schema.GetSignBytes()
+			signatureBytes := ed25519.Sign(verKeyPriv, signBytes)
+
+			signInfo := types.SignInfo{
+				VerificationMethodId: argVerificationMethodId,
+				Signature:            base64.StdEncoding.EncodeToString(signatureBytes),
+			}
+
+			msg := types.MsgCreateSchema{
+				Schema:     &schema,
+				Signatures: []*types.SignInfo{&signInfo},
+				Creator:    clientCtx.GetFromAddress().String(),
+			}
+
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), &msg)
+		},
+	}
+
+	flags.AddTxFlagsToCmd(cmd)
+	cmd.Flags().String(VerKeyFlag, "", "Base64 encoded ed25519 private key to sign identity message with. ")
+	return cmd
+}

@@ -37,17 +37,17 @@ func (k msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*t
 	}
 
 	var didSpec = types.Did{
-		Context: 	  didMsg.GetContext(),
-		Type: 		  didMsg.GetType(),
-		Id: 		  didMsg.GetId(),
-		Name: 		  didMsg.GetName(),
-		PublicKey:    didMsg.GetPublicKey(),
-		Authentication: didMsg.GetAuthentication(),
-		AssertionMethod: didMsg.GetAssertionMethod(),
-		KeyAgreement: didMsg.GetKeyAgreement(),
+		Context:              didMsg.GetContext(),
+		Type:                 didMsg.GetType(),
+		Id:                   didMsg.GetId(),
+		Name:                 didMsg.GetName(),
+		PublicKey:            didMsg.GetPublicKey(),
+		Authentication:       didMsg.GetAuthentication(),
+		AssertionMethod:      didMsg.GetAssertionMethod(),
+		KeyAgreement:         didMsg.GetKeyAgreement(),
 		CapabilityInvocation: didMsg.GetCapabilityInvocation(),
-		Created: 	  didMsg.GetCreated(),
-		Updated: 	  didMsg.GetUpdated(),
+		Created:              didMsg.GetCreated(),
+		Updated:              didMsg.GetUpdated(),
 	}
 	// Add a DID to the store and get back the ID
 	id := k.AppendDID(ctx, didSpec)

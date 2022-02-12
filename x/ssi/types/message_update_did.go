@@ -43,7 +43,6 @@ func (msg *DidDocStructUpdateDID) GetSignBytes() []byte {
 	return sdk.MustSortJSON(bz)
 }
 
-
 func (msg *MsgUpdateDID) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
