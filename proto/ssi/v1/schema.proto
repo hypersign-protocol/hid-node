@@ -2,8 +2,6 @@ syntax = "proto3";
 package hypersignprotocol.hidnode.ssi;
 option go_package = "github.com/hypersign-protocol/hid-node/x/ssi/types";
 
-import "google/protobuf/any.proto";
-
 message Schema {
     string type = 1;
     string modelVersion = 2;
