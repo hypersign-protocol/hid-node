@@ -4,8 +4,10 @@ package hypersignprotocol.hidnode.ssi;
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
-import "ssi/v1/params.proto";
-import "ssi/v1/schema.proto";
+import "ssi/params.proto";
+import "ssi/schema.proto";
+import "ssi/did.proto";
+import "ssi/tx.proto";
 // this line is used by starport scaffolding # 1
 
 option go_package = "github.com/hypersign-protocol/hid-node/x/ssi/types";
@@ -29,6 +31,11 @@ service Query {
 // Queries a list of SchemaCount items.
 	rpc SchemaCount(QuerySchemaCountRequest) returns (QuerySchemaCountResponse) {
 		option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/schema/count";
+	}
+
+// Queries a list of GetDidDocById items.
+	rpc GetDidDocById(QueryGetDidDocByIdRequest) returns (QueryGetDidDocByIdResponse) {
+		option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/did/queryDidDocById/{didDocId}";
 	}
 
 // this line is used by starport scaffolding # 2
@@ -65,6 +72,14 @@ message QuerySchemaCountRequest {
 
 message QuerySchemaCountResponse {
   uint64 count = 1;
+}
+
+message QueryGetDidDocByIdRequest {
+  string didDocId = 1;
+}
+
+message QueryGetDidDocByIdResponse {
+  DidDocStructCreateDID didDoc = 1;
 }
 
 // this line is used by starport scaffolding # 3

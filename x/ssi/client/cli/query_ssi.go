@@ -101,3 +101,34 @@ func CmdSchemaCount() *cobra.Command {
 
 	return cmd
 }
+
+func CmdGetDidDocById() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "did [didDoc-id]",
+		Short: "Query DidDoc for a given didDoc id",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			argDidDocId := args[0]
+
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			queryClient := types.NewQueryClient(clientCtx)
+
+			params := &types.QueryGetDidDocByIdRequest{DidDocId: argDidDocId}
+
+			res, err := queryClient.GetDidDocById(cmd.Context(), params)
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintProto(res)
+		},
+	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+
+	return cmd
+}
