@@ -132,3 +132,33 @@ func CmdGetDidDocById() *cobra.Command {
 
 	return cmd
 }
+
+func CmdDidDocCount() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "did-count",
+		Short: "Query the DID Count",
+		Args:  cobra.ExactArgs(0),
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			queryClient := types.NewQueryClient(clientCtx)
+
+			params := &types.QueryDidDocCountRequest{}
+
+			res, err := queryClient.DidDocCount(cmd.Context(), params)
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintProto(res)
+		},
+	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+
+	return cmd
+}
