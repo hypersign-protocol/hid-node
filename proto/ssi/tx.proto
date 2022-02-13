@@ -5,7 +5,7 @@ package hypersignprotocol.hidnode.ssi;
 
 option go_package = "github.com/hypersign-protocol/hid-node/x/ssi/types";
 
-import "ssi/v1/schema.proto";
+import "ssi/schema.proto";
 
 // Msg defines the Msg service.
 service Msg {

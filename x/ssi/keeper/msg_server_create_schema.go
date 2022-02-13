@@ -15,11 +15,10 @@ func (k msgServer) CreateSchema(goCtx context.Context, msg *types.MsgCreateSchem
 
 	schemaMsg := msg.GetSchema()
 	schemaID := schemaMsg.GetId()
-	
+
 	if err := utils.IsValidSchemaID(schemaID); err != nil {
 		return nil, sdkerrors.Wrap(types.ErrInvalidSchemaID, err.Error())
 	}
-	
 
 	if k.HasSchema(ctx, schemaID) {
 		return nil, sdkerrors.Wrap(types.ErrSchemaExists, fmt.Sprintf("Schema ID:  %s", schemaID))
