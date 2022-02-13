@@ -41,3 +41,63 @@ func CmdGetSchema() *cobra.Command {
 
 	return cmd
 }
+
+func CmdSchemas() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "schema-list",
+		Short: "Query Registered Schemas",
+		Args:  cobra.ExactArgs(0),
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			queryClient := types.NewQueryClient(clientCtx)
+
+			params := &types.QuerySchemasRequest{}
+
+			res, err := queryClient.Schemas(cmd.Context(), params)
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintProto(res)
+		},
+	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+
+	return cmd
+}
+
+func CmdSchemaCount() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "schema-count",
+		Short: "Get the Schema Count",
+		Args:  cobra.ExactArgs(0),
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			queryClient := types.NewQueryClient(clientCtx)
+
+			params := &types.QuerySchemaCountRequest{}
+
+			res, err := queryClient.SchemaCount(cmd.Context(), params)
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintProto(res)
+		},
+	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+
+	return cmd
+}
