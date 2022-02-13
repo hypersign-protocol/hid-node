@@ -72,7 +72,7 @@ func (k Keeper) SetSchemaCount(ctx sdk.Context, count uint64) {
 
 func (k Keeper) AppendSchema(ctx sdk.Context, schema types.Schema) uint64 {
 	// Get the current number of posts in the store
-	count := k.GetDidCount(ctx)
+	count := k.GetSchemaCount(ctx)
 	// Get the store
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.SchemaKey))
 	// Convert the post ID into bytes
@@ -82,6 +82,6 @@ func (k Keeper) AppendSchema(ctx sdk.Context, schema types.Schema) uint64 {
 	schemaID := utils.ExtractIDFromSchema(schema.Id)
 	store.Set(utils.UnsafeStrToBytes(schemaID), schemaBytes)
 	// Update the post count
-	k.SetDidCount(ctx, count+1)
+	k.SetSchemaCount(ctx, count+1)
 	return count
 }
