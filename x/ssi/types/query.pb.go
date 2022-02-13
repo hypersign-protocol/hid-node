@@ -6,7 +6,7 @@ package types
 import (
 	context "context"
 	fmt "fmt"
-	_ "github.com/cosmos/cosmos-sdk/types/query"
+	query "github.com/cosmos/cosmos-sdk/types/query"
 	_ "github.com/gogo/protobuf/gogoproto"
 	grpc1 "github.com/gogo/protobuf/grpc"
 	proto "github.com/gogo/protobuf/proto"
@@ -201,44 +201,148 @@ func (m *QueryGetSchemaResponse) GetSchema() *Schema {
 	return nil
 }
 
+type QuerySchemasRequest struct {
+	Pagination *query.PageRequest `protobuf:"bytes,1,opt,name=pagination,proto3" json:"pagination,omitempty"`
+}
+
+func (m *QuerySchemasRequest) Reset()         { *m = QuerySchemasRequest{} }
+func (m *QuerySchemasRequest) String() string { return proto.CompactTextString(m) }
+func (*QuerySchemasRequest) ProtoMessage()    {}
+func (*QuerySchemasRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_fb5ae019dccaca42, []int{4}
+}
+func (m *QuerySchemasRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QuerySchemasRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QuerySchemasRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QuerySchemasRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QuerySchemasRequest.Merge(m, src)
+}
+func (m *QuerySchemasRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *QuerySchemasRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QuerySchemasRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QuerySchemasRequest proto.InternalMessageInfo
+
+func (m *QuerySchemasRequest) GetPagination() *query.PageRequest {
+	if m != nil {
+		return m.Pagination
+	}
+	return nil
+}
+
+type QuerySchemasResponse struct {
+	SchemaList []*Schema           `protobuf:"bytes,1,rep,name=schemaList,proto3" json:"schemaList,omitempty"`
+	Pagination *query.PageResponse `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
+}
+
+func (m *QuerySchemasResponse) Reset()         { *m = QuerySchemasResponse{} }
+func (m *QuerySchemasResponse) String() string { return proto.CompactTextString(m) }
+func (*QuerySchemasResponse) ProtoMessage()    {}
+func (*QuerySchemasResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_fb5ae019dccaca42, []int{5}
+}
+func (m *QuerySchemasResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QuerySchemasResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QuerySchemasResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QuerySchemasResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QuerySchemasResponse.Merge(m, src)
+}
+func (m *QuerySchemasResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *QuerySchemasResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QuerySchemasResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QuerySchemasResponse proto.InternalMessageInfo
+
+func (m *QuerySchemasResponse) GetSchemaList() []*Schema {
+	if m != nil {
+		return m.SchemaList
+	}
+	return nil
+}
+
+func (m *QuerySchemasResponse) GetPagination() *query.PageResponse {
+	if m != nil {
+		return m.Pagination
+	}
+	return nil
+}
+
 func init() {
 	proto.RegisterType((*QueryParamsRequest)(nil), "hypersignprotocol.hidnode.ssi.QueryParamsRequest")
 	proto.RegisterType((*QueryParamsResponse)(nil), "hypersignprotocol.hidnode.ssi.QueryParamsResponse")
 	proto.RegisterType((*QueryGetSchemaRequest)(nil), "hypersignprotocol.hidnode.ssi.QueryGetSchemaRequest")
 	proto.RegisterType((*QueryGetSchemaResponse)(nil), "hypersignprotocol.hidnode.ssi.QueryGetSchemaResponse")
+	proto.RegisterType((*QuerySchemasRequest)(nil), "hypersignprotocol.hidnode.ssi.QuerySchemasRequest")
+	proto.RegisterType((*QuerySchemasResponse)(nil), "hypersignprotocol.hidnode.ssi.QuerySchemasResponse")
 }
 
 func init() { proto.RegisterFile("ssi/query.proto", fileDescriptor_fb5ae019dccaca42) }
 
 var fileDescriptor_fb5ae019dccaca42 = []byte{
-	// 421 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x92, 0x3f, 0x6b, 0xdb, 0x40,
-	0x18, 0xc6, 0x25, 0xd3, 0x8a, 0xfa, 0x3a, 0xb4, 0x5c, 0xdd, 0x52, 0x44, 0xab, 0x16, 0x81, 0x69,
-	0x29, 0x58, 0x87, 0xe5, 0x76, 0xec, 0x50, 0x7b, 0x28, 0x86, 0x0e, 0xad, 0x3b, 0x14, 0xbc, 0x9d,
-	0xa4, 0x43, 0x3a, 0xb0, 0x74, 0xb2, 0xee, 0x5c, 0x22, 0x42, 0x96, 0x7c, 0x82, 0x40, 0xf6, 0x7c,
-	0x99, 0x2c, 0x1e, 0x0d, 0x59, 0x32, 0x85, 0x60, 0x67, 0xce, 0x67, 0x08, 0xbe, 0xbb, 0xd8, 0x89,
-	0x9d, 0x3f, 0xf6, 0xa6, 0x7b, 0xdf, 0xf7, 0x79, 0x9e, 0xdf, 0xbd, 0x27, 0xf0, 0x82, 0x73, 0x8a,
-	0x86, 0x23, 0x52, 0x94, 0x5e, 0x5e, 0x30, 0xc1, 0xe0, 0xfb, 0xa4, 0xcc, 0x49, 0xc1, 0x69, 0x9c,
-	0xc9, 0x73, 0xc8, 0x06, 0x5e, 0x42, 0xa3, 0x8c, 0x45, 0xc4, 0xe3, 0x9c, 0xda, 0xb5, 0x98, 0xc5,
-	0x4c, 0x76, 0xd0, 0xfc, 0x4b, 0x89, 0xec, 0x77, 0x31, 0x63, 0xf1, 0x80, 0x20, 0x9c, 0x53, 0x84,
-	0xb3, 0x8c, 0x09, 0x2c, 0x28, 0xcb, 0xb8, 0xee, 0x7e, 0x09, 0x19, 0x4f, 0x19, 0x47, 0x01, 0xe6,
-	0x44, 0x65, 0xa1, 0xff, 0xcd, 0x80, 0x08, 0xdc, 0x44, 0x39, 0x8e, 0x69, 0x26, 0x87, 0xf5, 0xec,
-	0xcb, 0x39, 0x4f, 0x8e, 0x0b, 0x9c, 0xf2, 0x9b, 0x15, 0x1e, 0x26, 0x24, 0xc5, 0xaa, 0xe2, 0xd6,
-	0x00, 0xfc, 0x33, 0x77, 0xf9, 0x2d, 0xc7, 0x7a, 0x64, 0x38, 0x22, 0x5c, 0xb8, 0x7d, 0xf0, 0xea,
-	0x56, 0x95, 0xe7, 0x2c, 0xe3, 0x04, 0x76, 0x80, 0xa5, 0xec, 0xde, 0x9a, 0x1f, 0xcd, 0xcf, 0xcf,
-	0xfd, 0xba, 0xf7, 0xe0, 0x05, 0x3d, 0x25, 0x6f, 0x3f, 0x19, 0x9f, 0x7d, 0x30, 0x7a, 0x5a, 0xea,
-	0xb6, 0xc0, 0x6b, 0xe9, 0xfd, 0x93, 0x88, 0xbf, 0x92, 0x44, 0x87, 0x42, 0x1b, 0x3c, 0x53, 0x68,
-	0xdd, 0x48, 0xfa, 0x57, 0x7b, 0x8b, 0xb3, 0xfb, 0x0f, 0xbc, 0x59, 0x15, 0x69, 0xa6, 0xef, 0xc0,
-	0x52, 0x53, 0x1b, 0x32, 0x69, 0xb9, 0x16, 0xf9, 0x97, 0x15, 0xf0, 0x54, 0x3a, 0xc3, 0x23, 0x13,
-	0x58, 0x0a, 0x18, 0x36, 0x1f, 0xf1, 0x58, 0xdf, 0x98, 0xed, 0x6f, 0x23, 0x51, 0xe8, 0x6e, 0x63,
-	0xff, 0xe4, 0xe2, 0xb0, 0xf2, 0x09, 0xd6, 0xd1, 0x9a, 0x16, 0x69, 0x2d, 0x5a, 0x3e, 0x21, 0x3c,
-	0x36, 0x41, 0x75, 0x71, 0x7f, 0xf8, 0x75, 0x93, 0xc0, 0xd5, 0x1d, 0xdb, 0xdf, 0xb6, 0x54, 0x69,
-	0xd2, 0xae, 0x24, 0xed, 0xc0, 0x1f, 0x4b, 0xd2, 0xc6, 0x9d, 0xa8, 0x6a, 0xab, 0xea, 0xc7, 0x54,
-	0x1e, 0xed, 0xb2, 0x1b, 0xa1, 0xdd, 0xeb, 0x87, 0xdc, 0x6b, 0xff, 0x1a, 0x4f, 0x1d, 0x73, 0x32,
-	0x75, 0xcc, 0xf3, 0xa9, 0x63, 0x1e, 0xcc, 0x1c, 0x63, 0x32, 0x73, 0x8c, 0xd3, 0x99, 0x63, 0xf4,
-	0xfd, 0x98, 0x8a, 0x64, 0x14, 0x78, 0x21, 0x4b, 0xef, 0x89, 0x69, 0xc8, 0x9c, 0x1d, 0x99, 0x24,
-	0xca, 0x9c, 0xf0, 0xc0, 0x92, 0xed, 0xd6, 0x55, 0x00, 0x00, 0x00, 0xff, 0xff, 0x6f, 0xff, 0x50,
-	0xbd, 0x7b, 0x03, 0x00, 0x00,
+	// 522 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x93, 0x41, 0x6b, 0x13, 0x41,
+	0x14, 0xc7, 0x33, 0xb5, 0x46, 0xfb, 0x3c, 0x28, 0x63, 0x94, 0xb2, 0xe8, 0x5a, 0x16, 0x6a, 0x45,
+	0xc8, 0x8c, 0x49, 0xd4, 0x9b, 0x07, 0x53, 0xb4, 0x04, 0x7a, 0xa8, 0xf1, 0x20, 0x14, 0x3c, 0x4c,
+	0x92, 0x61, 0xb3, 0xd0, 0xec, 0x6c, 0xf3, 0x26, 0x62, 0x10, 0x2f, 0x7e, 0x02, 0xc1, 0xa3, 0xe0,
+	0xd1, 0x83, 0x5f, 0xc3, 0x4b, 0x8f, 0x05, 0x2f, 0x9e, 0x44, 0x12, 0x3f, 0x88, 0x64, 0xde, 0xb4,
+	0x49, 0x5a, 0x6d, 0x37, 0xa7, 0x64, 0xde, 0xbc, 0xff, 0x7f, 0x7e, 0xf3, 0xe6, 0xbf, 0x70, 0x15,
+	0x31, 0x91, 0xfb, 0x03, 0xdd, 0x1f, 0x8a, 0xac, 0x6f, 0xac, 0xe1, 0xb7, 0xbb, 0xc3, 0x4c, 0xf7,
+	0x31, 0x89, 0x53, 0xb7, 0x6e, 0x9b, 0x3d, 0xd1, 0x4d, 0x3a, 0xa9, 0xe9, 0x68, 0x81, 0x98, 0x04,
+	0xa5, 0xd8, 0xc4, 0xc6, 0xed, 0xc8, 0xc9, 0x3f, 0x12, 0x05, 0xb7, 0x62, 0x63, 0xe2, 0x3d, 0x2d,
+	0x55, 0x96, 0x48, 0x95, 0xa6, 0xc6, 0x2a, 0x9b, 0x98, 0x14, 0xfd, 0xee, 0xfd, 0xb6, 0xc1, 0x9e,
+	0x41, 0xd9, 0x52, 0xa8, 0xe9, 0x2c, 0xf9, 0xa6, 0xd2, 0xd2, 0x56, 0x55, 0x64, 0xa6, 0xe2, 0x24,
+	0x75, 0xcd, 0xbe, 0xf7, 0xda, 0x84, 0x27, 0x53, 0x7d, 0xd5, 0xc3, 0xd9, 0x0a, 0xb6, 0xbb, 0xba,
+	0xa7, 0xa8, 0x12, 0x95, 0x80, 0xbf, 0x98, 0xb8, 0xec, 0xb8, 0xb6, 0xa6, 0xde, 0x1f, 0x68, 0xb4,
+	0xd1, 0x2e, 0x5c, 0x9f, 0xab, 0x62, 0x66, 0x52, 0xd4, 0x7c, 0x13, 0x8a, 0x64, 0xb7, 0xca, 0xd6,
+	0xd8, 0xbd, 0x2b, 0xd5, 0x75, 0x71, 0xe6, 0x05, 0x05, 0xc9, 0xeb, 0xcb, 0x07, 0xbf, 0xee, 0x14,
+	0x9a, 0x5e, 0x1a, 0xd5, 0xe0, 0x86, 0xf3, 0xde, 0xd2, 0xf6, 0xa5, 0x23, 0xf1, 0x87, 0xf2, 0x00,
+	0x2e, 0x13, 0x5a, 0xa3, 0xe3, 0xfc, 0x57, 0x9a, 0xc7, 0xeb, 0xe8, 0x15, 0xdc, 0x3c, 0x29, 0xf2,
+	0x4c, 0x4f, 0xa0, 0x48, 0x5d, 0x39, 0x99, 0xbc, 0xdc, 0x8b, 0xa2, 0xd7, 0xfe, 0xa6, 0x54, 0x3e,
+	0x1a, 0x00, 0x7f, 0x0e, 0x30, 0x1d, 0xa7, 0x77, 0xbe, 0x2b, 0x68, 0xf6, 0x62, 0x32, 0x7b, 0x41,
+	0xef, 0xec, 0x67, 0x2f, 0x76, 0x54, 0xac, 0xbd, 0xb6, 0x39, 0xa3, 0x8c, 0xbe, 0x32, 0x28, 0xcd,
+	0xfb, 0x7b, 0xec, 0x67, 0x00, 0x44, 0xb0, 0x9d, 0xa0, 0x5d, 0x65, 0x6b, 0x17, 0xf2, 0xa3, 0xcf,
+	0x08, 0xf9, 0xd6, 0x1c, 0xe7, 0x92, 0xe3, 0xdc, 0x38, 0x97, 0x93, 0x18, 0x66, 0x41, 0xab, 0x9f,
+	0x97, 0xe1, 0xa2, 0x03, 0xe5, 0x5f, 0x18, 0x14, 0xe9, 0xe1, 0x78, 0xe5, 0x1c, 0xa0, 0xd3, 0xc9,
+	0x09, 0xaa, 0x8b, 0x48, 0x88, 0x23, 0x2a, 0x7f, 0xf8, 0xf1, 0xe7, 0xd3, 0xd2, 0x06, 0x5f, 0x97,
+	0xa7, 0xb4, 0xd2, 0x6b, 0xe5, 0x34, 0xca, 0xfc, 0x3b, 0x83, 0x95, 0xe3, 0x1c, 0xf0, 0x87, 0x79,
+	0x0e, 0x3c, 0x99, 0xb5, 0xe0, 0xd1, 0x82, 0x2a, 0x4f, 0xda, 0x70, 0xa4, 0x9b, 0xfc, 0xe9, 0x94,
+	0xb4, 0xfc, 0x4f, 0x54, 0x7a, 0x22, 0xfa, 0x40, 0xc9, 0xa3, 0x3e, 0x6c, 0x74, 0xe4, 0xbb, 0xa3,
+	0x40, 0xbf, 0xe7, 0xdf, 0x18, 0x5c, 0xf2, 0xa1, 0xe0, 0xb9, 0x86, 0x36, 0x9f, 0xd0, 0xa0, 0xb6,
+	0x90, 0xc6, 0xf3, 0x3f, 0x76, 0xfc, 0x0f, 0xb8, 0xc8, 0xc9, 0x4f, 0x3f, 0x58, 0xdf, 0x3e, 0x18,
+	0x85, 0xec, 0x70, 0x14, 0xb2, 0xdf, 0xa3, 0x90, 0x7d, 0x1c, 0x87, 0x85, 0xc3, 0x71, 0x58, 0xf8,
+	0x39, 0x0e, 0x0b, 0xbb, 0xd5, 0x38, 0xb1, 0xdd, 0x41, 0x4b, 0xb4, 0x4d, 0xef, 0x3f, 0x9e, 0x65,
+	0x67, 0xfa, 0xd6, 0xd9, 0xda, 0x61, 0xa6, 0xb1, 0x55, 0x74, 0xdb, 0xb5, 0xbf, 0x01, 0x00, 0x00,
+	0xff, 0xff, 0x33, 0x05, 0xdd, 0xef, 0x30, 0x05, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -257,6 +361,8 @@ type QueryClient interface {
 	Params(ctx context.Context, in *QueryParamsRequest, opts ...grpc.CallOption) (*QueryParamsResponse, error)
 	// Queries a list of GetSchema items.
 	GetSchema(ctx context.Context, in *QueryGetSchemaRequest, opts ...grpc.CallOption) (*QueryGetSchemaResponse, error)
+	// Queries a list of Schemas items.
+	Schemas(ctx context.Context, in *QuerySchemasRequest, opts ...grpc.CallOption) (*QuerySchemasResponse, error)
 }
 
 type queryClient struct {
@@ -285,12 +391,23 @@ func (c *queryClient) GetSchema(ctx context.Context, in *QueryGetSchemaRequest, 
 	return out, nil
 }
 
+func (c *queryClient) Schemas(ctx context.Context, in *QuerySchemasRequest, opts ...grpc.CallOption) (*QuerySchemasResponse, error) {
+	out := new(QuerySchemasResponse)
+	err := c.cc.Invoke(ctx, "/hypersignprotocol.hidnode.ssi.Query/Schemas", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // QueryServer is the server API for Query service.
 type QueryServer interface {
 	// Parameters queries the parameters of the module.
 	Params(context.Context, *QueryParamsRequest) (*QueryParamsResponse, error)
 	// Queries a list of GetSchema items.
 	GetSchema(context.Context, *QueryGetSchemaRequest) (*QueryGetSchemaResponse, error)
+	// Queries a list of Schemas items.
+	Schemas(context.Context, *QuerySchemasRequest) (*QuerySchemasResponse, error)
 }
 
 // UnimplementedQueryServer can be embedded to have forward compatible implementations.
@@ -302,6 +419,9 @@ func (*UnimplementedQueryServer) Params(ctx context.Context, req *QueryParamsReq
 }
 func (*UnimplementedQueryServer) GetSchema(ctx context.Context, req *QueryGetSchemaRequest) (*QueryGetSchemaResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetSchema not implemented")
+}
+func (*UnimplementedQueryServer) Schemas(ctx context.Context, req *QuerySchemasRequest) (*QuerySchemasResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Schemas not implemented")
 }
 
 func RegisterQueryServer(s grpc1.Server, srv QueryServer) {
@@ -344,6 +464,24 @@ func _Query_GetSchema_Handler(srv interface{}, ctx context.Context, dec func(int
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Query_Schemas_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QuerySchemasRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).Schemas(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/hypersignprotocol.hidnode.ssi.Query/Schemas",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).Schemas(ctx, req.(*QuerySchemasRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _Query_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "hypersignprotocol.hidnode.ssi.Query",
 	HandlerType: (*QueryServer)(nil),
@@ -355,6 +493,10 @@ var _Query_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetSchema",
 			Handler:    _Query_GetSchema_Handler,
+		},
+		{
+			MethodName: "Schemas",
+			Handler:    _Query_Schemas_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -482,6 +624,90 @@ func (m *QueryGetSchemaResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) 
 	return len(dAtA) - i, nil
 }
 
+func (m *QuerySchemasRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QuerySchemasRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QuerySchemasRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Pagination != nil {
+		{
+			size, err := m.Pagination.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintQuery(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *QuerySchemasResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QuerySchemasResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QuerySchemasResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Pagination != nil {
+		{
+			size, err := m.Pagination.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintQuery(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.SchemaList) > 0 {
+		for iNdEx := len(m.SchemaList) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.SchemaList[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintQuery(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0xa
+		}
+	}
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintQuery(dAtA []byte, offset int, v uint64) int {
 	offset -= sovQuery(v)
 	base := offset
@@ -534,6 +760,38 @@ func (m *QueryGetSchemaResponse) Size() (n int) {
 	_ = l
 	if m.Schema != nil {
 		l = m.Schema.Size()
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	return n
+}
+
+func (m *QuerySchemasRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Pagination != nil {
+		l = m.Pagination.Size()
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	return n
+}
+
+func (m *QuerySchemasResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if len(m.SchemaList) > 0 {
+		for _, e := range m.SchemaList {
+			l = e.Size()
+			n += 1 + l + sovQuery(uint64(l))
+		}
+	}
+	if m.Pagination != nil {
+		l = m.Pagination.Size()
 		n += 1 + l + sovQuery(uint64(l))
 	}
 	return n
@@ -822,6 +1080,212 @@ func (m *QueryGetSchemaResponse) Unmarshal(dAtA []byte) error {
 				m.Schema = &Schema{}
 			}
 			if err := m.Schema.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QuerySchemasRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QuerySchemasRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QuerySchemasRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Pagination", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Pagination == nil {
+				m.Pagination = &query.PageRequest{}
+			}
+			if err := m.Pagination.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QuerySchemasResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QuerySchemasResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QuerySchemasResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SchemaList", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.SchemaList = append(m.SchemaList, &Schema{})
+			if err := m.SchemaList[len(m.SchemaList)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Pagination", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Pagination == nil {
+				m.Pagination = &query.PageResponse{}
+			}
+			if err := m.Pagination.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

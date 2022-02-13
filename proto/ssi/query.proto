@@ -21,6 +21,11 @@ service Query {
 		option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/schema/querySchemaById/{schemaId}";
 	}
 
+// Queries a list of Schemas items.
+	rpc Schemas(QuerySchemasRequest) returns (QuerySchemasResponse) {
+		option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/schema/schemas";
+	}
+
 // this line is used by starport scaffolding # 2
 }
 
@@ -39,6 +44,15 @@ message QueryGetSchemaRequest {
 
 message QueryGetSchemaResponse {
   Schema schema = 1;
+}
+
+message QuerySchemasRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QuerySchemasResponse {
+  repeated Schema schemaList = 1;
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
 // this line is used by starport scaffolding # 3
