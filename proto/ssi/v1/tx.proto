@@ -24,7 +24,7 @@ message MsgCreateDID {
 message DidDocStructCreateDID {
   repeated string context = 1;
   string id = 2;
-  repeated string controller = 3;
+  repeated string controller = 3;  // DID Controller Spec: https://www.w3.org/TR/did-core/#did-controller
   repeated VerificationMethod verificationMethod = 4;
   repeated string authentication = 5;
   repeated string assertionMethod = 6;
@@ -37,7 +37,7 @@ message DidDocStructCreateDID {
 message DidDocStructUpdateDID {
   repeated string context = 1;
   string id = 2;
-  repeated string controller = 3;
+  repeated string controller = 3;  // DID Controller Spec: https://www.w3.org/TR/did-core/#did-controller
   repeated VerificationMethod verificationMethod = 4;
   repeated string authentication = 5;
   repeated string assertionMethod = 6;

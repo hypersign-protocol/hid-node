@@ -14,7 +14,8 @@ import (
 
 // Ref 1: The current implementatition takes in the verification key and checks if that belongs to EITHER
 // of the DID controllers. If so, then the signature is valid, which is an approach as opposed to the earlier
-// implementation where all the signatures of DIDs were expected. This needs to be verified.
+// implementation where all the signatures of all DIDs present in DID controller were expected. This needs to be verified.
+// Link to DID Controller Spec: https://www.w3.org/TR/did-core/#did-controller
 func VerifyIdentitySignature(signer types.Signer, signatures []*types.SignInfo, signingInput []byte) (bool, error) {
 	result := false
 	// foundOne := false
@@ -105,7 +106,8 @@ func AppendSignerIfNeed(signers []types.Signer, controller string, msg *types.Di
 
 // Ref 1: The current implementatition takes in the verification key and checks if that belongs to EITHER
 // of the DID controllers. If so, then the signature is valid, which is an approach as opposed to the earlier
-// implementation where all the signatures of DIDs were expected. This needs to be verified.
+// implementation where all the signatures of all DIDs present in DID controller were expected. This needs to be verified.
+// Link to DID Controller Spec: https://www.w3.org/TR/did-core/#did-controller
 func (k *Keeper) VerifySignature(ctx *sdk.Context, msg types.IdentityMsg, signers []types.Signer, signatures []*types.SignInfo) error {
 	var validArr []types.ValidDid
 	
