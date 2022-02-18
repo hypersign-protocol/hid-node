@@ -34,7 +34,7 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 	if k.ValidateDidControllers(&ctx, did, didMsg.GetController(), didMsg.GetVerificationMethod()) != nil {
 		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, "DID controller is not valid")
 	}
-	
+
 	if err := k.VerifySignatureOnDidUpdate(&ctx, oldDIDDoc, didMsg, msg.Signatures); err != nil {
 		return nil, err
 	}
@@ -49,6 +49,7 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 		Context:              didMsg.GetContext(),
 		Id:                   didMsg.GetId(),
 		Controller:           didMsg.GetController(),
+		AlsoKnownAs:          didMsg.GetAlsoKnownAs(),
 		VerificationMethod:   didMsg.GetVerificationMethod(),
 		Authentication:       didMsg.GetAuthentication(),
 		AssertionMethod:      didMsg.GetAssertionMethod(),

@@ -11898,6 +11898,10 @@ paths:
                     type: array
                     items:
                       type: string
+                  alsoKnownAs:
+                    type: array
+                    items:
+                      type: string
                   verificationMethod:
                     type: array
                     items:
@@ -20170,6 +20174,10 @@ definitions:
         type: array
         items:
           type: string
+      alsoKnownAs:
+        type: array
+        items:
+          type: string
       verificationMethod:
         type: array
         items:
@@ -20213,6 +20221,10 @@ definitions:
       id:
         type: string
       controller:
+        type: array
+        items:
+          type: string
+      alsoKnownAs:
         type: array
         items:
           type: string
@@ -20288,6 +20300,10 @@ definitions:
           id:
             type: string
           controller:
+            type: array
+            items:
+              type: string
+          alsoKnownAs:
             type: array
             items:
               type: string
