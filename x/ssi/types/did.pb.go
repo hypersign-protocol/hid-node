@@ -23,17 +23,16 @@ var _ = math.Inf
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type Did struct {
-	Context              []string           `protobuf:"bytes,1,rep,name=context,proto3" json:"context,omitempty"`
-	Type                 string             `protobuf:"bytes,2,opt,name=type,proto3" json:"type,omitempty"`
-	Id                   string             `protobuf:"bytes,3,opt,name=id,proto3" json:"id,omitempty"`
-	Name                 string             `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
-	PublicKey            []*PublicKeyStruct `protobuf:"bytes,5,rep,name=publicKey,proto3" json:"publicKey,omitempty"`
-	Authentication       []string           `protobuf:"bytes,6,rep,name=authentication,proto3" json:"authentication,omitempty"`
-	AssertionMethod      []string           `protobuf:"bytes,7,rep,name=assertionMethod,proto3" json:"assertionMethod,omitempty"`
-	KeyAgreement         []string           `protobuf:"bytes,8,rep,name=keyAgreement,proto3" json:"keyAgreement,omitempty"`
-	CapabilityInvocation []string           `protobuf:"bytes,9,rep,name=capabilityInvocation,proto3" json:"capabilityInvocation,omitempty"`
-	Created              string             `protobuf:"bytes,10,opt,name=created,proto3" json:"created,omitempty"`
-	Updated              string             `protobuf:"bytes,11,opt,name=updated,proto3" json:"updated,omitempty"`
+	Context              []string              `protobuf:"bytes,1,rep,name=context,proto3" json:"context,omitempty"`
+	Id                   string                `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
+	Controller           []string              `protobuf:"bytes,3,rep,name=controller,proto3" json:"controller,omitempty"`
+	VerificationMethod   []*VerificationMethod `protobuf:"bytes,4,rep,name=verificationMethod,proto3" json:"verificationMethod,omitempty"`
+	Authentication       []string              `protobuf:"bytes,5,rep,name=authentication,proto3" json:"authentication,omitempty"`
+	AssertionMethod      []string              `protobuf:"bytes,6,rep,name=assertionMethod,proto3" json:"assertionMethod,omitempty"`
+	KeyAgreement         []string              `protobuf:"bytes,7,rep,name=keyAgreement,proto3" json:"keyAgreement,omitempty"`
+	CapabilityInvocation []string              `protobuf:"bytes,8,rep,name=capabilityInvocation,proto3" json:"capabilityInvocation,omitempty"`
+	Created              string                `protobuf:"bytes,9,opt,name=created,proto3" json:"created,omitempty"`
+	Updated              string                `protobuf:"bytes,10,opt,name=updated,proto3" json:"updated,omitempty"`
 }
 
 func (m *Did) Reset()         { *m = Did{} }
@@ -76,13 +75,6 @@ func (m *Did) GetContext() []string {
 	return nil
 }
 
-func (m *Did) GetType() string {
-	if m != nil {
-		return m.Type
-	}
-	return ""
-}
-
 func (m *Did) GetId() string {
 	if m != nil {
 		return m.Id
@@ -90,16 +82,16 @@ func (m *Did) GetId() string {
 	return ""
 }
 
-func (m *Did) GetName() string {
+func (m *Did) GetController() []string {
 	if m != nil {
-		return m.Name
+		return m.Controller
 	}
-	return ""
+	return nil
 }
 
-func (m *Did) GetPublicKey() []*PublicKeyStruct {
+func (m *Did) GetVerificationMethod() []*VerificationMethod {
 	if m != nil {
-		return m.PublicKey
+		return m.VerificationMethod
 	}
 	return nil
 }
@@ -153,30 +145,29 @@ func init() {
 func init() { proto.RegisterFile("ssi/v1/did.proto", fileDescriptor_cddfa22cf6c6aba3) }
 
 var fileDescriptor_cddfa22cf6c6aba3 = []byte{
-	// 354 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x7c, 0x91, 0xb1, 0x6e, 0xe2, 0x40,
-	0x10, 0x86, 0x31, 0xe6, 0xe0, 0xbc, 0x9c, 0xe0, 0xb4, 0xba, 0x62, 0x75, 0xd2, 0x59, 0x88, 0xe2,
-	0xe4, 0x06, 0x5b, 0xc7, 0x3d, 0x41, 0xa2, 0x34, 0x51, 0x88, 0x14, 0x91, 0x2e, 0x9d, 0xed, 0x1d,
-	0xe1, 0x51, 0x60, 0xd7, 0xf2, 0x8e, 0x11, 0xae, 0xf3, 0x02, 0x79, 0xac, 0x94, 0x94, 0x29, 0x23,
-	0x78, 0x91, 0xc8, 0x0b, 0x4e, 0x14, 0x14, 0xa5, 0x9b, 0xff, 0xff, 0x3f, 0x7b, 0x47, 0xff, 0xb0,
-	0x9f, 0xc6, 0x60, 0xb4, 0xfe, 0x17, 0x49, 0x94, 0x61, 0x5e, 0x68, 0xd2, 0xfc, 0x4f, 0x56, 0xe5,
-	0x50, 0x18, 0x5c, 0x28, 0xab, 0x53, 0xbd, 0x0c, 0x33, 0x94, 0x4a, 0x4b, 0x08, 0x8d, 0xc1, 0xdf,
-	0xc3, 0xe3, 0x07, 0xb4, 0x39, 0xf0, 0xe3, 0x07, 0x97, 0xb9, 0x17, 0x28, 0xb9, 0x60, 0xbd, 0x54,
-	0x2b, 0x82, 0x0d, 0x09, 0x67, 0xe4, 0x06, 0xde, 0xbc, 0x91, 0x9c, 0xb3, 0x0e, 0x55, 0x39, 0x88,
-	0xf6, 0xc8, 0x09, 0xbc, 0xb9, 0x9d, 0xf9, 0x80, 0xb5, 0x51, 0x0a, 0xd7, 0x3a, 0x6d, 0x94, 0x35,
-	0xa3, 0xe2, 0x15, 0x88, 0xce, 0x81, 0xa9, 0x67, 0x3e, 0x63, 0x5e, 0x5e, 0x26, 0x4b, 0x4c, 0xaf,
-	0xa0, 0x12, 0xdf, 0x46, 0x6e, 0xd0, 0x9f, 0x86, 0xe1, 0x97, 0xdb, 0x85, 0x37, 0x0d, 0x7f, 0x4b,
-	0x45, 0x99, 0xd2, 0xfc, 0xfd, 0x07, 0xfc, 0x2f, 0x1b, 0xc4, 0x25, 0x65, 0xa0, 0x08, 0xd3, 0x98,
-	0x50, 0x2b, 0xd1, 0xb5, 0x6b, 0x9e, 0xb8, 0x3c, 0x60, 0xc3, 0xd8, 0x18, 0x28, 0x6a, 0x71, 0x0d,
-	0x94, 0x69, 0x29, 0x7a, 0x16, 0x3c, 0xb5, 0xf9, 0x98, 0xfd, 0xb8, 0x87, 0xea, 0x6c, 0x51, 0x00,
-	0xac, 0x40, 0x91, 0xf8, 0x6e, 0xb1, 0x0f, 0x1e, 0x9f, 0xb2, 0x5f, 0x69, 0x9c, 0xc7, 0x09, 0x2e,
-	0x91, 0xaa, 0x4b, 0xb5, 0xd6, 0xc7, 0xb7, 0x3d, 0xcb, 0x7e, 0x9a, 0xd9, 0x26, 0x0b, 0x88, 0x09,
-	0xa4, 0x60, 0xb6, 0x8e, 0x46, 0xd6, 0x49, 0x99, 0x4b, 0x9b, 0xf4, 0x0f, 0xc9, 0x51, 0x9e, 0xcf,
-	0x9e, 0x76, 0xbe, 0xb3, 0xdd, 0xf9, 0xce, 0xcb, 0xce, 0x77, 0x1e, 0xf7, 0x7e, 0x6b, 0xbb, 0xf7,
-	0x5b, 0xcf, 0x7b, 0xbf, 0x75, 0x37, 0x5d, 0x20, 0x65, 0x65, 0x12, 0xa6, 0x7a, 0x15, 0xbd, 0x95,
-	0x37, 0x69, 0xda, 0x8b, 0x32, 0x94, 0x93, 0xba, 0xbe, 0x68, 0x13, 0xd5, 0x97, 0xad, 0x8f, 0x63,
-	0x92, 0xae, 0x8d, 0xff, 0xbf, 0x06, 0x00, 0x00, 0xff, 0xff, 0x8e, 0x16, 0xdf, 0x1a, 0x1e, 0x02,
-	0x00, 0x00,
+	// 339 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x7c, 0x91, 0xc1, 0x4e, 0xf2, 0x40,
+	0x14, 0x85, 0x29, 0xfd, 0x7f, 0x90, 0xd1, 0x80, 0x99, 0xb8, 0x98, 0x98, 0xd8, 0x10, 0x16, 0xa6,
+	0x1b, 0xda, 0x80, 0x4f, 0xa0, 0x71, 0x63, 0xa2, 0x1b, 0x16, 0x2e, 0xdc, 0x0d, 0x9d, 0x2b, 0xbd,
+	0xb1, 0xcc, 0x34, 0x33, 0x03, 0xa1, 0x6f, 0xc1, 0x63, 0xb9, 0x64, 0xe9, 0xd2, 0xc0, 0x8b, 0x98,
+	0x0e, 0xc5, 0x20, 0x12, 0x97, 0xe7, 0x7c, 0xe7, 0xb6, 0x27, 0x67, 0xc8, 0xb9, 0x31, 0x18, 0xcf,
+	0x07, 0xb1, 0x40, 0x11, 0xe5, 0x5a, 0x59, 0x45, 0xaf, 0xd2, 0x22, 0x07, 0x6d, 0x70, 0x22, 0x9d,
+	0x4e, 0x54, 0x16, 0xa5, 0x28, 0xa4, 0x12, 0x10, 0x19, 0x83, 0x97, 0x9d, 0xea, 0xc0, 0x2e, 0xb6,
+	0xf9, 0xde, 0xd2, 0x27, 0xfe, 0x3d, 0x0a, 0xca, 0x48, 0x33, 0x51, 0xd2, 0xc2, 0xc2, 0x32, 0xaf,
+	0xeb, 0x87, 0xad, 0xd1, 0x4e, 0xd2, 0x36, 0xa9, 0xa3, 0x60, 0xf5, 0xae, 0x17, 0xb6, 0x46, 0x75,
+	0x14, 0x34, 0x20, 0xa4, 0x44, 0x5a, 0x65, 0x19, 0x68, 0xe6, 0xbb, 0xf0, 0x9e, 0x43, 0x39, 0xa1,
+	0x73, 0xd0, 0xf8, 0x8a, 0x09, 0xb7, 0xa8, 0xe4, 0x13, 0xd8, 0x54, 0x09, 0xf6, 0xaf, 0xeb, 0x87,
+	0xa7, 0xc3, 0x41, 0xf4, 0x67, 0xbd, 0xe8, 0xf9, 0xd7, 0xe1, 0xe8, 0xc8, 0xc7, 0xe8, 0x35, 0x69,
+	0xf3, 0x99, 0x4d, 0x41, 0xda, 0xca, 0x67, 0xff, 0x5d, 0x8d, 0x03, 0x97, 0x86, 0xa4, 0xc3, 0x8d,
+	0x01, 0xbd, 0xd7, 0xa3, 0xe1, 0x82, 0x87, 0x36, 0xed, 0x91, 0xb3, 0x37, 0x28, 0x6e, 0x27, 0x1a,
+	0x60, 0x0a, 0xd2, 0xb2, 0xa6, 0x8b, 0xfd, 0xf0, 0xe8, 0x90, 0x5c, 0x24, 0x3c, 0xe7, 0x63, 0xcc,
+	0xd0, 0x16, 0x0f, 0x72, 0xae, 0xaa, 0x7f, 0x9f, 0xb8, 0xec, 0x51, 0xe6, 0x66, 0xd5, 0xc0, 0x2d,
+	0x08, 0xd6, 0x72, 0x0b, 0xee, 0x64, 0x49, 0x66, 0xb9, 0x70, 0x84, 0x6c, 0x49, 0x25, 0xef, 0x1e,
+	0xdf, 0xd7, 0x81, 0xb7, 0x5a, 0x07, 0xde, 0xe7, 0x3a, 0xf0, 0x96, 0x9b, 0xa0, 0xb6, 0xda, 0x04,
+	0xb5, 0x8f, 0x4d, 0x50, 0x7b, 0x19, 0x4e, 0xd0, 0xa6, 0xb3, 0x71, 0x94, 0xa8, 0x69, 0xfc, 0x3d,
+	0x64, 0x7f, 0xb7, 0x64, 0x9c, 0xa2, 0xe8, 0x97, 0x53, 0xc6, 0x8b, 0xb8, 0x7c, 0x66, 0x5b, 0xe4,
+	0x60, 0xc6, 0x0d, 0x87, 0x6f, 0xbe, 0x02, 0x00, 0x00, 0xff, 0xff, 0xb8, 0x5b, 0xee, 0xef, 0x2b,
+	0x02, 0x00, 0x00,
 }
 
 func (m *Did) Marshal() (dAtA []byte, err error) {
@@ -204,14 +195,14 @@ func (m *Did) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		copy(dAtA[i:], m.Updated)
 		i = encodeVarintDid(dAtA, i, uint64(len(m.Updated)))
 		i--
-		dAtA[i] = 0x5a
+		dAtA[i] = 0x52
 	}
 	if len(m.Created) > 0 {
 		i -= len(m.Created)
 		copy(dAtA[i:], m.Created)
 		i = encodeVarintDid(dAtA, i, uint64(len(m.Created)))
 		i--
-		dAtA[i] = 0x52
+		dAtA[i] = 0x4a
 	}
 	if len(m.CapabilityInvocation) > 0 {
 		for iNdEx := len(m.CapabilityInvocation) - 1; iNdEx >= 0; iNdEx-- {
@@ -219,7 +210,7 @@ func (m *Did) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			copy(dAtA[i:], m.CapabilityInvocation[iNdEx])
 			i = encodeVarintDid(dAtA, i, uint64(len(m.CapabilityInvocation[iNdEx])))
 			i--
-			dAtA[i] = 0x4a
+			dAtA[i] = 0x42
 		}
 	}
 	if len(m.KeyAgreement) > 0 {
@@ -228,7 +219,7 @@ func (m *Did) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			copy(dAtA[i:], m.KeyAgreement[iNdEx])
 			i = encodeVarintDid(dAtA, i, uint64(len(m.KeyAgreement[iNdEx])))
 			i--
-			dAtA[i] = 0x42
+			dAtA[i] = 0x3a
 		}
 	}
 	if len(m.AssertionMethod) > 0 {
@@ -237,7 +228,7 @@ func (m *Did) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			copy(dAtA[i:], m.AssertionMethod[iNdEx])
 			i = encodeVarintDid(dAtA, i, uint64(len(m.AssertionMethod[iNdEx])))
 			i--
-			dAtA[i] = 0x3a
+			dAtA[i] = 0x32
 		}
 	}
 	if len(m.Authentication) > 0 {
@@ -246,13 +237,13 @@ func (m *Did) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			copy(dAtA[i:], m.Authentication[iNdEx])
 			i = encodeVarintDid(dAtA, i, uint64(len(m.Authentication[iNdEx])))
 			i--
-			dAtA[i] = 0x32
+			dAtA[i] = 0x2a
 		}
 	}
-	if len(m.PublicKey) > 0 {
-		for iNdEx := len(m.PublicKey) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.VerificationMethod) > 0 {
+		for iNdEx := len(m.VerificationMethod) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.PublicKey[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.VerificationMethod[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -260,27 +251,22 @@ func (m *Did) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 				i = encodeVarintDid(dAtA, i, uint64(size))
 			}
 			i--
-			dAtA[i] = 0x2a
+			dAtA[i] = 0x22
 		}
 	}
-	if len(m.Name) > 0 {
-		i -= len(m.Name)
-		copy(dAtA[i:], m.Name)
-		i = encodeVarintDid(dAtA, i, uint64(len(m.Name)))
-		i--
-		dAtA[i] = 0x22
+	if len(m.Controller) > 0 {
+		for iNdEx := len(m.Controller) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.Controller[iNdEx])
+			copy(dAtA[i:], m.Controller[iNdEx])
+			i = encodeVarintDid(dAtA, i, uint64(len(m.Controller[iNdEx])))
+			i--
+			dAtA[i] = 0x1a
+		}
 	}
 	if len(m.Id) > 0 {
 		i -= len(m.Id)
 		copy(dAtA[i:], m.Id)
 		i = encodeVarintDid(dAtA, i, uint64(len(m.Id)))
-		i--
-		dAtA[i] = 0x1a
-	}
-	if len(m.Type) > 0 {
-		i -= len(m.Type)
-		copy(dAtA[i:], m.Type)
-		i = encodeVarintDid(dAtA, i, uint64(len(m.Type)))
 		i--
 		dAtA[i] = 0x12
 	}
@@ -319,20 +305,18 @@ func (m *Did) Size() (n int) {
 			n += 1 + l + sovDid(uint64(l))
 		}
 	}
-	l = len(m.Type)
-	if l > 0 {
-		n += 1 + l + sovDid(uint64(l))
-	}
 	l = len(m.Id)
 	if l > 0 {
 		n += 1 + l + sovDid(uint64(l))
 	}
-	l = len(m.Name)
-	if l > 0 {
-		n += 1 + l + sovDid(uint64(l))
+	if len(m.Controller) > 0 {
+		for _, s := range m.Controller {
+			l = len(s)
+			n += 1 + l + sovDid(uint64(l))
+		}
 	}
-	if len(m.PublicKey) > 0 {
-		for _, e := range m.PublicKey {
+	if len(m.VerificationMethod) > 0 {
+		for _, e := range m.VerificationMethod {
 			l = e.Size()
 			n += 1 + l + sovDid(uint64(l))
 		}
@@ -441,38 +425,6 @@ func (m *Did) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Type", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowDid
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthDid
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthDid
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Type = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
 			}
 			var stringLen uint64
@@ -503,9 +455,9 @@ func (m *Did) Unmarshal(dAtA []byte) error {
 			}
 			m.Id = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 4:
+		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Controller", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -533,11 +485,11 @@ func (m *Did) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Name = string(dAtA[iNdEx:postIndex])
+			m.Controller = append(m.Controller, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
-		case 5:
+		case 4:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field PublicKey", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field VerificationMethod", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -564,12 +516,12 @@ func (m *Did) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.PublicKey = append(m.PublicKey, &PublicKeyStruct{})
-			if err := m.PublicKey[len(m.PublicKey)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.VerificationMethod = append(m.VerificationMethod, &VerificationMethod{})
+			if err := m.VerificationMethod[len(m.VerificationMethod)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
-		case 6:
+		case 5:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Authentication", wireType)
 			}
@@ -601,7 +553,7 @@ func (m *Did) Unmarshal(dAtA []byte) error {
 			}
 			m.Authentication = append(m.Authentication, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
-		case 7:
+		case 6:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field AssertionMethod", wireType)
 			}
@@ -633,7 +585,7 @@ func (m *Did) Unmarshal(dAtA []byte) error {
 			}
 			m.AssertionMethod = append(m.AssertionMethod, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
-		case 8:
+		case 7:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field KeyAgreement", wireType)
 			}
@@ -665,7 +617,7 @@ func (m *Did) Unmarshal(dAtA []byte) error {
 			}
 			m.KeyAgreement = append(m.KeyAgreement, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
-		case 9:
+		case 8:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field CapabilityInvocation", wireType)
 			}
@@ -697,7 +649,7 @@ func (m *Did) Unmarshal(dAtA []byte) error {
 			}
 			m.CapabilityInvocation = append(m.CapabilityInvocation, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
-		case 10:
+		case 9:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Created", wireType)
 			}
@@ -729,7 +681,7 @@ func (m *Did) Unmarshal(dAtA []byte) error {
 			}
 			m.Created = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 11:
+		case 10:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Updated", wireType)
 			}

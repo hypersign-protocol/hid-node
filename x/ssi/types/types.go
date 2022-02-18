@@ -7,8 +7,13 @@ type (
 	}
 
 	Signer struct {
-		Signer          string
-		Authentication  []string
-		PublicKeyStruct []*PublicKeyStruct
+		Signer             string
+		Authentication     []string
+		VerificationMethod []*VerificationMethod
+	}
+
+	ValidDid struct {
+		Did     string
+		IsValid bool
 	}
 )

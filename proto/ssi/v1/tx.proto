@@ -23,37 +23,35 @@ message MsgCreateDID {
 
 message DidDocStructCreateDID {
   repeated string context = 1;
-  string type = 2;
-  string id = 3;
-  string name = 4;
-  repeated PublicKeyStruct publicKey = 5;
-  repeated string authentication = 6;
-  repeated string assertionMethod = 7;
-  repeated string keyAgreement = 8;
-  repeated string capabilityInvocation = 9;
-  string created = 10;
-  string updated = 11;
+  string id = 2;
+  repeated string controller = 3;
+  repeated VerificationMethod verificationMethod = 4;
+  repeated string authentication = 5;
+  repeated string assertionMethod = 6;
+  repeated string keyAgreement = 7;
+  repeated string capabilityInvocation = 8;
+  string created = 9;
+  string updated = 10;
 }
 
 message DidDocStructUpdateDID {
   repeated string context = 1;
-  string type = 2;
-  string id = 3;
-  string name = 4;
-  repeated PublicKeyStruct publicKey = 5;
-  repeated string authentication = 6;
-  repeated string assertionMethod = 7;
-  repeated string keyAgreement = 8;
-  repeated string capabilityInvocation = 9;
-  string created = 10;
-  string updated = 11;
+  string id = 2;
+  repeated string controller = 3;
+  repeated VerificationMethod verificationMethod = 4;
+  repeated string authentication = 5;
+  repeated string assertionMethod = 6;
+  repeated string keyAgreement = 7;
+  repeated string capabilityInvocation = 8;
+  string created = 9;
+  string updated = 10;
 }
 
-message PublicKeyStruct {
-  string context = 1;
-  string id = 2;
-  string type = 3;
-  string publicKeyBase58 = 4;
+message VerificationMethod {
+  string id = 1;
+  string type = 2;
+  string controller = 3;
+  string publicKeyMultibase = 4;
 }
 
 message MsgCreateDIDResponse {
