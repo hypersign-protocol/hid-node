@@ -11892,24 +11892,24 @@ paths:
                     type: array
                     items:
                       type: string
-                  type:
-                    type: string
                   id:
                     type: string
-                  name:
-                    type: string
-                  publicKey:
+                  controller:
+                    type: array
+                    items:
+                      type: string
+                  verificationMethod:
                     type: array
                     items:
                       type: object
                       properties:
-                        context:
-                          type: string
                         id:
                           type: string
                         type:
                           type: string
-                        publicKeyBase58:
+                        controller:
+                          type: string
+                        publicKeyMultibase:
                           type: string
                   authentication:
                     type: array
@@ -20164,24 +20164,24 @@ definitions:
         type: array
         items:
           type: string
-      type:
-        type: string
       id:
         type: string
-      name:
-        type: string
-      publicKey:
+      controller:
+        type: array
+        items:
+          type: string
+      verificationMethod:
         type: array
         items:
           type: object
           properties:
-            context:
-              type: string
             id:
               type: string
             type:
               type: string
-            publicKeyBase58:
+            controller:
+              type: string
+            publicKeyMultibase:
               type: string
       authentication:
         type: array
@@ -20210,24 +20210,24 @@ definitions:
         type: array
         items:
           type: string
-      type:
-        type: string
       id:
         type: string
-      name:
-        type: string
-      publicKey:
+      controller:
+        type: array
+        items:
+          type: string
+      verificationMethod:
         type: array
         items:
           type: object
           properties:
-            context:
-              type: string
             id:
               type: string
             type:
               type: string
-            publicKeyBase58:
+            controller:
+              type: string
+            publicKeyMultibase:
               type: string
       authentication:
         type: array
@@ -20269,17 +20269,6 @@ definitions:
   hypersignprotocol.hidnode.ssi.Params:
     type: object
     description: Params defines the parameters for the module.
-  hypersignprotocol.hidnode.ssi.PublicKeyStruct:
-    type: object
-    properties:
-      context:
-        type: string
-      id:
-        type: string
-      type:
-        type: string
-      publicKeyBase58:
-        type: string
   hypersignprotocol.hidnode.ssi.QueryDidDocCountResponse:
     type: object
     properties:
@@ -20296,24 +20285,24 @@ definitions:
             type: array
             items:
               type: string
-          type:
-            type: string
           id:
             type: string
-          name:
-            type: string
-          publicKey:
+          controller:
+            type: array
+            items:
+              type: string
+          verificationMethod:
             type: array
             items:
               type: object
               properties:
-                context:
-                  type: string
                 id:
                   type: string
                 type:
                   type: string
-                publicKeyBase58:
+                controller:
+                  type: string
+                publicKeyMultibase:
                   type: string
           authentication:
             type: array
@@ -20500,6 +20489,17 @@ definitions:
       verificationMethodId:
         type: string
       signature:
+        type: string
+  hypersignprotocol.hidnode.ssi.VerificationMethod:
+    type: object
+    properties:
+      id:
+        type: string
+      type:
+        type: string
+      controller:
+        type: string
+      publicKeyMultibase:
         type: string
   ibc.applications.transfer.v1.DenomTrace:
     type: object

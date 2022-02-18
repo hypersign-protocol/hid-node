@@ -52,33 +52,32 @@ func (msg *MsgUpdateDID) ValidateBasic() error {
 }
 
 func (msg *DidDocStructUpdateDID) GetSigners() []Signer {
-	// TODO: Implemt this when working on the updated DidDoc standard
-	// if len(msg.Controller) > 0 {
-	// 	result := make([]Signer, len(msg.Controller))
+	if len(msg.Controller) > 0 {
+		result := make([]Signer, len(msg.Controller))
 
-	// 	for i, controller := range msg.Controller {
-	// 		if controller == msg.Id {
-	// 			result[i] = Signer{
-	// 				Signer:             controller,
-	// 				Authentication:     msg.Authentication,
-	// 				VerificationMethod: msg.VerificationMethod,
-	// 			}
-	// 		} else {
-	// 			result[i] = Signer{
-	// 				Signer: controller,
-	// 			}
-	// 		}
-	// 	}
+		for i, controller := range msg.Controller {
+			if controller == msg.Id {
+				result[i] = Signer{
+					Signer:             controller,
+					Authentication:     msg.Authentication,
+					VerificationMethod: msg.VerificationMethod,
+				}
+			} else {
+				result[i] = Signer{
+					Signer: controller,
+				}
+			}
+		}
 
-	// 	return result
-	// }
+		return result
+	}
 
 	if len(msg.Authentication) > 0 {
 		return []Signer{
 			{
 				Signer:          msg.Id,
 				Authentication:  msg.Authentication,
-				PublicKeyStruct: msg.PublicKey,
+				VerificationMethod: msg.VerificationMethod,
 			},
 		}
 	}

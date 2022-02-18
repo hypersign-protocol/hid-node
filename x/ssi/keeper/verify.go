@@ -4,6 +4,7 @@ import (
 	"crypto/ed25519"
 	"encoding/base64"
 	"fmt"
+	"reflect"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -11,9 +12,13 @@ import (
 	"github.com/hypersign-protocol/hid-node/x/ssi/utils"
 )
 
+// Ref 1: The current implementatition takes in the verification key and checks if that belongs to EITHER
+// of the DID controllers. If so, then the signature is valid, which is an approach as opposed to the earlier
+// implementation where all the signatures of all DIDs present in DID controller were expected. This needs to be verified.
+// Link to DID Controller Spec: https://www.w3.org/TR/did-core/#did-controller
 func VerifyIdentitySignature(signer types.Signer, signatures []*types.SignInfo, signingInput []byte) (bool, error) {
-	result := true
-	foundOne := false
+	result := false
+	// foundOne := false
 
 	for _, info := range signatures {
 		did, _ := utils.SplitDidUrlIntoDid(info.VerificationMethodId)
@@ -28,14 +33,14 @@ func VerifyIdentitySignature(signer types.Signer, signatures []*types.SignInfo, 
 				return false, err
 			}
 
-			result = result && ed25519.Verify(pubKey, signingInput, signature)
-			foundOne = true
+			result = ed25519.Verify(pubKey, signingInput, signature)
+			// foundOne = true
 		}
 	}
 
-	if !foundOne {
-		return false, fmt.Errorf("signature %s not found", signer.Signer)
-	}
+	// if !foundOne {
+	// 	return false, fmt.Errorf("signature %s not found", signer.Signer)
+	// }
 
 	return result, nil
 }
@@ -43,37 +48,34 @@ func VerifyIdentitySignature(signer types.Signer, signatures []*types.SignInfo, 
 func (k msgServer) VerifySignatureOnDidUpdate(ctx *sdk.Context, oldDIDDoc *types.DidDocStructCreateDID, newDIDDoc *types.DidDocStructUpdateDID, signatures []*types.SignInfo) error {
 	var signers []types.Signer
 
-	// TODO: Implement when controller feild is used.
-	// Get Old DID Doc controller if it's nil then assign self
-	// oldController := oldDIDDoc.Controller
-	// if len(oldController) == 0 {
-	// 	oldController = []string{oldDIDDoc.Id}
-	// }
+	oldController := oldDIDDoc.Controller
+	if len(oldController) == 0 {
+		oldController = []string{oldDIDDoc.Id}
+	}
 
-	// for _, controller := range oldController {
-	// 	signers = append(signers, types.Signer{Signer: controller})
-	// }
+	for _, controller := range oldController {
+		signers = append(signers, types.Signer{Signer: controller})
+	}
 
-	// TODO: Implement this when `controller` field is added
-	// for _, oldVM := range oldDIDDoc.PublicKey {
-	// 	newVM := utils.FindVerificationMethod(newDIDDoc.PublicKey, oldVM.Id)
+	for _, oldVM := range oldDIDDoc.VerificationMethod {
+		newVM := utils.FindVerificationMethod(newDIDDoc.VerificationMethod, oldVM.Id)
 
-	// 	// Verification Method has been deleted
-	// 	if newVM == nil {
-	// 		signers = AppendSignerIfNeed(signers, oldVM.Controller, newDIDDoc)
-	// 		continue
-	// 	}
+		// Verification Method has been deleted
+		if newVM == nil {
+			signers = AppendSignerIfNeed(signers, oldVM.Controller, newDIDDoc)
+			continue
+		}
 
-	// 	// Verification Method has been changed
-	// 	if !reflect.DeepEqual(oldVM, newVM) {
-	// 		signers = AppendSignerIfNeed(signers, newVM.Controller, newDIDDoc)
-	// 	}
+		// Verification Method has been changed
+		if !reflect.DeepEqual(oldVM, newVM) {
+			signers = AppendSignerIfNeed(signers, newVM.Controller, newDIDDoc)
+		}
 
-	// 	// Verification Method Controller has been changed, need to add old controller
-	// 	if newVM.Controller != oldVM.Controller {
-	// 		signers = AppendSignerIfNeed(signers, oldVM.Controller, newDIDDoc)
-	// 	}
-	// }
+		// Verification Method Controller has been changed, need to add old controller
+		if newVM.Controller != oldVM.Controller {
+			signers = AppendSignerIfNeed(signers, oldVM.Controller, newDIDDoc)
+		}
+	}
 
 	if err := k.VerifySignature(ctx, newDIDDoc, signers, signatures); err != nil {
 		return err
@@ -83,26 +85,32 @@ func (k msgServer) VerifySignatureOnDidUpdate(ctx *sdk.Context, oldDIDDoc *types
 }
 
 // TODO: Implement this when `controller` field is added
-// func AppendSignerIfNeed(signers []types.Signer, controller string, msg *types.MsgUpdateDidPayload) []types.Signer {
-// 	for _, signer := range signers {
-// 		if signer.Signer == controller {
-// 			return signers
-// 		}
-// 	}
+func AppendSignerIfNeed(signers []types.Signer, controller string, msg *types.DidDocStructUpdateDID) []types.Signer {
+	for _, signer := range signers {
+		if signer.Signer == controller {
+			return signers
+		}
+	}
 
-// 	signer := types.Signer{
-// 		Signer: controller,
-// 	}
+	signer := types.Signer{
+		Signer: controller,
+	}
 
-// 	if controller == msg.Id {
-// 		signer.VerificationMethod = msg.VerificationMethod
-// 		signer.Authentication = msg.Authentication
-// 	}
+	if controller == msg.Id {
+		signer.VerificationMethod = msg.VerificationMethod
+		signer.Authentication = msg.Authentication
+	}
 
-// 	return append(signers, signer)
-// }
+	return append(signers, signer)
+}
 
+// Ref 1: The current implementatition takes in the verification key and checks if that belongs to EITHER
+// of the DID controllers. If so, then the signature is valid, which is an approach as opposed to the earlier
+// implementation where all the signatures of all DIDs present in DID controller were expected. This needs to be verified.
+// Link to DID Controller Spec: https://www.w3.org/TR/did-core/#did-controller
 func (k *Keeper) VerifySignature(ctx *sdk.Context, msg types.IdentityMsg, signers []types.Signer, signatures []*types.SignInfo) error {
+	var validArr []types.ValidDid
+	
 	if len(signers) == 0 {
 		return types.ErrInvalidSignature.Wrap("At least one signer should be present")
 	}
@@ -114,33 +122,41 @@ func (k *Keeper) VerifySignature(ctx *sdk.Context, msg types.IdentityMsg, signer
 	signingInput := msg.GetSignBytes()
 
 	for _, signer := range signers {
-		// TODO: Understand stateValue part of it on Cheqd
-		// if signer.PublicKeyStruct == nil {
-		// 	state, err := k.GetDid(ctx, signer.Signer)
-		// 	if err != nil {
-		// 		return types.ErrDidDocNotFound.Wrap(signer.Signer)
-		// 	}
+		if signer.VerificationMethod == nil {
+			didDoc, err := k.GetDid(ctx, signer.Signer)
+			if err != nil {
+				return types.ErrDidDocNotFound.Wrap(signer.Signer)
+			}
 
-		// 	didDoc, err := state.UnpackDataAsDid()
-		// 	if err != nil {
-		// 		return types.ErrDidDocNotFound.Wrap(signer.Signer)
-		// 	}
-
-		// 	signer.Authentication = didDoc.Authentication
-		// 	signer.PublicKeyStruct = didDoc.PublicKeyStruct
-		// }
+			signer.Authentication = didDoc.Authentication
+			signer.VerificationMethod = didDoc.VerificationMethod
+		}
 
 		valid, err := VerifyIdentitySignature(signer, signatures, signingInput)
 		if err != nil {
 			return sdkerrors.Wrap(types.ErrInvalidSignature, err.Error())
 		}
 
-		if !valid {
-			return sdkerrors.Wrap(types.ErrInvalidSignature, signer.Signer)
-		}
+		validArr = append(validArr, types.ValidDid{Did: signer.Signer, IsValid: valid})
+	}
+
+	didFoundTrue := contains(validArr)
+
+	if didFoundTrue == (types.ValidDid{}) {
+		return sdkerrors.Wrap(types.ErrInvalidSignature, didFoundTrue.Did)
 	}
 
 	return nil
+}
+
+// TODO: Look for a better way to do this
+func contains(s []types.ValidDid) (types.ValidDid) {
+	for _, v := range s {
+		if v.IsValid {
+			return v
+		}
+	}
+	return types.ValidDid{}
 }
 
 func (k *Keeper) VerifySignatureOnCreateSchema(ctx *sdk.Context, msg *types.Schema, signers []types.Signer, signatures []*types.SignInfo) error {
@@ -182,5 +198,36 @@ func (k *Keeper) VerifySignatureOnCreateSchema(ctx *sdk.Context, msg *types.Sche
 		}
 	}
 
+	return nil
+}
+
+func (k *Keeper) ValidateController(ctx *sdk.Context, id string, controller string) error {
+	if id == controller {
+		return nil
+	}
+	didDoc, err := k.GetDid(ctx, controller)
+	if err != nil {
+		return types.ErrDidDocNotFound.Wrap(controller)
+	}
+	if len(didDoc.Authentication) == 0 {
+		return types.ErrBadRequestInvalidVerMethod.Wrap(
+			fmt.Sprintf("Verificatition method controller %s doesn't have an authentication keys", controller))
+	}
+	return nil
+}
+
+func (k msgServer) ValidateDidControllers(ctx *sdk.Context, id string, controllers []string, verMethods []*types.VerificationMethod) error {
+
+	for _, verificationMethod := range verMethods {
+		if err := k.ValidateController(ctx, id, verificationMethod.Controller); err != nil {
+			return err
+		}
+	}
+
+	for _, didController := range controllers {
+		if err := k.ValidateController(ctx, id, didController); err != nil {
+			return err
+		}
+	}
 	return nil
 }

@@ -36,12 +36,15 @@ func (k msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*t
 		return nil, sdkerrors.Wrap(types.ErrDidDocExists, fmt.Sprintf("DID already exists %s", did))
 	}
 
+	if k.ValidateDidControllers(&ctx, did, didMsg.GetController(), didMsg.GetVerificationMethod()) != nil {
+		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, "DID controller is not valid")
+	}
+	
 	var didSpec = types.Did{
 		Context:              didMsg.GetContext(),
-		Type:                 didMsg.GetType(),
 		Id:                   didMsg.GetId(),
-		Name:                 didMsg.GetName(),
-		PublicKey:            didMsg.GetPublicKey(),
+		Controller:           didMsg.GetController(),
+		VerificationMethod:   didMsg.GetVerificationMethod(),
 		Authentication:       didMsg.GetAuthentication(),
 		AssertionMethod:      didMsg.GetAssertionMethod(),
 		KeyAgreement:         didMsg.GetKeyAgreement(),

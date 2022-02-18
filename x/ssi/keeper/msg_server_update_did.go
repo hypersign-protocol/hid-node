@@ -15,16 +15,12 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 	didMsg := msg.GetDidDocString()
 	did := msg.GetDidDocString().GetId()
 
-	// TODO: The oldDidDoc is used k.VerifySignatureOnDidUpdate function
-	// Since, there are issues with with fields of DiDDoc such as
-	// controller not being used, this needs to be used later
-	// --------------------------------------------------------------
-	// oldDIDDoc, err := k.GetDid(&ctx, didMsg.Id)
-	// if err != nil {
-	// 	return nil, err
-	// }
+	oldDIDDoc, err := k.GetDid(&ctx, didMsg.Id)
+	if err != nil {
+		return nil, err
+	}
 
-	// TODO: Generic format for both DidDocStructCreateDID and DidDocStructUpdateDID. Checks if the DidDoc is a valid format
+	// TODO: Implement this when we have generic type for Create and Update DID
 	// didDocCheck := utils.IsValidDidDoc(didMsg)
 	// if didDocCheck != "" {
 	// 	return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, didDocCheck)
@@ -35,10 +31,13 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("DID doesnt exists %s", did))
 	}
 
-	// TODO: This needs update when controller field is used
-	// if err := k.VerifySignatureOnDidUpdate(&ctx, oldDIDDoc, didMsg, msg.Signatures); err != nil {
-	// 	return nil, err
-	// }
+	if k.ValidateDidControllers(&ctx, did, didMsg.GetController(), didMsg.GetVerificationMethod()) != nil {
+		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, "DID controller is not valid")
+	}
+	
+	if err := k.VerifySignatureOnDidUpdate(&ctx, oldDIDDoc, didMsg, msg.Signatures); err != nil {
+		return nil, err
+	}
 
 	// TODO: Implement this when the version ID is used
 	// if oldStateValue.Metadata.VersionId != didMsg.VersionId {
@@ -48,10 +47,9 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 
 	var didSpec = types.Did{
 		Context:              didMsg.GetContext(),
-		Type:                 didMsg.GetType(),
 		Id:                   didMsg.GetId(),
-		Name:                 didMsg.GetName(),
-		PublicKey:            didMsg.GetPublicKey(),
+		Controller:           didMsg.GetController(),
+		VerificationMethod:   didMsg.GetVerificationMethod(),
 		Authentication:       didMsg.GetAuthentication(),
 		AssertionMethod:      didMsg.GetAssertionMethod(),
 		KeyAgreement:         didMsg.GetKeyAgreement(),
