@@ -16,6 +16,7 @@ hid-noded tx ssi update-did '{
 ],
 "id": "did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52",
 "controller": ["did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52","did:hs:0f49341a-20ef-43d1-bc93-de30993e6c51"],
+"alsoKnownAs": ["did:hs:1f49341a-de30993e6c52"],
 "verificationMethod": [
 {
 "id": "did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52#z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4",
@@ -45,6 +46,7 @@ hid-noded tx ssi update-did '{
 ],
 "id": "did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52",
 "controller": ["did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52","did:hs:0f49341a-20ef-43d1-bc93-de30993e6c51"],
+"alsoKnownAs": ["did:hs:1f49341a-de30993e6c52"],
 "verificationMethod": [
 {
 "id": "did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52#z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4",
@@ -76,6 +78,7 @@ hid-noded tx ssi update-did '{
 ],
 "id": "did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52",
 "controller": ["did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52","did:hs:0f49341a-20ef-43d1-bc93-de30993e6c51","did:hs:0f49341a-20ef-43d1-bc93-de30993e6c53"],
+"alsoKnownAs": ["did:hs:1f49341a-de30993e6c52"],
 "verificationMethod": [
 {
 "id": "did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52#z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4",
@@ -105,6 +108,7 @@ hid-noded tx ssi update-did '{
 ],
 "id": "did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52",
 "controller": ["did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52","did:hs:0f49341a-20ef-43d1-bc93-de30993e6c51","did:hs:0f49341a-20ef-43d1-bc93-de30993e6c53"],
+"alsoKnownAs": ["did:hs:1f49341a-de30993e6c52"],
 "verificationMethod": [
 {
 "id": "did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52#z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4",

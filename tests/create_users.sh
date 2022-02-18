@@ -10,6 +10,7 @@ hid-noded tx ssi create-did '{
 ],
 "id": "did:hs:0f49341a-20ef-43d1-bc93-de30993e6c51",
 "controller": [],
+"alsoKnownAs": ["did:hs:1f49341a-de30993e6c51"],
 "verificationMethod": [
 {
 "id": "did:hs:0f49341a-20ef-43d1-bc93-de30993e6c51#zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf",
@@ -39,6 +40,7 @@ hid-noded tx ssi create-did '{
 ],
 "id": "did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52",
 "controller": ["did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52"],
+"alsoKnownAs": ["did:hs:1f49341a-de30993e6c52"],
 "verificationMethod": [
 {
 "id": "did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52#z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4",
@@ -68,6 +70,7 @@ hid-noded tx ssi create-did '{
 ],
 "id": "did:hs:0f49341a-20ef-43d1-bc93-de30993e6c53",
 "controller": [],
+"alsoKnownAs": ["did:hs:1f49341a-de30993e6c53"],
 "verificationMethod": [
 {
 "id": "did:hs:0f49341a-20ef-43d1-bc93-de30993e6c53#zE2seaoaAwBzfLaTd7oqEf5GJZdEiQgo64ayJgMstRZ91",

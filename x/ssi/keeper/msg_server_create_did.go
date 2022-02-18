@@ -39,11 +39,12 @@ func (k msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*t
 	if k.ValidateDidControllers(&ctx, did, didMsg.GetController(), didMsg.GetVerificationMethod()) != nil {
 		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, "DID controller is not valid")
 	}
-	
+
 	var didSpec = types.Did{
 		Context:              didMsg.GetContext(),
 		Id:                   didMsg.GetId(),
 		Controller:           didMsg.GetController(),
+		AlsoKnownAs:          didMsg.GetAlsoKnownAs(),
 		VerificationMethod:   didMsg.GetVerificationMethod(),
 		Authentication:       didMsg.GetAuthentication(),
 		AssertionMethod:      didMsg.GetAssertionMethod(),

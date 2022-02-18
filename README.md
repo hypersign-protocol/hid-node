@@ -72,6 +72,35 @@ hid-noded tx ssi create-did '{
 ```
 Note: While performing a CLI transaction, it is required to pass chain-id as `--chain-id hidnode` , as the default chain id set is `hid-node` which will cause the transaction to fail.
 
+## Update DID
+
+After the DIDDoc is created from running the above command, making changes to it happens through the following CLI command:
+
+```sh
+hid-noded tx ssi update-did '{
+"context": [
+"https://www.w3.org/ns/did/v1",
+"https://w3id.org/security/v1",
+"https://schema.org",
+"https://some.domain"
+],
+"id": "did:hs:0f49341a-20ef-43d1-bc93-de30993e6c51",
+"controller": ["did:hs:0f49341a-20ef-43d1-bc93-de30993e6c51"],
+"verificationMethod": [
+{
+"id": "did:hs:0f49341a-20ef-43d1-bc93-de30993e6c51#zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf",
+"type": "Ed25519VerificationKey2020",
+"controller": "did:hs:0f49341a-20ef-43d1-bc93-de30993e6c51",
+"publicKeyMultibase": "zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf"
+}
+],
+"authentication": [
+"did:hs:0f49341a-20ef-43d1-bc93-de30993e6c51#zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf"
+]
+}' did:hs:0f49341a-20ef-43d1-bc93-de30993e6c51#zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf --ver-key oVtY1xceDZQjkfwlbCEC2vgeADcxpgd27vtYasBhcM/JLR6PnPoD9jvjSJrMsMJwS7faPy5OlFCdj/kgLVZMEg== --from alice --chain-id hidnode
+```
+The `context` field of the DIDDoc is now updated with a new entry: `"https://some.domain"`
+
 ## Resolve DID
 
 There are two ways to resolve DID:
