@@ -9,13 +9,13 @@ import (
 )
 
 func getVerKey(cmd *cobra.Command, clientCtx client.Context) (ed25519.PrivateKey, error) {
-	// Try getting from arg
+	// Get the verification key from --ver-key flag
 	verKeyPrivBase64, err := cmd.Flags().GetString(VerKeyFlag)
 	if err != nil {
 		return nil, err
 	}
 
-	// Decode key
+	// Decode key into bytes
 	verKeyPrivBytes, err := base64.StdEncoding.DecodeString(verKeyPrivBase64)
 	if err != nil {
 		return nil, err

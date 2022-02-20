@@ -6,6 +6,7 @@ package hypersignprotocol.hidnode.ssi;
 option go_package = "github.com/hypersign-protocol/hid-node/x/ssi/types";
 
 import "ssi/v1/schema.proto";
+import "ssi/v1/did.proto";
 
 // Msg defines the Msg service.
 service Msg {
@@ -16,57 +17,17 @@ service Msg {
 }
 
 message MsgCreateDID {
-  DidDocStructCreateDID didDocString = 1;
+  Did didDocString = 1;
   repeated SignInfo signatures = 2;
   string creator = 3;
-}
-
-message DidDocStructCreateDID {
-  repeated string context = 1;
-  string id = 2;
-  repeated string controller = 3;  // DID Controller Spec: https://www.w3.org/TR/did-core/#did-controller
-  repeated string alsoKnownAs = 4;
-  repeated VerificationMethod verificationMethod = 5;
-  repeated string authentication = 6;
-  repeated string assertionMethod = 7;
-  repeated string keyAgreement = 8;
-  repeated string capabilityInvocation = 9;
-  string created = 10;
-  string updated = 11;
-}
-
-message DidDocStructUpdateDID {
-  repeated string context = 1;
-  string id = 2;
-  repeated string controller = 3;  // DID Controller Spec: https://www.w3.org/TR/did-core/#did-controller
-  repeated string alsoKnownAs = 4;
-  repeated VerificationMethod verificationMethod = 5;
-  repeated string authentication = 6;
-  repeated string assertionMethod = 7;
-  repeated string keyAgreement = 8;
-  repeated string capabilityInvocation = 9;
-  string created = 10;
-  string updated = 11;
-}
-
-message VerificationMethod {
-  string id = 1;
-  string type = 2;
-  string controller = 3;
-  string publicKeyMultibase = 4;
 }
 
 message MsgCreateDIDResponse {
   uint64 id = 1;
 }
 
-message SignInfo {
-  string verification_method_id = 1;
-  string signature = 2;
-}
-
 message MsgUpdateDID {
-  DidDocStructUpdateDID didDocString = 1;
+  Did didDocString = 1;
   repeated SignInfo signatures = 2;
   string creator = 3;
 }
