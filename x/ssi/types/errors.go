@@ -18,5 +18,6 @@ var (
 	ErrDidDocNotFound             = sdkerrors.Register(ModuleName, 108, "DID Doc not found")
 	ErrSchemaExists               = sdkerrors.Register(ModuleName, 109, "Schema already exists")
 	ErrInvalidSchemaID            = sdkerrors.Register(ModuleName, 110, "Invalid schema Id")
-	ErrBadRequestInvalidVerMethod = sdkerrors.Register(ModuleName, 111, "invalid verification method")
+	ErrBadRequestInvalidVerMethod = sdkerrors.Register(ModuleName, 111, "Invalid verification method")
+	ErrInvalidService             = sdkerrors.Register(ModuleName, 112, "Invalid Service")
 )

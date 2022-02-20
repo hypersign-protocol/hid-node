@@ -2,7 +2,6 @@ package utils
 
 import (
 	"crypto/ed25519"
-	"encoding/base64"
 	"errors"
 	"fmt"
 	"regexp"
@@ -11,16 +10,64 @@ import (
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 )
 
-var did_prefix string = "did:hs:"
-
 // Checks whether the given string is a valid DID
 func IsValidDid(did string) bool {
-	return strings.HasPrefix(did, did_prefix)
+	return strings.HasPrefix(did, DidPrefix)
 }
 
 // Checks whether the ID in the DidDoc is a valid string
-func IsValidDidDocID(didDoc *types.DidDocStructCreateDID) bool {
-	return strings.HasPrefix(didDoc.GetId(), did_prefix)
+func IsValidDidDocID(didDoc *types.Did) bool {
+	return strings.HasPrefix(didDoc.GetId(), DidPrefix)
+}
+
+// Cheks whether the Service is valid
+func ValidateServices(services []*types.Service) error {
+	for idx, service := range services {
+		if !IsValidDidFragment(service.Id) {
+			return types.ErrInvalidService.Wrapf("Service ID %s is Invalid", service.Id)
+		}
+
+		if !IsValidDidServiceType(service.Type) {
+			return types.ErrInvalidService.Wrapf("Service Type %s is Invalid", service.Type)
+		}
+
+		if DuplicateServiceExists(service.Id, services[idx+1:]) {
+			return types.ErrInvalidService.Wrapf("Service with Id: %s is duplicate", service.Id)
+		}
+	}
+	return nil
+}
+
+// Check for valid DID fragment
+func IsValidDidFragment(didUrl string) bool {
+	if !strings.Contains(didUrl, "#") {
+		return false
+	}
+
+	did, _ := SplitDidUrlIntoDid(didUrl)
+	hasPrefix := IsValidDid(did)
+	return hasPrefix
+}
+
+// Check Valid DID service type
+func IsValidDidServiceType(sType string) bool {
+	for _, val := range ServiceTypes {
+		if val == sType {
+			return true
+		}
+	}
+	return false
+}
+
+func DuplicateServiceExists(serviceId string, services []*types.Service) bool {
+	did, _ := SplitDidUrlIntoDid(serviceId)
+	for _, s := range services {
+		sDid, _ := SplitDidUrlIntoDid(s.Id)
+		if did == sDid {
+			return true
+		}
+	}
+	return false
 }
 
 // Check whether the fields whose values are array of DIDs are valid DID
@@ -34,16 +81,17 @@ func IsValidDIDArray(didArray []string) bool {
 }
 
 // Checks whether the DidDoc string is valid
-func IsValidDidDoc(didDoc *types.DidDocStructCreateDID) string {
+func IsValidDidDoc(didDoc *types.Did) string {
 	didArrayMap := map[string][]string{
 		"authentication":       didDoc.GetAuthentication(),
 		"assertionMethod":      didDoc.GetAssertionMethod(),
 		"keyAgreement":         didDoc.GetKeyAgreement(),
 		"capabilityInvocation": didDoc.GetCapabilityInvocation(),
+		"capabilityDelegation": didDoc.GetCapabilityDelegation(),
 	}
 
 	nonEmptyFields := map[string]string{
-		"id":   didDoc.GetId(),
+		"id": didDoc.GetId(),
 	}
 
 	// Invalid ID check
@@ -64,36 +112,15 @@ func IsValidDidDoc(didDoc *types.DidDocStructCreateDID) string {
 			return fmt.Sprintf("The field %s must have a value", field)
 		}
 	}
+
+	// Valid Services Check
+	err := ValidateServices(didDoc.GetService())
+	if err != nil {
+		return fmt.Sprint(err)
+	}
+
 	return ""
-}
 
-func VerifyIdentitySignature(signer types.Signer, signatures []*types.SignInfo, signingInput []byte) (bool, error) {
-	result := true
-	foundOne := false
-
-	for _, info := range signatures {
-		did, _ := SplitDidUrlIntoDid(info.VerificationMethodId)
-		if did == signer.Signer {
-			pubKey, err := FindPublicKey(signer, info.VerificationMethodId)
-			if err != nil {
-				return false, err
-			}
-
-			signature, err := base64.StdEncoding.DecodeString(info.Signature)
-			if err != nil {
-				return false, err
-			}
-
-			result = result && ed25519.Verify(pubKey, signingInput, signature)
-			foundOne = true
-		}
-	}
-
-	if !foundOne {
-		return false, fmt.Errorf("signature %s not found", signer.Signer)
-	}
-
-	return result, nil
 }
 
 func SplitDidUrlIntoDid(didUrl string) (string, string) {

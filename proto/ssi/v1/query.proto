@@ -84,7 +84,7 @@ message QueryGetDidDocByIdRequest {
 }
 
 message QueryGetDidDocByIdResponse {
-  DidDocStructCreateDID didDoc = 1;
+  Did didDoc = 1;
 }
 
 message QueryDidDocCountRequest {

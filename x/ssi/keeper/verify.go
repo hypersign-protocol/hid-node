@@ -45,7 +45,7 @@ func VerifyIdentitySignature(signer types.Signer, signatures []*types.SignInfo, 
 	return result, nil
 }
 
-func (k msgServer) VerifySignatureOnDidUpdate(ctx *sdk.Context, oldDIDDoc *types.DidDocStructCreateDID, newDIDDoc *types.DidDocStructUpdateDID, signatures []*types.SignInfo) error {
+func (k msgServer) VerifySignatureOnDidUpdate(ctx *sdk.Context, oldDIDDoc *types.Did, newDIDDoc *types.Did, signatures []*types.SignInfo) error {
 	var signers []types.Signer
 
 	oldController := oldDIDDoc.Controller
@@ -84,8 +84,7 @@ func (k msgServer) VerifySignatureOnDidUpdate(ctx *sdk.Context, oldDIDDoc *types
 	return nil
 }
 
-// TODO: Implement this when `controller` field is added
-func AppendSignerIfNeed(signers []types.Signer, controller string, msg *types.DidDocStructUpdateDID) []types.Signer {
+func AppendSignerIfNeed(signers []types.Signer, controller string, msg *types.Did) []types.Signer {
 	for _, signer := range signers {
 		if signer.Signer == controller {
 			return signers
@@ -108,7 +107,7 @@ func AppendSignerIfNeed(signers []types.Signer, controller string, msg *types.Di
 // of the DID controllers. If so, then the signature is valid, which is an approach as opposed to the earlier
 // implementation where all the signatures of all DIDs present in DID controller were expected. This needs to be verified.
 // Link to DID Controller Spec: https://www.w3.org/TR/did-core/#did-controller
-func (k *Keeper) VerifySignature(ctx *sdk.Context, msg types.IdentityMsg, signers []types.Signer, signatures []*types.SignInfo) error {
+func (k *Keeper) VerifySignature(ctx *sdk.Context, msg *types.Did, signers []types.Signer, signatures []*types.SignInfo) error {
 	var validArr []types.ValidDid
 	
 	if len(signers) == 0 {
@@ -171,7 +170,7 @@ func (k *Keeper) VerifySignatureOnCreateSchema(ctx *sdk.Context, msg *types.Sche
 	signingInput := msg.GetSignBytes()
 
 	for _, signer := range signers {
-		// TODO: Understand stateValue part of it on Cheqd
+		// TODO: Uncomment when Schema is being implemented properly
 		// if signer.PublicKeyStruct == nil {
 		// 	state, err := k.GetDid(ctx, signer.Signer)
 		// 	if err != nil {

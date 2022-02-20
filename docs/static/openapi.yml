@@ -11931,6 +11931,21 @@ paths:
                     type: array
                     items:
                       type: string
+                  capabilityDelegation:
+                    type: array
+                    items:
+                      type: string
+                  service:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        type:
+                          type: string
+                        serviceEndpoint:
+                          type: string
                   created:
                     type: string
                   updated:
@@ -20161,7 +20176,7 @@ definitions:
     description: >-
       MsgCreateVestingAccountResponse defines the Msg/CreateVestingAccount
       response type.
-  hypersignprotocol.hidnode.ssi.DidDocStructCreateDID:
+  hypersignprotocol.hidnode.ssi.Did:
     type: object
     properties:
       context:
@@ -20207,28 +20222,11 @@ definitions:
         type: array
         items:
           type: string
-      created:
-        type: string
-      updated:
-        type: string
-  hypersignprotocol.hidnode.ssi.DidDocStructUpdateDID:
-    type: object
-    properties:
-      context:
+      capabilityDelegation:
         type: array
         items:
           type: string
-      id:
-        type: string
-      controller:
-        type: array
-        items:
-          type: string
-      alsoKnownAs:
-        type: array
-        items:
-          type: string
-      verificationMethod:
+      service:
         type: array
         items:
           type: object
@@ -20237,26 +20235,8 @@ definitions:
               type: string
             type:
               type: string
-            controller:
+            serviceEndpoint:
               type: string
-            publicKeyMultibase:
-              type: string
-      authentication:
-        type: array
-        items:
-          type: string
-      assertionMethod:
-        type: array
-        items:
-          type: string
-      keyAgreement:
-        type: array
-        items:
-          type: string
-      capabilityInvocation:
-        type: array
-        items:
-          type: string
       created:
         type: string
       updated:
@@ -20336,6 +20316,21 @@ definitions:
             type: array
             items:
               type: string
+          capabilityDelegation:
+            type: array
+            items:
+              type: string
+          service:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: string
+                type:
+                  type: string
+                serviceEndpoint:
+                  type: string
           created:
             type: string
           updated:
@@ -20499,6 +20494,15 @@ definitions:
           type: string
       additionalProperties:
         type: boolean
+  hypersignprotocol.hidnode.ssi.Service:
+    type: object
+    properties:
+      id:
+        type: string
+      type:
+        type: string
+      serviceEndpoint:
+        type: string
   hypersignprotocol.hidnode.ssi.SignInfo:
     type: object
     properties:

@@ -2,8 +2,6 @@ syntax = "proto3";
 package hypersignprotocol.hidnode.ssi;
 option go_package = "github.com/hypersign-protocol/hid-node/x/ssi/types";
 
-import "ssi/v1/tx.proto";
-
 message Did {
   repeated string context = 1;
   string id = 2;
@@ -14,6 +12,26 @@ message Did {
   repeated string assertionMethod = 7;
   repeated string keyAgreement = 8;
   repeated string capabilityInvocation = 9;
-  string created = 10;
-  string updated = 11;
+  repeated string capabilityDelegation = 10;
+  repeated Service service = 11;
+  string created = 12;
+  string updated = 13;
+}
+
+message VerificationMethod {
+  string id = 1;
+  string type = 2;
+  string controller = 3;
+  string publicKeyMultibase = 4;
+}
+
+message Service {
+  string id = 1;
+  string type = 2;
+  string serviceEndpoint = 3;
+}
+
+message SignInfo {
+  string verification_method_id = 1;
+  string signature = 2;
 }
