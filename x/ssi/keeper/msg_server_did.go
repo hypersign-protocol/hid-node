@@ -52,11 +52,18 @@ func (k msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*t
 		CapabilityInvocation: didMsg.GetCapabilityInvocation(),
 		CapabilityDelegation: didMsg.GetCapabilityDelegation(),
 		Service:              didMsg.GetService(),
-		Created:              didMsg.GetCreated(),
-		Updated:              didMsg.GetUpdated(),
+	}
+
+	// Create the Metadata
+	metadata := types.CreateNewMetadata(ctx)
+
+	// Form the DID Document
+	didDoc := types.DidDocument{
+		Did: &didSpec,
+		Metadata: &metadata,
 	}
 	// Add a DID to the store and get back the ID
-	id := k.AppendDID(ctx, didSpec)
+	id := k.AppendDID(ctx, &didDoc)
 	// Return the Id of the DID
 	return &types.MsgCreateDIDResponse{Id: id}, nil
 }
@@ -71,12 +78,13 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 	if err != nil {
 		return nil, err
 	}
-
-	// TODO: Implement this when we have generic type for Create and Update DID
-	// didDocCheck := utils.IsValidDidDoc(didMsg)
-	// if didDocCheck != "" {
-	// 	return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, didDocCheck)
-	// }
+	oldDid := oldDIDDoc.GetDid()
+	
+	// Check if the didDoc is valid
+	didDocCheck := utils.IsValidDidDoc(didMsg)
+	if didDocCheck != "" {
+		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, didDocCheck)
+	}
 
 	// Checks if the DID is not present in the store
 	if !k.HasDid(ctx, did) {
@@ -87,15 +95,9 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, "DID controller is not valid")
 	}
 
-	if err := k.VerifySignatureOnDidUpdate(&ctx, oldDIDDoc, didMsg, msg.Signatures); err != nil {
+	if err := k.VerifySignatureOnDidUpdate(&ctx, oldDid, didMsg, msg.Signatures); err != nil {
 		return nil, err
 	}
-
-	// TODO: Implement this when the version ID is used
-	// if oldStateValue.Metadata.VersionId != didMsg.VersionId {
-	// 	errMsg := fmt.Sprintf("Ecpected %s with version %s. Got version %s", didMsg.Id, oldStateValue.Metadata.VersionId, didMsg.VersionId)
-	// 	return nil, sdkerrors.Wrap(types.ErrUnexpectedDidVersion, errMsg)
-	// }
 
 	var didSpec = types.Did{
 		Context:              didMsg.GetContext(),
@@ -108,13 +110,20 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 		KeyAgreement:         didMsg.GetKeyAgreement(),
 		CapabilityInvocation: didMsg.GetCapabilityInvocation(),
 		Service:              didMsg.GetService(),
-		Created:              didMsg.GetCreated(),
-		Updated:              didMsg.GetUpdated(),
 	}
 
-	didSpec.Updated = ctx.BlockTime().String()
+	// Create the Metadata
+	metadata := types.CreateNewMetadata(ctx)
+	// Assign `created` and `deactivated` to previous DIDDoc's metadata values
+	metadata.Created = oldDIDDoc.GetMetadata().Created
+	metadata.Deactivated = oldDIDDoc.GetMetadata().Deactivated
 
-	if err := k.SetDid(ctx, didSpec); err != nil {
+	// Form the DID Document
+	didDoc := types.DidDocument{
+		Did: &didSpec,
+		Metadata: &metadata,
+	}
+	if err := k.SetDid(ctx, didDoc); err != nil {
 		return nil, err
 	}
 

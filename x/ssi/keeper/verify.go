@@ -127,8 +127,8 @@ func (k *Keeper) VerifySignature(ctx *sdk.Context, msg *types.Did, signers []typ
 				return types.ErrDidDocNotFound.Wrap(signer.Signer)
 			}
 
-			signer.Authentication = didDoc.Authentication
-			signer.VerificationMethod = didDoc.VerificationMethod
+			signer.Authentication = didDoc.Did.Authentication
+			signer.VerificationMethod = didDoc.Did.VerificationMethod
 		}
 
 		valid, err := VerifyIdentitySignature(signer, signatures, signingInput)
@@ -208,7 +208,7 @@ func (k *Keeper) ValidateController(ctx *sdk.Context, id string, controller stri
 	if err != nil {
 		return types.ErrDidDocNotFound.Wrap(controller)
 	}
-	if len(didDoc.Authentication) == 0 {
+	if len(didDoc.Did.Authentication) == 0 {
 		return types.ErrBadRequestInvalidVerMethod.Wrap(
 			fmt.Sprintf("Verificatition method controller %s doesn't have an authentication keys", controller))
 	}
