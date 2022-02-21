@@ -32,14 +32,14 @@ func (k Keeper) HasDid(ctx sdk.Context, id string) bool {
 }
 
 // Retrieves the DID from the store
-func (k Keeper) GetDid(ctx *sdk.Context, id string) (*types.Did, error) {
+func (k Keeper) GetDid(ctx *sdk.Context, id string) (*types.DidDocument, error) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidKey))
 
 	if !k.HasDid(*ctx, id) {
 		return nil, sdkerrors.ErrNotFound
 	}
 
-	var value types.Did
+	var value types.DidDocument
 	var bytes = store.Get([]byte(id))
 	if err := k.cdc.Unmarshal(bytes, &value); err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidType, err.Error())
@@ -61,21 +61,23 @@ func (k Keeper) SetDidCount(ctx sdk.Context, count uint64) {
 }
 
 // SetDid set a specific did in the store
-func (k Keeper) SetDid(ctx sdk.Context, did types.Did) error {
+func (k Keeper) SetDid(ctx sdk.Context, didDoc types.DidDocument) error {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidKey))
-	b := k.cdc.MustMarshal(&did)
-	store.Set([]byte(did.Id), b)
+	b := k.cdc.MustMarshal(&didDoc)
+	store.Set([]byte(didDoc.Did.Id), b)
 	return nil
 }
 
-func (k Keeper) AppendDID(ctx sdk.Context, didSpec types.Did) uint64 {
+func (k Keeper) AppendDID(ctx sdk.Context, didDoc *types.DidDocument) uint64 {
 	// Get the current number of DIDs in the store
 	count := k.GetDidCount(ctx)
 	// Get the store
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.DidKey))
+	// Get ID from DID Doc
+	id := didDoc.GetDid().GetId()
 	// Marshal the DID into bytes
-	didDocString := k.cdc.MustMarshal(&didSpec)
-	store.Set(utils.UnsafeStrToBytes(didSpec.Id), didDocString)
+	didDocBytes := k.cdc.MustMarshal(didDoc)
+	store.Set([]byte(id), didDocBytes)
 	// Update the Did count
 	k.SetDidCount(ctx, count+1)
 	return count
