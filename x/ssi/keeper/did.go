@@ -68,6 +68,14 @@ func (k Keeper) SetDid(ctx sdk.Context, didDoc types.DidDocument) error {
 	return nil
 }
 
+// SetDid set a specific did in the store
+func (k Keeper) SetDidDeactivate(ctx sdk.Context, didDoc types.DidDocument, id string) error {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidKey))
+	b := k.cdc.MustMarshal(&didDoc)
+	store.Set([]byte(id), b)
+	return nil
+}
+
 func (k Keeper) AppendDID(ctx sdk.Context, didDoc *types.DidDocument) uint64 {
 	// Get the current number of DIDs in the store
 	count := k.GetDidCount(ctx)

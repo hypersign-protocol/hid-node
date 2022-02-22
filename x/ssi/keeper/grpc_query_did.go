@@ -2,8 +2,12 @@ package keeper
 
 import (
 	"context"
+	"fmt"
+	//"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	//sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -31,6 +35,10 @@ func (k Keeper) GetDidDocById(goCtx context.Context, req *types.QueryGetDidDocBy
 	didDoc, err := k.GetDid(&ctx, req.DidDocId)
 	if err != nil {
 		return nil, status.Error(codes.NotFound, "DidDoc not found")
+	}
+
+	if didDoc.GetMetadata().GetDeactivated() {
+		return nil, sdkerrors.Wrap(types.ErrDidDocDeactivated, fmt.Sprintf("DidDoc ID: %s", req.DidDocId))
 	}
 
 	return &types.QueryGetDidDocByIdResponse{

@@ -97,12 +97,40 @@ hid-noded tx ssi update-did '{
 "authentication": [
 "did:hs:0f49341a-20ef-43d1-bc93-de30993e6c51#zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf"
 ]
-}' `<version-id> `did:hs:0f49341a-20ef-43d1-bc93-de30993e6c51#zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf --ver-key oVtY1xceDZQjkfwlbCEC2vgeADcxpgd27vtYasBhcM/JLR6PnPoD9jvjSJrMsMJwS7faPy5OlFCdj/kgLVZMEg== --from alice --chain-id hidnode
+}' <version-id> did:hs:0f49341a-20ef-43d1-bc93-de30993e6c51#zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf --ver-key oVtY1xceDZQjkfwlbCEC2vgeADcxpgd27vtYasBhcM/JLR6PnPoD9jvjSJrMsMJwS7faPy5OlFCdj/kgLVZMEg== --from alice --chain-id hidnode
 ```
 
 The second param `<version-id>` should be the version-id of the latest DID Doc.
 
 The `context` field of the DIDDoc is now updated with a new entry: `"https://some.domain"`
+
+## Deactivate DID
+
+Run the following to deactivate the DID Document:
+
+```sh
+hid-noded tx ssi deactivate-did '{
+"context": [
+"https://www.w3.org/ns/did/v1",
+"https://w3id.org/security/v1",
+"https://schema.org"
+],
+"id": "did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52",
+"controller": ["did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52"],
+"alsoKnownAs": ["did:hs:1f49341a-de30993e6c52"],
+"verificationMethod": [
+{
+"id": "did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52#z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4",
+"type": "Ed25519VerificationKey2020",
+"controller": "did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52",
+"publicKeyMultibase": "z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4"
+}
+],
+"authentication": [
+"did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52#z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4"
+]
+}' <version-id> did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52#z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4 --ver-key bZBUkLGChnJujYHUZ4L8PECoN2Odv6adWGXc1qVWCRVqtEx0o/FmtFZnd5pT3laR518P58TRUGY5q5KSrToSmQ== --from alice --chain-id hidnode --yes
+```
 
 ## Resolve DID
 

@@ -13,6 +13,7 @@ service Msg {
       rpc CreateDID(MsgCreateDID) returns (MsgCreateDIDResponse);
   rpc UpdateDID(MsgUpdateDID) returns (MsgUpdateDIDResponse);
   rpc CreateSchema(MsgCreateSchema) returns (MsgCreateSchemaResponse);
+  rpc DeactivateDID(MsgDeactivateDID) returns (MsgDeactivateDIDResponse);
 // this line is used by starport scaffolding # proto/tx/rpc
 }
 
@@ -44,6 +45,17 @@ message MsgCreateSchema {
 }
 
 message MsgCreateSchemaResponse {
+  uint64 id = 1;
+}
+
+message MsgDeactivateDID {
+  string creator = 1;
+  Did didDocString = 2;
+  string version_id = 3;
+  repeated SignInfo signatures = 4;
+}
+
+message MsgDeactivateDIDResponse {
   uint64 id = 1;
 }
 
