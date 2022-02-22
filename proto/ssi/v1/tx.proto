@@ -18,8 +18,8 @@ service Msg {
 
 message MsgCreateDID {
   Did didDocString = 1;
-  repeated SignInfo signatures = 3;
-  string creator = 4;
+  repeated SignInfo signatures = 2;
+  string creator = 3;
 }
 
 message MsgCreateDIDResponse {
