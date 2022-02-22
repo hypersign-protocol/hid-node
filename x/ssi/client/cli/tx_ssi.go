@@ -174,3 +174,59 @@ func CmdCreateSchema() *cobra.Command {
 	cmd.Flags().String(VerKeyFlag, "", "Base64 encoded ed25519 private key to sign identity message with. ")
 	return cmd
 }
+
+func CmdDeactivateDID() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "deactivate-did [did-doc-string] [version-id] [verification-method-id]",
+		Short: "Deactivates the DID",
+		Args:  cobra.ExactArgs(3),
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			argDidDocString := args[0]
+			argVersionId := args[1]
+			argVerificationMethodId := args[2]
+
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			var didDoc types.Did
+			err = clientCtx.Codec.UnmarshalJSON([]byte(argDidDocString), &didDoc)
+			if err != nil {
+				return err
+			}
+
+			verKeyPriv, err := getVerKey(cmd, clientCtx)
+			if err != nil {
+				return err
+			}
+
+			// // Build identity message
+			signBytes := didDoc.GetSignBytes()
+			signatureBytes := ed25519.Sign(verKeyPriv, signBytes)
+
+			signInfo := types.SignInfo{
+				VerificationMethodId: argVerificationMethodId,
+				Signature:            base64.StdEncoding.EncodeToString(signatureBytes),
+			}
+
+
+			msg := types.MsgDeactivateDID{
+				Creator:      clientCtx.GetFromAddress().String(),
+				DidDocString: &didDoc,
+				VersionId:    argVersionId,
+				Signatures:   []*types.SignInfo{&signInfo},
+			}
+
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), &msg)
+		},
+	}
+
+	flags.AddTxFlagsToCmd(cmd)
+	cmd.Flags().String(VerKeyFlag, "", "Base64 encoded ed25519 private key to sign identity message with. ")
+	return cmd
+}
