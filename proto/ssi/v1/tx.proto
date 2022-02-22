@@ -28,8 +28,9 @@ message MsgCreateDIDResponse {
 
 message MsgUpdateDID {
   Did didDocString = 1;
-  repeated SignInfo signatures = 2;
-  string creator = 3;
+  string version_id = 2;
+  repeated SignInfo signatures = 3;
+  string creator = 4;
 }
 
 message MsgUpdateDIDResponse {
