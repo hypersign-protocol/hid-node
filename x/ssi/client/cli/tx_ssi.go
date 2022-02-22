@@ -68,12 +68,13 @@ func CmdCreateDID() *cobra.Command {
 
 func CmdUpdateDID() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "update-did [did-doc-string] [verification-method-id]",
+		Use:   "update-did [did-doc-string] [version-id] [verification-method-id]",
 		Short: "Updates the DID",
-		Args:  cobra.ExactArgs(2),
+		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argDidDocString := args[0]
-			argVerificationMethodId := args[1]
+			argVersionId := args[1]
+			argVerificationMethodId := args[2]
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -104,6 +105,7 @@ func CmdUpdateDID() *cobra.Command {
 			msg := types.MsgUpdateDID{
 				Creator:      clientCtx.GetFromAddress().String(),
 				DidDocString: &didDoc,
+				VersionId:    argVersionId,
 				Signatures:   []*types.SignInfo{&signInfo},
 			}
 

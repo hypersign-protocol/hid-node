@@ -73,13 +73,15 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 
 	didMsg := msg.GetDidDocString()
 	did := msg.GetDidDocString().GetId()
+	versionId := msg.GetVersionId()
 
 	oldDIDDoc, err := k.GetDid(&ctx, didMsg.Id)
 	if err != nil {
 		return nil, err
 	}
 	oldDid := oldDIDDoc.GetDid()
-	
+	oldMetaData := oldDIDDoc.GetMetadata()
+
 	// Check if the didDoc is valid
 	didDocCheck := utils.IsValidDidDoc(didMsg)
 	if didDocCheck != "" {
@@ -97,6 +99,12 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 
 	if err := k.VerifySignatureOnDidUpdate(&ctx, oldDid, didMsg, msg.Signatures); err != nil {
 		return nil, err
+	}
+
+	// Check if the versionId passed is the same as the one in the Latest DID Document in store
+	if oldMetaData.VersionId != versionId {
+		errMsg := fmt.Sprintf("Expected %s with version %s. Got version %s", didMsg.Id, oldMetaData.VersionId, versionId)
+		return nil, sdkerrors.Wrap(types.ErrUnexpectedDidVersion, errMsg)
 	}
 
 	var didSpec = types.Did{
