@@ -33,9 +33,9 @@ service Query {
 		option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/schema/count";
 	}
 
-// Queries a list of GetDidDocById items.
-	rpc GetDidDocById(QueryGetDidDocByIdRequest) returns (QueryGetDidDocByIdResponse) {
-		option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/did/queryDidDocById/{didDocId}";
+// Resolve DID
+	rpc Resolve(QueryGetDidDocByIdRequest) returns (QueryGetDidDocByIdResponse) {
+		option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/did/resolve/{didDocId}";
 	}
 
 // Queries a list of DidDocCount items.
@@ -84,7 +84,14 @@ message QueryGetDidDocByIdRequest {
 }
 
 message QueryGetDidDocByIdResponse {
-  DidDocument didDoc = 1;
+  string _at_context = 1;
+  Did didDocument = 2;
+  Metadata didDocumentMetadata = 3;
+  DidResolveMeta didResolutionMetadata = 4;
+}
+
+message QueryDidDereferenceResponse {
+  string result = 1;
 }
 
 message QueryDidDocCountRequest {

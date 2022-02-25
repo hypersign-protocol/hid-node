@@ -11875,91 +11875,97 @@ paths:
                   additionalProperties: {}
       tags:
         - Query
-  '/hypersign-protocol/hidnode/ssi/did/queryDidDocById/{didDocId}':
+  '/hypersign-protocol/hidnode/ssi/did/resolve/{didDocId}':
     get:
-      summary: Queries a list of GetDidDocById items.
-      operationId: HypersignprotocolHidnodeSsiGetDidDocById
+      summary: Resolve DID
+      operationId: HypersignprotocolHidnodeSsiResolve
       responses:
         '200':
           description: A successful response.
           schema:
             type: object
             properties:
-              didDoc:
+              AtContext:
+                type: string
+              didDocument:
                 type: object
                 properties:
-                  did:
-                    type: object
-                    properties:
-                      context:
-                        type: array
-                        items:
+                  context:
+                    type: array
+                    items:
+                      type: string
+                  id:
+                    type: string
+                  controller:
+                    type: array
+                    items:
+                      type: string
+                  alsoKnownAs:
+                    type: array
+                    items:
+                      type: string
+                  verificationMethod:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
                           type: string
-                      id:
-                        type: string
-                      controller:
-                        type: array
-                        items:
+                        type:
                           type: string
-                      alsoKnownAs:
-                        type: array
-                        items:
+                        controller:
                           type: string
-                      verificationMethod:
-                        type: array
-                        items:
-                          type: object
-                          properties:
-                            id:
-                              type: string
-                            type:
-                              type: string
-                            controller:
-                              type: string
-                            publicKeyMultibase:
-                              type: string
-                      authentication:
-                        type: array
-                        items:
+                        publicKeyMultibase:
                           type: string
-                      assertionMethod:
-                        type: array
-                        items:
+                  authentication:
+                    type: array
+                    items:
+                      type: string
+                  assertionMethod:
+                    type: array
+                    items:
+                      type: string
+                  keyAgreement:
+                    type: array
+                    items:
+                      type: string
+                  capabilityInvocation:
+                    type: array
+                    items:
+                      type: string
+                  capabilityDelegation:
+                    type: array
+                    items:
+                      type: string
+                  service:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
                           type: string
-                      keyAgreement:
-                        type: array
-                        items:
+                        type:
                           type: string
-                      capabilityInvocation:
-                        type: array
-                        items:
+                        serviceEndpoint:
                           type: string
-                      capabilityDelegation:
-                        type: array
-                        items:
-                          type: string
-                      service:
-                        type: array
-                        items:
-                          type: object
-                          properties:
-                            id:
-                              type: string
-                            type:
-                              type: string
-                            serviceEndpoint:
-                              type: string
-                  metadata:
-                    type: object
-                    properties:
-                      created:
-                        type: string
-                      updated:
-                        type: string
-                      deactivated:
-                        type: boolean
-                      versionId:
-                        type: string
+              didDocumentMetadata:
+                type: object
+                properties:
+                  created:
+                    type: string
+                  updated:
+                    type: string
+                  deactivated:
+                    type: boolean
+                  versionId:
+                    type: string
+              didResolutionMetadata:
+                type: object
+                properties:
+                  retrieved:
+                    type: string
+                  error:
+                    type: string
         default:
           description: An unexpected error response.
           schema:
@@ -20247,10 +20253,62 @@ definitions:
               type: string
             serviceEndpoint:
               type: string
-  hypersignprotocol.hidnode.ssi.DidDocument:
+  hypersignprotocol.hidnode.ssi.DidResolveMeta:
     type: object
     properties:
-      did:
+      retrieved:
+        type: string
+      error:
+        type: string
+  hypersignprotocol.hidnode.ssi.Metadata:
+    type: object
+    properties:
+      created:
+        type: string
+      updated:
+        type: string
+      deactivated:
+        type: boolean
+      versionId:
+        type: string
+  hypersignprotocol.hidnode.ssi.MsgCreateDIDResponse:
+    type: object
+    properties:
+      id:
+        type: string
+        format: uint64
+  hypersignprotocol.hidnode.ssi.MsgCreateSchemaResponse:
+    type: object
+    properties:
+      id:
+        type: string
+        format: uint64
+  hypersignprotocol.hidnode.ssi.MsgDeactivateDIDResponse:
+    type: object
+    properties:
+      id:
+        type: string
+        format: uint64
+  hypersignprotocol.hidnode.ssi.MsgUpdateDIDResponse:
+    type: object
+    properties:
+      updateId:
+        type: string
+  hypersignprotocol.hidnode.ssi.Params:
+    type: object
+    description: Params defines the parameters for the module.
+  hypersignprotocol.hidnode.ssi.QueryDidDocCountResponse:
+    type: object
+    properties:
+      count:
+        type: string
+        format: uint64
+  hypersignprotocol.hidnode.ssi.QueryGetDidDocByIdResponse:
+    type: object
+    properties:
+      AtContext:
+        type: string
+      didDocument:
         type: object
         properties:
           context:
@@ -20311,7 +20369,7 @@ definitions:
                   type: string
                 serviceEndpoint:
                   type: string
-      metadata:
+      didDocumentMetadata:
         type: object
         properties:
           created:
@@ -20322,127 +20380,13 @@ definitions:
             type: boolean
           versionId:
             type: string
-  hypersignprotocol.hidnode.ssi.Metadata:
-    type: object
-    properties:
-      created:
-        type: string
-      updated:
-        type: string
-      deactivated:
-        type: boolean
-      versionId:
-        type: string
-  hypersignprotocol.hidnode.ssi.MsgCreateDIDResponse:
-    type: object
-    properties:
-      id:
-        type: string
-        format: uint64
-  hypersignprotocol.hidnode.ssi.MsgCreateSchemaResponse:
-    type: object
-    properties:
-      id:
-        type: string
-        format: uint64
-  hypersignprotocol.hidnode.ssi.MsgDeactivateDIDResponse:
-    type: object
-    properties:
-      id:
-        type: string
-        format: uint64
-  hypersignprotocol.hidnode.ssi.MsgUpdateDIDResponse:
-    type: object
-    properties:
-      updateId:
-        type: string
-  hypersignprotocol.hidnode.ssi.Params:
-    type: object
-    description: Params defines the parameters for the module.
-  hypersignprotocol.hidnode.ssi.QueryDidDocCountResponse:
-    type: object
-    properties:
-      count:
-        type: string
-        format: uint64
-  hypersignprotocol.hidnode.ssi.QueryGetDidDocByIdResponse:
-    type: object
-    properties:
-      didDoc:
+      didResolutionMetadata:
         type: object
         properties:
-          did:
-            type: object
-            properties:
-              context:
-                type: array
-                items:
-                  type: string
-              id:
-                type: string
-              controller:
-                type: array
-                items:
-                  type: string
-              alsoKnownAs:
-                type: array
-                items:
-                  type: string
-              verificationMethod:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: string
-                    type:
-                      type: string
-                    controller:
-                      type: string
-                    publicKeyMultibase:
-                      type: string
-              authentication:
-                type: array
-                items:
-                  type: string
-              assertionMethod:
-                type: array
-                items:
-                  type: string
-              keyAgreement:
-                type: array
-                items:
-                  type: string
-              capabilityInvocation:
-                type: array
-                items:
-                  type: string
-              capabilityDelegation:
-                type: array
-                items:
-                  type: string
-              service:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: string
-                    type:
-                      type: string
-                    serviceEndpoint:
-                      type: string
-          metadata:
-            type: object
-            properties:
-              created:
-                type: string
-              updated:
-                type: string
-              deactivated:
-                type: boolean
-              versionId:
-                type: string
+          retrieved:
+            type: string
+          error:
+            type: string
   hypersignprotocol.hidnode.ssi.QueryGetSchemaResponse:
     type: object
     properties:

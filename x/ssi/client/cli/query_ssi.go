@@ -102,7 +102,7 @@ func CmdSchemaCount() *cobra.Command {
 	return cmd
 }
 
-func CmdGetDidDocById() *cobra.Command {
+func CmdResolveDID() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "did [didDoc-id]",
 		Short: "Query DidDoc for a given didDoc id",
@@ -119,7 +119,7 @@ func CmdGetDidDocById() *cobra.Command {
 
 			params := &types.QueryGetDidDocByIdRequest{DidDocId: argDidDocId}
 
-			res, err := queryClient.GetDidDocById(cmd.Context(), params)
+			res, err := queryClient.Resolve(cmd.Context(), params)
 			if err != nil {
 				return err
 			}

@@ -31,7 +31,7 @@ func GetQueryCmd(queryRoute string) *cobra.Command {
 
 	cmd.AddCommand(CmdSchemaCount())
 
-	cmd.AddCommand(CmdGetDidDocById())
+	cmd.AddCommand(CmdResolveDID())
 
 	cmd.AddCommand(CmdDidDocCount())
 
