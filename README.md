@@ -143,9 +143,17 @@ There are two ways to resolve DID:
 
 
 **API**:
+
+1. Retrieve a did Document by providing a Did ID:
 ```sh
-curl -X GET "http://localhost:1318/hypersign-protocol/hidnode/ssi/did/queryDidDocById/did%3Ahs%3A0f49341a-20ef-43d1-bc93-de30993e6c51%3A" -H  "accept: application/json"
+curl -X GET "http://localhost:1318/hypersign-protocol/hidnode/ssi/did/did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52:" -H  "accept: application/json"
 ```
+
+2. Retrieve the count and list of did Documents:
+```sh
+curl -X GET "http://localhost:1318/hypersign-protocol/hidnode/ssi/did" -H  "accept: application/json"
+```
+
 Note: The above curl command was taken from the Swagger UI of Blockchain API, where the `did` input parameter was entered along with an extra semicolon appended, because gRPC server has issues parsing the regular DID string.
 
 **CLI**:
