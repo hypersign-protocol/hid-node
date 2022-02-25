@@ -34,14 +34,14 @@ service Query {
 	}
 
 // Resolve DID
-	rpc Resolve(QueryGetDidDocByIdRequest) returns (QueryGetDidDocByIdResponse) {
-		option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/did/resolve/{didDocId}";
+	rpc ResolveDid(QueryGetDidDocByIdRequest) returns (QueryGetDidDocByIdResponse) {
+		option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/did/{didId}";
 	}
 
-// Queries a list of DidDocCount items.
-	rpc DidDocCount(QueryDidDocCountRequest) returns (QueryDidDocCountResponse) {
-		option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/did/count";
-	}
+// Did Param
+  rpc DidParam(QueryDidParamRequest) returns (QueryDidParamResponse) {
+    option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/did";
+  }
 
 // this line is used by starport scaffolding # 2
 }
@@ -80,7 +80,8 @@ message QuerySchemaCountResponse {
 }
 
 message QueryGetDidDocByIdRequest {
-  string didDocId = 1;
+  string didId = 1;
+  string versionId = 2;
 }
 
 message QueryGetDidDocByIdResponse {
@@ -90,15 +91,22 @@ message QueryGetDidDocByIdResponse {
   DidResolveMeta didResolutionMetadata = 4;
 }
 
-message QueryDidDereferenceResponse {
-  string result = 1;
+
+message QueryDidParamRequest {
+  bool count = 1;
+  cosmos.base.query.v1beta1.PageRequest pagination = 2;
 }
 
-message QueryDidDocCountRequest {
+message QueryDidParamResponse {
+  uint64 totalDidCount = 1;
+  repeated DidResolutionResponse didDocList = 2;
 }
 
-message QueryDidDocCountResponse {
-  uint64 count = 1;
+message DidResolutionResponse {
+  string _at_context = 1;
+  Did didDocument = 2;
+  Metadata didDocumentMetadata = 3;
+  DidResolveMeta didResolutionMetadata = 4;
 }
 
 // this line is used by starport scaffolding # 3

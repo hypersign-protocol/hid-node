@@ -5,7 +5,7 @@
 
 Following are the prerequisites that needs to be installed:
 
-- golang (Installation Guide: https://go.dev/doc/install)
+- golang (Installation Guide: https://go.dev/doc/install) (version: 1.17.2)
 - starport (Installation Guide: https://docs.starport.network/guide/install.html)
 
 ## Get started
@@ -72,7 +72,9 @@ hid-noded tx ssi create-did '{
 ```
 Note: While performing a CLI transaction, it is required to pass chain-id as `--chain-id hidnode` , as the default chain id set is `hid-node` which will cause the transaction to fail.
 
-## Update DID
+## Operations
+
+### Update DID
 
 After the DIDDoc is created from running the above command, making changes to it happens through the following CLI command:
 
@@ -104,7 +106,7 @@ The second param `<version-id>` should be the version-id of the latest DID Doc.
 
 The `context` field of the DIDDoc is now updated with a new entry: `"https://some.domain"`
 
-## Deactivate DID
+### Deactivate DID
 
 Run the following to deactivate the DID Document:
 
