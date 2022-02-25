@@ -16,8 +16,8 @@ func (k msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*t
 	didMsg := msg.GetDidDocString()
 	did := didMsg.GetId()
 	// Checks if the DID has a valid format
-	if !utils.IsValidDid(did) {
-		return nil, types.ErrBadRequestIsNotDid.Wrap(did)
+	if err := utils.IsValidDid(did); err != nil {
+		return nil, err
 	}
 
 	// Checks if the DidDoc is a valid format
@@ -198,7 +198,7 @@ func (k msgServer) DeactivateDID(goCtx context.Context, msg *types.MsgDeactivate
 		Did:      nil,
 		Metadata: &metadata,
 	}
-	
+
 	if err := k.SetDidDeactivate(ctx, didDoc, id); err != nil {
 		return nil, err
 	}

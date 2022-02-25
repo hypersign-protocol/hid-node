@@ -5,4 +5,5 @@ var ServiceTypes = []string{
 	"DIDCommMessaging",
 }
 
-var DidPrefix string = "did:hs:"
+var didMethod string = "hs"
+var didElementsAfterColonSplit int = 3

@@ -210,7 +210,6 @@ func CmdDeactivateDID() *cobra.Command {
 				Signature:            base64.StdEncoding.EncodeToString(signatureBytes),
 			}
 
-
 			msg := types.MsgDeactivateDID{
 				Creator:      clientCtx.GetFromAddress().String(),
 				DidDocString: &didDoc,
