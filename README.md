@@ -1,5 +1,5 @@
-# hid-node
-**hid-node** is a blockchain built using Cosmos SDK and Tendermint and created with [Starport](https://starport.com).
+# Hypersign Identity Network
+The  Hypersign Identity Network is a permissionless blockchain network to manage digital identity and access rights. It aims to empower humans to gain control of their data and access on the internet by providing scalable, interoperable and secure verifiable data registry (VDR) to implement use cases on Self Sovereign Identity (SSI) principles. The Hypersign Identity Network is built using Cosmos-SDK and is fully compatible with W3C DID specification.
 
 ## Prerequisite
 
@@ -17,7 +17,7 @@ $ git clone https://github.com/hypersign-protocol/hid-node.git
 $ cd hid-node
 ```
 
-Run the following command to build the binary file and start the `hid-node` blockchain: 
+Run the following command to build the binary file and start the blockchain: 
 ```
 starport chain serve
 ```
@@ -27,24 +27,6 @@ You now have a blockchain up and running!
 The binary `hid-noded` will be generated in `$GO_PATH/bin` directory. To explore its functionalities, type `hid-noded --help` im a seperate terminal window.
 
 To stop the blockchain, navigate to the terminal window where the blockchain is running, and hit `Ctrl+C`.
-
-## Module Creation
-
-Once we have scaffolded the chain using `starport`, a default module is always created if we scaffolded the chain without the `--no-module` flag. In our case, it will be `x/hidnode`. We can delete this module and its dependent files and folders, since it's not necessary.
-
-Creating the module `did` is as follows:
-
-```
-$ starport scaffold module did
-```
-
-Now, to scaffold any structures such as `messages`, `types`, `list` etc., following needs to run:
-
-```
-$ starport scaffold message createDID did didDocString createdAt --module did
-```
-Notice the `--module` flag. This is required to specify the module for which we are scaffolding the structure
-
 
 ## Register DID
 
