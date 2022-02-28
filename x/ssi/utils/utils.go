@@ -10,14 +10,31 @@ import (
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 )
 
+// Check if the DID Method is valid
+func IsValidDidMethod(method string) bool {
+	return method == didMethod
+}
+
 // Checks whether the given string is a valid DID
-func IsValidDid(did string) bool {
-	return strings.HasPrefix(did, DidPrefix)
+func IsValidDid(did string) error {
+	didElements := strings.Split(did, ":")
+
+	if (didElements[0] != "did") || len(didElements) != didElementsAfterColonSplit {
+		return types.ErrInvalidDidElements
+	}
+	if !IsValidDidMethod(didElements[1]) {
+		return types.ErrInvalidDidMethod
+	}
+
+	return nil
 }
 
 // Checks whether the ID in the DidDoc is a valid string
 func IsValidDidDocID(didDoc *types.Did) bool {
-	return strings.HasPrefix(didDoc.GetId(), DidPrefix)
+	if err := IsValidDid(didDoc.GetId()); err != nil {
+		return false
+	}
+	return true
 }
 
 // Cheks whether the Service is valid
@@ -45,8 +62,8 @@ func IsValidDidFragment(didUrl string) bool {
 	}
 
 	did, _ := SplitDidUrlIntoDid(didUrl)
-	hasPrefix := IsValidDid(did)
-	return hasPrefix
+	err := IsValidDid(did)
+	return err == nil
 }
 
 // Check Valid DID service type
@@ -73,7 +90,7 @@ func DuplicateServiceExists(serviceId string, services []*types.Service) bool {
 // Check whether the fields whose values are array of DIDs are valid DID
 func IsValidDIDArray(didArray []string) bool {
 	for _, did := range didArray {
-		if !IsValidDid(did) {
+		if err := IsValidDid(did); err != nil {
 			return false
 		}
 	}
@@ -172,4 +189,16 @@ func IsValidSchemaID(schemaId string) error {
 		return fmt.Errorf("input version Id -> `%s`, is an invalid format", versionNumber)
 	}
 	return nil
+}
+
+func MergeUrlWithResource(url string, resource string) string {
+	if url[len(url)-1] == '/' {
+		url = url[:len(url)-1]
+	}
+
+	if resource[0] == '/' {
+		resource = resource[1:]
+	}
+
+	return url + "/" + resource
 }

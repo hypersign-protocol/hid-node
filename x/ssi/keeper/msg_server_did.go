@@ -16,8 +16,8 @@ func (k msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*t
 	didMsg := msg.GetDidDocString()
 	did := didMsg.GetId()
 	// Checks if the DID has a valid format
-	if !utils.IsValidDid(did) {
-		return nil, types.ErrBadRequestIsNotDid.Wrap(did)
+	if err := utils.IsValidDid(did); err != nil {
+		return nil, err
 	}
 
 	// Checks if the DidDoc is a valid format
@@ -52,11 +52,18 @@ func (k msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*t
 		CapabilityInvocation: didMsg.GetCapabilityInvocation(),
 		CapabilityDelegation: didMsg.GetCapabilityDelegation(),
 		Service:              didMsg.GetService(),
-		Created:              didMsg.GetCreated(),
-		Updated:              didMsg.GetUpdated(),
+	}
+
+	// Create the Metadata
+	metadata := types.CreateNewMetadata(ctx)
+
+	// Form the DID Document
+	didDoc := types.DidDocument{
+		Did:      &didSpec,
+		Metadata: &metadata,
 	}
 	// Add a DID to the store and get back the ID
-	id := k.AppendDID(ctx, didSpec)
+	id := k.AppendDID(ctx, &didDoc)
 	// Return the Id of the DID
 	return &types.MsgCreateDIDResponse{Id: id}, nil
 }
@@ -66,17 +73,25 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 
 	didMsg := msg.GetDidDocString()
 	did := msg.GetDidDocString().GetId()
+	versionId := msg.GetVersionId()
 
 	oldDIDDoc, err := k.GetDid(&ctx, didMsg.Id)
 	if err != nil {
 		return nil, err
 	}
+	oldDid := oldDIDDoc.GetDid()
+	oldMetaData := oldDIDDoc.GetMetadata()
 
-	// TODO: Implement this when we have generic type for Create and Update DID
-	// didDocCheck := utils.IsValidDidDoc(didMsg)
-	// if didDocCheck != "" {
-	// 	return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, didDocCheck)
-	// }
+	// Check if the DID is already deactivated
+	if err := VerifyDidDeactivate(oldMetaData, didMsg.Id); err != nil {
+		return nil, err
+	}
+
+	// Check if the didDoc is valid
+	didDocCheck := utils.IsValidDidDoc(didMsg)
+	if didDocCheck != "" {
+		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, didDocCheck)
+	}
 
 	// Checks if the DID is not present in the store
 	if !k.HasDid(ctx, did) {
@@ -87,15 +102,15 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, "DID controller is not valid")
 	}
 
-	if err := k.VerifySignatureOnDidUpdate(&ctx, oldDIDDoc, didMsg, msg.Signatures); err != nil {
+	if err := k.VerifySignatureOnDidUpdate(&ctx, oldDid, didMsg, msg.Signatures); err != nil {
 		return nil, err
 	}
 
-	// TODO: Implement this when the version ID is used
-	// if oldStateValue.Metadata.VersionId != didMsg.VersionId {
-	// 	errMsg := fmt.Sprintf("Ecpected %s with version %s. Got version %s", didMsg.Id, oldStateValue.Metadata.VersionId, didMsg.VersionId)
-	// 	return nil, sdkerrors.Wrap(types.ErrUnexpectedDidVersion, errMsg)
-	// }
+	// Check if the versionId passed is the same as the one in the Latest DID Document in store
+	if oldMetaData.VersionId != versionId {
+		errMsg := fmt.Sprintf("Expected %s with version %s. Got version %s", didMsg.Id, oldMetaData.VersionId, versionId)
+		return nil, sdkerrors.Wrap(types.ErrUnexpectedDidVersion, errMsg)
+	}
 
 	var didSpec = types.Did{
 		Context:              didMsg.GetContext(),
@@ -108,15 +123,85 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 		KeyAgreement:         didMsg.GetKeyAgreement(),
 		CapabilityInvocation: didMsg.GetCapabilityInvocation(),
 		Service:              didMsg.GetService(),
-		Created:              didMsg.GetCreated(),
-		Updated:              didMsg.GetUpdated(),
 	}
 
-	didSpec.Updated = ctx.BlockTime().String()
+	// Create the Metadata
+	metadata := types.CreateNewMetadata(ctx)
+	// Assign `created` and `deactivated` to previous DIDDoc's metadata values
+	metadata.Created = oldDIDDoc.GetMetadata().Created
+	metadata.Deactivated = oldDIDDoc.GetMetadata().Deactivated
 
-	if err := k.SetDid(ctx, didSpec); err != nil {
+	// Form the DID Document
+	didDoc := types.DidDocument{
+		Did:      &didSpec,
+		Metadata: &metadata,
+	}
+	if err := k.SetDid(ctx, didDoc); err != nil {
 		return nil, err
 	}
 
 	return &types.MsgUpdateDIDResponse{UpdateId: didSpec.Id}, nil
+}
+
+func (k msgServer) DeactivateDID(goCtx context.Context, msg *types.MsgDeactivateDID) (*types.MsgDeactivateDIDResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	didMsg := msg.GetDidDocString()
+	id := msg.GetDidDocString().GetId()
+	versionId := msg.GetVersionId()
+
+	oldDIDDoc, err := k.GetDid(&ctx, didMsg.Id)
+	if err != nil {
+		return nil, err
+	}
+	oldDid := oldDIDDoc.GetDid()
+	oldMetaData := oldDIDDoc.GetMetadata()
+
+	// Check if the didDoc is valid
+	didDocCheck := utils.IsValidDidDoc(didMsg)
+	if didDocCheck != "" {
+		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, didDocCheck)
+	}
+
+	// Checks if the DID is not present in the store
+	if !k.HasDid(ctx, id) {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("DID doesnt exists %s", id))
+	}
+
+	if k.ValidateDidControllers(&ctx, id, didMsg.GetController(), didMsg.GetVerificationMethod()) != nil {
+		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, "DID controller is not valid")
+	}
+
+	if err := k.VerifySignatureOnDidUpdate(&ctx, oldDid, didMsg, msg.Signatures); err != nil {
+		return nil, err
+	}
+
+	// Check if the versionId passed is the same as the one in the Latest DID Document in store
+	if oldMetaData.VersionId != versionId {
+		errMsg := fmt.Sprintf("Expected %s with version %s. Got version %s", didMsg.Id, oldMetaData.VersionId, versionId)
+		return nil, sdkerrors.Wrap(types.ErrUnexpectedDidVersion, errMsg)
+	}
+
+	// Check if the DID is already deactivated
+	if err := VerifyDidDeactivate(oldMetaData, didMsg.Id); err != nil {
+		return nil, err
+	}
+
+	// Create the Metadata
+	metadata := types.CreateNewMetadata(ctx)
+	// Assign `created` and `deactivated` to previous DIDDoc's metadata values
+	metadata.Created = oldDIDDoc.GetMetadata().Created
+	metadata.Deactivated = true
+
+	// Form the DID Document
+	didDoc := types.DidDocument{
+		Did:      nil,
+		Metadata: &metadata,
+	}
+
+	if err := k.SetDidDeactivate(ctx, didDoc, id); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgDeactivateDIDResponse{Id: 1}, nil
 }

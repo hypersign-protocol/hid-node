@@ -5,8 +5,8 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/hypersign-protocol/hid-node/utils"
 	"github.com/cosmos/cosmos-sdk/types/query"
+	"github.com/hypersign-protocol/hid-node/utils"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

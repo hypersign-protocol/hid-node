@@ -1,5 +1,6 @@
 syntax = "proto3";
 package hypersignprotocol.hidnode.ssi;
+
 option go_package = "github.com/hypersign-protocol/hid-node/x/ssi/types";
 
 message Did {
@@ -14,8 +15,18 @@ message Did {
   repeated string capabilityInvocation = 9;
   repeated string capabilityDelegation = 10;
   repeated Service service = 11;
-  string created = 12;
-  string updated = 13;
+}
+
+message Metadata {
+  string created = 1;
+  string updated = 2;
+  bool deactivated = 3;
+  string versionId = 4;
+}
+
+message DidResolveMeta {
+  string retrieved = 2;
+  string error = 3;
 }
 
 message VerificationMethod {
@@ -34,4 +45,9 @@ message Service {
 message SignInfo {
   string verification_method_id = 1;
   string signature = 2;
+}
+
+message DidDocument {
+  Did did = 1;
+  Metadata metadata = 2;
 }

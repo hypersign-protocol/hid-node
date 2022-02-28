@@ -20,4 +20,8 @@ var (
 	ErrInvalidSchemaID            = sdkerrors.Register(ModuleName, 110, "Invalid schema Id")
 	ErrBadRequestInvalidVerMethod = sdkerrors.Register(ModuleName, 111, "Invalid verification method")
 	ErrInvalidService             = sdkerrors.Register(ModuleName, 112, "Invalid Service")
+	ErrUnexpectedDidVersion       = sdkerrors.Register(ModuleName, 113, "Unexpected DID version")
+	ErrDidDocDeactivated          = sdkerrors.Register(ModuleName, 114, "DID Document is deactivated")
+	ErrInvalidDidElements         = sdkerrors.Register(ModuleName, 115, "Invalid DID elements")
+	ErrInvalidDidMethod           = sdkerrors.Register(ModuleName, 116, "Invalid DID method")
 )

@@ -31,7 +31,8 @@ func (k msgServer) CreateSchema(goCtx context.Context, msg *types.MsgCreateSchem
 	}
 
 	// Signature check
-	if err := k.VerifySignatureOnCreateSchema(&ctx, schemaMsg, authorDID.GetSigners(), msg.GetSignatures()); err != nil {
+	didSigners := authorDID.GetDid().GetSigners()
+	if err := k.VerifySignatureOnCreateSchema(&ctx, schemaMsg, didSigners, msg.GetSignatures()); err != nil {
 		return nil, err
 	}
 

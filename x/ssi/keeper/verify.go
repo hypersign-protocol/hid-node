@@ -109,7 +109,7 @@ func AppendSignerIfNeed(signers []types.Signer, controller string, msg *types.Di
 // Link to DID Controller Spec: https://www.w3.org/TR/did-core/#did-controller
 func (k *Keeper) VerifySignature(ctx *sdk.Context, msg *types.Did, signers []types.Signer, signatures []*types.SignInfo) error {
 	var validArr []types.ValidDid
-	
+
 	if len(signers) == 0 {
 		return types.ErrInvalidSignature.Wrap("At least one signer should be present")
 	}
@@ -127,8 +127,8 @@ func (k *Keeper) VerifySignature(ctx *sdk.Context, msg *types.Did, signers []typ
 				return types.ErrDidDocNotFound.Wrap(signer.Signer)
 			}
 
-			signer.Authentication = didDoc.Authentication
-			signer.VerificationMethod = didDoc.VerificationMethod
+			signer.Authentication = didDoc.Did.Authentication
+			signer.VerificationMethod = didDoc.Did.VerificationMethod
 		}
 
 		valid, err := VerifyIdentitySignature(signer, signatures, signingInput)
@@ -149,7 +149,7 @@ func (k *Keeper) VerifySignature(ctx *sdk.Context, msg *types.Did, signers []typ
 }
 
 // TODO: Look for a better way to do this
-func contains(s []types.ValidDid) (types.ValidDid) {
+func contains(s []types.ValidDid) types.ValidDid {
 	for _, v := range s {
 		if v.IsValid {
 			return v
@@ -208,7 +208,7 @@ func (k *Keeper) ValidateController(ctx *sdk.Context, id string, controller stri
 	if err != nil {
 		return types.ErrDidDocNotFound.Wrap(controller)
 	}
-	if len(didDoc.Authentication) == 0 {
+	if len(didDoc.Did.Authentication) == 0 {
 		return types.ErrBadRequestInvalidVerMethod.Wrap(
 			fmt.Sprintf("Verificatition method controller %s doesn't have an authentication keys", controller))
 	}
@@ -227,6 +227,14 @@ func (k msgServer) ValidateDidControllers(ctx *sdk.Context, id string, controlle
 		if err := k.ValidateController(ctx, id, didController); err != nil {
 			return err
 		}
+	}
+	return nil
+}
+
+// Check the Deactivate status of DID
+func VerifyDidDeactivate(metadata *types.Metadata, id string) error {
+	if metadata.Deactivated {
+		return sdkerrors.Wrap(types.ErrDidDocDeactivated, fmt.Sprintf("DidDoc ID: %s", id))
 	}
 	return nil
 }

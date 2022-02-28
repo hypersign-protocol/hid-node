@@ -127,3 +127,47 @@ func (msg *MsgUpdateDID) ValidateBasic() error {
 	}
 	return nil
 }
+
+// MsgDeactivateDID Type Methods
+
+const TypeMsgDeactivateDID = "deactivate_did"
+
+var _ sdk.Msg = &MsgDeactivateDID{}
+
+func NewMsgDeactivateDID(creator string, didDocString *Did, versionId string, signatures []*SignInfo) *MsgDeactivateDID {
+	return &MsgDeactivateDID{
+		Creator:      creator,
+		DidDocString: didDocString,
+		VersionId:    versionId,
+		Signatures:   signatures,
+	}
+}
+
+func (msg *MsgDeactivateDID) Route() string {
+	return RouterKey
+}
+
+func (msg *MsgDeactivateDID) Type() string {
+	return TypeMsgDeactivateDID
+}
+
+func (msg *MsgDeactivateDID) GetSigners() []sdk.AccAddress {
+	creator, err := sdk.AccAddressFromBech32(msg.Creator)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{creator}
+}
+
+func (msg *MsgDeactivateDID) GetSignBytes() []byte {
+	bz := ModuleCdc.MustMarshalJSON(msg)
+	return sdk.MustSortJSON(bz)
+}
+
+func (msg *MsgDeactivateDID) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.Creator)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+	}
+	return nil
+}
