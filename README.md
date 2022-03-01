@@ -29,7 +29,9 @@ The binary `hid-noded` will be generated in `$GO_PATH/bin` directory. To explore
 
 To stop the blockchain, navigate to the terminal window where the blockchain is running, and hit `Ctrl+C`.
 
-## Register DID
+## Operations
+
+### Register DID
 
 ```sh
 hid-noded tx ssi create-did '{
@@ -54,8 +56,6 @@ hid-noded tx ssi create-did '{
 }' did:hs:0f49341a-20ef-43d1-bc93-de30993e6c51#zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf --ver-key oVtY1xceDZQjkfwlbCEC2vgeADcxpgd27vtYasBhcM/JLR6PnPoD9jvjSJrMsMJwS7faPy5OlFCdj/kgLVZMEg== --from alice --chain-id hidnode
 ```
 Note: While performing a CLI transaction, it is required to pass chain-id as `--chain-id hidnode` , as the default chain id set is `hid-node` which will cause the transaction to fail.
-
-## Operations
 
 ### Update DID
 
@@ -117,7 +117,7 @@ hid-noded tx ssi deactivate-did '{
 }' <version-id> did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52#z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4 --ver-key bZBUkLGChnJujYHUZ4L8PECoN2Odv6adWGXc1qVWCRVqtEx0o/FmtFZnd5pT3laR518P58TRUGY5q5KSrToSmQ== --from alice --chain-id hidnode --yes
 ```
 
-## Resolve DID
+### Resolve DID
 
 There are two ways to resolve DID:
 
