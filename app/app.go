@@ -96,7 +96,7 @@ import (
 )
 
 const (
-	AccountAddressPrefix = "cosmos"
+	AccountAddressPrefix = "hid"
 	Name                 = "hid-node"
 )
 
