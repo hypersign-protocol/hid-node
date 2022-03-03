@@ -14,14 +14,15 @@ require (
 	github.com/tendermint/spm v0.1.9
 	github.com/tendermint/tendermint v0.34.14
 	github.com/tendermint/tm-db v0.6.4
-	google.golang.org/genproto v0.0.0-20220118154757-00ab72f36ad5
-	google.golang.org/grpc v1.43.0
+	google.golang.org/genproto v0.0.0-20220302033224-9aa15565e42a
+	google.golang.org/grpc v1.44.0
 )
 
 require (
 	github.com/golang/protobuf v1.5.2
 	github.com/google/go-cmp v0.5.7 // indirect
 	github.com/multiformats/go-multibase v0.0.3
+	golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd // indirect
 	gopkg.in/yaml.v2 v2.4.0
 )
 
