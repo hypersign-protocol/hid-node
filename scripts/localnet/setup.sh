@@ -52,12 +52,15 @@ sed -i -E 's|0.0.0.0:9091|0.0.0.0:9087|g' $HOME/.hid-node/node3/config/app.toml
 # node1
 sed -i -E 's|allow_duplicate_ip = false|allow_duplicate_ip = true|g' $HOME/.hid-node/node1/config/config.toml
 sed -i -E 's|addr_book_strict = true|addr_book_strict = false|g' $HOME/.hid-node/node1/config/config.toml
+# sed -i -E 's|cors_allowed_origins = []|cors_allowed_origins = ["*"]|g' $HOME/.hid-node/node1/config/config.toml
+
 # node2
 sed -i -E 's|tcp://127.0.0.1:26658|tcp://127.0.0.1:36658|g' $HOME/.hid-node/node2/config/config.toml
 sed -i -E 's|tcp://127.0.0.1:26657|tcp://127.0.0.1:36657|g' $HOME/.hid-node/node2/config/config.toml
 sed -i -E 's|tcp://0.0.0.0:26656|tcp://0.0.0.0:36656|g' $HOME/.hid-node/node2/config/config.toml
 sed -i -E 's|allow_duplicate_ip = false|allow_duplicate_ip = true|g' $HOME/.hid-node/node2/config/config.toml
 sed -i -E 's|addr_book_strict = true|addr_book_strict = false|g' $HOME/.hid-node/node2/config/config.toml
+# sed -i -E 's|cors_allowed_origins = []|cors_allowed_origins = ["*"]|g' $HOME/.hid-node/node2/config/config.toml
 
 # node3
 sed -i -E 's|tcp://127.0.0.1:26658|tcp://127.0.0.1:46658|g' $HOME/.hid-node/node3/config/config.toml
@@ -65,6 +68,7 @@ sed -i -E 's|tcp://127.0.0.1:26657|tcp://127.0.0.1:46657|g' $HOME/.hid-node/node
 sed -i -E 's|tcp://0.0.0.0:26656|tcp://0.0.0.0:46656|g' $HOME/.hid-node/node3/config/config.toml
 sed -i -E 's|allow_duplicate_ip = false|allow_duplicate_ip = true|g' $HOME/.hid-node/node3/config/config.toml
 sed -i -E 's|addr_book_strict = true|addr_book_strict = false|g' $HOME/.hid-node/node3/config/config.toml
+# sed -i -E 's|cors_allowed_origins = []|cors_allowed_origins = ["*"]|g' $HOME/.hid-node/node3/config/config.toml
 
 # copy node1 genesis file to node2 and node3
 cp $HOME/.hid-node/node1/config/genesis.json $HOME/.hid-node/node2/config/genesis.json
@@ -76,20 +80,4 @@ sed -i -E "s|persistent_peers = \"\"|persistent_peers = \"$(hid-noded tendermint
 sed -i -E "s|persistent_peers = \"\"|persistent_peers = \"$(hid-noded tendermint show-node-id --home=$HOME/.hid-node/node1)@127.0.0.1:26656\"|g" $HOME/.hid-node/node3/config/config.toml
 
 
-# Start all three nodes
-tmux new -s node1 -d hid-noded start --home=$HOME/.hid-node/node1
-tmux new -s node2 -d hid-noded start --home=$HOME/.hid-node/node2
-tmux new -s node3 -d hid-noded start --home=$HOME/.hid-node/node3
 
-# send uhid from first node to second node
-sleep 7
-hid-noded tx bank send node1 $(hid-noded keys show node2 -a --keyring-backend=test --home=$HOME/.hid-node/node2) 500000000uhid --keyring-backend=test --home=$HOME/.hid-node/node1 --chain-id=hidnode --yes
-sleep 7
-hid-noded tx bank send node1 $(hid-noded keys show node3 -a --keyring-backend=test --home=$HOME/.hid-node/node3) 400000000uhid --keyring-backend=test --home=$HOME/.hid-node/node1 --chain-id=hidnode --yes
-
-# create second validator
-sleep 7
-hid-noded tx staking create-validator --amount=500000000uhid --from=node2 --pubkey=$(hid-noded tendermint show-validator --home=$HOME/.hid-node/node2) --moniker="node2" --chain-id="hidnode" --commission-rate="0.1" --commission-max-rate="0.2" --commission-max-change-rate="0.05" --min-self-delegation="5000" --keyring-backend=test --home=$HOME/.hid-node/node2 --yes
-# create third validator
-sleep 7
-hid-noded tx staking create-validator --amount=400000000uhid --from=node3 --pubkey=$(hid-noded tendermint show-validator --home=$HOME/.hid-node/node3) --moniker="node3" --chain-id="hidnode" --commission-rate="0.1" --commission-max-rate="0.2" --commission-max-change-rate="0.05" --min-self-delegation="4000" --keyring-backend=test --home=$HOME/.hid-node/node3 --yes
