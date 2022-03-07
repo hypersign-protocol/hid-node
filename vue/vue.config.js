@@ -2,7 +2,7 @@ const NodePolyfillPlugin = require('node-polyfill-webpack-plugin')
 const path = require('path')
 
 module.exports = {
-  transpileDependencies: true,
+  transpileDependencies: ['@starport/client-js'],
   configureWebpack: {
     resolve: {
       symlinks: false,
