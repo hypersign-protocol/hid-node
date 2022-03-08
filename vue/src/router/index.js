@@ -6,11 +6,11 @@ import Relayers from '@/views/Relayers.vue'
 const routerHistory = createWebHistory()
 const routes = [
   {
-    path: '/',
+    path: '/wallet/',
     component: Index,
   },
-  { path: '/types', component: Types },
-  { path: '/relayers', component: Relayers },
+  { path: '/wallet/types', component: Types },
+  { path: '/wallet/relayers', component: Relayers },
 ]
 
 const router = createRouter({
