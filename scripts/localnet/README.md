@@ -1,7 +1,5 @@
 # LocalNet
 
-The script `start-3node.sh` runs a 3-Node local hid-node network
-
 ## Port Configuration
 
 - Node 1
@@ -21,9 +19,7 @@ The script `start-3node.sh` runs a 3-Node local hid-node network
 
 ## Prerequisite
 
-### step1  : Install Golang (ver 1.17.2)
-
-
+### step 1: Install Golang (ver 1.17.2)
 
 ### step 2: Setup `hid-noded` binary 
 
@@ -32,24 +28,20 @@ wget https://github.com/hypersign-protocol/hid-node/releases/download/latest/hid
 tar -xvzf hid-node_latest_linux_amd64.tar.gz
 mv hid-noded ~/go/bin
 ```
-### step 3: Install `tmux`
+### step 3: Install `tmux` and `jq`
 
 
 ## Running the locanet
 
-- Provide permissions to `start-3node.sh` to execute:
+- Execute the script to execute the complete workflow:
   ```sh
-  sudo chmod +x path/to/start-3node.sh
-  ```
-- Execute the script:
-  ```sh
-  sh path/to/start-3node.sh
+  sh all.sh
   ```
 
 ## Stop  the localnet
 
 ```sh
-sh path/to/stop-3node.sh
+sh path/to/stop.sh
 ```
 
 To display the logs of each node, run the following:

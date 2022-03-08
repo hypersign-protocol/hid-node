@@ -36,23 +36,29 @@ cat $HOME/.hid-node/node1/config/genesis.json | jq '.app_state["mint"]["params"]
 
 # change app.toml values
 
+sed -i -E '104s/enable = false/enable = true/' $HOME/.hid-node/node1/config/app.toml
+sed -i -E '107s/swagger = false/swagger = true/' $HOME/.hid-node/node1/config/app.toml
+
 # node2
 sed -i -E 's|tcp://0.0.0.0:1317|tcp://0.0.0.0:2317|g' $HOME/.hid-node/node2/config/app.toml
 sed -i -E 's|0.0.0.0:9090|0.0.0.0:9088|g' $HOME/.hid-node/node2/config/app.toml
 sed -i -E 's|0.0.0.0:9091|0.0.0.0:9089|g' $HOME/.hid-node/node2/config/app.toml
+sed -i -E '104s/enable = false/enable = true/' $HOME/.hid-node/node2/config/app.toml
+sed -i -E '107s/swagger = false/swagger = true/' $HOME/.hid-node/node2/config/app.toml
 
 # node3
 sed -i -E 's|tcp://0.0.0.0:1317|tcp://0.0.0.0:3317|g' $HOME/.hid-node/node3/config/app.toml
 sed -i -E 's|0.0.0.0:9090|0.0.0.0:9086|g' $HOME/.hid-node/node3/config/app.toml
 sed -i -E 's|0.0.0.0:9091|0.0.0.0:9087|g' $HOME/.hid-node/node3/config/app.toml
-
+sed -i -E '104s/enable = false/enable = true/' $HOME/.hid-node/node3/config/app.toml
+sed -i -E '107s/swagger = false/swagger = true/' $HOME/.hid-node/node3/config/app.toml
 
 # change config.toml values
 
 # node1
 sed -i -E 's|allow_duplicate_ip = false|allow_duplicate_ip = true|g' $HOME/.hid-node/node1/config/config.toml
 sed -i -E 's|addr_book_strict = true|addr_book_strict = false|g' $HOME/.hid-node/node1/config/config.toml
-# sed -i -E 's|cors_allowed_origins = []|cors_allowed_origins = ["*"]|g' $HOME/.hid-node/node1/config/config.toml
+sed -i -E 's|cors_allowed_origins = \[\]|cors_allowed_origins = \[\"\*\"\]|g' $HOME/.hid-node/node1/config/config.toml
 
 # node2
 sed -i -E 's|tcp://127.0.0.1:26658|tcp://127.0.0.1:36658|g' $HOME/.hid-node/node2/config/config.toml
@@ -60,7 +66,7 @@ sed -i -E 's|tcp://127.0.0.1:26657|tcp://127.0.0.1:36657|g' $HOME/.hid-node/node
 sed -i -E 's|tcp://0.0.0.0:26656|tcp://0.0.0.0:36656|g' $HOME/.hid-node/node2/config/config.toml
 sed -i -E 's|allow_duplicate_ip = false|allow_duplicate_ip = true|g' $HOME/.hid-node/node2/config/config.toml
 sed -i -E 's|addr_book_strict = true|addr_book_strict = false|g' $HOME/.hid-node/node2/config/config.toml
-# sed -i -E 's|cors_allowed_origins = []|cors_allowed_origins = ["*"]|g' $HOME/.hid-node/node2/config/config.toml
+sed -i -E 's|cors_allowed_origins = \[\]|cors_allowed_origins = \[\"\*\"\]|g' $HOME/.hid-node/node2/config/config.toml
 
 # node3
 sed -i -E 's|tcp://127.0.0.1:26658|tcp://127.0.0.1:46658|g' $HOME/.hid-node/node3/config/config.toml
@@ -68,7 +74,7 @@ sed -i -E 's|tcp://127.0.0.1:26657|tcp://127.0.0.1:46657|g' $HOME/.hid-node/node
 sed -i -E 's|tcp://0.0.0.0:26656|tcp://0.0.0.0:46656|g' $HOME/.hid-node/node3/config/config.toml
 sed -i -E 's|allow_duplicate_ip = false|allow_duplicate_ip = true|g' $HOME/.hid-node/node3/config/config.toml
 sed -i -E 's|addr_book_strict = true|addr_book_strict = false|g' $HOME/.hid-node/node3/config/config.toml
-# sed -i -E 's|cors_allowed_origins = []|cors_allowed_origins = ["*"]|g' $HOME/.hid-node/node3/config/config.toml
+sed -i -E 's|cors_allowed_origins = \[\]|cors_allowed_origins = \[\"\*\"\]|g' $HOME/.hid-node/node3/config/config.toml
 
 # copy node1 genesis file to node2 and node3
 cp $HOME/.hid-node/node1/config/genesis.json $HOME/.hid-node/node2/config/genesis.json
