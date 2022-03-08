@@ -9,6 +9,18 @@
 npm install
 ```
 
+## Setup Env
+
+```
+mv  .env<dev/local>.hid .env
+```
+
+## Generate store
+
+```
+starport generate vuex
+```
+
 ### Compiles and reloads the app on save for development
 
 ```
