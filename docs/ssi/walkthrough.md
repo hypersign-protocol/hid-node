@@ -96,7 +96,7 @@ hid-noded tx ssi create-did '{
 "authentication": [
 "did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52#z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4"
 ]
-}' did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52#z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4 --ver-key <private-key> --from alice --chain-id hidnode --yes
+}' did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52#z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4 --ver-key <private-key> --from alice --keyring-backend test --chain-id hidnode --yes
 ```
 
 ### Update DID
@@ -124,7 +124,7 @@ hid-noded tx ssi update-did '{
 "authentication": [
 "did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52#z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4"
 ]
-}' "${VERSION_ID}" did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52#z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4 --ver-key <private-key> --from alice --chain-id hidnode --yes
+}' "${VERSION_ID}" did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52#z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4 --ver-key <private-key> --keyring-backend test --from alice --chain-id hidnode --yes
 ```
 
 Here, the `${VERSION_ID}` should have the version id of the latest DID of User 2 (`did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52`)
@@ -154,7 +154,7 @@ hid-noded tx ssi deactivate-did '{
 "authentication": [
 "did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52#z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4"
 ]
-}' "${VERSION_ID}" did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52#z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4 --ver-key <private-key> --from alice --chain-id hidnode --yes
+}' "${VERSION_ID}" did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52#z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4 --ver-key <private-key> --keyring-backend test --from alice --chain-id hidnode --yes
 ```
 
 ### Resolving DID

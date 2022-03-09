@@ -69,7 +69,7 @@ hid-noded tx ssi create-did '{
 "authentication": [
 "did:hs:0f49341a-20ef-43d1-bc93-de30993e6c51#zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf"
 ]
-}' did:hs:0f49341a-20ef-43d1-bc93-de30993e6c51#zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf --ver-key oVtY1xceDZQjkfwlbCEC2vgeADcxpgd27vtYasBhcM/JLR6PnPoD9jvjSJrMsMJwS7faPy5OlFCdj/kgLVZMEg== --from alice --chain-id hidnode
+}' did:hs:0f49341a-20ef-43d1-bc93-de30993e6c51#zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf --ver-key oVtY1xceDZQjkfwlbCEC2vgeADcxpgd27vtYasBhcM/JLR6PnPoD9jvjSJrMsMJwS7faPy5OlFCdj/kgLVZMEg== --from alice --keyring-backend test --chain-id hidnode
 ```
 Note: While performing a CLI transaction, it is required to pass chain-id as `--chain-id hidnode` , as the default chain id set is `hid-node` which will cause the transaction to fail.
 
@@ -98,7 +98,7 @@ hid-noded tx ssi update-did '{
 "authentication": [
 "did:hs:0f49341a-20ef-43d1-bc93-de30993e6c51#zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf"
 ]
-}' <version-id> did:hs:0f49341a-20ef-43d1-bc93-de30993e6c51#zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf --ver-key oVtY1xceDZQjkfwlbCEC2vgeADcxpgd27vtYasBhcM/JLR6PnPoD9jvjSJrMsMJwS7faPy5OlFCdj/kgLVZMEg== --from alice --chain-id hidnode
+}' <version-id> did:hs:0f49341a-20ef-43d1-bc93-de30993e6c51#zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf --ver-key oVtY1xceDZQjkfwlbCEC2vgeADcxpgd27vtYasBhcM/JLR6PnPoD9jvjSJrMsMJwS7faPy5OlFCdj/kgLVZMEg== --from alice --keyring-backend test --chain-id hidnode
 ```
 
 The second param `<version-id>` should be the version-id of the latest DID Doc.
@@ -130,7 +130,7 @@ hid-noded tx ssi deactivate-did '{
 "authentication": [
 "did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52#z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4"
 ]
-}' <version-id> did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52#z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4 --ver-key bZBUkLGChnJujYHUZ4L8PECoN2Odv6adWGXc1qVWCRVqtEx0o/FmtFZnd5pT3laR518P58TRUGY5q5KSrToSmQ== --from alice --chain-id hidnode --yes
+}' <version-id> did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52#z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4 --ver-key bZBUkLGChnJujYHUZ4L8PECoN2Odv6adWGXc1qVWCRVqtEx0o/FmtFZnd5pT3laR518P58TRUGY5q5KSrToSmQ== --from alice --keyring-backend test --chain-id hidnode --yes
 ```
 
 ### Resolve DID
@@ -145,17 +145,17 @@ There are two ways to resolve DID:
 
 1. Retrieve a did Document by providing a Did ID:
 ```sh
-curl -X GET "http://localhost:1318/hypersign-protocol/hidnode/ssi/did/did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52:" -H  "accept: application/json"
+curl -X GET "http://localhost:<API-PORT>/hypersign-protocol/hidnode/ssi/did/did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52:" -H  "accept: application/json"
 ```
 
 2. Retrieve the count and list of did Documents:
 ```sh
-curl -X GET "http://localhost:1318/hypersign-protocol/hidnode/ssi/did" -H  "accept: application/json"
+curl -X GET "http://localhost:<API-PORT>/hypersign-protocol/hidnode/ssi/did" -H  "accept: application/json"
 ```
 
 Note: The above curl command was taken from the Swagger UI of Blockchain API, where the `did` input parameter was entered along with an extra semicolon appended, because gRPC server has issues parsing the regular DID string.
 
 **CLI**:
 ```sh
-hid-noded query ssi did did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52
+hid-noded query ssi did did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52 --chain-id hidnode
 ```
