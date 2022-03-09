@@ -15,7 +15,7 @@ RUN apk add --no-cache $PACKAGES && make build
 # Install ca-certificates
 RUN apk add --update ca-certificates
 
-# Run persistenceCore by default, omit entrypoint to ease using container with cli
+# Run hid-noded by default, omit entrypoint to ease using container with cli
 RUN bash ./scripts/docker-node/setup.sh
 
 # Entry for containers

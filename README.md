@@ -13,34 +13,37 @@ Following are the prerequisites that needs to be installed:
 
 ### Local:
 
-Clone the hid-node repository:
+Clone the hid-node repository and build the binary:
 
+```sh
+git clone https://github.com/hypersign-protocol/hid-node.git
+cd hid-node
+make build
 ```
-$ git clone https://github.com/hypersign-protocol/hid-node.git
-$ cd hid-node
-```
-
-Run the following command to build the binary file and start the blockchain: 
-```
-starport chain serve
-```
-
-You now have a blockchain up and running!
 
 The binary `hid-noded` will be generated in `$GO_PATH/bin` directory. To explore its functionalities, type `hid-noded --help` im a seperate terminal window.
 
-To stop the blockchain, navigate to the terminal window where the blockchain is running, and hit `Ctrl+C`.
+#### Running the Blockchain
+
+To start a single-node blockchain, refer to the README.md file present in [`/scripts/localnet-single-node/README.md`](/scripts/localnet-single-node/README.md)`
 
 ### Docker:
 
 To run a single node `hid-node` docker container, run the following:
 
-1. Build the image:
+1. Clone the repository:
+
+   ```sh
+   git clone https://github.com/hypersign-protocol/hid-node.git
+   cd hid-node
+   ```
+
+2. Build the image:
    ```sh
    sudo docker build -t hidnode .
    ```
 
-2. Run the container:
+3. Run the container:
    ```sh
    sudo docker run -d hidnode
    ```

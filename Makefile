@@ -1,5 +1,3 @@
-PACKAGES=$(shell go list ./... | grep -v '/simulation')
-
 VERSION := $(shell echo $(shell git describe --tags) | sed 's/^v//')
 COMMIT := $(shell git rev-parse --short HEAD)
 
