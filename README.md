@@ -11,6 +11,8 @@ Following are the prerequisites that needs to be installed:
 
 ## Get started
 
+### Local:
+
 Clone the hid-node repository:
 
 ```
@@ -28,6 +30,20 @@ You now have a blockchain up and running!
 The binary `hid-noded` will be generated in `$GO_PATH/bin` directory. To explore its functionalities, type `hid-noded --help` im a seperate terminal window.
 
 To stop the blockchain, navigate to the terminal window where the blockchain is running, and hit `Ctrl+C`.
+
+### Docker:
+
+To run a single node `hid-node` docker container, run the following:
+
+1. Build the image:
+   ```sh
+   sudo docker build -t hidnode .
+   ```
+
+2. Run the container:
+   ```sh
+   sudo docker run -d hidnode
+   ```
 
 ## Operations
 
