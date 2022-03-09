@@ -10,7 +10,7 @@ const { MsgCreateDID } =  require("./tx.js");
 
 const runfn = async () => {
     const myRegistry = new Registry(defaultRegistryTypes);
-    myRegistry.register("/hypersignprotocol.hidnode.did.MsgCreateDID", MsgCreateDID); // Replace with your own type URL and Msg class
+    myRegistry.register("/hypersignprotocol.hidnode.ssi.MsgCreateDID", MsgCreateDID); // Replace with your own type URL and Msg class
     const mnemonic = // Replace with your own mnemonic
     "crystal marble excuse boil vendor festival subject grape spatial absorb jaguar keep harbor pass argue fame easy borrow slide exhaust honey clutch attitude slab";
 
@@ -34,11 +34,10 @@ const runfn = async () => {
     const myAddress = firstAccount.address
     console.log(myAddress)
     const message = {
-    typeUrl: "/hypersignprotocol.hidnode.did.MsgCreateDID", // Same as above
+    typeUrl: "/hypersignprotocol.hidnode.ssi.MsgCreateDID", // Same as above
     value: MsgCreateDID.fromPartial({
-        did: "did:hs:1f49341a-20ef-43d1-bc93-de30993e6456",
         didDocString: "{\"@context\":[\"https://www.w3123.org/ns/did/v1\",\"https://w3id.org/security/v1\",\"https://schema.org\"],\"@type\":\"https://schema.org/Person\",\"id\":\"did:hs:0f49341a-20ef-43d1-bc93-de30993e6c51\",\"name\":\"Vishwas\",\"publicKey\":[{\"@context\":\"https://w3id.org/security/v2\",\"id\":\"did:hs:0f49341a-20ef-43d1-bc93-de30993e6c51#z6MkjAwRoZNV1oifLPb2GzLatZ7sVxY5jZ16xYTTAgSgCqQQ\",\"type\":\"Ed25519VerificationKey2018\",\"publicKeyBase58\":\"5igPDK83gGECDtkKbRNk3TZsgPGEKfkkGXYXLQUfHcd2\"}],\"authentication\":[\"did:hs:0f49341a-20ef-43d1-bc93-de30993e6c51#z6MkjAwRoZNV1oifLPb2GzLatZ7sVxY5jZ16xYTTAgSgCqQQ\"],\"assertionMethod\":[\"did:hs:0f49341a-20ef-43d1-bc93-de30993e6c51#z6MkjAwRoZNV1oifLPb2GzLatZ7sVxY5jZ16xYTTAgSgCqQQ\"],\"keyAgreement\":[\"did:hs:0f49341a-20ef-43d1-bc93-de30993e6c51#z6MkjAwRoZNV1oifLPb2GzLatZ7sVxY5jZ16xYTTAgSgCqQQ\"],\"capabilityInvocation\":[\"did:hs:0f49341a-20ef-43d1-bc93-de30993e6c51#z6MkjAwRoZNV1oifLPb2GzLatZ7sVxY5jZ16xYTTAgSgCqQQ\"],\"created\":\"2021-04-06T14:13:14.018Z\",\"updated\":\"2021-04-06T14:13:14.018Z\"}",
-        createdAt: "2022-04-06T14:13:14.018Z",
+        signatures: [],
         creator: myAddress,
     }),
     };
