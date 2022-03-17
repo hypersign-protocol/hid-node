@@ -9,16 +9,16 @@ WORKDIR /usr/local/app
 # Add source files
 COPY . .
 
-# Install minimum necessary dependencies, build persistenceCore, remove packages
+# Install minimum necessary dependencies and build hid-node
 RUN apk add --no-cache $PACKAGES && make build
 
 # Install ca-certificates
 RUN apk add --update ca-certificates
 
-# Run hid-noded by default, omit entrypoint to ease using container with cli
+# Setup the node
 RUN bash ./scripts/docker-node/setup.sh
 
-# Entry for containers
+# Entry for containers, Run the single-node script
 ENTRYPOINT [ "bash", "./scripts/docker-node/start.sh" ]
 
 # Expose Ports
