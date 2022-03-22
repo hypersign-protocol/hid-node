@@ -28,4 +28,4 @@ go.sum: go.mod
 ###############################################################################
 
 proto-build:
-	./scripts/protocgen.sh
+	sh ./scripts/protocgen.sh
