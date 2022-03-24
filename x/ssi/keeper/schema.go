@@ -2,10 +2,10 @@ package keeper
 
 import (
 	"encoding/binary"
+	"strings"
 
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/hypersign-protocol/hid-node/utils"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 )
 
@@ -26,9 +26,8 @@ func (k Keeper) GetSchemaCount(ctx sdk.Context) uint64 {
 
 // Check whether the given Schema already exists in the store
 func (k Keeper) HasSchema(ctx sdk.Context, id string) bool {
-	extractedID := utils.ExtractIDFromSchema(id)
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.SchemaKey))
-	return store.Has(utils.UnsafeStrToBytes(extractedID))
+	return store.Has([]byte(id))
 }
 
 func (k Keeper) SetSchemaCount(ctx sdk.Context, count uint64) {
@@ -50,10 +49,26 @@ func (k Keeper) AppendSchema(ctx sdk.Context, schema types.Schema) uint64 {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.SchemaKey))
 	// Marshal the Schema into bytes
 	schemaBytes := k.cdc.MustMarshal(&schema)
-	// Strip the id part from schema.ID
-	schemaID := utils.ExtractIDFromSchema(schema.Id)
-	store.Set(utils.UnsafeStrToBytes(schemaID), schemaBytes)
+	store.Set([]byte(schema.Id), schemaBytes)
 	// Update the Schema count
 	k.SetSchemaCount(ctx, count+1)
 	return count
+}
+
+// Get the schema from store	
+func (k Keeper) GetSchemaFromStore(ctx sdk.Context, querySchemaStr string) []*types.Schema {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.SchemaKey))
+	var schemas []*types.Schema
+	iterator := sdk.KVStorePrefixIterator(store, []byte{})
+	
+	for ; iterator.Valid(); iterator.Next() {
+		var schema types.Schema
+		k.cdc.MustUnmarshal(iterator.Value(), &schema)
+		
+		if strings.Contains(schema.Id, querySchemaStr) {
+			schemas = append(schemas, &schema)
+		}
+	}
+
+	return schemas
 }

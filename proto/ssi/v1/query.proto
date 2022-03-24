@@ -60,7 +60,7 @@ message QueryGetSchemaRequest {
 }
 
 message QueryGetSchemaResponse {
-  Schema schema = 1;
+  repeated Schema schema = 1;
 }
 
 message QuerySchemasRequest {

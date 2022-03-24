@@ -6,8 +6,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/query"
-	"github.com/hypersign-protocol/hid-node/utils"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
+	//"github.com/hypersign-protocol/hid-node/x/ssi/utils"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -16,23 +16,18 @@ func (k Keeper) GetSchema(goCtx context.Context, req *types.QueryGetSchemaReques
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
-
 	ctx := sdk.UnwrapSDKContext(goCtx)
+	
+	// Check if the input is proper
+	// TODO: This needs to be checked thoroughly
+	// if err := utils.IsValidSchemaID(req.SchemaId); err != nil {
+	// 	return nil, status.Error(codes.InvalidArgument, err.Error())
+	// }
 
-	// Get the key-value module store using the store key (in our case store key is "chain")
-	store := ctx.KVStore(k.storeKey)
-	// Get the part of the store that keeps schemas (using post key, which is "Schema-value-")
-	schemaStore := prefix.NewStore(store, []byte(types.SchemaKey))
-	bz := schemaStore.Get(utils.UnsafeStrToBytes(req.SchemaId))
-	if bz == nil {
-		return nil, status.Error(codes.NotFound, "schema not found")
-	}
-
-	var schema types.Schema
-	k.cdc.MustUnmarshal(bz, &schema)
+	var schemaList []*types.Schema = k.GetSchemaFromStore(ctx, req.SchemaId)
 
 	return &types.QueryGetSchemaResponse{
-		Schema: &schema,
+		Schema: schemaList,
 	}, nil
 }
 
