@@ -3,7 +3,7 @@ import { Reader, util, configure, Writer } from "protobufjs/minimal";
 import * as Long from "long";
 import { Params } from "../../ssi/v1/params";
 import { Schema } from "../../ssi/v1/schema";
-import { PageRequest, PageResponse, } from "../../cosmos/base/query/v1beta1/pagination";
+import { PageRequest } from "../../cosmos/base/query/v1beta1/pagination";
 import { Did, Metadata, DidResolveMeta } from "../../ssi/v1/did";
 export const protobufPackage = "hypersignprotocol.hidnode.ssi";
 const baseQueryParamsRequest = {};
@@ -144,8 +144,8 @@ export const QueryGetSchemaRequest = {
 const baseQueryGetSchemaResponse = {};
 export const QueryGetSchemaResponse = {
     encode(message, writer = Writer.create()) {
-        if (message.schema !== undefined) {
-            Schema.encode(message.schema, writer.uint32(10).fork()).ldelim();
+        for (const v of message.schema) {
+            Schema.encode(v, writer.uint32(10).fork()).ldelim();
         }
         return writer;
     },
@@ -153,11 +153,12 @@ export const QueryGetSchemaResponse = {
         const reader = input instanceof Uint8Array ? new Reader(input) : input;
         let end = length === undefined ? reader.len : reader.pos + length;
         const message = { ...baseQueryGetSchemaResponse };
+        message.schema = [];
         while (reader.pos < end) {
             const tag = reader.uint32();
             switch (tag >>> 3) {
                 case 1:
-                    message.schema = Schema.decode(reader, reader.uint32());
+                    message.schema.push(Schema.decode(reader, reader.uint32()));
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -168,33 +169,37 @@ export const QueryGetSchemaResponse = {
     },
     fromJSON(object) {
         const message = { ...baseQueryGetSchemaResponse };
+        message.schema = [];
         if (object.schema !== undefined && object.schema !== null) {
-            message.schema = Schema.fromJSON(object.schema);
-        }
-        else {
-            message.schema = undefined;
+            for (const e of object.schema) {
+                message.schema.push(Schema.fromJSON(e));
+            }
         }
         return message;
     },
     toJSON(message) {
         const obj = {};
-        message.schema !== undefined &&
-            (obj.schema = message.schema ? Schema.toJSON(message.schema) : undefined);
+        if (message.schema) {
+            obj.schema = message.schema.map((e) => e ? Schema.toJSON(e) : undefined);
+        }
+        else {
+            obj.schema = [];
+        }
         return obj;
     },
     fromPartial(object) {
         const message = { ...baseQueryGetSchemaResponse };
+        message.schema = [];
         if (object.schema !== undefined && object.schema !== null) {
-            message.schema = Schema.fromPartial(object.schema);
-        }
-        else {
-            message.schema = undefined;
+            for (const e of object.schema) {
+                message.schema.push(Schema.fromPartial(e));
+            }
         }
         return message;
     },
 };
-const baseQuerySchemasRequest = {};
-export const QuerySchemasRequest = {
+const baseQuerySchemaParamRequest = {};
+export const QuerySchemaParamRequest = {
     encode(message, writer = Writer.create()) {
         if (message.pagination !== undefined) {
             PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
@@ -204,7 +209,9 @@ export const QuerySchemasRequest = {
     decode(input, length) {
         const reader = input instanceof Uint8Array ? new Reader(input) : input;
         let end = length === undefined ? reader.len : reader.pos + length;
-        const message = { ...baseQuerySchemasRequest };
+        const message = {
+            ...baseQuerySchemaParamRequest,
+        };
         while (reader.pos < end) {
             const tag = reader.uint32();
             switch (tag >>> 3) {
@@ -219,7 +226,9 @@ export const QuerySchemasRequest = {
         return message;
     },
     fromJSON(object) {
-        const message = { ...baseQuerySchemasRequest };
+        const message = {
+            ...baseQuerySchemaParamRequest,
+        };
         if (object.pagination !== undefined && object.pagination !== null) {
             message.pagination = PageRequest.fromJSON(object.pagination);
         }
@@ -237,7 +246,9 @@ export const QuerySchemasRequest = {
         return obj;
     },
     fromPartial(object) {
-        const message = { ...baseQuerySchemasRequest };
+        const message = {
+            ...baseQuerySchemaParamRequest,
+        };
         if (object.pagination !== undefined && object.pagination !== null) {
             message.pagination = PageRequest.fromPartial(object.pagination);
         }
@@ -247,30 +258,32 @@ export const QuerySchemasRequest = {
         return message;
     },
 };
-const baseQuerySchemasResponse = {};
-export const QuerySchemasResponse = {
+const baseQuerySchemaParamResponse = { totalCount: 0 };
+export const QuerySchemaParamResponse = {
     encode(message, writer = Writer.create()) {
-        for (const v of message.schemaList) {
-            Schema.encode(v, writer.uint32(10).fork()).ldelim();
+        if (message.totalCount !== 0) {
+            writer.uint32(8).uint64(message.totalCount);
         }
-        if (message.pagination !== undefined) {
-            PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+        for (const v of message.schemaList) {
+            Schema.encode(v, writer.uint32(18).fork()).ldelim();
         }
         return writer;
     },
     decode(input, length) {
         const reader = input instanceof Uint8Array ? new Reader(input) : input;
         let end = length === undefined ? reader.len : reader.pos + length;
-        const message = { ...baseQuerySchemasResponse };
+        const message = {
+            ...baseQuerySchemaParamResponse,
+        };
         message.schemaList = [];
         while (reader.pos < end) {
             const tag = reader.uint32();
             switch (tag >>> 3) {
                 case 1:
-                    message.schemaList.push(Schema.decode(reader, reader.uint32()));
+                    message.totalCount = longToNumber(reader.uint64());
                     break;
                 case 2:
-                    message.pagination = PageResponse.decode(reader, reader.uint32());
+                    message.schemaList.push(Schema.decode(reader, reader.uint32()));
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -280,143 +293,49 @@ export const QuerySchemasResponse = {
         return message;
     },
     fromJSON(object) {
-        const message = { ...baseQuerySchemasResponse };
+        const message = {
+            ...baseQuerySchemaParamResponse,
+        };
         message.schemaList = [];
+        if (object.totalCount !== undefined && object.totalCount !== null) {
+            message.totalCount = Number(object.totalCount);
+        }
+        else {
+            message.totalCount = 0;
+        }
         if (object.schemaList !== undefined && object.schemaList !== null) {
             for (const e of object.schemaList) {
                 message.schemaList.push(Schema.fromJSON(e));
             }
         }
-        if (object.pagination !== undefined && object.pagination !== null) {
-            message.pagination = PageResponse.fromJSON(object.pagination);
-        }
-        else {
-            message.pagination = undefined;
-        }
         return message;
     },
     toJSON(message) {
         const obj = {};
+        message.totalCount !== undefined && (obj.totalCount = message.totalCount);
         if (message.schemaList) {
             obj.schemaList = message.schemaList.map((e) => e ? Schema.toJSON(e) : undefined);
         }
         else {
             obj.schemaList = [];
         }
-        message.pagination !== undefined &&
-            (obj.pagination = message.pagination
-                ? PageResponse.toJSON(message.pagination)
-                : undefined);
         return obj;
     },
     fromPartial(object) {
-        const message = { ...baseQuerySchemasResponse };
+        const message = {
+            ...baseQuerySchemaParamResponse,
+        };
         message.schemaList = [];
+        if (object.totalCount !== undefined && object.totalCount !== null) {
+            message.totalCount = object.totalCount;
+        }
+        else {
+            message.totalCount = 0;
+        }
         if (object.schemaList !== undefined && object.schemaList !== null) {
             for (const e of object.schemaList) {
                 message.schemaList.push(Schema.fromPartial(e));
             }
-        }
-        if (object.pagination !== undefined && object.pagination !== null) {
-            message.pagination = PageResponse.fromPartial(object.pagination);
-        }
-        else {
-            message.pagination = undefined;
-        }
-        return message;
-    },
-};
-const baseQuerySchemaCountRequest = {};
-export const QuerySchemaCountRequest = {
-    encode(_, writer = Writer.create()) {
-        return writer;
-    },
-    decode(input, length) {
-        const reader = input instanceof Uint8Array ? new Reader(input) : input;
-        let end = length === undefined ? reader.len : reader.pos + length;
-        const message = {
-            ...baseQuerySchemaCountRequest,
-        };
-        while (reader.pos < end) {
-            const tag = reader.uint32();
-            switch (tag >>> 3) {
-                default:
-                    reader.skipType(tag & 7);
-                    break;
-            }
-        }
-        return message;
-    },
-    fromJSON(_) {
-        const message = {
-            ...baseQuerySchemaCountRequest,
-        };
-        return message;
-    },
-    toJSON(_) {
-        const obj = {};
-        return obj;
-    },
-    fromPartial(_) {
-        const message = {
-            ...baseQuerySchemaCountRequest,
-        };
-        return message;
-    },
-};
-const baseQuerySchemaCountResponse = { count: 0 };
-export const QuerySchemaCountResponse = {
-    encode(message, writer = Writer.create()) {
-        if (message.count !== 0) {
-            writer.uint32(8).uint64(message.count);
-        }
-        return writer;
-    },
-    decode(input, length) {
-        const reader = input instanceof Uint8Array ? new Reader(input) : input;
-        let end = length === undefined ? reader.len : reader.pos + length;
-        const message = {
-            ...baseQuerySchemaCountResponse,
-        };
-        while (reader.pos < end) {
-            const tag = reader.uint32();
-            switch (tag >>> 3) {
-                case 1:
-                    message.count = longToNumber(reader.uint64());
-                    break;
-                default:
-                    reader.skipType(tag & 7);
-                    break;
-            }
-        }
-        return message;
-    },
-    fromJSON(object) {
-        const message = {
-            ...baseQuerySchemaCountResponse,
-        };
-        if (object.count !== undefined && object.count !== null) {
-            message.count = Number(object.count);
-        }
-        else {
-            message.count = 0;
-        }
-        return message;
-    },
-    toJSON(message) {
-        const obj = {};
-        message.count !== undefined && (obj.count = message.count);
-        return obj;
-    },
-    fromPartial(object) {
-        const message = {
-            ...baseQuerySchemaCountResponse,
-        };
-        if (object.count !== undefined && object.count !== null) {
-            message.count = object.count;
-        }
-        else {
-            message.count = 0;
         }
         return message;
     },
@@ -909,15 +828,10 @@ export class QueryClientImpl {
         const promise = this.rpc.request("hypersignprotocol.hidnode.ssi.Query", "GetSchema", data);
         return promise.then((data) => QueryGetSchemaResponse.decode(new Reader(data)));
     }
-    Schemas(request) {
-        const data = QuerySchemasRequest.encode(request).finish();
-        const promise = this.rpc.request("hypersignprotocol.hidnode.ssi.Query", "Schemas", data);
-        return promise.then((data) => QuerySchemasResponse.decode(new Reader(data)));
-    }
-    SchemaCount(request) {
-        const data = QuerySchemaCountRequest.encode(request).finish();
-        const promise = this.rpc.request("hypersignprotocol.hidnode.ssi.Query", "SchemaCount", data);
-        return promise.then((data) => QuerySchemaCountResponse.decode(new Reader(data)));
+    SchemaParam(request) {
+        const data = QuerySchemaParamRequest.encode(request).finish();
+        const promise = this.rpc.request("hypersignprotocol.hidnode.ssi.Query", "SchemaParam", data);
+        return promise.then((data) => QuerySchemaParamResponse.decode(new Reader(data)));
     }
     ResolveDid(request) {
         const data = QueryGetDidDocByIdRequest.encode(request).finish();

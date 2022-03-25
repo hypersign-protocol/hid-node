@@ -55,8 +55,7 @@ const getDefaultState = () => {
 	return {
 				Params: {},
 				GetSchema: {},
-				Schemas: {},
-				SchemaCount: {},
+				SchemaParam: {},
 				ResolveDid: {},
 				DidParam: {},
 				
@@ -112,17 +111,11 @@ export default {
 					}
 			return state.GetSchema[JSON.stringify(params)] ?? {}
 		},
-				getSchemas: (state) => (params = { params: {}}) => {
+				getSchemaParam: (state) => (params = { params: {}}) => {
 					if (!(<any> params).query) {
 						(<any> params).query=null
 					}
-			return state.Schemas[JSON.stringify(params)] ?? {}
-		},
-				getSchemaCount: (state) => (params = { params: {}}) => {
-					if (!(<any> params).query) {
-						(<any> params).query=null
-					}
-			return state.SchemaCount[JSON.stringify(params)] ?? {}
+			return state.SchemaParam[JSON.stringify(params)] ?? {}
 		},
 				getResolveDid: (state) => (params = { params: {}}) => {
 					if (!(<any> params).query) {
@@ -219,44 +212,22 @@ export default {
 		 		
 		
 		
-		async QuerySchemas({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+		async QuerySchemaParam({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
 			try {
 				const key = params ?? {};
 				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.querySchemas(query)).data
+				let value= (await queryClient.querySchemaParam(query)).data
 				
 					
 				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
-					let next_values=(await queryClient.querySchemas({...query, 'pagination.key':(<any> value).pagination.next_key})).data
+					let next_values=(await queryClient.querySchemaParam({...query, 'pagination.key':(<any> value).pagination.next_key})).data
 					value = mergeResults(value, next_values);
 				}
-				commit('QUERY', { query: 'Schemas', key: { params: {...key}, query}, value })
-				if (subscribe) commit('SUBSCRIBE', { action: 'QuerySchemas', payload: { options: { all }, params: {...key},query }})
-				return getters['getSchemas']( { params: {...key}, query}) ?? {}
+				commit('QUERY', { query: 'SchemaParam', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QuerySchemaParam', payload: { options: { all }, params: {...key},query }})
+				return getters['getSchemaParam']( { params: {...key}, query}) ?? {}
 			} catch (e) {
-				throw new SpVuexError('QueryClient:QuerySchemas', 'API Node Unavailable. Could not perform query: ' + e.message)
-				
-			}
-		},
-		
-		
-		
-		
-		 		
-		
-		
-		async QuerySchemaCount({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
-			try {
-				const key = params ?? {};
-				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.querySchemaCount()).data
-				
-					
-				commit('QUERY', { query: 'SchemaCount', key: { params: {...key}, query}, value })
-				if (subscribe) commit('SUBSCRIBE', { action: 'QuerySchemaCount', payload: { options: { all }, params: {...key},query }})
-				return getters['getSchemaCount']( { params: {...key}, query}) ?? {}
-			} catch (e) {
-				throw new SpVuexError('QueryClient:QuerySchemaCount', 'API Node Unavailable. Could not perform query: ' + e.message)
+				throw new SpVuexError('QueryClient:QuerySchemaParam', 'API Node Unavailable. Could not perform query: ' + e.message)
 				
 			}
 		},
@@ -329,6 +300,21 @@ export default {
 				}
 			}
 		},
+		async sendMsgDeactivateDID({ rootGetters }, { value, fee = [], memo = '' }) {
+			try {
+				const txClient=await initTxClient(rootGetters)
+				const msg = await txClient.msgDeactivateDID(value)
+				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
+	gas: "200000" }, memo})
+				return result
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new SpVuexError('TxClient:MsgDeactivateDID:Init', 'Could not initialize signing client. Wallet is required.')
+				}else{
+					throw new SpVuexError('TxClient:MsgDeactivateDID:Send', 'Could not broadcast Tx: '+ e.message)
+				}
+			}
+		},
 		async sendMsgUpdateDID({ rootGetters }, { value, fee = [], memo = '' }) {
 			try {
 				const txClient=await initTxClient(rootGetters)
@@ -359,21 +345,6 @@ export default {
 				}
 			}
 		},
-		async sendMsgDeactivateDID({ rootGetters }, { value, fee = [], memo = '' }) {
-			try {
-				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgDeactivateDID(value)
-				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
-	gas: "200000" }, memo})
-				return result
-			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new SpVuexError('TxClient:MsgDeactivateDID:Init', 'Could not initialize signing client. Wallet is required.')
-				}else{
-					throw new SpVuexError('TxClient:MsgDeactivateDID:Send', 'Could not broadcast Tx: '+ e.message)
-				}
-			}
-		},
 		
 		async MsgCreateDID({ rootGetters }, { value }) {
 			try {
@@ -385,6 +356,20 @@ export default {
 					throw new SpVuexError('TxClient:MsgCreateDID:Init', 'Could not initialize signing client. Wallet is required.')
 				}else{
 					throw new SpVuexError('TxClient:MsgCreateDID:Create', 'Could not create message: ' + e.message)
+					
+				}
+			}
+		},
+		async MsgDeactivateDID({ rootGetters }, { value }) {
+			try {
+				const txClient=await initTxClient(rootGetters)
+				const msg = await txClient.msgDeactivateDID(value)
+				return msg
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new SpVuexError('TxClient:MsgDeactivateDID:Init', 'Could not initialize signing client. Wallet is required.')
+				}else{
+					throw new SpVuexError('TxClient:MsgDeactivateDID:Create', 'Could not create message: ' + e.message)
 					
 				}
 			}
@@ -413,20 +398,6 @@ export default {
 					throw new SpVuexError('TxClient:MsgCreateSchema:Init', 'Could not initialize signing client. Wallet is required.')
 				}else{
 					throw new SpVuexError('TxClient:MsgCreateSchema:Create', 'Could not create message: ' + e.message)
-					
-				}
-			}
-		},
-		async MsgDeactivateDID({ rootGetters }, { value }) {
-			try {
-				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgDeactivateDID(value)
-				return msg
-			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new SpVuexError('TxClient:MsgDeactivateDID:Init', 'Could not initialize signing client. Wallet is required.')
-				}else{
-					throw new SpVuexError('TxClient:MsgDeactivateDID:Create', 'Could not create message: ' + e.message)
 					
 				}
 			}
