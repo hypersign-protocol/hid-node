@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"encoding/binary"
-	"strings"
 
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -55,17 +54,17 @@ func (k Keeper) AppendSchema(ctx sdk.Context, schema types.Schema) uint64 {
 	return count
 }
 
-// Get the schema from store	
+// Get the schema from store
 func (k Keeper) GetSchemaFromStore(ctx sdk.Context, querySchemaStr string) []*types.Schema {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.SchemaKey))
 	var schemas []*types.Schema
 	iterator := sdk.KVStorePrefixIterator(store, []byte{})
-	
+
 	for ; iterator.Valid(); iterator.Next() {
 		var schema types.Schema
 		k.cdc.MustUnmarshal(iterator.Value(), &schema)
-		
-		if strings.Contains(schema.Id, querySchemaStr) {
+
+		if querySchemaStr == schema.Id[0:len(schema.Id)-12] || querySchemaStr == schema.Id {
 			schemas = append(schemas, &schema)
 		}
 	}

@@ -17,12 +17,6 @@ func (k Keeper) GetSchema(goCtx context.Context, req *types.QueryGetSchemaReques
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	
-	// Check if the input is proper
-	// TODO: This needs to be checked thoroughly
-	// if err := utils.IsValidSchemaID(req.SchemaId); err != nil {
-	// 	return nil, status.Error(codes.InvalidArgument, err.Error())
-	// }
 
 	var schemaList []*types.Schema = k.GetSchemaFromStore(ctx, req.SchemaId)
 
