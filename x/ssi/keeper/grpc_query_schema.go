@@ -7,7 +7,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/query"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
-	//"github.com/hypersign-protocol/hid-node/x/ssi/utils"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -25,19 +24,7 @@ func (k Keeper) GetSchema(goCtx context.Context, req *types.QueryGetSchemaReques
 	}, nil
 }
 
-func (k Keeper) SchemaCount(goCtx context.Context, req *types.QuerySchemaCountRequest) (*types.QuerySchemaCountResponse, error) {
-	if req == nil {
-		return nil, status.Error(codes.InvalidArgument, "invalid request")
-	}
-
-	ctx := sdk.UnwrapSDKContext(goCtx)
-
-	var count uint64 = k.GetSchemaCount(ctx)
-
-	return &types.QuerySchemaCountResponse{Count: count}, nil
-}
-
-func (k Keeper) Schemas(goCtx context.Context, req *types.QuerySchemasRequest) (*types.QuerySchemasResponse, error) {
+func (k Keeper) SchemaParam(goCtx context.Context, req *types.QuerySchemaParamRequest) (*types.QuerySchemaParamResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -51,7 +38,7 @@ func (k Keeper) Schemas(goCtx context.Context, req *types.QuerySchemasRequest) (
 	// Get the part of the store that keeps schema (using post key, which is "Schema-value-")
 	postStore := prefix.NewStore(store, []byte(types.SchemaKey))
 	// Paginate the schema store based on PageRequest
-	pageRes, err := query.Paginate(postStore, req.Pagination, func(key []byte, value []byte) error {
+	_, err := query.Paginate(postStore, req.Pagination, func(key []byte, value []byte) error {
 		var schema types.Schema
 		if err := k.cdc.Unmarshal(value, &schema); err != nil {
 			return err
@@ -63,5 +50,5 @@ func (k Keeper) Schemas(goCtx context.Context, req *types.QuerySchemasRequest) (
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
-	return &types.QuerySchemasResponse{SchemaList: schemas, Pagination: pageRes}, nil
+	return &types.QuerySchemaParamResponse{SchemaList: schemas, TotalCount: k.GetSchemaCount(ctx)}, nil
 }

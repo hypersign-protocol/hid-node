@@ -170,13 +170,14 @@ export class Api extends HttpClient {
          * No description
          *
          * @tags Query
-         * @name QuerySchemaCount
-         * @summary Queries a list of SchemaCount items.
-         * @request GET:/hypersign-protocol/hidnode/ssi/schema/count
+         * @name QuerySchemaParam
+         * @summary Schema Param
+         * @request GET:/hypersign-protocol/hidnode/ssi/schema
          */
-        this.querySchemaCount = (params = {}) => this.request({
-            path: `/hypersign-protocol/hidnode/ssi/schema/count`,
+        this.querySchemaParam = (query, params = {}) => this.request({
+            path: `/hypersign-protocol/hidnode/ssi/schema`,
             method: "GET",
+            query: query,
             format: "json",
             ...params,
         });
@@ -186,26 +187,11 @@ export class Api extends HttpClient {
          * @tags Query
          * @name QueryGetSchema
          * @summary Queries a list of GetSchema items.
-         * @request GET:/hypersign-protocol/hidnode/ssi/schema/querySchemaById/{schemaId}
+         * @request GET:/hypersign-protocol/hidnode/ssi/schema/{schemaId}
          */
         this.queryGetSchema = (schemaId, params = {}) => this.request({
-            path: `/hypersign-protocol/hidnode/ssi/schema/querySchemaById/${schemaId}`,
+            path: `/hypersign-protocol/hidnode/ssi/schema/${schemaId}`,
             method: "GET",
-            format: "json",
-            ...params,
-        });
-        /**
-         * No description
-         *
-         * @tags Query
-         * @name QuerySchemas
-         * @summary Queries a list of Schemas items.
-         * @request GET:/hypersign-protocol/hidnode/ssi/schema/schemas
-         */
-        this.querySchemas = (query, params = {}) => this.request({
-            path: `/hypersign-protocol/hidnode/ssi/schema/schemas`,
-            method: "GET",
-            query: query,
             format: "json",
             ...params,
         });

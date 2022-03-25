@@ -20,17 +20,12 @@ service Query {
   }
   // Queries a list of GetSchema items.
 	rpc GetSchema(QueryGetSchemaRequest) returns (QueryGetSchemaResponse) {
-		option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/schema/querySchemaById/{schemaId}";
+		option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/schema/{schemaId}";
 	}
 
-// Queries a list of Schemas items.
-	rpc Schemas(QuerySchemasRequest) returns (QuerySchemasResponse) {
-		option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/schema/schemas";
-	}
-
-// Queries a list of SchemaCount items.
-	rpc SchemaCount(QuerySchemaCountRequest) returns (QuerySchemaCountResponse) {
-		option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/schema/count";
+// Schema Param
+	rpc SchemaParam(QuerySchemaParamRequest) returns (QuerySchemaParamResponse) {
+		option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/schema";
 	}
 
 // Resolve DID
@@ -63,20 +58,13 @@ message QueryGetSchemaResponse {
   repeated Schema schema = 1;
 }
 
-message QuerySchemasRequest {
+message QuerySchemaParamRequest {
   cosmos.base.query.v1beta1.PageRequest pagination = 1;
 }
 
-message QuerySchemasResponse {
-  repeated Schema schemaList = 1;
-  cosmos.base.query.v1beta1.PageResponse pagination = 2;
-}
-
-message QuerySchemaCountRequest {
-}
-
-message QuerySchemaCountResponse {
-  uint64 count = 1;
+message QuerySchemaParamResponse {
+  uint64 totalCount = 1;
+  repeated Schema schemaList = 2;
 }
 
 message QueryGetDidDocByIdRequest {
