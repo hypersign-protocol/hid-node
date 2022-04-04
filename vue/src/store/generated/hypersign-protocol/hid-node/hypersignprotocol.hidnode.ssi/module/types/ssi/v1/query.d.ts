@@ -1,7 +1,7 @@
 import { Reader, Writer } from "protobufjs/minimal";
 import { Params } from "../../ssi/v1/params";
 import { Schema } from "../../ssi/v1/schema";
-import { PageRequest, PageResponse } from "../../cosmos/base/query/v1beta1/pagination";
+import { PageRequest } from "../../cosmos/base/query/v1beta1/pagination";
 import { Did, Metadata, DidResolveMeta } from "../../ssi/v1/did";
 export declare const protobufPackage = "hypersignprotocol.hidnode.ssi";
 /** QueryParamsRequest is request type for the Query/Params RPC method. */
@@ -16,19 +16,14 @@ export interface QueryGetSchemaRequest {
     schemaId: string;
 }
 export interface QueryGetSchemaResponse {
-    schema: Schema | undefined;
+    schema: Schema[];
 }
-export interface QuerySchemasRequest {
+export interface QuerySchemaParamRequest {
     pagination: PageRequest | undefined;
 }
-export interface QuerySchemasResponse {
+export interface QuerySchemaParamResponse {
+    totalCount: number;
     schemaList: Schema[];
-    pagination: PageResponse | undefined;
-}
-export interface QuerySchemaCountRequest {
-}
-export interface QuerySchemaCountResponse {
-    count: number;
 }
 export interface QueryGetDidDocByIdRequest {
     didId: string;
@@ -82,33 +77,19 @@ export declare const QueryGetSchemaResponse: {
     toJSON(message: QueryGetSchemaResponse): unknown;
     fromPartial(object: DeepPartial<QueryGetSchemaResponse>): QueryGetSchemaResponse;
 };
-export declare const QuerySchemasRequest: {
-    encode(message: QuerySchemasRequest, writer?: Writer): Writer;
-    decode(input: Reader | Uint8Array, length?: number): QuerySchemasRequest;
-    fromJSON(object: any): QuerySchemasRequest;
-    toJSON(message: QuerySchemasRequest): unknown;
-    fromPartial(object: DeepPartial<QuerySchemasRequest>): QuerySchemasRequest;
+export declare const QuerySchemaParamRequest: {
+    encode(message: QuerySchemaParamRequest, writer?: Writer): Writer;
+    decode(input: Reader | Uint8Array, length?: number): QuerySchemaParamRequest;
+    fromJSON(object: any): QuerySchemaParamRequest;
+    toJSON(message: QuerySchemaParamRequest): unknown;
+    fromPartial(object: DeepPartial<QuerySchemaParamRequest>): QuerySchemaParamRequest;
 };
-export declare const QuerySchemasResponse: {
-    encode(message: QuerySchemasResponse, writer?: Writer): Writer;
-    decode(input: Reader | Uint8Array, length?: number): QuerySchemasResponse;
-    fromJSON(object: any): QuerySchemasResponse;
-    toJSON(message: QuerySchemasResponse): unknown;
-    fromPartial(object: DeepPartial<QuerySchemasResponse>): QuerySchemasResponse;
-};
-export declare const QuerySchemaCountRequest: {
-    encode(_: QuerySchemaCountRequest, writer?: Writer): Writer;
-    decode(input: Reader | Uint8Array, length?: number): QuerySchemaCountRequest;
-    fromJSON(_: any): QuerySchemaCountRequest;
-    toJSON(_: QuerySchemaCountRequest): unknown;
-    fromPartial(_: DeepPartial<QuerySchemaCountRequest>): QuerySchemaCountRequest;
-};
-export declare const QuerySchemaCountResponse: {
-    encode(message: QuerySchemaCountResponse, writer?: Writer): Writer;
-    decode(input: Reader | Uint8Array, length?: number): QuerySchemaCountResponse;
-    fromJSON(object: any): QuerySchemaCountResponse;
-    toJSON(message: QuerySchemaCountResponse): unknown;
-    fromPartial(object: DeepPartial<QuerySchemaCountResponse>): QuerySchemaCountResponse;
+export declare const QuerySchemaParamResponse: {
+    encode(message: QuerySchemaParamResponse, writer?: Writer): Writer;
+    decode(input: Reader | Uint8Array, length?: number): QuerySchemaParamResponse;
+    fromJSON(object: any): QuerySchemaParamResponse;
+    toJSON(message: QuerySchemaParamResponse): unknown;
+    fromPartial(object: DeepPartial<QuerySchemaParamResponse>): QuerySchemaParamResponse;
 };
 export declare const QueryGetDidDocByIdRequest: {
     encode(message: QueryGetDidDocByIdRequest, writer?: Writer): Writer;
@@ -151,10 +132,8 @@ export interface Query {
     Params(request: QueryParamsRequest): Promise<QueryParamsResponse>;
     /** Queries a list of GetSchema items. */
     GetSchema(request: QueryGetSchemaRequest): Promise<QueryGetSchemaResponse>;
-    /** Queries a list of Schemas items. */
-    Schemas(request: QuerySchemasRequest): Promise<QuerySchemasResponse>;
-    /** Queries a list of SchemaCount items. */
-    SchemaCount(request: QuerySchemaCountRequest): Promise<QuerySchemaCountResponse>;
+    /** Schema Param */
+    SchemaParam(request: QuerySchemaParamRequest): Promise<QuerySchemaParamResponse>;
     /** Resolve DID */
     ResolveDid(request: QueryGetDidDocByIdRequest): Promise<QueryGetDidDocByIdResponse>;
     /** Did Param */
@@ -165,8 +144,7 @@ export declare class QueryClientImpl implements Query {
     constructor(rpc: Rpc);
     Params(request: QueryParamsRequest): Promise<QueryParamsResponse>;
     GetSchema(request: QueryGetSchemaRequest): Promise<QueryGetSchemaResponse>;
-    Schemas(request: QuerySchemasRequest): Promise<QuerySchemasResponse>;
-    SchemaCount(request: QuerySchemaCountRequest): Promise<QuerySchemaCountResponse>;
+    SchemaParam(request: QuerySchemaParamRequest): Promise<QuerySchemaParamResponse>;
     ResolveDid(request: QueryGetDidDocByIdRequest): Promise<QueryGetDidDocByIdResponse>;
     DidParam(request: QueryDidParamRequest): Promise<QueryDidParamResponse>;
 }

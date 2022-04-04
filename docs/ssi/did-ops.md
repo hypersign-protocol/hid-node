@@ -1,4 +1,4 @@
-# SSI Module Walkthrough
+# DID Operation Walkthrough
 
 ## Features
 

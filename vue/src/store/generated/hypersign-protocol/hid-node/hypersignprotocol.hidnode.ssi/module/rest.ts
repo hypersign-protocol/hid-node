@@ -91,7 +91,7 @@ export interface SsiQueryGetDidDocByIdResponse {
 }
 
 export interface SsiQueryGetSchemaResponse {
-  schema?: SsiSchema;
+  schema?: SsiSchema[];
 }
 
 /**
@@ -102,24 +102,10 @@ export interface SsiQueryParamsResponse {
   params?: SsiParams;
 }
 
-export interface SsiQuerySchemaCountResponse {
+export interface SsiQuerySchemaParamResponse {
   /** @format uint64 */
-  count?: string;
-}
-
-export interface SsiQuerySchemasResponse {
+  totalCount?: string;
   schemaList?: SsiSchema[];
-
-  /**
-   * PageResponse is to be embedded in gRPC response messages where the
-   * corresponding request message has used PageRequest.
-   *
-   *  message SomeResponse {
-   *          repeated Bar results = 1;
-   *          PageResponse page = 2;
-   *  }
-   */
-  pagination?: V1Beta1PageResponse;
 }
 
 export interface SsiSchema {
@@ -203,23 +189,6 @@ export interface V1Beta1PageRequest {
    * Since: cosmos-sdk 0.43
    */
   reverse?: boolean;
-}
-
-/**
-* PageResponse is to be embedded in gRPC response messages where the
-corresponding request message has used PageRequest.
-
- message SomeResponse {
-         repeated Bar results = 1;
-         PageResponse page = 2;
- }
-*/
-export interface V1Beta1PageResponse {
-  /** @format byte */
-  nextKey?: string;
-
-  /** @format uint64 */
-  total?: string;
 }
 
 export type QueryParamsType = Record<string | number, any>;
@@ -466,14 +435,24 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * No description
    *
    * @tags Query
-   * @name QuerySchemaCount
-   * @summary Queries a list of SchemaCount items.
-   * @request GET:/hypersign-protocol/hidnode/ssi/schema/count
+   * @name QuerySchemaParam
+   * @summary Schema Param
+   * @request GET:/hypersign-protocol/hidnode/ssi/schema
    */
-  querySchemaCount = (params: RequestParams = {}) =>
-    this.request<SsiQuerySchemaCountResponse, RpcStatus>({
-      path: `/hypersign-protocol/hidnode/ssi/schema/count`,
+  querySchemaParam = (
+    query?: {
+      "pagination.key"?: string;
+      "pagination.offset"?: string;
+      "pagination.limit"?: string;
+      "pagination.countTotal"?: boolean;
+      "pagination.reverse"?: boolean;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<SsiQuerySchemaParamResponse, RpcStatus>({
+      path: `/hypersign-protocol/hidnode/ssi/schema`,
       method: "GET",
+      query: query,
       format: "json",
       ...params,
     });
@@ -484,38 +463,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * @tags Query
    * @name QueryGetSchema
    * @summary Queries a list of GetSchema items.
-   * @request GET:/hypersign-protocol/hidnode/ssi/schema/querySchemaById/{schemaId}
+   * @request GET:/hypersign-protocol/hidnode/ssi/schema/{schemaId}
    */
   queryGetSchema = (schemaId: string, params: RequestParams = {}) =>
     this.request<SsiQueryGetSchemaResponse, RpcStatus>({
-      path: `/hypersign-protocol/hidnode/ssi/schema/querySchemaById/${schemaId}`,
+      path: `/hypersign-protocol/hidnode/ssi/schema/${schemaId}`,
       method: "GET",
-      format: "json",
-      ...params,
-    });
-
-  /**
-   * No description
-   *
-   * @tags Query
-   * @name QuerySchemas
-   * @summary Queries a list of Schemas items.
-   * @request GET:/hypersign-protocol/hidnode/ssi/schema/schemas
-   */
-  querySchemas = (
-    query?: {
-      "pagination.key"?: string;
-      "pagination.offset"?: string;
-      "pagination.limit"?: string;
-      "pagination.countTotal"?: boolean;
-      "pagination.reverse"?: boolean;
-    },
-    params: RequestParams = {},
-  ) =>
-    this.request<SsiQuerySchemasResponse, RpcStatus>({
-      path: `/hypersign-protocol/hidnode/ssi/schema/schemas`,
-      method: "GET",
-      query: query,
       format: "json",
       ...params,
     });

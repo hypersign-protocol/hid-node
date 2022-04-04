@@ -171,7 +171,7 @@ func FindVerificationMethod(vms []*types.VerificationMethod, id string) *types.V
 
 func IsValidSchemaID(schemaId string) error {
 	IdComponents := strings.Split(schemaId, ";")
-	if len(IdComponents) != 3 {
+	if len(IdComponents) < 2 {
 		return errors.New("Expected 3 components in schema ID after being seperated by `;`, got " + fmt.Sprint(len(IdComponents)) + " components. The Schema ID is `" + schemaId + "` ")
 	}
 
