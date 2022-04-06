@@ -125,7 +125,7 @@ func CmdUpdateDID() *cobra.Command {
 func CmdCreateSchema() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create-schema [schema] [verification-method-id]",
-		Short: "Broadcast message createSchema",
+		Short: "Creates a Schema",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argSchema := args[0]
