@@ -7,7 +7,6 @@ The Hypersign Identity Network is a permissionless blockchain network to manage 
 Following are the prerequisites that needs to be installed:
 
 - golang (Installation Guide: https://go.dev/doc/install) (version: 1.17.2)
-- starport (Installation Guide: https://docs.starport.network/guide/install.html)
 
 ## Get started
 
