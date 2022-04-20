@@ -19,7 +19,7 @@ RUN apk add --update ca-certificates
 RUN bash ./scripts/docker-node/setup.sh
 
 # Entry for containers, Run the single-node script
-ENTRYPOINT [ "bash", "./scripts/docker-node/start.sh" ]
+ENTRYPOINT [ "hid-noded" ]
 
 # Expose Ports
 EXPOSE 26657 1317 9090 9091 26656

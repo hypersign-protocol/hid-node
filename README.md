@@ -30,21 +30,14 @@ To start a single-node blockchain, refer to the README.md file present in [`/scr
 
 To run a single node `hid-node` docker container, run the following:
 
-1. Clone the repository:
-
+1. Pull the image:
    ```sh
-   git clone https://github.com/hypersign-protocol/hid-node.git
-   cd hid-node
+   docker pull hypersignprotocol/hid-node
    ```
 
-2. Build the image:
+2. Open a separate terminal window. Run the node:
    ```sh
-   sudo docker build -t hidnode .
-   ```
-
-3. Run the container:
-   ```sh
-   sudo docker run -d hidnode
+   docker run -it hypersignprotocol/hid-node start
    ```
 
 ## Operations
