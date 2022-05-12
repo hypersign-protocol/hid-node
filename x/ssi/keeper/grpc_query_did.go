@@ -2,10 +2,12 @@ package keeper
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	//"fmt"
 
+	cdc "github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/query"
@@ -29,7 +31,7 @@ func (k Keeper) DidParam(goCtx context.Context, req *types.QueryDidParamRequest)
 	_, err := query.Paginate(store, req.Pagination, func(key []byte, value []byte) error {
 		var (
 			didResolve types.DidResolutionResponse
-			didDoc types.DidDocument
+			didDoc     types.DidDocument
 		)
 		if err := k.cdc.Unmarshal(value, &didDoc); err != nil {
 			return err
@@ -38,7 +40,7 @@ func (k Keeper) DidParam(goCtx context.Context, req *types.QueryDidParamRequest)
 		didResolve.DidDocument = didDoc.Did
 		didResolve.DidDocumentMetadata = didDoc.Metadata
 		didResolve.DidResolutionMetadata = &types.DidResolveMeta{
-			Error: "",
+			Error:     "",
 			Retrieved: ctx.BlockTime().Format(time.RFC3339),
 		}
 
@@ -117,4 +119,29 @@ func (k Keeper) ResolveDid(goCtx context.Context, req *types.QueryGetDidDocByIdR
 			Retrieved: ctx.BlockTime().Format(time.RFC3339),
 		},
 	}, nil
+}
+
+// TEMPORARY (NOT TO BE USED): This Query Service takes strings as an input, and returns Unmarshalled output
+func (k Keeper) TempUnmarshal(goCtx context.Context, req *types.MarshalInput) (*types.MarshalOutput, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
+
+	var _ sdk.Context = sdk.UnwrapSDKContext(goCtx)
+
+	// Step 1: Get the DidDocString Input from request Object
+	res := req.StringInput
+
+	// Step 2: Unmarshal the said string into bytes
+	var didDoc types.Did
+	err := cdc.NewLegacyAmino().UnmarshalJSON([]byte(res), &didDoc)
+	if err != nil {
+		return nil, err
+	}
+	didDocBytes := didDoc.GetSignBytes()
+
+	// Step 3: Send those bytes as string to Response
+	response := fmt.Sprintf("%v", didDocBytes)
+
+	return &types.MarshalOutput{UnmarshalOutput: response}, nil
 }
