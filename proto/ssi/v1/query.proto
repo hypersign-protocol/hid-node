@@ -38,14 +38,6 @@ service Query {
     option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/did";
   }
 
-// TEMPORARY (NOT TO BE USED): This Query Service takes strings as an input, and returns Unmarshalled output
-  rpc TempUnmarshal(MarshalInput) returns (MarshalOutput) {
-    option (google.api.http) = {
-      post: "/hypersign-protocol/hidnode/ssi/unmarshal"
-      body: "*"
-    };
-  } 
-
 // this line is used by starport scaffolding # 2
 }
 
