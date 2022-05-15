@@ -18899,49 +18899,6 @@ paths:
           type: string
       tags:
         - Query
-  /hypersign-protocol/hidnode/ssi/unmarshal:
-    post:
-      summary: >-
-        TEMPORARY (NOT TO BE USED): This Query Service takes strings as an
-        input, and returns Unmarshalled output
-      operationId: HypersignprotocolHidnodeSsiTempUnmarshal
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              unmarshalOutput:
-                type: string
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    '@type':
-                      type: string
-                  additionalProperties: {}
-      parameters:
-        - name: body
-          in: body
-          required: true
-          schema:
-            type: object
-            properties:
-              stringInput:
-                type: string
-      tags:
-        - Query
   /hypersignprotocol/hidnode/ssi/params:
     get:
       summary: Parameters queries the parameters of the module.
@@ -44289,16 +44246,6 @@ definitions:
       retrieved:
         type: string
       error:
-        type: string
-  hypersignprotocol.hidnode.ssi.MarshalInput:
-    type: object
-    properties:
-      stringInput:
-        type: string
-  hypersignprotocol.hidnode.ssi.MarshalOutput:
-    type: object
-    properties:
-      unmarshalOutput:
         type: string
   hypersignprotocol.hidnode.ssi.Metadata:
     type: object
