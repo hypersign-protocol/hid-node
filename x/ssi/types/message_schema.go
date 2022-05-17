@@ -39,8 +39,7 @@ func (msg *MsgCreateSchema) GetSignBytes() []byte {
 }
 
 func (msg *Schema) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(msg)
-	return sdk.MustSortJSON(bz)
+	return ModuleCdc.MustMarshal(msg)
 }
 
 func (msg *MsgCreateSchema) ValidateBasic() error {
