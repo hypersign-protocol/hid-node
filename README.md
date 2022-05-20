@@ -24,7 +24,16 @@ The binary `hid-noded` will be generated in `$GO_PATH/bin` directory. To explore
 
 #### Running the Blockchain
 
-To start a single-node blockchain, refer to the README.md file present in [`/scripts/localnet-single-node/README.md`](/scripts/localnet-single-node/README.md)`
+To start a single-node blockchain, run the following command to initialize the node:
+
+```sh
+sh ./scripts/localnet-single-node/setup.sh
+```
+Run the hid-node:
+
+```sh
+hid-noded start --home ~/.hid-node
+```
 
 ### Docker:
 
