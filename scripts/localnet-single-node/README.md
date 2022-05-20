@@ -20,7 +20,7 @@ Install the following:
   - `sh setup.sh`
 
 - Run the localnet
-  - `sh start.sh`
+  - `hid-noded start`
 
 - To display the logs of each node, run the following in a seperate terminal:
 
