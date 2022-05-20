@@ -22,12 +22,4 @@ Install the following:
 - Run the localnet
   - `hid-noded start`
 
-- To display the logs of each node, run the following in a seperate terminal:
-
-Node1: `tmux a -t node1`<br>
-
-## Stop the localnet
-
-```sh
-sh stop.sh
-```
+- To stop the `hid-node`, press `Ctrl + C`
