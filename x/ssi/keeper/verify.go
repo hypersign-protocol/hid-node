@@ -238,3 +238,34 @@ func VerifyDidDeactivate(metadata *types.Metadata, id string) error {
 	}
 	return nil
 }
+
+// Verify Credential Signature
+func (k msgServer) VerifyCredentialSignature(msg *types.CredentialStatus, didDoc *types.Did, signature string, verificationMethod string) error {
+	signingInput := msg.GetSignBytes()
+
+	signer := types.Signer{
+		Signer:             didDoc.GetId(),
+		Authentication:     didDoc.GetAuthentication(),
+		VerificationMethod: didDoc.GetVerificationMethod(),
+	}
+
+	signingInfo := &types.SignInfo{
+		VerificationMethodId: verificationMethod,
+		Signature:            signature,
+	}
+
+	signingInfoList := []*types.SignInfo{
+		signingInfo,
+	}
+
+	valid, err := VerifyIdentitySignature(signer, signingInfoList, signingInput)
+	if err != nil {
+		return sdkerrors.Wrap(types.ErrInvalidSignature, err.Error())
+	}
+
+	if !valid {
+		// return sdkerrors.Wrap(types.ErrInvalidSignature, signer.Signer)
+		return sdkerrors.Wrap(types.ErrInvalidSignature, string(signer.Signer))
+	}
+	return nil
+}

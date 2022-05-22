@@ -7,13 +7,15 @@ option go_package = "github.com/hypersign-protocol/hid-node/x/ssi/types";
 
 import "ssi/v1/schema.proto";
 import "ssi/v1/did.proto";
+import "ssi/v1/credential.proto";
 
 // Msg defines the Msg service.
 service Msg {
-      rpc CreateDID(MsgCreateDID) returns (MsgCreateDIDResponse);
+  rpc CreateDID(MsgCreateDID) returns (MsgCreateDIDResponse);
   rpc UpdateDID(MsgUpdateDID) returns (MsgUpdateDIDResponse);
   rpc CreateSchema(MsgCreateSchema) returns (MsgCreateSchemaResponse);
   rpc DeactivateDID(MsgDeactivateDID) returns (MsgDeactivateDIDResponse);
+  rpc RegisterCredentialStatus(MsgRegisterCredentialStatus) returns (MsgRegisterCredentialStatusResponse);
 // this line is used by starport scaffolding # proto/tx/rpc
 }
 
@@ -56,6 +58,16 @@ message MsgDeactivateDID {
 }
 
 message MsgDeactivateDIDResponse {
+  uint64 id = 1;
+}
+
+message MsgRegisterCredentialStatus {
+  string creator = 1;
+  CredentialStatus credentialStatus = 2;
+  CredentialProof proof = 3;
+}
+
+message MsgRegisterCredentialStatusResponse {
   uint64 id = 1;
 }
 

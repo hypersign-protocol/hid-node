@@ -229,3 +229,52 @@ func CmdDeactivateDID() *cobra.Command {
 	cmd.Flags().String(VerKeyFlag, "", "Base64 encoded ed25519 private key to sign identity message with. ")
 	return cmd
 }
+
+func CmdRegisterCredentialStatus() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "register-credential-status [credential-status] [proof]",
+		Short: "Registers the status of a Verifiable Credential",
+		Args:  cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			argCredStatus := args[0]
+			argProof := args[1]
+
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			// Unmarshal Credential Status
+			var (
+				credentialStatus types.CredentialStatus
+				proof            types.CredentialProof
+			)
+
+			err = clientCtx.Codec.UnmarshalJSON([]byte(argCredStatus), &credentialStatus)
+			if err != nil {
+				return err
+			}
+
+			// Unmarshal Proof
+			err = clientCtx.Codec.UnmarshalJSON([]byte(argProof), &proof)
+			if err != nil {
+				return err
+			}
+
+			msg := types.MsgRegisterCredentialStatus{
+				CredentialStatus: &credentialStatus,
+				Proof:            &proof,
+				Creator:          clientCtx.GetFromAddress().String(),
+			}
+
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), &msg)
+		},
+	}
+
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
+}
