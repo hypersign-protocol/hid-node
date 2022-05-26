@@ -26,4 +26,5 @@ var (
 	ErrInvalidDidMethod           = sdkerrors.Register(ModuleName, 116, "Invalid DID method")
 	ErrCredentialExists           = sdkerrors.Register(ModuleName, 117, "Credential Already Exists")
 	ErrInvalidCredentialStatus    = sdkerrors.Register(ModuleName, 118, "Invalid Credential Status")
+	ErrInvalidDate                = sdkerrors.Register(ModuleName, 119, "Invalid Date")
 )

@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"reflect"
+	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -267,5 +268,59 @@ func (k msgServer) VerifyCredentialSignature(msg *types.CredentialStatus, didDoc
 		// return sdkerrors.Wrap(types.ErrInvalidSignature, signer.Signer)
 		return sdkerrors.Wrap(types.ErrInvalidSignature, string(signer.Signer))
 	}
+	return nil
+}
+
+func VerifyCredentialStatusDates(credStatus *types.CredentialStatus) error {
+	var dateDiff int64
+
+	expirationDate := credStatus.GetExpirationDate()
+	expirationDateParsed, err := time.Parse(time.RFC3339, expirationDate)
+	if err != nil {
+		return sdkerrors.Wrapf(types.ErrInvalidDate, fmt.Sprintf("invalid expiration date format: %s", expirationDate))
+	}
+
+	issuanceDate := credStatus.GetIssuanceDate()
+	issuanceDateParsed, err := time.Parse(time.RFC3339, issuanceDate)
+	if err != nil {
+		return sdkerrors.Wrapf(types.ErrInvalidDate, fmt.Sprintf("invalid issuance date format: %s", issuanceDate))
+	}
+
+	dateDiff = int64(expirationDateParsed.Sub(issuanceDateParsed)) / 1e9 // converting nanoseconds to seconds
+	if dateDiff < 0 {
+		return sdkerrors.Wrapf(types.ErrInvalidDate, fmt.Sprintf("expiration date %s cannot be less than issuance date %s", expirationDate, issuanceDate))
+	}
+
+	return nil
+}
+
+func VerifyCredentialProofDates(credProof *types.CredentialProof, credRegistration bool) error {
+	var dateDiff int64
+
+	proofCreatedDate := credProof.GetCreated()
+	proofCreatedDateParsed, err := time.Parse(time.RFC3339, proofCreatedDate)
+	if err != nil {
+		return sdkerrors.Wrapf(types.ErrInvalidDate, fmt.Sprintf("invalid created date format: %s", proofCreatedDate))
+	}
+
+	proofUpdatedDate := credProof.GetUpdated()
+	proofUpdatedDateParsed, err := time.Parse(time.RFC3339, proofUpdatedDate)
+	if err != nil {
+		return sdkerrors.Wrapf(types.ErrInvalidDate, fmt.Sprintf("invalid created date format: %s", proofUpdatedDate))
+	}
+
+	// If credRegistration is True, check for equity of updated and created dates will proceeed
+	// Else, check for updated date being greater than created date will proceeed
+	if credRegistration {
+		if !proofUpdatedDateParsed.Equal(proofCreatedDateParsed) {
+			return sdkerrors.Wrapf(types.ErrInvalidDate, fmt.Sprintf("updated date %s should be similar to created date %s", proofUpdatedDate, proofCreatedDate))
+		}
+	} else {
+		dateDiff = int64(proofUpdatedDateParsed.Sub(proofCreatedDateParsed)) / 1e9 // converting nanoseconds to seconds
+		if dateDiff < 0 {
+			return fmt.Errorf("update date %s cannot be less than created date %s", proofUpdatedDate, proofCreatedDate)
+		}
+	}
+
 	return nil
 }

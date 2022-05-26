@@ -3,10 +3,12 @@ package keeper
 import (
 	"context"
 	"fmt"
+
 	//"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+
 	//sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 )
@@ -22,7 +24,7 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 	if k.HasCredential(ctx, credId) {
 		return nil, sdkerrors.Wrap(types.ErrCredentialExists, fmt.Sprintf("Credential ID: %s ", credId))
 	}
-	
+
 	// Check for the correct credential status
 	credStatus := credMsg.GetClaim().GetCurrentStatus()
 	if credStatus != "Live" {
@@ -35,7 +37,17 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("Issuer`s DID %s doesnt exists", issuerId))
 	}
 
-	// Verify the Signature 
+	// Check if the expiration date is not before the issuance date.
+	if err := VerifyCredentialStatusDates(credMsg); err != nil {
+		return nil, err
+	}
+
+	// Check if updated date iss imilar to created date
+	if err := VerifyCredentialProofDates(credProof, true); err != nil {
+		return nil, err
+	}
+
+	// Verify the Signature
 	didDocument, err := k.GetDid(&ctx, issuerId)
 	if err != nil {
 		return nil, err
@@ -49,14 +61,14 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 	if err != nil {
 		return nil, err
 	}
-	
+
 	cred := types.Credential{
-		Claim:  credMsg.GetClaim(),
-		Issuer: credMsg.GetIssuer(),
-		IssuanceDate: credMsg.GetIssuanceDate(),
+		Claim:          credMsg.GetClaim(),
+		Issuer:         credMsg.GetIssuer(),
+		IssuanceDate:   credMsg.GetIssuanceDate(),
 		ExpirationDate: credMsg.GetExpirationDate(),
 		CredentialHash: credMsg.GetCredentialHash(),
-		Proof:  credProof,
+		Proof:          credProof,
 	}
 
 	id := k.RegisterCred(ctx, &cred)
