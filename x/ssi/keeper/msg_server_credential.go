@@ -53,7 +53,9 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 	cred := types.Credential{
 		Claim:  credMsg.GetClaim(),
 		Issuer: credMsg.GetIssuer(),
-		Issued: credMsg.GetIssuanceDate(),
+		IssuanceDate: credMsg.GetIssuanceDate(),
+		ExpirationDate: credMsg.GetExpirationDate(),
+		CredentialHash: credMsg.GetCredentialHash(),
 		Proof:  credProof,
 	}
 

@@ -18430,7 +18430,11 @@ paths:
                         type: string
                   issuer:
                     type: string
-                  issued:
+                  issuanceDate:
+                    type: string
+                  expirationDate:
+                    type: string
+                  credentialHash:
                     type: string
                   proof:
                     type: object
@@ -18438,6 +18442,8 @@ paths:
                       type:
                         type: string
                       created:
+                        type: string
+                      updated:
                         type: string
                       verificationMethod:
                         type: string
@@ -44182,7 +44188,11 @@ definitions:
             type: string
       issuer:
         type: string
-      issued:
+      issuanceDate:
+        type: string
+      expirationDate:
+        type: string
+      credentialHash:
         type: string
       proof:
         type: object
@@ -44190,6 +44200,8 @@ definitions:
           type:
             type: string
           created:
+            type: string
+          updated:
             type: string
           verificationMethod:
             type: string
@@ -44203,6 +44215,8 @@ definitions:
       type:
         type: string
       created:
+        type: string
+      updated:
         type: string
       verificationMethod:
         type: string
@@ -44224,7 +44238,11 @@ definitions:
             type: string
       issuer:
         type: string
-      issued:
+      issuanceDate:
+        type: string
+      expirationDate:
+        type: string
+      credentialHash:
         type: string
   hypersignprotocol.hidnode.ssi.Did:
     type: object
@@ -44438,7 +44456,11 @@ definitions:
                 type: string
           issuer:
             type: string
-          issued:
+          issuanceDate:
+            type: string
+          expirationDate:
+            type: string
+          credentialHash:
             type: string
           proof:
             type: object
@@ -44446,6 +44468,8 @@ definitions:
               type:
                 type: string
               created:
+                type: string
+              updated:
                 type: string
               verificationMethod:
                 type: string
