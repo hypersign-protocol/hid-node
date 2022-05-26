@@ -11,11 +11,6 @@ import (
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 )
 
-var acceptableCredentialStatuses = []string{
-	"Live",
-	"Revoked",
-}
-
 func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.MsgRegisterCredentialStatus) (*types.MsgRegisterCredentialStatusResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
@@ -30,14 +25,8 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 	
 	// Check for the correct credential status
 	credStatus := credMsg.GetClaim().GetCurrentStatus()
-	statusFound := 0
-	for _, elem := range acceptableCredentialStatuses {
-		if elem == credStatus {
-			statusFound = 1
-		}
-	}
-	if statusFound != 1 {
-		return nil, sdkerrors.Wrap(types.ErrInvalidCredentialStatus, fmt.Sprintf("expected credential status to be either of %v, got %s", acceptableCredentialStatuses, credStatus))
+	if credStatus != "Live" {
+		return nil, sdkerrors.Wrap(types.ErrInvalidCredentialStatus, fmt.Sprintf("expected credential status to be `Live`, got %s", credStatus))
 	}
 
 	// Check if the DID of the issuer exists
