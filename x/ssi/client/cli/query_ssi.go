@@ -73,3 +73,33 @@ func CmdResolveDID() *cobra.Command {
 	return cmd
 }
 
+func CmdGetCredentialStatus() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "credential-status [credential-id]",
+		Short: "Query credential status for a given credential id",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			argCredId := args[0]
+
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			queryClient := types.NewQueryClient(clientCtx)
+
+			params := &types.QueryCredentialRequest{CredId: argCredId}
+
+			res, err := queryClient.QueryCredential(cmd.Context(), params)
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintProto(res)
+		},
+	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+
+	return cmd
+}
