@@ -3,17 +3,25 @@ package keeper
 import (
 	"context"
 	"fmt"
-
-	//"fmt"
+	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
-	//sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 )
 
+// Acceptable Statuses for update-credential-rpc
+var acceptableCredStatuses = []string{
+	"Live",
+	"Suspended",
+	"Revoked",
+	"Expired",
+}
+
 func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.MsgRegisterCredentialStatus) (*types.MsgRegisterCredentialStatusResponse, error) {
+	var id uint64
+
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	credMsg := msg.GetCredentialStatus()
@@ -21,32 +29,212 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 
 	// Check if the credential already exist in the store
 	credId := credMsg.GetClaim().GetId()
-	if k.HasCredential(ctx, credId) {
-		return nil, sdkerrors.Wrap(types.ErrCredentialExists, fmt.Sprintf("Credential ID: %s ", credId))
+
+	if !k.HasCredential(ctx, credId) {
+		// Check for the correct credential status
+		credStatus := credMsg.GetClaim().GetCurrentStatus()
+		if credStatus != "Live" {
+			return nil, sdkerrors.Wrap(types.ErrInvalidCredentialStatus, fmt.Sprintf("expected credential status to be `Live`, got %s", credStatus))
+		}
+
+		// Check if the DID of the issuer exists
+		issuerId := credMsg.GetIssuer()
+		if !k.HasDid(ctx, issuerId) {
+			return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("Issuer`s DID %s doesnt exists", issuerId))
+		}
+
+		// Check if the expiration date is not before the issuance date.
+		expirationDate := credMsg.GetExpirationDate()
+		expirationDateParsed, err := time.Parse(time.RFC3339, expirationDate)
+		if err != nil {
+			return nil, sdkerrors.Wrapf(types.ErrInvalidDate, fmt.Sprintf("invalid expiration date format: %s", expirationDate))
+		}
+
+		issuanceDate := credMsg.GetIssuanceDate()
+		issuanceDateParsed, err := time.Parse(time.RFC3339, issuanceDate)
+		if err != nil {
+			return nil, sdkerrors.Wrapf(types.ErrInvalidDate, fmt.Sprintf("invalid issuance date format: %s", issuanceDate))
+		}
+
+		if err := VerifyCredentialStatusDates(issuanceDateParsed, expirationDateParsed); err != nil {
+			return nil, err
+		}
+
+		// Check if the date on which the update occurs lies between issuance and expiration
+		currentDate := ctx.BlockTime()
+		if currentDate.After(expirationDateParsed) || currentDate.Before(issuanceDateParsed) {
+			return nil, sdkerrors.Wrapf(types.ErrInvalidDate, "credential registeration is happening on a date which doesn`t lie between issuance date and expiration date")
+		}
+
+		// Check if updated date iss imilar to created date
+		if err := VerifyCredentialProofDates(credProof, true); err != nil {
+			return nil, err
+		}
+
+		// Verify the Signature
+		didDocument, err := k.GetDid(&ctx, issuerId)
+		if err != nil {
+			return nil, err
+		}
+
+		did := didDocument.GetDid()
+		signature := credProof.GetProofValue()
+		verificationMethod := credProof.GetVerificationMethod()
+
+		err = k.VerifyCredentialSignature(credMsg, did, signature, verificationMethod)
+		if err != nil {
+			return nil, err
+		}
+
+		cred := &types.Credential{
+			Claim:          credMsg.GetClaim(),
+			Issuer:         credMsg.GetIssuer(),
+			IssuanceDate:   credMsg.GetIssuanceDate(),
+			ExpirationDate: credMsg.GetExpirationDate(),
+			CredentialHash: credMsg.GetCredentialHash(),
+			Proof:          credProof,
+		}
+
+		id = k.RegisterCred(ctx, cred)
+
+    } else { 
+		cred, err := k.updateCredentialStatus(ctx, credMsg, credProof)
+		if err != nil {
+			return nil, err
+		}
+		id = k.RegisterCred(ctx, cred)
 	}
 
+	return &types.MsgRegisterCredentialStatusResponse{Id: id}, nil
+}
+
+func (k msgServer) updateCredentialStatus(ctx sdk.Context, newCredStatus *types.CredentialStatus, newCredProof *types.CredentialProof) (*types.Credential, error) {
+	credId := newCredStatus.GetClaim().GetId()
+
+	// Get Credential from store
+	oldCredStatus, err := k.GetCredential(&ctx, credId)
+	if err != nil {
+		return nil, err
+	}
+	oldClaimStatus := oldCredStatus.GetClaim().GetCurrentStatus()
 	// Check for the correct credential status
-	credStatus := credMsg.GetClaim().GetCurrentStatus()
-	if credStatus != "Live" {
-		return nil, sdkerrors.Wrap(types.ErrInvalidCredentialStatus, fmt.Sprintf("expected credential status to be `Live`, got %s", credStatus))
+	newClaimStatus := newCredStatus.GetClaim().GetCurrentStatus()
+	statusFound := 0
+	for _, acceptablestatus := range acceptableCredStatuses {
+		if newClaimStatus == acceptablestatus {
+			statusFound = 1
+		}
+	}
+	if statusFound == 0 {
+		return nil, sdkerrors.Wrap(types.ErrInvalidCredentialStatus, fmt.Sprintf("expected credential status to be either of Revoke, Suspend or Expired, got %s", newClaimStatus))
 	}
 
 	// Check if the DID of the issuer exists
-	issuerId := credMsg.GetIssuer()
+	issuerId := newCredStatus.GetIssuer()
 	if !k.HasDid(ctx, issuerId) {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("Issuer`s DID %s doesnt exists", issuerId))
 	}
 
-	// Check if the expiration date is not before the issuance date.
-	if err := VerifyCredentialStatusDates(credMsg); err != nil {
+	// Check if the provided isser Id is the one who issued the VC
+	if issuerId != oldCredStatus.GetIssuer() {
+		return nil, sdkerrors.Wrapf(types.ErrInvalidCredentialField,
+			 fmt.Sprintf("Isser ID %s is not issuer of verifiable credential id %s", issuerId, credId))
+	}
+
+	// Check if the new expiration date and issuance date are same as old one.
+	newExpirationDate := newCredStatus.GetExpirationDate()
+	newExpirationDateParsed, err := time.Parse(time.RFC3339, newExpirationDate)
+	if err != nil {
+		return nil, sdkerrors.Wrapf(types.ErrInvalidDate, fmt.Sprintf("invalid expiration date format: %s", newExpirationDate))
+	}
+
+	newIssuanceDate := newCredStatus.GetIssuanceDate()
+	newIssuanceDateParsed, err := time.Parse(time.RFC3339, newIssuanceDate)
+	if err != nil {
+		return nil, sdkerrors.Wrapf(types.ErrInvalidDate, fmt.Sprintf("invalid issuance date format: %s", newIssuanceDate))
+	}
+
+	oldExpirationDateParsed, err := time.Parse(time.RFC3339, oldCredStatus.GetExpirationDate())
+	if err != nil {
+		return nil, sdkerrors.Wrapf(types.ErrInvalidDate, fmt.Sprintf("invalid existing expiration date format: %s", oldCredStatus.GetExpirationDate()))
+	}
+
+	oldIssuanceDateParsed, err := time.Parse(time.RFC3339, oldCredStatus.GetIssuanceDate())
+	if err != nil {
+		return nil, sdkerrors.Wrapf(types.ErrInvalidDate, fmt.Sprintf("invalid existing issuance date format: %s", oldCredStatus.GetIssuanceDate()))
+	}
+
+	if !newIssuanceDateParsed.Equal(oldIssuanceDateParsed) {
+		return nil, sdkerrors.Wrapf(types.ErrInvalidDate, fmt.Sprintf("issuance date should be same, new issuance date provided : %s", newIssuanceDate))
+	}
+
+	if !newExpirationDateParsed.Equal(oldExpirationDateParsed) {
+		return nil, sdkerrors.Wrapf(types.ErrInvalidDate, fmt.Sprintf("expiration date should be same, new expiration date provided : %s", newExpirationDate))
+	}
+
+	// Check if new expiration date isn't less than new issuance date
+	if err := VerifyCredentialStatusDates(newIssuanceDateParsed, newExpirationDateParsed); err != nil {
 		return nil, err
+	}
+
+	// Check if the date on which the update occurs lies between issuance and expiration
+	currentDate := ctx.BlockTime()
+	if currentDate.After(newExpirationDateParsed) || currentDate.Before(newIssuanceDateParsed) {
+		return nil, sdkerrors.Wrapf(types.ErrInvalidDate, "credential update is happening on a date which doesn`t lie between issuance date and expiration date")
+	}
+
+	// Old and New Credential Claim Check
+	newStatusReason := newCredStatus.GetClaim().GetStatusReason()
+
+	switch oldClaimStatus {
+	case "Live":
+		if newClaimStatus == oldClaimStatus {
+			return nil, sdkerrors.Wrapf(
+				types.ErrInvalidCredentialStatus,
+				fmt.Sprintf("credential is already %s", newClaimStatus))
+		}
+
+		// TODO: Status change to Expired should happend automatically within hid-node
+		if newClaimStatus == "Revoked" || newClaimStatus == "Suspended" || newClaimStatus == "Expired" {
+			if len(newStatusReason) == 0 {
+				return nil, sdkerrors.Wrapf(
+					types.ErrInvalidCredentialField,
+					fmt.Sprintf("claim status reason cannot be empty for claim status %s", newClaimStatus))
+			}
+		}
+
+	case "Suspended":
+		if newClaimStatus == oldClaimStatus {
+			return nil, sdkerrors.Wrapf(
+				types.ErrInvalidCredentialStatus,
+				fmt.Sprintf("credential is already %s", newClaimStatus))
+		}
+
+	// TODO: Status change to Expired should happend automatically within hid-node
+	case "Revoked", "Expired":
+		if newClaimStatus == oldClaimStatus {
+			return nil, sdkerrors.Wrapf(
+				types.ErrInvalidCredentialStatus,
+				fmt.Sprintf("credential is already %s", newClaimStatus))
+		}
+
+		if newClaimStatus != oldClaimStatus {
+			return nil, sdkerrors.Wrapf(
+				types.ErrInvalidCredentialStatus,
+				fmt.Sprintf("credential cannot be updated from %s to %s", oldClaimStatus, newClaimStatus))
+		}
+	
+	default:
+		return nil, sdkerrors.Wrapf(
+			types.ErrInvalidCredentialField,
+			fmt.Sprintf("invalid Credential Status present in existing credential %s", oldClaimStatus))
 	}
 
 	// Check if updated date iss imilar to created date
-	if err := VerifyCredentialProofDates(credProof, true); err != nil {
+	if err := VerifyCredentialProofDates(newCredProof, false); err != nil {
 		return nil, err
 	}
-
+	
 	// Verify the Signature
 	didDocument, err := k.GetDid(&ctx, issuerId)
 	if err != nil {
@@ -54,24 +242,22 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 	}
 
 	did := didDocument.GetDid()
-	signature := credProof.GetProofValue()
-	verificationMethod := credProof.GetVerificationMethod()
+	signature := newCredProof.GetProofValue()
+	verificationMethod := newCredProof.GetVerificationMethod()
 
-	err = k.VerifyCredentialSignature(credMsg, did, signature, verificationMethod)
+	err = k.VerifyCredentialSignature(newCredStatus, did, signature, verificationMethod)
 	if err != nil {
 		return nil, err
 	}
 
 	cred := types.Credential{
-		Claim:          credMsg.GetClaim(),
-		Issuer:         credMsg.GetIssuer(),
-		IssuanceDate:   credMsg.GetIssuanceDate(),
-		ExpirationDate: credMsg.GetExpirationDate(),
-		CredentialHash: credMsg.GetCredentialHash(),
-		Proof:          credProof,
+		Claim:          newCredStatus.GetClaim(),
+		Issuer:         newCredStatus.GetIssuer(),
+		IssuanceDate:   newCredStatus.GetIssuanceDate(),
+		ExpirationDate: newCredStatus.GetExpirationDate(),
+		CredentialHash: newCredStatus.GetCredentialHash(),
+		Proof:          newCredProof,
 	}
 
-	id := k.RegisterCred(ctx, &cred)
-
-	return &types.MsgRegisterCredentialStatusResponse{Id: id}, nil
+	return &cred, nil
 }

@@ -17,13 +17,15 @@ Usage:
 
 ```json
 {
-    claim: {
-        id: "vc_example1",
-            currentStatus: "Live",
-            statusReason: "Credential Active"
+    "claim": {
+            "id": "vc_example1",
+            "currentStatus": "Live",
+            "statusReason": "Credential Active"
         },
-        issuer: "did:hs:b8da6c12-0833-4c54-af98-55af55c2fd22",
-        issued: "2022-04-10T04:07:12Z"
+        "issuer": "did:hs:b8da6c12-0833-4c54-af98-55af55c2fd22",
+        "issuanceDate": "2022-04-10T04:07:12Z",
+        "expirationDate": "2023-02-22T13:45:55Z",
+        "credentialHash": "< -- Hash -->"
 }
 ```
 
@@ -31,11 +33,12 @@ Usage:
 
 ```json
 {
-    type: "Ed25519VerificationKey2020",
-    created: "2022-04-10T04:07:12Z",
-    verificationMethod: "did:hs:b8da6c12-0833-4c54-af98-55af55c2fd22#key-1",
-    proofValue: "<-- Base64 encoded signature -->",
-    proofPurpose: "assertion"
+    "type": "Ed25519VerificationKey2020",
+    "created": "2022-04-10T04:07:12Z",
+    "updated": "2022-04-10T04:07:12Z",
+    "verificationMethod": "did:hs:b8da6c12-0833-4c54-af98-55af55c2fd22#key-1",
+    "proofValue": "<-- Base64 encoded signature -->",
+    "proofPurpose": "assertion"
 }
 ```
 
@@ -46,5 +49,5 @@ The field `proofValue` holds the signature that was produced by signing the `cre
 The following command registers the status of a VC with id `vc_example1`:
 
 ```sh
-hid-noded tx ssi register-credential-status '{"claim":{"id":"vc_abc1234","currentStatus":"Revoked","statusReason":"It all good"},"issuer":"did:hs:b8da6c12-0833-4c54-af98-55af55c2fd22","issued":"22 May 2022"}' '{"type":"Ed25519VerificationKey2020","created":"2022-04-10T04:07:12Z","verificationMethod":"did:hs:b8da6c12-0833-4c54-af98-55af55c2fd22#key-1","proofValue":"<-- base64 encoded signature -->","proofPurpose":"assertion"}' --from <user-blockchain-address>
+hid-noded tx ssi register-credential-status '{"claim":{"id":"vc_example1","currentStatus":"Live","statusReason":"Credential Active"},"issuer":"did:hs:b8da6c12-0833-4c54-af98-55af55c2fd22","issuanceDate":"2022-04-10T04:07:12Z","expirationDate":"2023-02-22T13:45:55Z","credentialHash":"< -- Hash -->"}' '{"type":"Ed25519VerificationKey2020","created":"2022-04-10T04:07:12Z","updated":"2022-04-10T04:07:12Z","verificationMethod":"did:hs:b8da6c12-0833-4c54-af98-55af55c2fd22#key-1","proofValue":"<-- Base64 encoded signature -->","proofPurpose":"assertion"}' --from <hid-account>
 ```

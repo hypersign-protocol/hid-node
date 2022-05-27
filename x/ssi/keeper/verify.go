@@ -271,22 +271,10 @@ func (k msgServer) VerifyCredentialSignature(msg *types.CredentialStatus, didDoc
 	return nil
 }
 
-func VerifyCredentialStatusDates(credStatus *types.CredentialStatus) error {
+func VerifyCredentialStatusDates(issuanceDate time.Time, expirationDate time.Time) error {
 	var dateDiff int64
 
-	expirationDate := credStatus.GetExpirationDate()
-	expirationDateParsed, err := time.Parse(time.RFC3339, expirationDate)
-	if err != nil {
-		return sdkerrors.Wrapf(types.ErrInvalidDate, fmt.Sprintf("invalid expiration date format: %s", expirationDate))
-	}
-
-	issuanceDate := credStatus.GetIssuanceDate()
-	issuanceDateParsed, err := time.Parse(time.RFC3339, issuanceDate)
-	if err != nil {
-		return sdkerrors.Wrapf(types.ErrInvalidDate, fmt.Sprintf("invalid issuance date format: %s", issuanceDate))
-	}
-
-	dateDiff = int64(expirationDateParsed.Sub(issuanceDateParsed)) / 1e9 // converting nanoseconds to seconds
+	dateDiff = int64(expirationDate.Sub(issuanceDate)) / 1e9 // converting nanoseconds to seconds
 	if dateDiff < 0 {
 		return sdkerrors.Wrapf(types.ErrInvalidDate, fmt.Sprintf("expiration date %s cannot be less than issuance date %s", expirationDate, issuanceDate))
 	}
@@ -317,8 +305,8 @@ func VerifyCredentialProofDates(credProof *types.CredentialProof, credRegistrati
 		}
 	} else {
 		dateDiff = int64(proofUpdatedDateParsed.Sub(proofCreatedDateParsed)) / 1e9 // converting nanoseconds to seconds
-		if dateDiff < 0 {
-			return fmt.Errorf("update date %s cannot be less than created date %s", proofUpdatedDate, proofCreatedDate)
+		if dateDiff <= 0 {
+			return sdkerrors.Wrapf(types.ErrInvalidDate, fmt.Sprintf("update date %s cannot be less than or equal to created date %s in case of credential status update", proofUpdatedDate, proofCreatedDate))
 		}
 	}
 
