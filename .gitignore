@@ -12,8 +12,8 @@
 *.out
 
 # Dependency directories (remove the comment below to include it)
-vue/node_modules
-vue/dist
+vue
+
 # vue/src/store/generated
 release/
 .idea/

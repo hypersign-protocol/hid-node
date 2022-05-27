@@ -18406,6 +18406,76 @@ paths:
           format: int64
       tags:
         - Query
+  '/hypersign-protocol/hidnode/ssi/credential/{credId}':
+    get:
+      summary: Query Credential
+      operationId: HypersignprotocolHidnodeSsiQueryCredential
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              credStatus:
+                type: object
+                properties:
+                  claim:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      currentStatus:
+                        type: string
+                      statusReason:
+                        type: string
+                  issuer:
+                    type: string
+                  issuanceDate:
+                    type: string
+                  expirationDate:
+                    type: string
+                  credentialHash:
+                    type: string
+                  proof:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                      created:
+                        type: string
+                      updated:
+                        type: string
+                      verificationMethod:
+                        type: string
+                      proofPurpose:
+                        type: string
+                      proofValue:
+                        type: string
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: credId
+          in: path
+          required: true
+          type: string
+      tags:
+        - Query
   /hypersign-protocol/hidnode/ssi/did:
     get:
       summary: Did Param
@@ -44095,6 +44165,85 @@ definitions:
     description: >-
       MsgCreateVestingAccountResponse defines the Msg/CreateVestingAccount
       response type.
+  hypersignprotocol.hidnode.ssi.Claim:
+    type: object
+    properties:
+      id:
+        type: string
+      currentStatus:
+        type: string
+      statusReason:
+        type: string
+  hypersignprotocol.hidnode.ssi.Credential:
+    type: object
+    properties:
+      claim:
+        type: object
+        properties:
+          id:
+            type: string
+          currentStatus:
+            type: string
+          statusReason:
+            type: string
+      issuer:
+        type: string
+      issuanceDate:
+        type: string
+      expirationDate:
+        type: string
+      credentialHash:
+        type: string
+      proof:
+        type: object
+        properties:
+          type:
+            type: string
+          created:
+            type: string
+          updated:
+            type: string
+          verificationMethod:
+            type: string
+          proofPurpose:
+            type: string
+          proofValue:
+            type: string
+  hypersignprotocol.hidnode.ssi.CredentialProof:
+    type: object
+    properties:
+      type:
+        type: string
+      created:
+        type: string
+      updated:
+        type: string
+      verificationMethod:
+        type: string
+      proofPurpose:
+        type: string
+      proofValue:
+        type: string
+  hypersignprotocol.hidnode.ssi.CredentialStatus:
+    type: object
+    properties:
+      claim:
+        type: object
+        properties:
+          id:
+            type: string
+          currentStatus:
+            type: string
+          statusReason:
+            type: string
+      issuer:
+        type: string
+      issuanceDate:
+        type: string
+      expirationDate:
+        type: string
+      credentialHash:
+        type: string
   hypersignprotocol.hidnode.ssi.Did:
     type: object
     properties:
@@ -44276,6 +44425,12 @@ definitions:
       id:
         type: string
         format: uint64
+  hypersignprotocol.hidnode.ssi.MsgRegisterCredentialStatusResponse:
+    type: object
+    properties:
+      id:
+        type: string
+        format: uint64
   hypersignprotocol.hidnode.ssi.MsgUpdateDIDResponse:
     type: object
     properties:
@@ -44284,6 +44439,44 @@ definitions:
   hypersignprotocol.hidnode.ssi.Params:
     type: object
     description: Params defines the parameters for the module.
+  hypersignprotocol.hidnode.ssi.QueryCredentialResponse:
+    type: object
+    properties:
+      credStatus:
+        type: object
+        properties:
+          claim:
+            type: object
+            properties:
+              id:
+                type: string
+              currentStatus:
+                type: string
+              statusReason:
+                type: string
+          issuer:
+            type: string
+          issuanceDate:
+            type: string
+          expirationDate:
+            type: string
+          credentialHash:
+            type: string
+          proof:
+            type: object
+            properties:
+              type:
+                type: string
+              created:
+                type: string
+              updated:
+                type: string
+              verificationMethod:
+                type: string
+              proofPurpose:
+                type: string
+              proofValue:
+                type: string
   hypersignprotocol.hidnode.ssi.QueryDidParamResponse:
     type: object
     properties:

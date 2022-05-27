@@ -8,6 +8,8 @@ import "ssi/v1/params.proto";
 import "ssi/v1/schema.proto";
 import "ssi/v1/did.proto";
 import "ssi/v1/tx.proto";
+import "ssi/v1/credential.proto";
+
 // this line is used by starport scaffolding # 1
 
 option go_package = "github.com/hypersign-protocol/hid-node/x/ssi/types";
@@ -38,7 +40,20 @@ service Query {
     option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/did";
   }
 
+// Query Credential
+  rpc QueryCredential(QueryCredentialRequest) returns (QueryCredentialResponse) {
+    option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/credential/{credId}";
+  }
+
 // this line is used by starport scaffolding # 2
+}
+
+message QueryCredentialRequest {
+  string credId = 1;
+}
+
+message QueryCredentialResponse {
+  Credential credStatus = 1;
 }
 
 // QueryParamsRequest is request type for the Query/Params RPC method.
