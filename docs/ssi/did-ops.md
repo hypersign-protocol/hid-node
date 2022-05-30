@@ -19,8 +19,8 @@ Usage:
   hid-noded tx ssi create-did [did-doc-string] [verification-method-id] [flags]
 
 Params:
- - did-doc-string : Did Doc String received from hs-ssi-sdk
- - verification-method-id : Verification Method ID
+ - did-doc-string : Did Document String
+ - verification-method-id : Id of verification Method Key
 
 Flags:
  - ver-key : Private Key of the Signer
@@ -33,9 +33,9 @@ Usage:
   hid-noded tx ssi update-did [did-doc-string] [version-id] [verification-method-id] [flags]
 
 Params:
- - did-doc-string : Did Doc String received from hs-ssi-sdk
- - version-id : Version ID of the DID Document to be updated. It is expected that version ID should of the latest DID Document
- - verification-method-id : Verification Method ID
+ - did-doc-string : Did Document string
+ - version-id : Version ID of the DID Document to be deactivated. It is expected that version Id should match latest DID Document's version Id
+ - verification-method-id : Id of verification Method Key
 
 Flags:
  - --ver-key : Private Key of the Signer
@@ -45,12 +45,12 @@ Flags:
 
 ```
 Usage:
-  hid-noded tx ssi deactivate-did [did-doc-string] [version-id] [verification-method-id] [flags]
+  hid-noded tx ssi deactivate-did [did-id] [version-id] [verification-method-id] [flags]
 
 Params:
- - did-doc-string : Did Doc String received from hs-ssi-sdk
- - version-id : Version ID of the DID Document to be updated. It is expected that version ID should of the latest DID Document
- - verification-method-id : Verification Method ID
+ - did-id : Id of the Did Document to deactivate
+ - version-id : Version ID of the DID Document to be deactivated. It is expected that version Id should match latest DID Document's version Id
+ - verification-method-id : Id of verification Method Key
 
 Flags:
  - --ver-key : Private Key of the Signer
@@ -58,7 +58,7 @@ Flags:
 
 ## Usage
 
-The usage of CLI is explained through scenarios:
+The usage of CLI is explained through following scenarios:
 
 ### Register DID
 
@@ -134,27 +134,7 @@ Here, the `${VERSION_ID}` should have the version id of the latest DID of User 2
 User 2 (`did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52`) is trying to deactivate it’s DID
 
 ```sh
-hid-noded tx ssi deactivate-did '{
-"context": [
-"https://www.w3.org/ns/did/v1",
-"https://w3id.org/security/v1",
-"https://schema.org"
-],
-"id": "did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52",
-"controller": ["did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52"],
-"alsoKnownAs": ["did:hs:1f49341a-de30993e6c52"],
-"verificationMethod": [
-{
-"id": "did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52#z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4",
-"type": "Ed25519VerificationKey2020",
-"controller": "did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52",
-"publicKeyMultibase": "z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4"
-}
-],
-"authentication": [
-"did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52#z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4"
-]
-}' "${VERSION_ID}" did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52#z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4 --ver-key <private-key> --keyring-backend test --from alice --chain-id hidnode --yes
+hid-noded tx ssi deactivate-did 'did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52' "${VERSION_ID}" did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52#z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4 --ver-key <private-key> --keyring-backend test --from alice --chain-id hidnode --yes
 ```
 
 ### Resolving DID
