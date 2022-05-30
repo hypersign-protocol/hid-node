@@ -234,7 +234,7 @@ func (k msgServer) ValidateDidControllers(ctx *sdk.Context, id string, controlle
 
 // Check the Deactivate status of DID
 func VerifyDidDeactivate(metadata *types.Metadata, id string) error {
-	if metadata.Deactivated {
+	if metadata.GetDeactivated() {
 		return sdkerrors.Wrap(types.ErrDidDocDeactivated, fmt.Sprintf("DidDoc ID: %s", id))
 	}
 	return nil

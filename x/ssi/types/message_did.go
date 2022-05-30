@@ -134,10 +134,10 @@ const TypeMsgDeactivateDID = "deactivate_did"
 
 var _ sdk.Msg = &MsgDeactivateDID{}
 
-func NewMsgDeactivateDID(creator string, didDocString *Did, versionId string, signatures []*SignInfo) *MsgDeactivateDID {
+func NewMsgDeactivateDID(creator string, didId string, versionId string, signatures []*SignInfo) *MsgDeactivateDID {
 	return &MsgDeactivateDID{
 		Creator:      creator,
-		DidDocString: didDocString,
+		DidId: didId,
 		VersionId:    versionId,
 		Signatures:   signatures,
 	}

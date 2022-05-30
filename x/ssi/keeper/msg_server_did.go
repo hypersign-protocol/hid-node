@@ -146,60 +146,58 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 func (k msgServer) DeactivateDID(goCtx context.Context, msg *types.MsgDeactivateDID) (*types.MsgDeactivateDIDResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	didMsg := msg.GetDidDocString()
-	id := msg.GetDidDocString().GetId()
+	id := msg.GetDidId()
 	versionId := msg.GetVersionId()
-
-	oldDIDDoc, err := k.GetDid(&ctx, didMsg.Id)
-	if err != nil {
-		return nil, err
-	}
-	oldDid := oldDIDDoc.GetDid()
-	oldMetaData := oldDIDDoc.GetMetadata()
-
-	// Check if the didDoc is valid
-	didDocCheck := utils.IsValidDidDoc(didMsg)
-	if didDocCheck != "" {
-		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, didDocCheck)
-	}
 
 	// Checks if the DID is not present in the store
 	if !k.HasDid(ctx, id) {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("DID doesnt exists %s", id))
 	}
 
-	if k.ValidateDidControllers(&ctx, id, didMsg.GetController(), didMsg.GetVerificationMethod()) != nil {
+	didDocument, err := k.GetDid(&ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	did := didDocument.GetDid()
+	metadata := didDocument.GetMetadata()
+
+	// Check if the didDoc is valid
+	didDocCheck := utils.IsValidDidDoc(did)
+	if didDocCheck != "" {
+		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, didDocCheck)
+	}
+
+	if k.ValidateDidControllers(&ctx, id, did.GetController(), did.GetVerificationMethod()) != nil {
 		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, "DID controller is not valid")
 	}
 
-	if err := k.VerifySignatureOnDidUpdate(&ctx, oldDid, didMsg, msg.Signatures); err != nil {
+	if err := k.VerifySignature(&ctx, did, did.GetSigners(), msg.Signatures); err != nil {
 		return nil, err
 	}
 
 	// Check if the versionId passed is the same as the one in the Latest DID Document in store
-	if oldMetaData.VersionId != versionId {
-		errMsg := fmt.Sprintf("Expected %s with version %s. Got version %s", didMsg.Id, oldMetaData.VersionId, versionId)
+	if metadata.GetVersionId() != versionId {
+		errMsg := fmt.Sprintf("Expected %s with version %s. Got version %s", did.GetId(), metadata.GetVersionId(), versionId)
 		return nil, sdkerrors.Wrap(types.ErrUnexpectedDidVersion, errMsg)
 	}
 
 	// Check if the DID is already deactivated
-	if err := VerifyDidDeactivate(oldMetaData, didMsg.Id); err != nil {
+	if err := VerifyDidDeactivate(metadata, did.GetId()); err != nil {
 		return nil, err
 	}
 
-	// Create the Metadata
-	metadata := types.CreateNewMetadata(ctx)
-	// Assign `created` and `deactivated` to previous DIDDoc's metadata values
-	metadata.Created = oldDIDDoc.GetMetadata().Created
-	metadata.Deactivated = true
+	// Create updated metadata
+	updatedMetadata := types.CreateNewMetadata(ctx)
+	updatedMetadata.Created = didDocument.GetMetadata().Created
+	updatedMetadata.Deactivated = true
 
-	// Form the DID Document
-	didDoc := types.DidDocument{
-		Did:      nil,
-		Metadata: &metadata,
+	// Form the updated DID Document
+	updatedDidDocument := types.DidDocument{
+		Did:      did,
+		Metadata: &updatedMetadata,
 	}
 
-	if err := k.SetDidDeactivate(ctx, didDoc, id); err != nil {
+	if err := k.SetDidDeactivate(ctx, updatedDidDocument, id); err != nil {
 		return nil, err
 	}
 
