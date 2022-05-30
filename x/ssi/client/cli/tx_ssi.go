@@ -16,7 +16,7 @@ const VerKeyFlag = "ver-key"
 func CmdCreateDID() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create-did [did-doc-string] [verification-method-id]",
-		Short: "Registers the DidDocString",
+		Short: "Registers Did Document",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argDidDocString := args[0]
@@ -69,7 +69,7 @@ func CmdCreateDID() *cobra.Command {
 func CmdUpdateDID() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "update-did [did-doc-string] [version-id] [verification-method-id]",
-		Short: "Updates the DID",
+		Short: "Updates Did Document",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argDidDocString := args[0]
@@ -125,7 +125,7 @@ func CmdUpdateDID() *cobra.Command {
 func CmdCreateSchema() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create-schema [schema] [verification-method-id]",
-		Short: "Creates a Schema",
+		Short: "Creates Schema",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argSchema := args[0]
@@ -177,11 +177,11 @@ func CmdCreateSchema() *cobra.Command {
 
 func CmdDeactivateDID() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "deactivate-did [did-doc-string] [version-id] [verification-method-id]",
-		Short: "Deactivates the DID",
+		Use:   "deactivate-did [did-id] [version-id] [verification-method-id]",
+		Short: "Deactivates Did Document",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			argDidDocString := args[0]
+			argDidId := args[0]
 			argVersionId := args[1]
 			argVerificationMethodId := args[2]
 
@@ -190,18 +190,21 @@ func CmdDeactivateDID() *cobra.Command {
 				return err
 			}
 
-			var didDoc types.Did
-			err = clientCtx.Codec.UnmarshalJSON([]byte(argDidDocString), &didDoc)
+			// Query Did Document from store using Did Id
+			queryClient := types.NewQueryClient(clientCtx)
+			requestParams := &types.QueryGetDidDocByIdRequest{DidId: argDidId}
+			resolvedDidDocument, err := queryClient.ResolveDid(cmd.Context(), requestParams)
 			if err != nil {
 				return err
 			}
+			didDoc := resolvedDidDocument.GetDidDocument()
 
 			verKeyPriv, err := getVerKey(cmd, clientCtx)
 			if err != nil {
 				return err
 			}
 
-			// // Build identity message
+			// Sign the Did Document
 			signBytes := didDoc.GetSignBytes()
 			signatureBytes := ed25519.Sign(verKeyPriv, signBytes)
 
@@ -212,7 +215,7 @@ func CmdDeactivateDID() *cobra.Command {
 
 			msg := types.MsgDeactivateDID{
 				Creator:      clientCtx.GetFromAddress().String(),
-				DidDocString: &didDoc,
+				DidId: argDidId,
 				VersionId:    argVersionId,
 				Signatures:   []*types.SignInfo{&signInfo},
 			}
@@ -233,7 +236,7 @@ func CmdDeactivateDID() *cobra.Command {
 func CmdRegisterCredentialStatus() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "register-credential-status [credential-status] [proof]",
-		Short: "Registers the status of a Verifiable Credential",
+		Short: "Registers the status of Verifiable Credential",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argCredStatus := args[0]

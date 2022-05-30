@@ -52,7 +52,7 @@ message MsgCreateSchemaResponse {
 
 message MsgDeactivateDID {
   string creator = 1;
-  Did didDocString = 2;
+  string didId = 2;
   string version_id = 3;
   repeated SignInfo signatures = 4;
 }

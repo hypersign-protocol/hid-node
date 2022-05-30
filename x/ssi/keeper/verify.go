@@ -234,7 +234,7 @@ func (k msgServer) ValidateDidControllers(ctx *sdk.Context, id string, controlle
 
 // Check the Deactivate status of DID
 func VerifyDidDeactivate(metadata *types.Metadata, id string) error {
-	if metadata.Deactivated {
+	if metadata.GetDeactivated() {
 		return sdkerrors.Wrap(types.ErrDidDocDeactivated, fmt.Sprintf("DidDoc ID: %s", id))
 	}
 	return nil
@@ -272,9 +272,7 @@ func (k msgServer) VerifyCredentialSignature(msg *types.CredentialStatus, didDoc
 }
 
 func VerifyCredentialStatusDates(issuanceDate time.Time, expirationDate time.Time) error {
-	var dateDiff int64
-
-	dateDiff = int64(expirationDate.Sub(issuanceDate)) / 1e9 // converting nanoseconds to seconds
+	var dateDiff int64 = int64(expirationDate.Sub(issuanceDate)) / 1e9 // converting nanoseconds to seconds
 	if dateDiff < 0 {
 		return sdkerrors.Wrapf(types.ErrInvalidDate, fmt.Sprintf("expiration date %s cannot be less than issuance date %s", expirationDate, issuanceDate))
 	}
