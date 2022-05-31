@@ -169,7 +169,7 @@ func FindVerificationMethod(vms []*types.VerificationMethod, id string) *types.V
 	return nil
 }
 
-func IsValidSchemaID(schemaId string) error {
+func IsValidSchemaID(schemaId string, authorDid string) error {
 	IdComponents := strings.Split(schemaId, ";")
 	if len(IdComponents) < 2 {
 		return errors.New("Expected 3 components in schema ID after being seperated by `;`, got " + fmt.Sprint(len(IdComponents)) + " components. The Schema ID is `" + schemaId + "` ")
@@ -179,6 +179,11 @@ func IsValidSchemaID(schemaId string) error {
 	if !strings.HasPrefix(IdComponents[0], "did:hs:") {
 		return errors.New("Expected did:hs as prefix in schema ID, The Schema ID is " + schemaId)
 	}
+
+	// Check if the first component matches with author Did
+	if authorDid != IdComponents[0] {
+		return errors.New("author`s did doesn`t match with the first component of schema id")
+	} 
 
 	//Checking the type of version
 	versionNumber := strings.Split(IdComponents[2], "=")[1]
