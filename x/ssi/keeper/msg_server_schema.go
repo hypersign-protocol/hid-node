@@ -16,22 +16,25 @@ func (k msgServer) CreateSchema(goCtx context.Context, msg *types.MsgCreateSchem
 	schemaMsg := msg.GetSchema()
 	schemaID := schemaMsg.GetId()
 
-	if err := utils.IsValidSchemaID(schemaID); err != nil {
-		return nil, sdkerrors.Wrap(types.ErrInvalidSchemaID, err.Error())
-	}
-
-	if k.HasSchema(ctx, schemaID) {
-		return nil, sdkerrors.Wrap(types.ErrSchemaExists, fmt.Sprintf("Schema ID:  %s", schemaID))
-	}
-
-	//Get the DID of SChema's Author
-	authorDID, err := k.GetDid(&ctx, schemaMsg.GetAuthor())
+	// Get the Did Document of Schema's Author
+	authorDidDocument, err := k.GetDid(&ctx, schemaMsg.GetAuthor())
 	if err != nil {
 		return nil, sdkerrors.Wrap(err, fmt.Sprintf("The DID %s is not available", schemaMsg.GetAuthor()))
 	}
 
+	// Check if Schema ID is valid
+	authorDid := authorDidDocument.GetDid().GetId()
+	if err := utils.IsValidSchemaID(schemaID, authorDid); err != nil {
+		return nil, sdkerrors.Wrap(types.ErrInvalidSchemaID, err.Error())
+	}
+
+	// Check if Schema already exists
+	if k.HasSchema(ctx, schemaID) {
+		return nil, sdkerrors.Wrap(types.ErrSchemaExists, fmt.Sprintf("Schema ID:  %s", schemaID))
+	}
+
 	// Signature check
-	didSigners := authorDID.GetDid().GetSigners()
+	didSigners := authorDidDocument.GetDid().GetSigners()
 	if err := k.VerifySignatureOnCreateSchema(&ctx, schemaMsg, didSigners, msg.GetSignatures()); err != nil {
 		return nil, err
 	}
