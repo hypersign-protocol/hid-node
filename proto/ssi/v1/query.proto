@@ -40,9 +40,14 @@ service Query {
     option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/did";
   }
 
-// Query Credential
+// Query Credential Status
   rpc QueryCredential(QueryCredentialRequest) returns (QueryCredentialResponse) {
     option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/credential/{credId}";
+  }
+
+// Query All Registed Credential Status
+  rpc QueryCredentials(QueryCredentialsRequest) returns (QueryCredentialsResponse) {
+    option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/credential";
   }
 
 // this line is used by starport scaffolding # 2
@@ -110,6 +115,15 @@ message DidResolutionResponse {
   Did didDocument = 2;
   Metadata didDocumentMetadata = 3;
   DidResolveMeta didResolutionMetadata = 4;
+}
+
+message QueryCredentialsRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryCredentialsResponse {
+  uint64 totalCount = 1;
+  repeated Credential credentials = 2;
 }
 
 message MarshalInput {
