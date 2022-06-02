@@ -25,6 +25,7 @@ const (
 	SchemaCountKey = "Schema-count-"
 
 	CredKey = "Cred-value-"
+	CredCountKey = "Cred-count-"
 )
 
 func KeyPrefix(p string) []byte {
