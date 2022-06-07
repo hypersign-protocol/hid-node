@@ -36,9 +36,9 @@ func (k Keeper) SchemaParam(goCtx context.Context, req *types.QuerySchemaParamRe
 	// Get the key-value module store using the store key (in our case store key is "chain")
 	store := ctx.KVStore(k.storeKey)
 	// Get the part of the store that keeps schema (using post key, which is "Schema-value-")
-	postStore := prefix.NewStore(store, []byte(types.SchemaKey))
+	schemaStore := prefix.NewStore(store, []byte(types.SchemaKey))
 	// Paginate the schema store based on PageRequest
-	_, err := query.Paginate(postStore, req.Pagination, func(key []byte, value []byte) error {
+	_, err := query.Paginate(schemaStore, req.Pagination, func(key []byte, value []byte) error {
 		var schema types.Schema
 		if err := k.cdc.Unmarshal(value, &schema); err != nil {
 			return err
