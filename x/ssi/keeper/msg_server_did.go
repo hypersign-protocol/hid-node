@@ -7,7 +7,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
-	utils "github.com/hypersign-protocol/hid-node/x/ssi/utils"
+	verify "github.com/hypersign-protocol/hid-node/x/ssi/keeper/verification"
 )
 
 func (k msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*types.MsgCreateDIDResponse, error) {
@@ -16,12 +16,12 @@ func (k msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*t
 	didMsg := msg.GetDidDocString()
 	did := didMsg.GetId()
 	// Checks if the DID has a valid format
-	if err := utils.IsValidDid(did); err != nil {
+	if err := verify.IsValidDid(did); err != nil {
 		return nil, err
 	}
 
 	// Checks if the DidDoc is a valid format
-	didDocCheck := utils.IsValidDidDoc(msg.DidDocString)
+	didDocCheck := verify.IsValidDidDoc(msg.DidDocString)
 	if didDocCheck != "" {
 		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, didDocCheck)
 	}
@@ -88,7 +88,7 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 	}
 
 	// Check if the didDoc is valid
-	didDocCheck := utils.IsValidDidDoc(didMsg)
+	didDocCheck := verify.IsValidDidDoc(didMsg)
 	if didDocCheck != "" {
 		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, didDocCheck)
 	}
@@ -162,7 +162,7 @@ func (k msgServer) DeactivateDID(goCtx context.Context, msg *types.MsgDeactivate
 	metadata := didDocument.GetMetadata()
 
 	// Check if the didDoc is valid
-	didDocCheck := utils.IsValidDidDoc(did)
+	didDocCheck := verify.IsValidDidDoc(did)
 	if didDocCheck != "" {
 		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, didDocCheck)
 	}
