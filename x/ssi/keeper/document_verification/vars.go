@@ -1,4 +1,4 @@
-package utils
+package verification
 
 var ServiceTypes = []string{
 	"LinkedDomains",
@@ -6,4 +6,4 @@ var ServiceTypes = []string{
 }
 
 var didMethod string = "hs"
-var didElementsAfterColonSplit int = 3
+var didIdElements int = 3

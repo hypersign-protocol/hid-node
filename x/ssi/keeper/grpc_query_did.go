@@ -12,9 +12,9 @@ import (
 
 	//sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
-	"github.com/hypersign-protocol/hid-node/x/ssi/utils"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	verify "github.com/hypersign-protocol/hid-node/x/ssi/keeper/document_verification"
 )
 
 func (k Keeper) DidParam(goCtx context.Context, req *types.QueryDidParamRequest) (*types.QueryDidParamResponse, error) {
@@ -67,7 +67,7 @@ func (k Keeper) ResolveDid(goCtx context.Context, req *types.QueryGetDidDocByIdR
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// Invalid DID Check
-	err := utils.IsValidDid(req.DidId)
+	err := verify.IsValidDid(req.DidId)
 	switch err {
 	case types.ErrInvalidDidElements:
 		return &types.QueryGetDidDocByIdResponse{
