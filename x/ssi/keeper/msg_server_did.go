@@ -7,7 +7,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
-	verify "github.com/hypersign-protocol/hid-node/x/ssi/keeper/verification"
+	verify "github.com/hypersign-protocol/hid-node/x/ssi/keeper/document_verification"
 )
 
 func (k msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*types.MsgCreateDIDResponse, error) {

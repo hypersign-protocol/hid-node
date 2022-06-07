@@ -14,7 +14,7 @@ import (
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	verify "github.com/hypersign-protocol/hid-node/x/ssi/keeper/verification"
+	verify "github.com/hypersign-protocol/hid-node/x/ssi/keeper/document_verification"
 )
 
 func (k Keeper) DidParam(goCtx context.Context, req *types.QueryDidParamRequest) (*types.QueryDidParamResponse, error) {
