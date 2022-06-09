@@ -19,6 +19,7 @@ require (
 )
 
 require (
+	github.com/btcsuite/btcutil v1.0.3-0.20201208143702-a53e38424cce
 	github.com/golang/protobuf v1.5.2
 	github.com/google/go-cmp v0.5.8 // indirect
 	github.com/multiformats/go-multibase v0.0.3

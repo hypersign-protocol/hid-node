@@ -3,6 +3,7 @@ package utils
 import (
 	"crypto/ed25519"
 	"strings"
+	"os/exec"
 
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 )
@@ -46,4 +47,12 @@ func MergeUrlWithResource(url string, resource string) string {
 func SplitDidUrlIntoDid(didUrl string) (string, string) {
 	segments := strings.Split(didUrl, "#")
 	return segments[0], segments[1]
+}
+
+func UUID() string {
+    out, err := exec.Command("uuidgen").Output()
+    if err != nil {
+        panic(err)
+    }
+    return string(out)
 }
