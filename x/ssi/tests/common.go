@@ -19,12 +19,8 @@ type ed25519KeyPair struct {
 
 var Creator = "hid1kxqk5ejca8nfpw8pg47484rppv359xh7qcasy4"
 
-/**************** DID Test *****************/
+/****************Create DID Test *****************/
 
-//var didMethod = "did:hs"
-// TODO: Need to look for an alternate approach for
-// generating uuid as the current method works for Linux
-// based systems
 var didId = "did:hs:5c3b799a-30f8-4bd8-9799-fd57d03b11c"
 
 var keyPair ed25519KeyPair = generatePublicPrivateKeyPair()
@@ -36,7 +32,7 @@ var vm = &types.VerificationMethod{
 	PublicKeyMultibase: keyPair.publicKeyBase58,
 }
 
-var ValidDidDocumet *types.Did = &types.Did{
+var ValidDidDocument *types.Did = &types.Did{
 	Context: []string{
 		"www.context.something",
 	},
@@ -49,7 +45,32 @@ var ValidDidDocumet *types.Did = &types.Did{
 	Authentication: []string{verificationMethodId},
 }
 
-var DidDocumentValidSignInfo []*types.SignInfo = getDidSigningInfo(ValidDidDocumet, keyPair, vm)
+var DidDocumentValidSignInfo []*types.SignInfo = getDidSigningInfo(ValidDidDocument, keyPair, vm)
+
+/**********************************************/
+
+/****************Update DID Test *****************/
+
+
+// Updated version of ValidDidDocument
+// New url has been updated in the context field
+var UpdatedValidDidDocument *types.Did = &types.Did{
+	Context: []string{
+		"www.context.something",
+		"www.example.com",
+	},
+	Id:          didId,
+	Controller:  []string{didId},
+	AlsoKnownAs: []string{"some name"},
+	VerificationMethod: []*types.VerificationMethod{
+		vm,
+	},
+	Authentication: []string{verificationMethodId},
+}
+
+var UpdatedDidDocumentValidSignInfo []*types.SignInfo = getDidSigningInfo(UpdatedValidDidDocument, keyPair, vm)
+
+/**********************************************/
 
 /**************** Schema Test *****************/
 

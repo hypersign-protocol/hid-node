@@ -15,8 +15,9 @@ func TestCreateDID(t *testing.T) {
 	msgServ := keeper.NewMsgServerImpl(*k)
 	goCtx :=  sdk.WrapSDKContext(ctx)
 	
+	t.Logf("Registering DID with DID Id: %s", ValidDidDocument.GetId())
 	msgCreateDID := &types.MsgCreateDID{
-		DidDocString: ValidDidDocumet,
+		DidDocString: ValidDidDocument,
 		Signatures: DidDocumentValidSignInfo,
 		Creator: Creator,
 	}
@@ -25,9 +26,9 @@ func TestCreateDID(t *testing.T) {
 	if err != nil {
 		t.Error("DID Registeration Failed")
 		t.Error(err)
-	} else {
-		t.Log("Did Registeration Successful")
+		t.FailNow()
 	}
+	t.Log("Did Registeration Successful")
 
 	t.Log("Create DID Tx Test Completed")
 }
