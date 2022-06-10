@@ -9,12 +9,13 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func TestCreateDID(t *testing.T) {
-	t.Log("Running test for Valid Create DID Tx")
+func TestCreateSchema(t *testing.T) {
+	t.Log("Running test for Valid Create Schmea Tx")
 	k, ctx := testkeeper.SsiKeeper(t)
 	msgServ := keeper.NewMsgServerImpl(*k)
 	goCtx :=  sdk.WrapSDKContext(ctx)
 	
+	t.Log("Registering DID")
 	msgCreateDID := &types.MsgCreateDID{
 		DidDocString: ValidDidDocumet,
 		Signatures: DidDocumentValidSignInfo,
@@ -26,8 +27,23 @@ func TestCreateDID(t *testing.T) {
 		t.Error("DID Registeration Failed")
 		t.Error(err)
 	} else {
-		t.Log("Did Registeration Successful")
+		t.Log("DID Registered Successfully")
 	}
 
-	t.Log("Create DID Tx Test Completed")
+	t.Log("Registering Schema")
+	msgCreateSchema := &types.MsgCreateSchema{
+		Schema: ValidSchemaDocument,
+		Signatures: SchemaValidSignInfo,
+		Creator: Creator,
+	}
+
+	_, errCreateSchema := msgServ.CreateSchema(goCtx, msgCreateSchema)
+	if errCreateSchema != nil {
+		t.Error("Schema Registeration Failed")
+		t.Error(errCreateSchema)
+	} else {
+		t.Log("Schema Registered Successfully")
+	}
+
+	t.Log("Create Schema Tx Test Completed")
 }

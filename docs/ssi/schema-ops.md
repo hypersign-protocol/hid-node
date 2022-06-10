@@ -33,3 +33,17 @@ hid-noded tx ssi create-schema '{"type":"https://w3c-ccg.github.io/vc-json-schem
 ```
 
 The above command will fail if the User's (`did:hs:0f49341a-20ef-43d1-bc93-de30993e6c51`) DID is not registered on chain
+
+### CLI
+
+1. Query schema for given schema id:
+
+```
+http://<REST-URL>/hypersign-protocol/hidnode/ssi/schema/{schemaId}
+```
+
+2. Query list of registered schema(s):
+
+```
+http://<REST-URL>/hypersign-protocol/hidnode/ssi/schema
+```

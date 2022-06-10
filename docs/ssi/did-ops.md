@@ -137,11 +137,11 @@ User 2 (`did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52`) is trying to deactivate i
 hid-noded tx ssi deactivate-did 'did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52' "${VERSION_ID}" did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52#z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4 --ver-key <private-key> --keyring-backend test --from alice --chain-id hidnode --yes
 ```
 
-### Resolving DID
+### CLI
 
 1) Get the list of Registered DID Documents
 
-URL: `http://localhost:1318/hypersign-protocol/hidnode/ssi/did`
+URL: `http://<REST-URL>/hypersign-protocol/hidnode/ssi/did`
 
 Output:
 
@@ -268,9 +268,9 @@ Output:
 }
 ```
 
-2) Get the list of Registered DID Documents with pagination limit
+1) Get the list of Registered DID Documents with pagination limit
 
-URL: `http://localhost:1318/hypersign-protocol/hidnode/ssi/did?pagination.limit=1`
+URL: `http://<REST-URL>/hypersign-protocol/hidnode/ssi/did?pagination.limit=1`
 
 Output:
 
@@ -325,7 +325,7 @@ Output:
 
 3) Query the DID Document for a given DID Id
 
-URL: `http://localhost:1318/hypersign-protocol/hidnode/ssi/did/did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52:`
+URL: `http://<REST-URL>/hypersign-protocol/hidnode/ssi/did/did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52:`
 
 <br>
 
