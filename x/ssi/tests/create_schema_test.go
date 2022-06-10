@@ -15,9 +15,9 @@ func TestCreateSchema(t *testing.T) {
 	msgServ := keeper.NewMsgServerImpl(*k)
 	goCtx :=  sdk.WrapSDKContext(ctx)
 	
-	t.Log("Registering DID")
+	t.Logf("Registering DID with Id: %s", ValidDidDocument.GetId())
 	msgCreateDID := &types.MsgCreateDID{
-		DidDocString: ValidDidDocumet,
+		DidDocString: ValidDidDocument,
 		Signatures: DidDocumentValidSignInfo,
 		Creator: Creator,
 	}
@@ -26,9 +26,9 @@ func TestCreateSchema(t *testing.T) {
 	if err != nil {
 		t.Error("DID Registeration Failed")
 		t.Error(err)
-	} else {
-		t.Log("DID Registered Successfully")
+		t.FailNow()
 	}
+	t.Log("DID Registered Successfully")
 
 	t.Log("Registering Schema")
 	msgCreateSchema := &types.MsgCreateSchema{
@@ -41,9 +41,9 @@ func TestCreateSchema(t *testing.T) {
 	if errCreateSchema != nil {
 		t.Error("Schema Registeration Failed")
 		t.Error(errCreateSchema)
-	} else {
-		t.Log("Schema Registered Successfully")
-	}
+		t.FailNow()
+	} 
+	t.Log("Schema Registered Successfully")
 
 	t.Log("Create Schema Tx Test Completed")
 }
