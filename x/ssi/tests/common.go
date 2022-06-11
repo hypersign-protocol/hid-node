@@ -95,6 +95,49 @@ var SchemaValidSignInfo []*types.SignInfo = getSchemaSigningInfo(ValidSchemaDocu
 
 /**********************************************/
 
+/**************** Register Cred Status Test *****************/
+
+var ValidCredentialStatus *types.CredentialStatus = &types.CredentialStatus{
+	Claim: &types.Claim{
+		Id: "vc_1",
+		CurrentStatus: "Live",
+		StatusReason: "Valid",
+	},
+	Issuer: didId,
+	IssuanceDate: "2022-04-10T04:07:12Z",
+	ExpirationDate: "2023-02-22T13:45:55Z",
+	CredentialHash: "Hash234",
+}
+
+var credentialStatusSignature string = base64.StdEncoding.EncodeToString(
+	ed25519.Sign(keyPair.privateKeyBase64, ValidCredentialStatus.GetSignBytes()),
+)
+
+var ValidCredentialProof *types.CredentialProof =  &types.CredentialProof{
+		Type: "Ed25519VerificationKey2020",
+		Created: "2022-04-10T04:07:12Z",
+		Updated: "2022-04-10T04:07:12Z",
+		VerificationMethod: verificationMethodId,
+		ProofValue: credentialStatusSignature,
+		ProofPurpose: "assertion",
+} 
+
+/************************************************************/
+
+func updateCredStatus(newStatus string, credStatus types.CredentialStatus, credProof types.CredentialProof) (types.CredentialStatus, types.CredentialProof) {
+	credStatus.Claim.CurrentStatus = newStatus
+	credStatus.Claim.StatusReason = "Status changed for Testing"
+	credProof.Updated = "2022-05-12T00:00:00Z"
+
+	updatedSignature := base64.StdEncoding.EncodeToString(
+		ed25519.Sign(keyPair.privateKeyBase64, credStatus.GetSignBytes()),
+	)
+	
+	credProof.ProofValue = updatedSignature
+
+	return credStatus, credProof
+}
+
 func getDidSigningInfo(didDoc *types.Did, keyPair ed25519KeyPair, vm *types.VerificationMethod) []*types.SignInfo {
 	signature := ed25519.Sign(keyPair.privateKeyBase64, didDoc.GetSignBytes())
 	signInfo := &types.SignInfo{
