@@ -4,15 +4,14 @@ import (
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	testkeeper "github.com/hypersign-protocol/hid-node/testutil/keeper"
 	"github.com/hypersign-protocol/hid-node/x/ssi/keeper"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 )
 
 func TestDeactivateDID(t *testing.T) {
 	t.Log("Running test for Valid Deactivate DID Tx")
-	k, ctx := testkeeper.SsiKeeper(t)
-	msgServ := keeper.NewMsgServerImpl(*k)
+	k, ctx := TestKeeper(t)
+	msgServer := keeper.NewMsgServerImpl(*k)
 	goCtx :=  sdk.WrapSDKContext(ctx)
 	
 	t.Logf("Registering DID with DID Id: %s", ValidDidDocument.GetId())
@@ -22,7 +21,7 @@ func TestDeactivateDID(t *testing.T) {
 		Creator: Creator,
 	}
 
-	_, err := msgServ.CreateDID(goCtx, msgCreateDID)
+	_, err := msgServer.CreateDID(goCtx, msgCreateDID)
 	if err != nil {
 		t.Error("DID Registeration Failed")
 		t.Error(err)
@@ -48,7 +47,7 @@ func TestDeactivateDID(t *testing.T) {
 		Creator: Creator,
 	}
 
-	_, errDeactivateDID := msgServ.DeactivateDID(goCtx, msgDeactivateDID)
+	_, errDeactivateDID := msgServer.DeactivateDID(goCtx, msgDeactivateDID)
 	if errDeactivateDID != nil {
 		t.Error("DID Deactivation Failed")
 		t.Error(errDeactivateDID)
