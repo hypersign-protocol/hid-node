@@ -121,10 +121,10 @@ func TestSchemaParam(t *testing.T) {
 
 	// Schema Document Count should't be zero 
 	assert.NotEqual(t, "0", res.TotalCount)
-	// List should be populated with a single Did Document
+	// List should be populated with a single Schema Document
 	assert.Equal(t, 1, len(res.SchemaList))
-	// Did Document shouldnt be nil
+	// Schema Document shouldnt be nil
 	assert.NotNil(t, res.SchemaList[0])
 
-	t.Log("Did Param Test Completed")
+	t.Log("SchemaParam Test Completed")
 }
