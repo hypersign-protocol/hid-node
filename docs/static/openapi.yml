@@ -18408,7 +18408,7 @@ paths:
         - Query
   /hypersign-protocol/hidnode/ssi/credential:
     get:
-      summary: Query All Registed Credential Status
+      summary: Get all the registed Credential Statuses
       operationId: HypersignprotocolHidnodeSsiQueryCredentials
       responses:
         '200':
@@ -18535,7 +18535,7 @@ paths:
         - Query
   '/hypersign-protocol/hidnode/ssi/credential/{credId}':
     get:
-      summary: Query Credential Status
+      summary: Get the Credential Status for a given credential Id
       operationId: HypersignprotocolHidnodeSsiQueryCredential
       responses:
         '200':
@@ -18605,7 +18605,7 @@ paths:
         - Query
   /hypersign-protocol/hidnode/ssi/did:
     get:
-      summary: Did Param
+      summary: Get the list of registered Did Documents and count
       operationId: HypersignprotocolHidnodeSsiDidParam
       responses:
         '200':
@@ -18785,7 +18785,7 @@ paths:
         - Query
   '/hypersign-protocol/hidnode/ssi/did/{didId}':
     get:
-      summary: Resolve DID
+      summary: Get the Did Document for a specified Did Id
       operationId: HypersignprotocolHidnodeSsiResolveDid
       responses:
         '200':
@@ -18905,7 +18905,7 @@ paths:
         - Query
   /hypersign-protocol/hidnode/ssi/schema:
     get:
-      summary: Schema Param
+      summary: Get the list of Schemas and count
       operationId: HypersignprotocolHidnodeSsiSchemaParam
       responses:
         '200':
@@ -19029,7 +19029,7 @@ paths:
         - Query
   '/hypersign-protocol/hidnode/ssi/schema/{schemaId}':
     get:
-      summary: Queries a list of GetSchema items.
+      summary: Get the Schema for a specified Schema Id
       operationId: HypersignprotocolHidnodeSsiGetSchema
       responses:
         '200':
