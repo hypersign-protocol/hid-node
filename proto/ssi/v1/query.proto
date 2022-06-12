@@ -20,32 +20,32 @@ service Query {
   rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
     option (google.api.http).get = "/hypersignprotocol/hidnode/ssi/params";
   }
-  // Queries a list of GetSchema items.
+  // Get the Schema for a specified Schema Id
 	rpc GetSchema(QueryGetSchemaRequest) returns (QueryGetSchemaResponse) {
 		option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/schema/{schemaId}";
 	}
 
-// Schema Param
+// Get the list of Schemas and count
 	rpc SchemaParam(QuerySchemaParamRequest) returns (QuerySchemaParamResponse) {
 		option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/schema";
 	}
 
-// Resolve DID
+// Get the Did Document for a specified Did Id
 	rpc ResolveDid(QueryGetDidDocByIdRequest) returns (QueryGetDidDocByIdResponse) {
 		option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/did/{didId}";
 	}
 
-// Did Param
+// Get the list of registered Did Documents and count
   rpc DidParam(QueryDidParamRequest) returns (QueryDidParamResponse) {
     option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/did";
   }
 
-// Query Credential Status
+// Get the Credential Status for a given credential Id
   rpc QueryCredential(QueryCredentialRequest) returns (QueryCredentialResponse) {
     option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/credential/{credId}";
   }
 
-// Query All Registed Credential Status
+// Get all the registed Credential Statuses
   rpc QueryCredentials(QueryCredentialsRequest) returns (QueryCredentialsResponse) {
     option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/credential";
   }
