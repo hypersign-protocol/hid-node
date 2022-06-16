@@ -24,11 +24,6 @@ message Metadata {
   string versionId = 4;
 }
 
-message DidResolveMeta {
-  string retrieved = 2;
-  string error = 3;
-}
-
 message VerificationMethod {
   string id = 1;
   string type = 2;

@@ -18621,8 +18621,6 @@ paths:
                 items:
                   type: object
                   properties:
-                    _at_context:
-                      type: string
                     didDocument:
                       type: object
                       properties:
@@ -18694,13 +18692,6 @@ paths:
                         deactivated:
                           type: boolean
                         versionId:
-                          type: string
-                    didResolutionMetadata:
-                      type: object
-                      properties:
-                        retrieved:
-                          type: string
-                        error:
                           type: string
         default:
           description: An unexpected error response.
@@ -18793,8 +18784,6 @@ paths:
           schema:
             type: object
             properties:
-              _at_context:
-                type: string
               didDocument:
                 type: object
                 properties:
@@ -18867,13 +18856,6 @@ paths:
                     type: boolean
                   versionId:
                     type: string
-              didResolutionMetadata:
-                type: object
-                properties:
-                  retrieved:
-                    type: string
-                  error:
-                    type: string
         default:
           description: An unexpected error response.
           schema:
@@ -18896,10 +18878,6 @@ paths:
         - name: didId
           in: path
           required: true
-          type: string
-        - name: versionId
-          in: query
-          required: false
           type: string
       tags:
         - Query
@@ -44435,8 +44413,6 @@ definitions:
   hypersignprotocol.hidnode.ssi.DidResolutionResponse:
     type: object
     properties:
-      _at_context:
-        type: string
       didDocument:
         type: object
         properties:
@@ -44509,20 +44485,6 @@ definitions:
             type: boolean
           versionId:
             type: string
-      didResolutionMetadata:
-        type: object
-        properties:
-          retrieved:
-            type: string
-          error:
-            type: string
-  hypersignprotocol.hidnode.ssi.DidResolveMeta:
-    type: object
-    properties:
-      retrieved:
-        type: string
-      error:
-        type: string
   hypersignprotocol.hidnode.ssi.Metadata:
     type: object
     properties:
@@ -44658,8 +44620,6 @@ definitions:
         items:
           type: object
           properties:
-            _at_context:
-              type: string
             didDocument:
               type: object
               properties:
@@ -44732,97 +44692,6 @@ definitions:
                   type: boolean
                 versionId:
                   type: string
-            didResolutionMetadata:
-              type: object
-              properties:
-                retrieved:
-                  type: string
-                error:
-                  type: string
-  hypersignprotocol.hidnode.ssi.QueryGetDidDocByIdResponse:
-    type: object
-    properties:
-      _at_context:
-        type: string
-      didDocument:
-        type: object
-        properties:
-          context:
-            type: array
-            items:
-              type: string
-          id:
-            type: string
-          controller:
-            type: array
-            items:
-              type: string
-          alsoKnownAs:
-            type: array
-            items:
-              type: string
-          verificationMethod:
-            type: array
-            items:
-              type: object
-              properties:
-                id:
-                  type: string
-                type:
-                  type: string
-                controller:
-                  type: string
-                publicKeyMultibase:
-                  type: string
-          authentication:
-            type: array
-            items:
-              type: string
-          assertionMethod:
-            type: array
-            items:
-              type: string
-          keyAgreement:
-            type: array
-            items:
-              type: string
-          capabilityInvocation:
-            type: array
-            items:
-              type: string
-          capabilityDelegation:
-            type: array
-            items:
-              type: string
-          service:
-            type: array
-            items:
-              type: object
-              properties:
-                id:
-                  type: string
-                type:
-                  type: string
-                serviceEndpoint:
-                  type: string
-      didDocumentMetadata:
-        type: object
-        properties:
-          created:
-            type: string
-          updated:
-            type: string
-          deactivated:
-            type: boolean
-          versionId:
-            type: string
-      didResolutionMetadata:
-        type: object
-        properties:
-          retrieved:
-            type: string
-          error:
-            type: string
   hypersignprotocol.hidnode.ssi.QueryGetSchemaResponse:
     type: object
     properties:

@@ -46,7 +46,7 @@ func TestDidResolve(t *testing.T) {
 	t.Log("Querying successful")
 	// To check if queried Did Document is not nil
 	assert.NotNil(t, res.DidDocument)
-
+	t.Log(res)
 	t.Log("Did Resolve Test Completed")
 }
 
