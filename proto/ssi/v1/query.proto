@@ -20,6 +20,7 @@ service Query {
   rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
     option (google.api.http).get = "/hypersignprotocol/hidnode/ssi/params";
   }
+
   // Get the Schema for a specified Schema Id
 	rpc GetSchema(QueryGetSchemaRequest) returns (QueryGetSchemaResponse) {
 		option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/schema/{schemaId}";
@@ -31,7 +32,7 @@ service Query {
 	}
 
 // Get the Did Document for a specified Did Id
-	rpc ResolveDid(QueryGetDidDocByIdRequest) returns (QueryGetDidDocByIdResponse) {
+	rpc ResolveDid(QueryGetDidDocByIdRequest) returns (DidResolutionResponse) {
 		option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/did/{didId}";
 	}
 
@@ -89,16 +90,7 @@ message QuerySchemaParamResponse {
 
 message QueryGetDidDocByIdRequest {
   string didId = 1;
-  string versionId = 2;
 }
-
-message QueryGetDidDocByIdResponse {
-  string _at_context = 1;
-  Did didDocument = 2;
-  Metadata didDocumentMetadata = 3;
-  DidResolveMeta didResolutionMetadata = 4;
-}
-
 
 message QueryDidParamRequest {
   bool count = 1;
@@ -111,10 +103,8 @@ message QueryDidParamResponse {
 }
 
 message DidResolutionResponse {
-  string _at_context = 1;
-  Did didDocument = 2;
-  Metadata didDocumentMetadata = 3;
-  DidResolveMeta didResolutionMetadata = 4;
+  Did didDocument = 1;
+  Metadata didDocumentMetadata = 2;
 }
 
 message QueryCredentialsRequest {
