@@ -3,14 +3,10 @@ package keeper
 import (
 	"context"
 
-	//"fmt"
-
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/query"
 
-	//sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	verify "github.com/hypersign-protocol/hid-node/x/ssi/keeper/document_verification"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -61,36 +57,10 @@ func (k Keeper) ResolveDid(goCtx context.Context, req *types.QueryGetDidDocByIdR
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	// Invalid DID Check
-	err := verify.IsValidDid(req.DidId)
-	switch err {
-	case types.ErrInvalidDidElements:
-		return &types.DidResolutionResponse{
-			DidDocument:         nil,
-			DidDocumentMetadata: nil,
-		}, nil
-	case types.ErrInvalidDidMethod:
-		return &types.DidResolutionResponse{
-			DidDocument:         nil,
-			DidDocumentMetadata: nil,
-		}, nil
-	}
-
 	// Check if DID Document exists
 	didDoc, err := k.GetDid(&ctx, req.DidId)
 	if err != nil {
-		return &types.DidResolutionResponse{
-			DidDocument:         nil,
-			DidDocumentMetadata: nil,
-		}, nil
-	}
-
-	// Check if DID Document is deactivated
-	if didDoc.GetMetadata().GetDeactivated() {
-		return &types.DidResolutionResponse{
-			DidDocument:         nil,
-			DidDocumentMetadata: didDoc.GetMetadata(),
-		}, nil
+		return nil, err
 	}
 
 	return &types.DidResolutionResponse{
