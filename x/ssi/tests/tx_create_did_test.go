@@ -3,22 +3,25 @@ package tests
 import (
 	"testing"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/hypersign-protocol/hid-node/x/ssi/keeper"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 func TestCreateDID(t *testing.T) {
 	t.Log("Running test for Valid Create DID Tx")
 	k, ctx := TestKeeper(t)
 	msgServer := keeper.NewMsgServerImpl(*k)
-	goCtx :=  sdk.WrapSDKContext(ctx)
-	
-	t.Logf("Registering DID with DID Id: %s", ValidDidDocument.GetId())
+	goCtx := sdk.WrapSDKContext(ctx)
+
+	keyPair1 := GeneratePublicPrivateKeyPair()
+	rpcElements := GenerateDidDocumentRPCElements(keyPair1)
+	t.Logf("Registering DID with DID Id: %s", rpcElements.DidDocument.GetId())
+
 	msgCreateDID := &types.MsgCreateDID{
-		DidDocString: ValidDidDocument,
-		Signatures: DidDocumentValidSignInfo,
-		Creator: Creator,
+		DidDocString: rpcElements.DidDocument,
+		Signatures:   rpcElements.Signatures,
+		Creator:      rpcElements.Creator,
 	}
 
 	_, err := msgServer.CreateDID(goCtx, msgCreateDID)

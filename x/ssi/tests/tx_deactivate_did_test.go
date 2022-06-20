@@ -12,13 +12,16 @@ func TestDeactivateDID(t *testing.T) {
 	t.Log("Running test for Valid Deactivate DID Tx")
 	k, ctx := TestKeeper(t)
 	msgServer := keeper.NewMsgServerImpl(*k)
-	goCtx :=  sdk.WrapSDKContext(ctx)
-	
-	t.Logf("Registering DID with DID Id: %s", ValidDidDocument.GetId())
+	goCtx := sdk.WrapSDKContext(ctx)
+
+	keyPair1 := GeneratePublicPrivateKeyPair()
+	rpcElements := GenerateDidDocumentRPCElements(keyPair1)
+	t.Logf("Registering DID with DID Id: %s", rpcElements.DidDocument.GetId())
+
 	msgCreateDID := &types.MsgCreateDID{
-		DidDocString: ValidDidDocument,
-		Signatures: DidDocumentValidSignInfo,
-		Creator: Creator,
+		DidDocString: rpcElements.DidDocument,
+		Signatures:   rpcElements.Signatures,
+		Creator:      rpcElements.Creator,
 	}
 
 	_, err := msgServer.CreateDID(goCtx, msgCreateDID)
@@ -31,7 +34,7 @@ func TestDeactivateDID(t *testing.T) {
 	}
 
 	// Querying registered did document to get the version ID
-	resolvedDidDocument, errResolve := k.GetDid(&ctx, ValidDidDocument.Id)
+	resolvedDidDocument, errResolve := k.GetDid(&ctx, rpcElements.DidDocument.GetId())
 	if errResolve != nil {
 		t.Error("Error in retrieving registered did document")
 		t.Error(errResolve)
@@ -39,12 +42,12 @@ func TestDeactivateDID(t *testing.T) {
 	}
 	versionId := resolvedDidDocument.GetMetadata().GetVersionId()
 
-	t.Logf("Deactivating DID with Id: %s", ValidDidDocument.GetId()) 
+	t.Logf("Deactivating DID with Id: %s", rpcElements.DidDocument.GetId())
 	msgDeactivateDID := &types.MsgDeactivateDID{
-		DidId: ValidDidDocument.GetId(),
-		Signatures: DidDocumentValidSignInfo,
-		VersionId: versionId,
-		Creator: Creator,
+		DidId:      rpcElements.DidDocument.Id,
+		Signatures: rpcElements.Signatures,
+		VersionId:  versionId,
+		Creator:    rpcElements.Creator,
 	}
 
 	_, errDeactivateDID := msgServer.DeactivateDID(goCtx, msgDeactivateDID)
@@ -52,7 +55,7 @@ func TestDeactivateDID(t *testing.T) {
 		t.Error("DID Deactivation Failed")
 		t.Error(errDeactivateDID)
 		t.FailNow()
-	} 
+	}
 	t.Log("DID Deactivation Successful")
 
 	t.Log("Deactivate DID Tx Test Completed")

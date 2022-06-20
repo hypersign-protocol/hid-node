@@ -15,11 +15,14 @@ func TestUpdateDID(t *testing.T) {
 	msgServ := keeper.NewMsgServerImpl(*k)
 	goCtx :=  sdk.WrapSDKContext(ctx)
 	
-	t.Logf("Registering DID with DID Id: %s", ValidDidDocument.GetId())
+	keyPair1 := GeneratePublicPrivateKeyPair()
+	rpcElements := GenerateDidDocumentRPCElements(keyPair1)
+	t.Logf("Registering DID with DID Id: %s", rpcElements.DidDocument.GetId())
+
 	msgCreateDID := &types.MsgCreateDID{
-		DidDocString: ValidDidDocument,
-		Signatures: DidDocumentValidSignInfo,
-		Creator: Creator,
+		DidDocString: rpcElements.DidDocument,
+		Signatures:   rpcElements.Signatures,
+		Creator:      rpcElements.Creator,
 	}
 
 	_, err := msgServ.CreateDID(goCtx, msgCreateDID)
@@ -32,20 +35,25 @@ func TestUpdateDID(t *testing.T) {
 	}
 
 	// Querying registered did document to get the version ID
-	resolvedDidDocument, errResolve := k.GetDid(&ctx, ValidDidDocument.Id)
+	resolvedDidDocument, errResolve := k.GetDid(&ctx, rpcElements.DidDocument.GetId())
 	if errResolve != nil {
 		t.Error("Error in retrieving registered did document")
 		t.Error(errResolve)
 		t.FailNow()
 	}
 	versionId := resolvedDidDocument.GetMetadata().GetVersionId()
-
-	t.Logf("Updating context field of the registered did with Id: %s", UpdatedValidDidDocument.GetId()) 
+	
+	// Updated the existing DID by appending a link
+	resolvedDidDocument.Did.Context = append(resolvedDidDocument.Did.Context, "http://www.example.com")
+	
+	updateRpcElements := GetModifiedDidDocumentSignature(resolvedDidDocument.Did, keyPair1)
+	t.Logf("Updating context field of the registered did with Id: %s", updateRpcElements.DidDocument.Id) 
+	
 	msgUpdateDID := &types.MsgUpdateDID{
-		DidDocString: UpdatedValidDidDocument,
-		Signatures: UpdatedDidDocumentValidSignInfo,
+		DidDocString: updateRpcElements.DidDocument,
+		Signatures: updateRpcElements.Signatures,
 		VersionId: versionId,
-		Creator: Creator,
+		Creator: updateRpcElements.Creator,
 	}
 
 	_, errUpdateDID := msgServ.UpdateDID(goCtx, msgUpdateDID)
