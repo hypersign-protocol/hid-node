@@ -15,12 +15,15 @@ func TestDidResolve(t *testing.T) {
 	msgServer := keeper.NewMsgServerImpl(*k)
 	goCtx := sdk.WrapSDKContext(ctx)
 
-	didId := ValidDidDocument.GetId()
+	keyPair1 := GeneratePublicPrivateKeyPair()
+	rpcElements := GenerateDidDocumentRPCElements(keyPair1)
+	didId := rpcElements.DidDocument.GetId()
 	t.Logf("Registering DID with DID Id: %s", didId)
+
 	msgCreateDID := &types.MsgCreateDID{
-		DidDocString: ValidDidDocument,
-		Signatures:   DidDocumentValidSignInfo,
-		Creator:      Creator,
+		DidDocString: rpcElements.DidDocument,
+		Signatures:   rpcElements.Signatures,
+		Creator:      rpcElements.Creator,
 	}
 
 	_, errCreateDID := msgServer.CreateDID(goCtx, msgCreateDID)
@@ -55,12 +58,15 @@ func TestDidParam(t *testing.T) {
 	msgServer := keeper.NewMsgServerImpl(*k)
 	goCtx := sdk.WrapSDKContext(ctx)
 
-	didId := ValidDidDocument.GetId()
+	keyPair1 := GeneratePublicPrivateKeyPair()
+	rpcElements := GenerateDidDocumentRPCElements(keyPair1)
+	didId := rpcElements.DidDocument.GetId()
 	t.Logf("Registering DID with DID Id: %s", didId)
+
 	msgCreateDID := &types.MsgCreateDID{
-		DidDocString: ValidDidDocument,
-		Signatures:   DidDocumentValidSignInfo,
-		Creator:      Creator,
+		DidDocString: rpcElements.DidDocument,
+		Signatures:   rpcElements.Signatures,
+		Creator:      rpcElements.Creator,
 	}
 
 	_, errCreateDID := msgServer.CreateDID(goCtx, msgCreateDID)

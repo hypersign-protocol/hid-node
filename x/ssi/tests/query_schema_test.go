@@ -15,12 +15,15 @@ func TestGetSchema(t *testing.T) {
 	msgServer := keeper.NewMsgServerImpl(*k)
 	goCtx := sdk.WrapSDKContext(ctx)
 
-	didId := ValidDidDocument.GetId()
+	keyPair1 := GeneratePublicPrivateKeyPair()
+	rpcElements := GenerateDidDocumentRPCElements(keyPair1)
+	didId := rpcElements.DidDocument.GetId()
 	t.Logf("Registering DID with DID Id: %s", didId)
+
 	msgCreateDID := &types.MsgCreateDID{
-		DidDocString: ValidDidDocument,
-		Signatures:   DidDocumentValidSignInfo,
-		Creator:      Creator,
+		DidDocString: rpcElements.DidDocument,
+		Signatures:   rpcElements.Signatures,
+		Creator:      rpcElements.Creator,
 	}
 
 	_, errCreateDID := msgServer.CreateDID(goCtx, msgCreateDID)
@@ -33,10 +36,16 @@ func TestGetSchema(t *testing.T) {
 	t.Log("Did Registeration Successful")
 
 	t.Log("Registering Schema")
+	schemaRpcElements := GenerateSchemaDocumentRPCElements(
+		keyPair1, 
+		rpcElements.DidDocument.Id,
+		rpcElements.DidDocument.VerificationMethod[0],
+	)
+
 	msgCreateSchema := &types.MsgCreateSchema{
-		Schema: ValidSchemaDocument,
-		Signatures: SchemaValidSignInfo,
-		Creator: Creator,
+		Schema: schemaRpcElements.SchemaDocument,
+		Signatures: schemaRpcElements.Signatures,
+		Creator: schemaRpcElements.Creator,
 	}
 
 	_, errCreateSchema := msgServer.CreateSchema(goCtx, msgCreateSchema)
@@ -51,7 +60,7 @@ func TestGetSchema(t *testing.T) {
 	t.Log("Querying the Schema from store")
 
 	req := &types.QueryGetSchemaRequest{
-		SchemaId: ValidSchemaDocument.GetId(),
+		SchemaId: schemaRpcElements.SchemaDocument.GetId(),
 	}
 
 	res, errResponse := k.GetSchema(goCtx, req)
@@ -74,12 +83,15 @@ func TestSchemaParam(t *testing.T) {
 	msgServer := keeper.NewMsgServerImpl(*k)
 	goCtx := sdk.WrapSDKContext(ctx)
 
-	didId := ValidDidDocument.GetId()
+	keyPair1 := GeneratePublicPrivateKeyPair()
+	rpcElements := GenerateDidDocumentRPCElements(keyPair1)
+	didId := rpcElements.DidDocument.GetId()
 	t.Logf("Registering DID with DID Id: %s", didId)
+
 	msgCreateDID := &types.MsgCreateDID{
-		DidDocString: ValidDidDocument,
-		Signatures:   DidDocumentValidSignInfo,
-		Creator:      Creator,
+		DidDocString: rpcElements.DidDocument,
+		Signatures:   rpcElements.Signatures,
+		Creator:      rpcElements.Creator,
 	}
 
 	_, errCreateDID := msgServer.CreateDID(goCtx, msgCreateDID)
@@ -92,10 +104,16 @@ func TestSchemaParam(t *testing.T) {
 	t.Log("Did Registeration Successful")
 
 	t.Log("Registering Schema")
+	schemaRpcElements := GenerateSchemaDocumentRPCElements(
+		keyPair1, 
+		rpcElements.DidDocument.Id,
+		rpcElements.DidDocument.VerificationMethod[0],
+	)
+
 	msgCreateSchema := &types.MsgCreateSchema{
-		Schema: ValidSchemaDocument,
-		Signatures: SchemaValidSignInfo,
-		Creator: Creator,
+		Schema: schemaRpcElements.SchemaDocument,
+		Signatures: schemaRpcElements.Signatures,
+		Creator: schemaRpcElements.Creator,
 	}
 
 	_, errCreateSchema := msgServer.CreateSchema(goCtx, msgCreateSchema)

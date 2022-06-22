@@ -15,11 +15,14 @@ func TestRegisterCredentialStatus(t *testing.T) {
 	msgServer := keeper.NewMsgServerImpl(*k)
 	goCtx := sdk.WrapSDKContext(ctx)
 
-	t.Logf("Registering DID with DID Id: %s", ValidDidDocument.GetId())
+	keyPair1 := GeneratePublicPrivateKeyPair()
+	didRpcElements := GenerateDidDocumentRPCElements(keyPair1)
+	t.Logf("Registering DID with DID Id: %s", didRpcElements.DidDocument.GetId())
+
 	msgCreateDID := &types.MsgCreateDID{
-		DidDocString: ValidDidDocument,
-		Signatures:   DidDocumentValidSignInfo,
-		Creator:      Creator,
+		DidDocString: didRpcElements.DidDocument,
+		Signatures:   didRpcElements.Signatures,
+		Creator:      didRpcElements.Creator,
 	}
 
 	_, err := msgServer.CreateDID(goCtx, msgCreateDID)
@@ -30,12 +33,18 @@ func TestRegisterCredentialStatus(t *testing.T) {
 	}
 	t.Log("Did Registeration Successful")
 
-	t.Logf("Registering Credential Status with Id: %s", ValidCredentialStatus.GetClaim().GetId())
+	credRpcElements := GenerateCredStatusRPCElements(
+		keyPair1, 
+		didRpcElements.DidDocument.Id, 
+		didRpcElements.DidDocument.VerificationMethod[0],
+	)
+
 	msgRegisterCredentialStatus := &types.MsgRegisterCredentialStatus{
-		CredentialStatus: ValidCredentialStatus,
-		Proof:            ValidCredentialProof,
+		CredentialStatus: credRpcElements.Status,
+		Proof:            credRpcElements.Proof,
 		Creator:          Creator,
 	}
+	t.Logf("Registering Credential Status with Id: %s", credRpcElements.Status.GetClaim().GetId())
 
 	t.Logf("Block Time: %s", ctx.BlockTime().Format(time.RFC3339))
 
@@ -56,11 +65,14 @@ func TestUpdateCredentialStatus(t *testing.T) {
 	msgServer := keeper.NewMsgServerImpl(*k)
 	goCtx := sdk.WrapSDKContext(ctx)
 
-	t.Logf("Registering DID with DID Id: %s", ValidDidDocument.GetId())
+	keyPair1 := GeneratePublicPrivateKeyPair()
+	didRpcElements := GenerateDidDocumentRPCElements(keyPair1)
+	t.Logf("Registering DID with DID Id: %s", didRpcElements.DidDocument.GetId())
+
 	msgCreateDID := &types.MsgCreateDID{
-		DidDocString: ValidDidDocument,
-		Signatures:   DidDocumentValidSignInfo,
-		Creator:      Creator,
+		DidDocString: didRpcElements.DidDocument,
+		Signatures:   didRpcElements.Signatures,
+		Creator:      didRpcElements.Creator,
 	}
 
 	_, err := msgServer.CreateDID(goCtx, msgCreateDID)
@@ -71,12 +83,18 @@ func TestUpdateCredentialStatus(t *testing.T) {
 	}
 	t.Log("Did Registeration Successful")
 
-	t.Logf("Registering Credential Status with Id: %s", ValidCredentialStatus.GetClaim().GetId())
+	credRpcElements := GenerateCredStatusRPCElements(
+		keyPair1, 
+		didRpcElements.DidDocument.Id, 
+		didRpcElements.DidDocument.VerificationMethod[0],
+	)
+
 	msgRegisterCredentialStatus := &types.MsgRegisterCredentialStatus{
-		CredentialStatus: ValidCredentialStatus,
-		Proof:            ValidCredentialProof,
+		CredentialStatus: credRpcElements.Status,
+		Proof:            credRpcElements.Proof,
 		Creator:          Creator,
 	}
+	t.Logf("Registering Credential Status with Id: %s", credRpcElements.Status.GetClaim().GetId())
 
 	t.Logf("Block Time: %s", ctx.BlockTime().Format(time.RFC3339))
 
@@ -88,13 +106,13 @@ func TestUpdateCredentialStatus(t *testing.T) {
 	}
 	t.Log("Credential Status Registeration Successful")
 
-	t.Logf("Updating Credential Status (Id: %s) from Live to Revoked", ValidCredentialStatus.GetClaim().GetId())
+	t.Logf("Updating Credential Status (Id: %s) from Live to Revoked", credRpcElements.Status.GetClaim().GetId())
 	
-	updatedCredentialStatus, updatedCredentialProof := updateCredStatus("Revoked", *ValidCredentialStatus, *ValidCredentialProof)
+	updatedRpcCredElements := UpdateCredStatus("Revoked", credRpcElements, keyPair1)
 	
 	msgUpdateCredentialStatus := &types.MsgRegisterCredentialStatus{
-		CredentialStatus: &updatedCredentialStatus,
-		Proof:            &updatedCredentialProof,
+		CredentialStatus: updatedRpcCredElements.Status,
+		Proof:            updatedRpcCredElements.Proof,
 		Creator:          Creator,
 	}
 
