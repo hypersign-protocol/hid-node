@@ -14,7 +14,7 @@ func IsValidSchemaID(schemaId string, authorDid string) error {
 	}
 
 	//Checking the prefix
-	if !strings.HasPrefix(IdComponents[0], "did:hs:") {
+	if !strings.HasPrefix(IdComponents[0], didMethod) {
 		return errors.New("Expected did:hs as prefix in schema ID, The Schema ID is " + schemaId)
 	}
 

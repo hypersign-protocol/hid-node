@@ -8,25 +8,25 @@ hid-noded tx ssi create-did '{
 "https://w3id.org/security/v1",
 "https://schema.org"
 ],
-"id": "did:hs:0f49341a-20ef-43d1-bc93-de30993e6c51",
+"id": "did:hs:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf",
 "controller": [],
 "alsoKnownAs": ["did:hs:1f49341a-de30993e6c51"],
 "verificationMethod": [
 {
-"id": "did:hs:0f49341a-20ef-43d1-bc93-de30993e6c51#zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf",
+"id": "did:hs:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf#key-1",
 "type": "Ed25519VerificationKey2020",
-"controller": "did:hs:0f49341a-20ef-43d1-bc93-de30993e6c51",
+"controller": "did:hs:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf",
 "publicKeyMultibase": "zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf"
 }
 ],
 "authentication": [
-"did:hs:0f49341a-20ef-43d1-bc93-de30993e6c51#zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf"
+"did:hs:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf#key-1"
 ]
-}' did:hs:0f49341a-20ef-43d1-bc93-de30993e6c51#zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf --ver-key oVtY1xceDZQjkfwlbCEC2vgeADcxpgd27vtYasBhcM/JLR6PnPoD9jvjSJrMsMJwS7faPy5OlFCdj/kgLVZMEg== --from alice --chain-id hidnode --yes
+}' did:hs:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf#key-1 --ver-key oVtY1xceDZQjkfwlbCEC2vgeADcxpgd27vtYasBhcM/JLR6PnPoD9jvjSJrMsMJwS7faPy5OlFCdj/kgLVZMEg== --from node1 --chain-id hidnode --broadcast-mode block --yes
 
 echo "\n----------- User 1 has been created ----------- "
 
-hid-noded query ssi did did:hs:0f49341a-20ef-43d1-bc93-de30993e6c51
+hid-noded query ssi did did:hs:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf
 
 echo "--------------- x ----------- "
 
@@ -38,25 +38,25 @@ hid-noded tx ssi create-did '{
 "https://w3id.org/security/v1",
 "https://schema.org"
 ],
-"id": "did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52",
-"controller": ["did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52"],
-"alsoKnownAs": ["did:hs:1f49341a-de30993e6c52"],
+"id": "did:hs:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4",
+"controller": ["did:hs:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4"],
+"alsoKnownAs": [],
 "verificationMethod": [
 {
-"id": "did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52#z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4",
+"id": "did:hs:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4#key-1",
 "type": "Ed25519VerificationKey2020",
-"controller": "did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52",
+"controller": "did:hs:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4",
 "publicKeyMultibase": "z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4"
 }
 ],
 "authentication": [
-"did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52#z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4"
+"did:hs:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4#key-1"
 ]
-}' did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52#z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4 --ver-key bZBUkLGChnJujYHUZ4L8PECoN2Odv6adWGXc1qVWCRVqtEx0o/FmtFZnd5pT3laR518P58TRUGY5q5KSrToSmQ== --from alice --chain-id hidnode --yes
+}' did:hs:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4#key-1 --ver-key bZBUkLGChnJujYHUZ4L8PECoN2Odv6adWGXc1qVWCRVqtEx0o/FmtFZnd5pT3laR518P58TRUGY5q5KSrToSmQ== --from node1 --chain-id hidnode --broadcast-mode block --yes
 
 echo "\n ----------- User 2 has been created ----------- "
 
-hid-noded query ssi did did:hs:0f49341a-20ef-43d1-bc93-de30993e6c52
+hid-noded query ssi did did:hs:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4
 
 echo "--------------- x ----------- "
 
@@ -68,24 +68,24 @@ hid-noded tx ssi create-did '{
 "https://w3id.org/security/v1",
 "https://schema.org"
 ],
-"id": "did:hs:0f49341a-20ef-43d1-bc93-de30993e6c53",
+"id": "did:hs:zE2seaoaAwBzfLaTd7oqEf5GJZdEiQgo64ayJgMstRZ91",
 "controller": [],
-"alsoKnownAs": ["did:hs:1f49341a-de30993e6c53"],
+"alsoKnownAs": [],
 "verificationMethod": [
 {
-"id": "did:hs:0f49341a-20ef-43d1-bc93-de30993e6c53#zE2seaoaAwBzfLaTd7oqEf5GJZdEiQgo64ayJgMstRZ91",
+"id": "did:hs:zE2seaoaAwBzfLaTd7oqEf5GJZdEiQgo64ayJgMstRZ91#key-1",
 "type": "Ed25519VerificationKey2020",
-"controller": "did:hs:0f49341a-20ef-43d1-bc93-de30993e6c53",
+"controller": "did:hs:zE2seaoaAwBzfLaTd7oqEf5GJZdEiQgo64ayJgMstRZ91",
 "publicKeyMultibase": "zE2seaoaAwBzfLaTd7oqEf5GJZdEiQgo64ayJgMstRZ91"
 }
 ],
 "authentication": [
-"did:hs:0f49341a-20ef-43d1-bc93-de30993e6c53#zE2seaoaAwBzfLaTd7oqEf5GJZdEiQgo64ayJgMstRZ91"
+"did:hs:zE2seaoaAwBzfLaTd7oqEf5GJZdEiQgo64ayJgMstRZ91#key-1"
 ]
-}' did:hs:0f49341a-20ef-43d1-bc93-de30993e6c53#zE2seaoaAwBzfLaTd7oqEf5GJZdEiQgo64ayJgMstRZ91 --ver-key JFfT5yPnBbwcDkmry9vdqX9eBKJmfnTT9C1r0LZ5S73BosdZL7AaZ9AYx6Mpvvw/ebaKPyaIiVZ3StijU8RRAA== --from alice --chain-id hidnode --yes
+}' did:hs:zE2seaoaAwBzfLaTd7oqEf5GJZdEiQgo64ayJgMstRZ91#key-1 --ver-key JFfT5yPnBbwcDkmry9vdqX9eBKJmfnTT9C1r0LZ5S73BosdZL7AaZ9AYx6Mpvvw/ebaKPyaIiVZ3StijU8RRAA== --from node1 --chain-id hidnode --broadcast-mode block --yes
 
 echo "\n -----------User 3 has been created ----------- "
 
-hid-noded query ssi did did:hs:0f49341a-20ef-43d1-bc93-de30993e6c53
+hid-noded query ssi did did:hs:zE2seaoaAwBzfLaTd7oqEf5GJZdEiQgo64ayJgMstRZ91
 
 echo "--------------- x ----------- "
