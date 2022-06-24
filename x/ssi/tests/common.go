@@ -96,7 +96,7 @@ func GenerateDidDocumentRPCElements(keyPair ed25519KeyPair) DidRpcElements {
 	var didMethod string = "did:hs"
 	var didId = didMethod + ":" + keyPair.publicKey
 
-	var verificationMethodId string = didId + "#" + keyPair.publicKey
+	var verificationMethodId string = didId + "#" + "key-1"
 
 	var vm = &types.VerificationMethod{
 		Id:                 verificationMethodId,
