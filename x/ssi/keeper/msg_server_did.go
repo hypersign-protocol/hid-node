@@ -16,8 +16,8 @@ func (k msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*t
 	didMsg := msg.GetDidDocString()
 	did := didMsg.GetId()
 	// Checks if the DID has a valid format
-	if err := verify.IsValidDid(did); err != nil {
-		return nil, err
+	if err := verify.IsValidDidDocID(did); err != "" {
+		return nil, fmt.Errorf(err)
 	}
 
 	// Checks if the DidDoc is a valid format

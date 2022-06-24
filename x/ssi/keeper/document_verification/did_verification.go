@@ -6,33 +6,26 @@ import (
 
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 	utils "github.com/hypersign-protocol/hid-node/x/ssi/utils"
+	"github.com/multiformats/go-multibase"
 )
 
-// Check if the DID Method is valid
-func IsValidDidMethod(method string) bool {
-	return method == didMethod
-}
-
-// Checks whether the given string is a valid DID
-func IsValidDid(did string) error {
-	didElements := strings.Split(did, ":")
-
-	if (didElements[0] != "did") || len(didElements) != didIdElements {
-		return types.ErrInvalidDidElements
-	}
-	if !IsValidDidMethod(didElements[1]) {
-		return types.ErrInvalidDidMethod
-	}
-
-	return nil
-}
 
 // Checks whether the ID in the DidDoc is a valid string
-func IsValidDidDocID(didDoc *types.Did) bool {
-	if err := IsValidDid(didDoc.GetId()); err != nil {
-		return false
+func IsValidDidDocID(Id string) string {
+	didElements := strings.Split(Id, ":")
+
+	if len(didElements) != didIdElements {
+		return types.ErrInvalidDidElements.Error()
 	}
-	return true
+	if (didElements[0] + ":" + didElements[1]) != didMethod {
+		return types.ErrInvalidDidMethod.Error()
+	}
+
+	_, _, err := multibase.Decode(didElements[2])
+	if err != nil || len(didElements[2]) != 45 {
+		return types.ErrInvalidMethodSpecificId.Error()
+	}
+	return ""
 }
 
 // Cheks whether the Service is valid
@@ -60,8 +53,11 @@ func IsValidDidFragment(didUrl string) bool {
 	}
 
 	did, _ := utils.SplitDidUrlIntoDid(didUrl)
-	err := IsValidDid(did)
-	return err == nil
+	err := IsValidDidDocID(did)
+	if err != "" {
+		return false
+	}
+	return true
 }
 
 // Check Valid DID service type
@@ -88,7 +84,7 @@ func DuplicateServiceExists(serviceId string, services []*types.Service) bool {
 // Check whether the fields whose values are array of DIDs are valid DID
 func IsValidDIDArray(didArray []string) bool {
 	for _, did := range didArray {
-		if err := IsValidDid(did); err != nil {
+		if err := IsValidDidDocID(did); err != "" {
 			return false
 		}
 	}
@@ -110,14 +106,16 @@ func IsValidDidDoc(didDoc *types.Did) string {
 	}
 
 	// Invalid ID check
-	if !IsValidDidDocID(didDoc) {
+	if IsValidDidDocID(didDoc.GetId()) != "" {
 		return fmt.Sprintf("The DidDoc ID %s is invalid", didDoc.GetId())
 	}
 
 	// Did Array Check
 	for field, didArray := range didArrayMap {
-		if !IsValidDIDArray(didArray) {
-			return fmt.Sprintf("The field %s is an invalid DID Array", field)
+		for _, elem := range didArray{
+			if !IsValidDidFragment(elem) {
+				return fmt.Sprintf("The field %s is an invalid DID Array", field)
+			}
 		}
 	}
 
