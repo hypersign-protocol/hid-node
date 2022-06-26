@@ -5,15 +5,8 @@ hid-noded &> /dev/null
 
 RET_VAL=$?
 if [ ${RET_VAL} -ne 0 ]; then
-    URL_PATH="https://github.com/hypersign-protocol/hid-node/releases/download/latest/"
-    FILE_NAME="hid-node_latest_linux_amd64.tar.gz"
-    DOWNLOAD_URL="${URL_PATH}${FILE_NAME}"
-    echo "hid-noded binary doesn't exist, installing......"
-    sleep 2
-    wget ${DOWNLOAD_URL}
-    tar -xvzf hid-node_latest_linux_amd64.tar.gz
-    mv hid-noded $(go env GOPATH)/bin/
-    rm -rf ${FILE_NAME}
+    echo "hid-noded binary not found"
+    exit 1
 fi
 
 # Setting up config files
@@ -55,3 +48,6 @@ sed -i -E '107s/swagger = false/swagger = true/' $HOME/.hid-node/config/app.toml
 sed -i -E 's|allow_duplicate_ip = false|allow_duplicate_ip = true|g' $HOME/.hid-node/config/config.toml
 sed -i -E 's|addr_book_strict = true|addr_book_strict = false|g' $HOME/.hid-node/config/config.toml
 sed -i -E 's|cors_allowed_origins = \[\]|cors_allowed_origins = \[\"\*\"\]|g' $HOME/.hid-node/config/config.toml
+
+hid-noded config chain-id hidnode
+hid-noded config keyring-backend test
