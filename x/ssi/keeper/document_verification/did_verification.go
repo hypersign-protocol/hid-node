@@ -71,10 +71,10 @@ func IsValidDidServiceType(sType string) bool {
 }
 
 func DuplicateServiceExists(serviceId string, services []*types.Service) bool {
-	did, _ := utils.SplitDidUrlIntoDid(serviceId)
+	_, fragment := utils.SplitDidUrlIntoDid(serviceId)
 	for _, s := range services {
-		sDid, _ := utils.SplitDidUrlIntoDid(s.Id)
-		if did == sDid {
+		_, sFragment := utils.SplitDidUrlIntoDid(s.Id)
+		if fragment == sFragment {
 			return true
 		}
 	}
