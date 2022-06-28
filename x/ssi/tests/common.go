@@ -105,6 +105,12 @@ func GenerateDidDocumentRPCElements(keyPair ed25519KeyPair) DidRpcElements {
 		PublicKeyMultibase: keyPair.publicKey,
 	}
 
+	var service *types.Service = &types.Service{
+		Id: didId + "#" + "linkedDomains",
+		Type: "LinkedDomains",
+		ServiceEndpoint: "http://www.example.com",
+	}
+
 	var didDocument *types.Did = &types.Did{
 		Context: []string{
 			"https://www.w3.org/ns/did/v1",
@@ -113,6 +119,9 @@ func GenerateDidDocumentRPCElements(keyPair ed25519KeyPair) DidRpcElements {
 		Controller: []string{didId},
 		VerificationMethod: []*types.VerificationMethod{
 			vm,
+		},
+		Service: []*types.Service{
+			service,
 		},
 		Authentication: []string{verificationMethodId},
 	}
