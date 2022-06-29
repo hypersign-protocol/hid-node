@@ -1,6 +1,7 @@
 package tests
 
 import (
+	"context"
 	"crypto/ed25519"
 	"crypto/rand"
 	"encoding/base64"
@@ -9,6 +10,8 @@ import (
 	//"fmt"
 
 	"github.com/btcsuite/btcutil/base58"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/hypersign-protocol/hid-node/x/ssi/keeper"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 	"github.com/hypersign-protocol/hid-node/x/ssi/utils"
 	//"github.com/hypersign-protocol/hid-node/x/ssi/utils"
@@ -51,10 +54,10 @@ func getSchemaSigningInfo(schemaDoc *types.Schema, keyPair ed25519KeyPair, vm *t
 	}
 }
 
-func getDidSigningInfo(didDoc *types.Did, keyPair ed25519KeyPair, vm *types.VerificationMethod) []*types.SignInfo {
+func getDidSigningInfo(didDoc *types.Did, keyPair ed25519KeyPair, vmId string) []*types.SignInfo {
 	signature := ed25519.Sign(keyPair.privateKey, didDoc.GetSignBytes())
 	signInfo := &types.SignInfo{
-		VerificationMethodId: vm.GetId(),
+		VerificationMethodId: vmId,
 		Signature:            base64.StdEncoding.EncodeToString(signature),
 	}
 
@@ -77,12 +80,11 @@ func UpdateCredStatus(newStatus string, credRpcElem CredRpcElements, keyPair ed2
 	return credRpcElem
 }
 
-func GetModifiedDidDocumentSignature(modifiedDidDocument *types.Did, keyPair ed25519KeyPair) DidRpcElements {
-	var vm *types.VerificationMethod = modifiedDidDocument.VerificationMethod[0]
+func GetModifiedDidDocumentSignature(modifiedDidDocument *types.Did, keyPair ed25519KeyPair, verificationMethodId string) DidRpcElements {
 	var signatures []*types.SignInfo = getDidSigningInfo(
 		modifiedDidDocument,
 		keyPair,
-		vm,
+		verificationMethodId,
 	)
 
 	return DidRpcElements{
@@ -106,8 +108,8 @@ func GenerateDidDocumentRPCElements(keyPair ed25519KeyPair) DidRpcElements {
 	}
 
 	var service *types.Service = &types.Service{
-		Id: didId + "#" + "linkedDomains",
-		Type: "LinkedDomains",
+		Id:              didId + "#" + "linkedDomains",
+		Type:            "LinkedDomains",
 		ServiceEndpoint: "http://www.example.com",
 	}
 
@@ -126,7 +128,7 @@ func GenerateDidDocumentRPCElements(keyPair ed25519KeyPair) DidRpcElements {
 		Authentication: []string{verificationMethodId},
 	}
 
-	var signInfo []*types.SignInfo = getDidSigningInfo(didDocument, keyPair, vm)
+	var signInfo []*types.SignInfo = getDidSigningInfo(didDocument, keyPair, vm.Id)
 
 	return DidRpcElements{
 		DidDocument: didDocument,
@@ -208,4 +210,45 @@ func GeneratePublicPrivateKeyPair() ed25519KeyPair {
 		publicKey:  publicKeyBase58Encoded,
 		privateKey: privateKey,
 	}
+}
+
+func CreateDidTx(msgServer types.MsgServer, ctx context.Context, keyPair ed25519KeyPair) (string, error) {
+	rpcElements := GenerateDidDocumentRPCElements(keyPair)
+
+	msgCreateDID := &types.MsgCreateDID{
+		DidDocString: rpcElements.DidDocument,
+		Signatures:   rpcElements.Signatures,
+		Creator:      rpcElements.Creator,
+	}
+
+	_, err := msgServer.CreateDID(ctx, msgCreateDID)
+	if err != nil {
+		return "", err
+	}
+
+	return rpcElements.DidDocument.Id, nil
+}
+
+func UpdateDidTx(msgServer types.MsgServer, ctx context.Context, rpcElements DidRpcElements, versionId string) error {
+	msgUpdateDID := &types.MsgUpdateDID{
+		DidDocString: rpcElements.DidDocument,
+		Signatures:   rpcElements.Signatures,
+		Creator:      rpcElements.Creator,
+		VersionId:    versionId,
+	}
+
+	_, err := msgServer.UpdateDID(ctx, msgUpdateDID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func QueryDid(k *keeper.Keeper, ctx sdk.Context, Id string) *types.DidDocument {
+	resolvedDidDocument, errResolve := k.GetDid(&ctx, Id)
+	if errResolve != nil {
+		panic(errResolve)
+	}
+
+	return resolvedDidDocument
 }

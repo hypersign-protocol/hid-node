@@ -28,6 +28,7 @@ func TestRegisterCredentialStatus(t *testing.T) {
 	_, err := msgServer.CreateDID(goCtx, msgCreateDID)
 	if err != nil {
 		t.Error("DID Registeration Failed")
+		t.Log(didRpcElements.DidDocument.Id)
 		t.Error(err)
 		t.FailNow()
 	}
@@ -78,6 +79,7 @@ func TestUpdateCredentialStatus(t *testing.T) {
 	_, err := msgServer.CreateDID(goCtx, msgCreateDID)
 	if err != nil {
 		t.Error("DID Registeration Failed")
+		t.Log(didRpcElements.DidDocument.Id)
 		t.Error(err)
 		t.FailNow()
 	}

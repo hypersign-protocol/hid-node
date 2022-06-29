@@ -38,7 +38,7 @@ func TestCreateDID(t *testing.T) {
 }
 
 func TestInvalidServiceType(t *testing.T) {
-	t.Log("Running test for Valid Create DID Tx")
+	t.Log("Running test for Invalid Service Type")
 	k, ctx := TestKeeper(t)
 	msgServer := keeper.NewMsgServerImpl(*k)
 	goCtx := sdk.WrapSDKContext(ctx)
@@ -50,7 +50,11 @@ func TestInvalidServiceType(t *testing.T) {
 	invalidServiceType := "DIDComm"
 	rpcElements.DidDocument.Service[0].Type = invalidServiceType
 	
-	updatedRpcElements := GetModifiedDidDocumentSignature(rpcElements.DidDocument, keyPair1)
+	updatedRpcElements := GetModifiedDidDocumentSignature(
+		rpcElements.DidDocument, 
+		keyPair1,
+		rpcElements.DidDocument.VerificationMethod[0].Id,
+	)
 	t.Logf("Registering DID with DID Id: %s", rpcElements.DidDocument.GetId())
 
 	msgCreateDID := &types.MsgCreateDID{
@@ -67,11 +71,11 @@ func TestInvalidServiceType(t *testing.T) {
 
 	assert.Contains(t, err.Error(), fmt.Sprintf("Service Type %s is Invalid: Invalid Service", invalidServiceType))
 
-	t.Log("Invalid DID Service Type Test Completed")
+	t.Log("Test Completed")
 }
 
 func TestDuplicateServiceId(t *testing.T) {
-	t.Log("Running test for Valid Create DID Tx")
+	t.Log("Running test for Invalid Duplicate Service Id")
 	k, ctx := TestKeeper(t)
 	msgServer := keeper.NewMsgServerImpl(*k)
 	goCtx := sdk.WrapSDKContext(ctx)
@@ -94,7 +98,11 @@ func TestDuplicateServiceId(t *testing.T) {
 
 	t.Logf("Registering DID with DID Id: %s", rpcElements.DidDocument.GetId())
 
-	updatedDidRpcElements := GetModifiedDidDocumentSignature(rpcElements.DidDocument, keyPair1)
+	updatedDidRpcElements := GetModifiedDidDocumentSignature(
+		rpcElements.DidDocument, 
+		keyPair1,
+		rpcElements.DidDocument.VerificationMethod[0].Id,
+	)
 
 	msgCreateDID := &types.MsgCreateDID{
 		DidDocString: updatedDidRpcElements.DidDocument,
@@ -111,5 +119,5 @@ func TestDuplicateServiceId(t *testing.T) {
 	
 	assert.Contains(t, err.Error(), fmt.Sprintf("Service with Id: %s is duplicate: Invalid Service", duplicateServiceId))
 
-	t.Log("Invalid DID Service Type Test Completed")
+	t.Log("Invalid Duplicate Service Id Test Completed")
 }
