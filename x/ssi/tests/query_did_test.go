@@ -29,6 +29,7 @@ func TestDidResolve(t *testing.T) {
 	_, errCreateDID := msgServer.CreateDID(goCtx, msgCreateDID)
 	if errCreateDID != nil {
 		t.Error("DID Registeration Failed")
+		t.Log(rpcElements.DidDocument.Id)
 		t.Error(errCreateDID)
 		t.FailNow()
 	}
@@ -72,6 +73,7 @@ func TestDidParam(t *testing.T) {
 	_, errCreateDID := msgServer.CreateDID(goCtx, msgCreateDID)
 	if errCreateDID != nil {
 		t.Error("DID Registeration Failed")
+		t.Log(rpcElements.DidDocument.Id)
 		t.Error(errCreateDID)
 		t.FailNow()
 	}

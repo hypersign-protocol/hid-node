@@ -30,6 +30,7 @@ func TestQueryCredential(t *testing.T) {
 	_, errCreateDID := msgServer.CreateDID(goCtx, msgCreateDID)
 	if errCreateDID != nil {
 		t.Error("DID Registeration Failed")
+		t.Log(didRpcElements.DidDocument.Id)
 		t.Error(errCreateDID)
 		t.FailNow()
 	}
