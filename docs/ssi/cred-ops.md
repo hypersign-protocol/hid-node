@@ -2,6 +2,15 @@
 
 Storing Verifiable Credential on a distributed ledger could lead to privacy violation. However, we can store the status of a Verifiable Credential on-chain, with no private information attached to it. Issuers of a Verifiable Credential have the ability to revoke the credential and provide the reason behind it.
 
+## Supported VC Statuses
+
+Following are the VC statuses supported by `hid-node`:
+
+- Live
+-	Suspended
+-	Revoked
+-	Expired
+
 ## Register VC Status
 
 For instance, an issuer with id `did:hs:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf` has issue a VC, following which they want to register it's status.
