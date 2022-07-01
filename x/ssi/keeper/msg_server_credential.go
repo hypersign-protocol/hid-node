@@ -11,7 +11,8 @@ import (
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 )
 
-// Acceptable Statuses for update-credential-rpc
+// Acceptable Credential Status.
+// Ref: https://github.com/hypersign-protocol/hid-node/discussions/141#discussioncomment-2825349
 var acceptableCredStatuses = []string{
 	"Live",
 	"Suspended",
@@ -41,6 +42,12 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 		issuerId := credMsg.GetIssuer()
 		if !k.HasDid(ctx, issuerId) {
 			return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("Issuer`s DID %s doesnt exists", issuerId))
+		}
+
+		// Check if issuer's DID is deactivated
+		if issuerDidDocument, _ := k.GetDid(&ctx, issuerId); 
+		issuerDidDocument.Metadata.Deactivated {
+			return nil, sdkerrors.Wrap(types.ErrDidDocDeactivated, fmt.Sprintf("%s is deactivated and cannot used be used to register credential status", issuerDidDocument.Did.Id))
 		}
 
 		// Check if the expiration date is not before the issuance date.
@@ -133,6 +140,12 @@ func (k msgServer) updateCredentialStatus(ctx sdk.Context, newCredStatus *types.
 	issuerId := newCredStatus.GetIssuer()
 	if !k.HasDid(ctx, issuerId) {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("Issuer`s DID %s doesnt exists", issuerId))
+	}
+
+	// Check if issuer's DID is deactivated
+	if issuerDidDocument, _ := k.GetDid(&ctx, issuerId); 
+	issuerDidDocument.Metadata.Deactivated {
+		return nil, sdkerrors.Wrap(types.ErrDidDocDeactivated, fmt.Sprintf("%s is deactivated and cannot used be used to register credential status", issuerDidDocument.Did.Id))
 	}
 
 	// Check if the provided isser Id is the one who issued the VC

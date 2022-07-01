@@ -61,7 +61,7 @@ The following command registers the status of a VC with id `vc_example1`:
 hid-noded tx ssi register-credential-status '{"claim":{"id":"vc_example1","currentStatus":"Live","statusReason":"Credential Active"},"issuer":"did:hs:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf","issuanceDate":"2022-04-10T04:07:12Z","expirationDate":"2023-02-22T13:45:55Z","credentialHash":"< -- Hash -->"}' '{"type":"Ed25519VerificationKey2020","created":"2022-04-10T04:07:12Z","updated":"2022-04-10T04:07:12Z","verificationMethod":"did:hs:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf#key-1","proofValue":"<-- Base64 encoded signature -->","proofPurpose":"assertion"}' --from <hid-account>
 ```
 
-### CLI
+### Querying Credential Status
 
 1. Query credential status for given credential id:
 
