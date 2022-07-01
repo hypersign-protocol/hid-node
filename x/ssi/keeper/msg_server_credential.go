@@ -27,9 +27,9 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 	credMsg := msg.GetCredentialStatus()
 	credProof := msg.GetProof()
 
-	// Check if the credential already exist in the store
 	credId := credMsg.GetClaim().GetId()
 
+	// Check if the credential already exist in the store
 	if !k.HasCredential(ctx, credId) {
 		// Check for the correct credential status
 		credStatus := credMsg.GetClaim().GetCurrentStatus()
@@ -60,15 +60,15 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 			return nil, err
 		}
 
-		// Check if the date on which the update occurs lies between issuance and expiration
-		currentDate := ctx.BlockTime()
-		if currentDate.After(expirationDateParsed) || currentDate.Before(issuanceDateParsed) {
-			return nil, sdkerrors.Wrapf(types.ErrInvalidDate, "credential registeration is happening on a date which doesn`t lie between issuance date and expiration date")
-		}
-
 		// Check if updated date iss imilar to created date
 		if err := VerifyCredentialProofDates(credProof, true); err != nil {
 			return nil, err
+		}
+
+		// Check if the created date lies between issuance and expiration
+		currentDate, _ := time.Parse(time.RFC3339, credProof.Created)
+		if currentDate.After(expirationDateParsed) || currentDate.Before(issuanceDateParsed) {
+			return nil, sdkerrors.Wrapf(types.ErrInvalidDate, "credential registeration is happening on a date which doesn`t lie between issuance date and expiration date")
 		}
 
 		// Verify the Signature
@@ -97,7 +97,7 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 
 		id = k.RegisterCred(ctx, cred)
 
-    } else { 
+	} else {
 		cred, err := k.updateCredentialStatus(ctx, credMsg, credProof)
 		if err != nil {
 			return nil, err
@@ -138,7 +138,7 @@ func (k msgServer) updateCredentialStatus(ctx sdk.Context, newCredStatus *types.
 	// Check if the provided isser Id is the one who issued the VC
 	if issuerId != oldCredStatus.GetIssuer() {
 		return nil, sdkerrors.Wrapf(types.ErrInvalidCredentialField,
-			 fmt.Sprintf("Isser ID %s is not issuer of verifiable credential id %s", issuerId, credId))
+			fmt.Sprintf("Isser ID %s is not issuer of verifiable credential id %s", issuerId, credId))
 	}
 
 	// Check if the new expiration date and issuance date are same as old one.
@@ -177,8 +177,13 @@ func (k msgServer) updateCredentialStatus(ctx sdk.Context, newCredStatus *types.
 		return nil, err
 	}
 
-	// Check if the date on which the update occurs lies between issuance and expiration
-	currentDate := ctx.BlockTime()
+	// Check if updated date iss imilar to created date
+	if err := VerifyCredentialProofDates(newCredProof, false); err != nil {
+		return nil, err
+	}
+
+	// Check if the created date lies between issuance and expiration
+	currentDate, _ := time.Parse(time.RFC3339, newCredProof.Created)
 	if currentDate.After(newExpirationDateParsed) || currentDate.Before(newIssuanceDateParsed) {
 		return nil, sdkerrors.Wrapf(types.ErrInvalidDate, "credential update is happening on a date which doesn`t lie between issuance date and expiration date")
 	}
@@ -194,7 +199,6 @@ func (k msgServer) updateCredentialStatus(ctx sdk.Context, newCredStatus *types.
 				fmt.Sprintf("credential is already %s", newClaimStatus))
 		}
 
-		// TODO: Status change to Expired should happend automatically within hid-node
 		if newClaimStatus == "Revoked" || newClaimStatus == "Suspended" || newClaimStatus == "Expired" {
 			if len(newStatusReason) == 0 {
 				return nil, sdkerrors.Wrapf(
@@ -223,18 +227,13 @@ func (k msgServer) updateCredentialStatus(ctx sdk.Context, newCredStatus *types.
 				types.ErrInvalidCredentialStatus,
 				fmt.Sprintf("credential cannot be updated from %s to %s", oldClaimStatus, newClaimStatus))
 		}
-	
+
 	default:
 		return nil, sdkerrors.Wrapf(
 			types.ErrInvalidCredentialField,
 			fmt.Sprintf("invalid Credential Status present in existing credential %s", oldClaimStatus))
 	}
 
-	// Check if updated date iss imilar to created date
-	if err := VerifyCredentialProofDates(newCredProof, false); err != nil {
-		return nil, err
-	}
-	
 	// Verify the Signature
 	didDocument, err := k.GetDid(&ctx, issuerId)
 	if err != nil {
