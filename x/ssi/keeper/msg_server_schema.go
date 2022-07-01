@@ -22,6 +22,11 @@ func (k msgServer) CreateSchema(goCtx context.Context, msg *types.MsgCreateSchem
 		return nil, sdkerrors.Wrap(err, fmt.Sprintf("The DID %s is not available", schemaMsg.GetAuthor()))
 	}
 
+	// Check if author's DID is deactivated
+	if authorDidDocument.Metadata.Deactivated {
+		return nil, sdkerrors.Wrap(types.ErrDidDocDeactivated, fmt.Sprintf("%s is deactivated and cannot used be used to create schema", authorDidDocument.Did.Id))
+	}
+
 	// Check if Schema ID is valid
 	authorDid := authorDidDocument.GetDid().GetId()
 	if err := verify.IsValidSchemaID(schemaID, authorDid); err != nil {
