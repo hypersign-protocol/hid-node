@@ -7,29 +7,55 @@ import (
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 	utils "github.com/hypersign-protocol/hid-node/x/ssi/utils"
 	"github.com/multiformats/go-multibase"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 
 // Checks whether the ID in the DidDoc is a valid string
-func IsValidDidDocID(Id string) string {
+func IsValidDidDocID(Id string, method string, namespace string) error {
 	didElements := strings.Split(Id, ":")
 
-	if len(didElements) != didIdElements {
-		return types.ErrInvalidDidElements.Error()
+	didStringIndex := 0
+	didMethodIndex := 1
+	didNamespaceIndex := 2
+	didMethodSpecificId := 3 
+
+	// `did` string check
+	if didElements[didStringIndex] != "did" {
+		return sdkerrors.Wrap(types.ErrInvalidDidDoc, "first element of Id should be `did`")
+	}
+
+	// did method check
+	didMethod := didElements[didMethodIndex]
+	if method != didMethod {
+		return sdkerrors.Wrap(types.ErrInvalidDidMethod, fmt.Sprintf("expected did method %s, got %s", method, didMethod))
+	}
+
+	// Mainnet namespace check
+	if namespace == "mainnet" {
+		if len(didElements) != 3 {
+			return sdkerrors.Wrap(types.ErrInvalidDidNamespace, fmt.Sprintf("expected number of did id elements for mainnet to be 3"))
+		}
+		didMethodSpecificId = 2
+	} else {
+		didNamespace := didElements[didNamespaceIndex]
+		if namespace != didNamespace {
+			return sdkerrors.Wrap(types.ErrInvalidDidNamespace, fmt.Sprintf("expected did namespace %s, got %s", namespace, didNamespace))
+		}
 	}
 
 	// Check if method-specific-id follows multibase format
-	_, _, err := multibase.Decode(didElements[3])
-	if err != nil || len(didElements[3]) != 45 {
-		return types.ErrInvalidMethodSpecificId.Error()
+	_, _, err := multibase.Decode(didElements[didMethodSpecificId])
+	if err != nil || len(didElements[didMethodSpecificId]) != 45 {
+		return types.ErrInvalidMethodSpecificId
 	}
-	return ""
+	return nil
 }
 
 // Cheks whether the Service is valid
-func ValidateServices(services []*types.Service) error {
+func ValidateServices(services []*types.Service, method string, namespace string) error {
 	for idx, service := range services {
-		if !IsValidDidFragment(service.Id) {
+		if !IsValidDidFragment(service.Id, method, namespace) {
 			return types.ErrInvalidService.Wrapf("Service ID %s is Invalid", service.Id)
 		}
 
@@ -45,14 +71,14 @@ func ValidateServices(services []*types.Service) error {
 }
 
 // Check for valid DID fragment
-func IsValidDidFragment(didUrl string) bool {
+func IsValidDidFragment(didUrl string, method string, namespace string) bool {
 	if !strings.Contains(didUrl, "#") {
 		return false
 	}
 
 	did, _ := utils.SplitDidUrlIntoDid(didUrl)
-	err := IsValidDidDocID(did)
-	if err != "" {
+	err := IsValidDidDocID(did, method, namespace)
+	if err != nil {
 		return false
 	}
 	return true
@@ -79,18 +105,9 @@ func DuplicateServiceExists(serviceId string, services []*types.Service) bool {
 	return false
 }
 
-// Check whether the fields whose values are array of DIDs are valid DID
-func IsValidDIDArray(didArray []string) bool {
-	for _, did := range didArray {
-		if err := IsValidDidDocID(did); err != "" {
-			return false
-		}
-	}
-	return true
-}
 
 // Checks whether the DidDoc string is valid
-func IsValidDidDoc(didDoc *types.Did) string {
+func IsValidDidDoc(didDoc *types.Did, genesisMethod string, genesisNamespace string) error {
 	didArrayMap := map[string][]string{
 		"authentication":       didDoc.GetAuthentication(),
 		"assertionMethod":      didDoc.GetAssertionMethod(),
@@ -103,16 +120,17 @@ func IsValidDidDoc(didDoc *types.Did) string {
 		"id": didDoc.GetId(),
 	}
 
-	// Invalid ID check
-	if IsValidDidDocID(didDoc.GetId()) != "" {
-		return fmt.Sprintf("The DidDoc ID %s is invalid", didDoc.GetId())
+	// Did Id Format Check
+	err := IsValidDidDocID(didDoc.GetId(), genesisMethod, genesisNamespace)
+	if err != nil {
+		return err
 	}
 
 	// Did Array Check
 	for field, didArray := range didArrayMap {
 		for _, elem := range didArray{
-			if !IsValidDidFragment(elem) {
-				return fmt.Sprintf("The field %s is an invalid DID Array", field)
+			if !IsValidDidFragment(elem, genesisMethod, genesisNamespace) {
+				return sdkerrors.Wrap(types.ErrInvalidDidDoc, fmt.Sprintf("The field %s is an invalid DID Array", field))
 			}
 		}
 	}
@@ -120,16 +138,15 @@ func IsValidDidDoc(didDoc *types.Did) string {
 	// Empty Field check
 	for field, value := range nonEmptyFields {
 		if value == "" {
-			return fmt.Sprintf("The field %s must have a value", field)
+			return sdkerrors.Wrap(types.ErrInvalidDidDoc, fmt.Sprintf("The field %s must have a value", field))
 		}
 	}
 
 	// Valid Services Check
-	err := ValidateServices(didDoc.GetService())
+	err = ValidateServices(didDoc.GetService(), genesisMethod, genesisNamespace)
 	if err != nil {
-		return fmt.Sprint(err)
+		return err
 	}
 
-	return ""
-
+	return nil
 }
