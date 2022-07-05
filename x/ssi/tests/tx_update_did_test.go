@@ -16,6 +16,9 @@ func TestUpdateDID(t *testing.T) {
 	msgServ := keeper.NewMsgServerImpl(*k)
 	goCtx := sdk.WrapSDKContext(ctx)
 
+	k.SetDidMethod(&ctx, "hs")
+	k.SetDidNamespace(&ctx, "devnet")
+
 	keyPair1 := GeneratePublicPrivateKeyPair()
 	rpcElements := GenerateDidDocumentRPCElements(keyPair1)
 	t.Logf("Registering DID with DID Id: %s", rpcElements.DidDocument.GetId())
@@ -79,6 +82,9 @@ func TestInvalidChangeByNonControllerDid(t *testing.T) {
 	msgServ := keeper.NewMsgServerImpl(*k)
 	goCtx := sdk.WrapSDKContext(ctx)
 
+	k.SetDidMethod(&ctx, "hs")
+	k.SetDidNamespace(&ctx, "devnet")
+
 	// Create Two DID: Alice and Charlie
 	aliceKeyPair := GeneratePublicPrivateKeyPair()
 	aliceDidId, err := CreateDidTx(msgServ, goCtx, aliceKeyPair)
@@ -124,6 +130,9 @@ func TestValidChangeByControllerDid(t *testing.T) {
 	msgServ := keeper.NewMsgServerImpl(*k)
 	goCtx := sdk.WrapSDKContext(ctx)
 
+	k.SetDidMethod(&ctx, "hs")
+	k.SetDidNamespace(&ctx, "devnet")
+	
 	// Create Two DID: Alice and Charlie
 	aliceKeyPair := GeneratePublicPrivateKeyPair()
 	aliceDidId, err := CreateDidTx(msgServ, goCtx, aliceKeyPair)

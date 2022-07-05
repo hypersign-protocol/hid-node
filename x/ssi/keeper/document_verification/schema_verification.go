@@ -9,13 +9,8 @@ import (
 
 func IsValidSchemaID(schemaId string, authorDid string) error {
 	IdComponents := strings.Split(schemaId, ";")
-	if len(IdComponents) < 2 {
+	if len(IdComponents) < 3 {
 		return errors.New("Expected 3 components in schema ID after being seperated by `;`, got " + fmt.Sprint(len(IdComponents)) + " components. The Schema ID is `" + schemaId + "` ")
-	}
-
-	//Checking the prefix
-	if !strings.HasPrefix(IdComponents[0], didMethod) {
-		return errors.New("Expected did:hs as prefix in schema ID, The Schema ID is " + schemaId)
 	}
 
 	// Check if the first component matches with author Did

@@ -15,6 +15,9 @@ func TestRegisterCredentialStatus(t *testing.T) {
 	msgServer := keeper.NewMsgServerImpl(*k)
 	goCtx := sdk.WrapSDKContext(ctx)
 
+	k.SetDidMethod(&ctx, "hs")
+	k.SetDidNamespace(&ctx, "devnet")
+
 	keyPair1 := GeneratePublicPrivateKeyPair()
 	didRpcElements := GenerateDidDocumentRPCElements(keyPair1)
 	t.Logf("Registering DID with DID Id: %s", didRpcElements.DidDocument.GetId())
@@ -66,6 +69,9 @@ func TestUpdateCredentialStatus(t *testing.T) {
 	msgServer := keeper.NewMsgServerImpl(*k)
 	goCtx := sdk.WrapSDKContext(ctx)
 
+	k.SetDidMethod(&ctx, "hs")
+	k.SetDidNamespace(&ctx, "devnet")
+	
 	keyPair1 := GeneratePublicPrivateKeyPair()
 	didRpcElements := GenerateDidDocumentRPCElements(keyPair1)
 	t.Logf("Registering DID with DID Id: %s", didRpcElements.DidDocument.GetId())

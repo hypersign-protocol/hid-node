@@ -6,8 +6,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 	verify "github.com/hypersign-protocol/hid-node/x/ssi/keeper/document_verification"
+	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 )
 
 func (k msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*types.MsgCreateDIDResponse, error) {
@@ -15,25 +15,24 @@ func (k msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*t
 
 	didMsg := msg.GetDidDocString()
 	did := didMsg.GetId()
-	// Checks if the DID has a valid format
-	if err := verify.IsValidDidDocID(did); err != "" {
-		return nil, fmt.Errorf(err)
-	}
+
+	didMethodStore := k.GetDidMethod(&ctx)
+	didNamespaceStore := k.GetDidNamespace(&ctx)
 
 	// Checks if the DidDoc is a valid format
-	didDocCheck := verify.IsValidDidDoc(msg.DidDocString)
-	if didDocCheck != "" {
-		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, didDocCheck)
-	}
-
-	// Signature check
-	if err := k.VerifySignature(&ctx, didMsg, didMsg.GetSigners(), msg.GetSignatures()); err != nil {
+	err := verify.IsValidDidDoc(msg.DidDocString, didMethodStore, didNamespaceStore)
+	if err != nil {
 		return nil, err
 	}
 
 	// Checks if the DID is already present in the store
 	if k.HasDid(ctx, did) {
 		return nil, sdkerrors.Wrap(types.ErrDidDocExists, fmt.Sprintf("DID already exists %s", did))
+	}
+
+	// Signature check
+	if err := k.VerifySignature(&ctx, didMsg, didMsg.GetSigners(), msg.GetSignatures()); err != nil {
+		return nil, err
 	}
 
 	if k.ValidateDidControllers(&ctx, did, didMsg.GetController(), didMsg.GetVerificationMethod()) != nil {
@@ -62,7 +61,7 @@ func (k msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*t
 		Did:      &didSpec,
 		Metadata: &metadata,
 	}
-	// Add a DID to the store and get back the ID
+	// Add a DID to the store 
 	id := k.AppendDID(ctx, &didDoc)
 	// Return the Id of the DID
 	return &types.MsgCreateDIDResponse{Id: id}, nil
@@ -75,6 +74,9 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 	did := msg.GetDidDocString().GetId()
 	versionId := msg.GetVersionId()
 
+	didMethodStore := k.GetDidMethod(&ctx)
+	didNamespaceStore := k.GetDidNamespace(&ctx)
+
 	oldDIDDoc, err := k.GetDid(&ctx, didMsg.Id)
 	if err != nil {
 		return nil, err
@@ -82,20 +84,20 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 	oldDid := oldDIDDoc.GetDid()
 	oldMetaData := oldDIDDoc.GetMetadata()
 
-	// Check if the DID is already deactivated
-	if err := VerifyDidDeactivate(oldMetaData, didMsg.Id); err != nil {
+	// Check if the didDoc is valid
+	err = verify.IsValidDidDoc(didMsg, didMethodStore, didNamespaceStore)
+	if err != nil {
 		return nil, err
 	}
-
-	// Check if the didDoc is valid
-	didDocCheck := verify.IsValidDidDoc(didMsg)
-	if didDocCheck != "" {
-		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, didDocCheck)
-	}
-
+	
 	// Checks if the DID is not present in the store
 	if !k.HasDid(ctx, did) {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("DID doesnt exists %s", did))
+	}
+
+	// Check if the DID is already deactivated
+	if err := VerifyDidDeactivate(oldMetaData, didMsg.Id); err != nil {
+		return nil, err
 	}
 
 	if k.ValidateDidControllers(&ctx, did, didMsg.GetController(), didMsg.GetVerificationMethod()) != nil {
@@ -149,11 +151,6 @@ func (k msgServer) DeactivateDID(goCtx context.Context, msg *types.MsgDeactivate
 	id := msg.GetDidId()
 	versionId := msg.GetVersionId()
 
-	// Checks if the DID is not present in the store
-	if !k.HasDid(ctx, id) {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("DID doesnt exists %s", id))
-	}
-
 	didDocument, err := k.GetDid(&ctx, id)
 	if err != nil {
 		return nil, err
@@ -161,10 +158,13 @@ func (k msgServer) DeactivateDID(goCtx context.Context, msg *types.MsgDeactivate
 	did := didDocument.GetDid()
 	metadata := didDocument.GetMetadata()
 
+	didMethodStore := k.GetDidMethod(&ctx)
+	didNamespaceStore := k.GetDidNamespace(&ctx)
+	
 	// Check if the didDoc is valid
-	didDocCheck := verify.IsValidDidDoc(did)
-	if didDocCheck != "" {
-		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, didDocCheck)
+	err = verify.IsValidDidDoc(did, didMethodStore, didNamespaceStore)
+	if err != nil {
+		return nil, err
 	}
 
 	if k.ValidateDidControllers(&ctx, id, did.GetController(), did.GetVerificationMethod()) != nil {

@@ -95,8 +95,9 @@ func GetModifiedDidDocumentSignature(modifiedDidDocument *types.Did, keyPair ed2
 }
 
 func GenerateDidDocumentRPCElements(keyPair ed25519KeyPair) DidRpcElements {
-	var didMethod string = "did:hs"
-	var didId = didMethod + ":" + keyPair.publicKey
+	var didMethod string = "hs"
+	var didNamespace string = "devnet"
+	var didId = "did:" + didMethod + ":" + didNamespace + ":" + keyPair.publicKey
 
 	var verificationMethodId string = didId + "#" + "key-1"
 

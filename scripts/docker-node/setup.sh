@@ -25,6 +25,10 @@ cat /root/.hid-node/config/genesis.json | jq '.app_state["gov"]["deposit_params"
 # update mint genesis
 cat /root/.hid-node/config/genesis.json | jq '.app_state["mint"]["params"]["mint_denom"]="uhid"' > /root/.hid-node/config/tmp_genesis.json && mv /root/.hid-node/config/tmp_genesis.json /root/.hid-node/config/genesis.json
 
+# update ssi genesis
+cat /root/.hid-node/config/genesis.json | jq '.app_state["ssi"]["did_method"]="hs"' > /root/.hid-node/config/tmp_genesis.json && mv /root/.hid-node/config/tmp_genesis.json /root/.hid-node/config/genesis.json
+cat /root/.hid-node/config/genesis.json | jq '.app_state["ssi"]["did_namespace"]="devnet"' > /root/.hid-node/config/tmp_genesis.json && mv /root/.hid-node/config/tmp_genesis.json /root/.hid-node/config/genesis.json
+
 # change app.toml values
 sed -i -E '104s/enable = false/enable = true/' /root/.hid-node/config/app.toml
 sed -i -E '107s/swagger = false/swagger = true/' /root/.hid-node/config/app.toml
