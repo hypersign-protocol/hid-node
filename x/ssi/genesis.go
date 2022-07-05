@@ -6,19 +6,24 @@ import (
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 )
 
-// InitGenesis initializes the capability module's state from a provided genesis
+// InitGenesis initializes the ssi module's state from a provided genesis
 // state.
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) {
-	// this line is used by starport scaffolding # genesis/module/init
-	k.SetParams(ctx, genState.Params)
+	k.SetDidMethod(&ctx, genState.DidMethod)
+	
+	if genState.DidNamespace != "" {
+		k.SetDidNamespace(&ctx, genState.DidNamespace)
+	} else {
+		k.SetDidNamespace(&ctx, "mainnet")
+	}
 }
 
-// ExportGenesis returns the capability module's exported genesis.
+// ExportGenesis returns the ssi module's exported genesis.
 func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	genesis := types.DefaultGenesis()
-	genesis.Params = k.GetParams(ctx)
 
-	// this line is used by starport scaffolding # genesis/module/export
+	genesis.DidMethod = k.GetDidMethod(&ctx)
+	genesis.DidNamespace = k.GetDidNamespace(&ctx)
 
 	return genesis
 }

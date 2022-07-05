@@ -19,12 +19,36 @@ func TestGenesisState_Validate(t *testing.T) {
 			valid:    true,
 		},
 		{
-			desc:     "valid genesis state",
+			desc:     "valid did namespace",
 			genState: &types.GenesisState{
-
-				// this line is used by starport scaffolding # types/genesis/validField
+				DidMethod: types.DefaultGenesis().DidMethod,
+				DidNamespace: "devnet",
 			},
 			valid: true,
+		},
+		{
+			desc:     "invalid did namespace of length more than 10",
+			genState: &types.GenesisState{
+				DidMethod: types.DefaultGenesis().DidMethod,
+				DidNamespace: "abracadabra123",
+			},
+			valid: false,
+		},
+		{
+			desc:     "invalid did namespace containing whitespaces",
+			genState: &types.GenesisState{
+				DidMethod: types.DefaultGenesis().DidMethod,
+				DidNamespace: "abracadabra	123",
+			},
+			valid: false,
+		},
+		{
+			desc:     "invalid did namespace containing underscore",
+			genState: &types.GenesisState{
+				DidMethod: types.DefaultGenesis().DidMethod,
+				DidNamespace: "xyz_123",
+			},
+			valid: false,
 		},
 		// this line is used by starport scaffolding # types/genesis/testcase
 	} {

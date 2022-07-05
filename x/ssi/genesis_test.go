@@ -4,26 +4,22 @@ import (
 	"testing"
 
 	keepertest "github.com/hypersign-protocol/hid-node/testutil/keeper"
-	"github.com/hypersign-protocol/hid-node/testutil/nullify"
 	"github.com/hypersign-protocol/hid-node/x/ssi"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 	"github.com/stretchr/testify/require"
 )
 
 func TestGenesis(t *testing.T) {
-	genesisState := types.GenesisState{
-		Params: types.DefaultParams(),
-
-		// this line is used by starport scaffolding # genesis/test/state
-	}
+	genesisState := types.DefaultGenesis()
 
 	k, ctx := keepertest.SsiKeeper(t)
-	ssi.InitGenesis(ctx, *k, genesisState)
-	got := ssi.ExportGenesis(ctx, *k)
-	require.NotNil(t, got)
+	ssi.InitGenesis(ctx, *k, *genesisState)
+	exportedGenesisState := ssi.ExportGenesis(ctx, *k)
 
-	nullify.Fill(&genesisState)
-	nullify.Fill(got)
+	ExpectedDidMethod := "hs"
+	ExpectedDidNamespace := ""
 
-	// this line is used by starport scaffolding # genesis/test/assert
+	require.NotNil(t, exportedGenesisState)
+	require.Equal(t, ExpectedDidMethod, genesisState.DidMethod)
+	require.Equal(t, ExpectedDidNamespace, genesisState.DidNamespace)
 }

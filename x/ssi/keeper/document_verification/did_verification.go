@@ -17,12 +17,10 @@ func IsValidDidDocID(Id string) string {
 	if len(didElements) != didIdElements {
 		return types.ErrInvalidDidElements.Error()
 	}
-	if (didElements[0] + ":" + didElements[1]) != didMethod {
-		return types.ErrInvalidDidMethod.Error()
-	}
 
-	_, _, err := multibase.Decode(didElements[2])
-	if err != nil || len(didElements[2]) != 45 {
+	// Check if method-specific-id follows multibase format
+	_, _, err := multibase.Decode(didElements[3])
+	if err != nil || len(didElements[3]) != 45 {
 		return types.ErrInvalidMethodSpecificId.Error()
 	}
 	return ""

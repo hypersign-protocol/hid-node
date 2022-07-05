@@ -1,24 +1,33 @@
 package types
 
 import (
-// this line is used by starport scaffolding # genesis/types/import
+	fmt "fmt"
+	"regexp"
 )
 
-// DefaultIndex is the default capability global index
-const DefaultIndex uint64 = 1
-
-// DefaultGenesis returns the default Capability genesis state
+// DefaultGenesis returns the default ssi genesis state
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
-		// this line is used by starport scaffolding # genesis/types/default
-		Params: DefaultParams(),
+		// TODO: Once did method spec has been confirmed, did_method should be removed
+		DidMethod: "hs",
 	}
 }
 
 // Validate performs basic genesis state validation returning an error upon any
 // failure.
 func (gs GenesisState) Validate() error {
-	// this line is used by starport scaffolding # genesis/types/validate
+	namespace := gs.DidNamespace
 
-	return gs.Params.Validate()
+	regexPattern, _ := regexp.Compile("^[a-zA-Z0-9-]*$") // Matches string containing whitespaces and tabs
+	maxDidNamespaceLength := 10
+
+	if len(namespace) > maxDidNamespaceLength  {
+		return fmt.Errorf("Did Namespace shouldn't shouldn't be more than 10, namespace recieved %s", namespace)
+	}
+
+	if !regexPattern.MatchString(namespace) && len(namespace) != 0 {
+		return fmt.Errorf("Did Namespace should be in alphanumeric format, namespace recieved %s", namespace)
+	}
+
+	return nil
 }

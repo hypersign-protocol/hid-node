@@ -3,11 +3,12 @@ package keeper
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 	verify "github.com/hypersign-protocol/hid-node/x/ssi/keeper/document_verification"
+	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 )
 
 func (k msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*types.MsgCreateDIDResponse, error) {
@@ -15,6 +16,7 @@ func (k msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*t
 
 	didMsg := msg.GetDidDocString()
 	did := didMsg.GetId()
+
 	// Checks if the DID has a valid format
 	if err := verify.IsValidDidDocID(did); err != "" {
 		return nil, fmt.Errorf(err)
@@ -24,6 +26,20 @@ func (k msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*t
 	didDocCheck := verify.IsValidDidDoc(msg.DidDocString)
 	if didDocCheck != "" {
 		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, didDocCheck)
+	}
+
+	// //Check for valid did method
+	didMethodStore := k.GetDidMethod(&ctx)
+	didMethod := strings.Split(did, ":")[1]
+	if didMethodStore != didMethod {
+		return nil, sdkerrors.Wrap(types.ErrInvalidDidMethod, fmt.Sprintf("expected %s, got %s", didMethodStore, didMethod))
+	}
+
+	// Check for valid did namespace
+	didNamespaceStore := k.GetDidNamespace(&ctx)
+	didNamespace := strings.Split(did, ":")[2]
+	if didNamespaceStore != didNamespace {
+		return nil, sdkerrors.Wrap(types.ErrInvalidDidNamespace, fmt.Sprintf("expected %s, got %s", didNamespaceStore, didNamespace))
 	}
 
 	// Signature check

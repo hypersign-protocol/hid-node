@@ -10,6 +10,38 @@ import (
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 )
 
+
+// Set the DID namespace
+func (k Keeper) SetDidNamespace(ctx *sdk.Context, namespace string) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.DidNamespaceKey))
+	// Convert the DidCountKey to bytes
+	byteKey := []byte(types.DidNamespaceKey)
+	store.Set(byteKey, []byte(namespace))
+}
+
+// Get the DID namespace
+func (k Keeper) GetDidNamespace(ctx *sdk.Context) string {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.DidNamespaceKey))
+	byteKey := []byte(types.DidNamespaceKey)
+	bz := store.Get(byteKey)
+	return string(bz)
+}
+
+// Set the DID method
+func (k Keeper) SetDidMethod(ctx *sdk.Context, method string) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.DidMethodKey))
+	byteKey := []byte(types.DidMethodKey)
+	store.Set(byteKey, []byte(method))
+}
+
+// Get the DID method
+func (k Keeper) GetDidMethod(ctx *sdk.Context) string {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.DidMethodKey))
+	byteKey := []byte(types.DidMethodKey)
+	bz := store.Get(byteKey)
+	return string(bz)
+}
+
 func (k Keeper) GetDidCount(ctx sdk.Context) uint64 {
 	// Get the store using storeKey and DidCountKey (which is "Did-count-")
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.DidCountKey))
