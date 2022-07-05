@@ -16,6 +16,9 @@ func TestQueryCredential(t *testing.T) {
 	msgServer := keeper.NewMsgServerImpl(*k)
 	goCtx := sdk.WrapSDKContext(ctx)
 
+	k.SetDidMethod(&ctx, "hs")
+	k.SetDidNamespace(&ctx, "devnet")
+
 	keyPair1 := GeneratePublicPrivateKeyPair()
 	didRpcElements := GenerateDidDocumentRPCElements(keyPair1)
 	didId := didRpcElements.DidDocument.GetId()
@@ -88,6 +91,9 @@ func TestQueryCredentials(t *testing.T) {
 	msgServer := keeper.NewMsgServerImpl(*k)
 	goCtx := sdk.WrapSDKContext(ctx)
 
+	k.SetDidMethod(&ctx, "hs")
+	k.SetDidNamespace(&ctx, "devnet")
+	
 	keyPair1 := GeneratePublicPrivateKeyPair()
 	didRpcElements := GenerateDidDocumentRPCElements(keyPair1)
 	didId := didRpcElements.DidDocument.GetId()

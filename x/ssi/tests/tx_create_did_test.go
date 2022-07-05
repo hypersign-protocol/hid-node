@@ -16,6 +16,9 @@ func TestCreateDID(t *testing.T) {
 	msgServer := keeper.NewMsgServerImpl(*k)
 	goCtx := sdk.WrapSDKContext(ctx)
 
+	k.SetDidMethod(&ctx, "hs")
+	k.SetDidNamespace(&ctx, "devnet")
+
 	keyPair1 := GeneratePublicPrivateKeyPair()
 	rpcElements := GenerateDidDocumentRPCElements(keyPair1)
 	t.Logf("Registering DID with DID Id: %s", rpcElements.DidDocument.GetId())
