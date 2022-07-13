@@ -13,13 +13,9 @@ import (
 	"github.com/hypersign-protocol/hid-node/x/ssi/utils"
 )
 
-// Ref 1: The current implementatition takes in the verification key and checks if that belongs to EITHER
-// of the DID controllers. If so, then the signature is valid, which is an approach as opposed to the earlier
-// implementation where all the signatures of all DIDs present in DID controller were expected. This needs to be verified.
-// Link to DID Controller Spec: https://www.w3.org/TR/did-core/#did-controller
 func VerifyIdentitySignature(signer types.Signer, signatures []*types.SignInfo, signingInput []byte) (bool, error) {
 	result := false
-	// foundOne := false
+	matchFound := false
 
 	for _, info := range signatures {
 		did, _ := utils.SplitDidUrlIntoDid(info.VerificationMethodId)
@@ -35,13 +31,13 @@ func VerifyIdentitySignature(signer types.Signer, signatures []*types.SignInfo, 
 			}
 
 			result = ed25519.Verify(pubKey, signingInput, signature)
-			// foundOne = true
+			matchFound = true
 		}
 	}
 
-	// if !foundOne {
-	// 	return false, fmt.Errorf("signature %s not found", signer.Signer)
-	// }
+	if !matchFound {
+		return false, fmt.Errorf("signature for %s not found", signer.Signer)
+	}
 
 	return result, nil
 }
@@ -104,13 +100,7 @@ func AppendSignerIfNeed(signers []types.Signer, controller string, msg *types.Di
 	return append(signers, signer)
 }
 
-// Ref 1: The current implementatition takes in the verification key and checks if that belongs to EITHER
-// of the DID controllers. If so, then the signature is valid, which is an approach as opposed to the earlier
-// implementation where all the signatures of all DIDs present in DID controller were expected. This needs to be verified.
-// Link to DID Controller Spec: https://www.w3.org/TR/did-core/#did-controller
 func (k *Keeper) VerifySignature(ctx *sdk.Context, msg *types.Did, signers []types.Signer, signatures []*types.SignInfo) error {
-	var validArr []types.ValidDid
-
 	if len(signers) == 0 {
 		return types.ErrInvalidSignature.Wrap("At least one signer should be present")
 	}
@@ -137,26 +127,12 @@ func (k *Keeper) VerifySignature(ctx *sdk.Context, msg *types.Did, signers []typ
 			return sdkerrors.Wrap(types.ErrInvalidSignature, err.Error())
 		}
 
-		validArr = append(validArr, types.ValidDid{Did: signer.Signer, IsValid: valid})
-	}
-
-	didFoundTrue := contains(validArr)
-
-	if didFoundTrue == (types.ValidDid{}) {
-		return sdkerrors.Wrap(types.ErrInvalidSignature, didFoundTrue.Did)
+		if !valid {
+			return types.ErrInvalidSignature
+		}
 	}
 
 	return nil
-}
-
-// TODO: Look for a better way to do this
-func contains(s []types.ValidDid) types.ValidDid {
-	for _, v := range s {
-		if v.IsValid {
-			return v
-		}
-	}
-	return types.ValidDid{}
 }
 
 func (k *Keeper) VerifySignatureOnCreateSchema(ctx *sdk.Context, msg *types.Schema, signers []types.Signer, signatures []*types.SignInfo) error {
@@ -171,30 +147,13 @@ func (k *Keeper) VerifySignatureOnCreateSchema(ctx *sdk.Context, msg *types.Sche
 	signingInput := msg.GetSignBytes()
 
 	for _, signer := range signers {
-		// TODO: Uncomment when Schema is being implemented properly
-		// if signer.PublicKeyStruct == nil {
-		// 	state, err := k.GetDid(ctx, signer.Signer)
-		// 	if err != nil {
-		// 		return types.ErrDidDocNotFound.Wrap(signer.Signer)
-		// 	}
-
-		// 	didDoc, err := state.UnpackDataAsDid()
-		// 	if err != nil {
-		// 		return types.ErrDidDocNotFound.Wrap(signer.Signer)
-		// 	}
-
-		// 	signer.Authentication = didDoc.Authentication
-		// 	signer.PublicKeyStruct = didDoc.PublicKeyStruct
-		// }
-
 		valid, err := VerifyIdentitySignature(signer, signatures, signingInput)
 		if err != nil {
 			return sdkerrors.Wrap(types.ErrInvalidSignature, err.Error())
 		}
 
 		if !valid {
-			// return sdkerrors.Wrap(types.ErrInvalidSignature, signer.Signer)
-			return sdkerrors.Wrap(types.ErrInvalidSignature, string(signingInput))
+			return sdkerrors.Wrap(types.ErrInvalidSignature, signer.Signer)
 		}
 	}
 
@@ -265,8 +224,7 @@ func (k msgServer) VerifyCredentialSignature(msg *types.CredentialStatus, didDoc
 	}
 
 	if !valid {
-		// return sdkerrors.Wrap(types.ErrInvalidSignature, signer.Signer)
-		return sdkerrors.Wrap(types.ErrInvalidSignature, string(signer.Signer))
+		return sdkerrors.Wrap(types.ErrInvalidSignature, signer.Signer)
 	}
 	return nil
 }

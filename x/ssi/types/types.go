@@ -11,9 +11,4 @@ type (
 		Authentication     []string
 		VerificationMethod []*VerificationMethod
 	}
-
-	ValidDid struct {
-		Did     string
-		IsValid bool
-	}
 )
