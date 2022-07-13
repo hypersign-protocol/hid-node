@@ -198,3 +198,115 @@ func TestValidChangeByControllerDid(t *testing.T) {
 	t.Log("Test Completed")
 
 }
+
+// In this test, we are looking to test the scenario where multiple signatures are passed 
+func TestMultiSigControllers(t *testing.T) {
+	t.Log("Multiple signatures test")
+	k, ctx := testkeeper.SsiKeeper(t)
+	msgServ := keeper.NewMsgServerImpl(*k)
+	goCtx := sdk.WrapSDKContext(ctx)
+
+	k.SetDidMethod(&ctx, "hs")
+	k.SetDidNamespace(&ctx, "devnet")
+	
+	// Create Two DID: Alice and Charlie
+	aliceKeyPair := GeneratePublicPrivateKeyPair()
+	aliceDidId, err := CreateDidTx(msgServ, goCtx, aliceKeyPair)
+	if err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
+	aliceDidDocument := QueryDid(k, ctx, aliceDidId)
+
+	charlieKeyPair := GeneratePublicPrivateKeyPair()
+	charlieDidId, err := CreateDidTx(msgServ, goCtx, charlieKeyPair)
+	if err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
+	charlieDidDocument := QueryDid(k, ctx, charlieDidId)
+
+	fileKeyPair := GeneratePublicPrivateKeyPair()
+	fileDidId, err := CreateDidTx(msgServ, goCtx, fileKeyPair)
+	if err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
+	fileDidDocument := QueryDid(k, ctx, fileDidId)
+
+	// File adds Alice and Charlie's Did to its controller group and removes itself
+	fileDidDocument.Did.Controller = []string{aliceDidId, charlieDidId}
+	versionId := fileDidDocument.Metadata.VersionId
+	updatedRpcElements := GetModifiedDidDocumentSignature(
+		fileDidDocument.Did, 
+		fileKeyPair,
+		fileDidDocument.Did.VerificationMethod[0].Id,
+	)
+
+	t.Log("File adds Alice and Charlie's Did to its controller group and removes itself")
+	errDidUpdate := UpdateDidTx(msgServ, goCtx, updatedRpcElements, versionId)
+	if errDidUpdate != nil {
+		t.Error("Unable to add Charlie and Alice's DID to File's Controller Group")
+		t.Error(errDidUpdate)
+		t.FailNow()
+	}
+	t.Log("Charlie and Alice are now part of File's Controller group")	
+
+
+	// File is trying to make changes in it's DID Document
+	// Since, File's Did Id is not part of its controller group, it is expected to fail
+	fileDidDocument.Did.Context = append(fileDidDocument.Did.Context, "something.com")
+	versionId = fileDidDocument.Metadata.VersionId
+	updatedRpcElements = GetModifiedDidDocumentSignature(
+		fileDidDocument.Did, 
+		fileKeyPair,
+		fileDidDocument.Did.VerificationMethod[0].Id,
+	)
+
+	t.Log("File attempting to make changes to it's DID Document")
+	errDidUpdate = UpdateDidTx(msgServ, goCtx, updatedRpcElements, versionId)
+	if errDidUpdate == nil {
+		t.Error("It was expected to fail")
+		t.FailNow()
+	}
+	t.Log("As expected, File's Did Id was unable to make any changes")
+	
+	// Charlie and File both attempt to sign the change to be made in File's Did Document
+	// It is also expected to fail, since File isn't part of the Did Controller Group
+	fileDidDocument.Did.Context = append(fileDidDocument.Did.Context, "something.com")
+	versionId = fileDidDocument.Metadata.VersionId
+	updatedRpcElements = getMultiSigDidSigningInfo(
+		fileDidDocument.Did,
+		[]ed25519KeyPair{charlieKeyPair, fileKeyPair},
+		[]string{charlieDidDocument.Did.VerificationMethod[0].Id, fileDidDocument.Did.VerificationMethod[0].Id},
+	)
+
+	t.Log("Charlie and File both attempt to sign the change to be made in File's Did Document")
+	errDidUpdate = UpdateDidTx(msgServ, goCtx, updatedRpcElements, versionId)
+	if errDidUpdate == nil {
+		t.Error("It was expected to fail")
+		t.FailNow()
+	}
+	t.Log("As expected, Both Charlie's and File's Did Id were unable to make any changes")
+
+	// Charlie and Alice both attempt to sign the change to be made in File's Did Document
+	// Since both are part of File's Controller group, it is expected to pass
+	fileDidDocument.Did.Context = append(fileDidDocument.Did.Context, "something.com")
+	versionId = fileDidDocument.Metadata.VersionId
+	updatedRpcElements = getMultiSigDidSigningInfo(
+		fileDidDocument.Did, 
+		[]ed25519KeyPair{charlieKeyPair, aliceKeyPair},
+		[]string{charlieDidDocument.Did.VerificationMethod[0].Id, aliceDidDocument.Did.VerificationMethod[0].Id},
+	)
+
+	t.Log("Charlie and Alice attempt to sign the change to be made in File's Did Document")
+	errDidUpdate = UpdateDidTx(msgServ, goCtx, updatedRpcElements, versionId)
+	if errDidUpdate != nil {
+		t.Error("Charlie and Alice are unable to make changes to File's DID Document")
+		t.Error(errDidUpdate)
+		t.FailNow()
+	}
+	t.Log("Charlie and Alice were able to make changes to File's DID Document")
+
+	t.Log("Test Completed")
+}
