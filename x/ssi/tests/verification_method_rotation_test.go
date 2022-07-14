@@ -5,7 +5,6 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/hypersign-protocol/hid-node/x/ssi/keeper"
-	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -35,43 +34,23 @@ func TestVerificationMethodRotation(t *testing.T) {
 	resolvedDidDocument := QueryDid(k, ctx, didId1)
 	versionId := resolvedDidDocument.GetMetadata().GetVersionId()
 
-	newVerificationMethod := &types.VerificationMethod{
-		Id:                 didId1 + "#" + keyPair2.publicKey,
-		Type:               "Ed25519VerificationKey",
-		Controller:         didId1,
-		PublicKeyMultibase: keyPair2.publicKey,
-	}
-	resolvedDidDocument.Did.VerificationMethod = append(
-		resolvedDidDocument.Did.VerificationMethod, 
-		newVerificationMethod)
-	resolvedDidDocument.Did.Authentication = append(
-		resolvedDidDocument.Did.Authentication,
-		newVerificationMethod.Id)
-
+	// Replace the old public key with new one
+	resolvedDidDocument.Did.VerificationMethod[0].PublicKeyMultibase = keyPair2.publicKey
+	
 	updatedDidRpcElements := GetModifiedDidDocumentSignature(
 		resolvedDidDocument.Did, 
 		keyPair1,
 		resolvedDidDocument.Did.VerificationMethod[0].Id,
 	)
 
-	UpdateDidTx(msgServer, goCtx, updatedDidRpcElements, versionId)
-	
-	// Remove the first public key using the second public key
-	resolvedDidDocument = QueryDid(k, ctx, didId1)
-	versionId = resolvedDidDocument.GetMetadata().GetVersionId()
-	
-	resolvedDidDocument.Did.VerificationMethod = resolvedDidDocument.Did.VerificationMethod[1:]
-	resolvedDidDocument.Did.Authentication = resolvedDidDocument.Did.Authentication[1:]
-	
-	updatedDidRpcElements = GetModifiedDidDocumentSignature(
-		resolvedDidDocument.Did, 
-		keyPair2,
-		resolvedDidDocument.Did.VerificationMethod[0].Id,
-	)
+	err = UpdateDidTx(msgServer, goCtx, updatedDidRpcElements, versionId)
+	if err != nil {
+		t.Error("Unable to rotate key")
+		t.Error(err)
+		t.FailNow()
+	}
 
-	UpdateDidTx(msgServer, goCtx, updatedDidRpcElements, versionId)
-	
-	// Assert if the new VM is on the only VM present
-	assert.Equal(t, 1, len(resolvedDidDocument.Did.VerificationMethod), "Updated DID Document should have only one Verfiication Method")
-	assert.EqualValues(t, newVerificationMethod, resolvedDidDocument.Did.VerificationMethod[0], "Unexpected Verification method")
+	resolvedDidDocument = QueryDid(k, ctx, didId1)
+	// Assert if the update was successful
+	assert.Equal(t, keyPair2.publicKey, resolvedDidDocument.Did.VerificationMethod[0].PublicKeyMultibase)
 }
