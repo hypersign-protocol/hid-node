@@ -227,7 +227,6 @@ func (k msgServer) updateCredentialStatus(ctx sdk.Context, newCredStatus *types.
 				fmt.Sprintf("credential is already %s", newClaimStatus))
 		}
 
-	// TODO: Status change to Expired should happend automatically within hid-node
 	case "Revoked", "Expired":
 		if newClaimStatus == oldClaimStatus {
 			return nil, sdkerrors.Wrapf(
