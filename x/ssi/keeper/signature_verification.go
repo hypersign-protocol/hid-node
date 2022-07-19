@@ -205,7 +205,7 @@ func (k msgServer) VerifyCredentialSignature(msg *types.CredentialStatus, didDoc
 
 	signer := types.Signer{
 		Signer:             didDoc.GetId(),
-		Authentication:     didDoc.GetAuthentication(),
+		AssertionMethod:    didDoc.GetAssertionMethod(),
 		VerificationMethod: didDoc.GetVerificationMethod(),
 	}
 

@@ -9,16 +9,29 @@ import (
 )
 
 func FindPublicKey(signer types.Signer, id string) (ed25519.PublicKey, error) {
-	for _, authentication := range signer.Authentication {
-		if authentication == id {
-			vm := FindVerificationMethod(signer.VerificationMethod, id)
-			if vm == nil {
-				return nil, types.ErrVerificationMethodNotFound.Wrap(id)
+	if signer.Authentication != nil {
+		for _, authentication := range signer.Authentication {
+			if authentication == id {
+				vm := FindVerificationMethod(signer.VerificationMethod, id)
+				if vm == nil {
+					return nil, types.ErrVerificationMethodNotFound.Wrap(id)
+				}
+				return vm.GetPublicKey()
 			}
-			return vm.GetPublicKey()
 		}
 	}
 
+	if signer.AssertionMethod != nil {
+		for _, assertionMethod := range signer.AssertionMethod {
+			if assertionMethod == id {
+				vm := FindVerificationMethod(signer.VerificationMethod, id)
+				if vm == nil {
+					return nil, types.ErrVerificationMethodNotFound.Wrap(id)
+				}
+				return vm.GetPublicKey()
+			}
+		}
+	}
 	return nil, types.ErrVerificationMethodNotFound.Wrap(id)
 }
 

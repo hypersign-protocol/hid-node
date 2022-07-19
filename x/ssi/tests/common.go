@@ -151,6 +151,7 @@ func GenerateDidDocumentRPCElements(keyPair ed25519KeyPair) DidRpcElements {
 			service,
 		},
 		Authentication: []string{verificationMethodId},
+		AssertionMethod: []string{verificationMethodId},
 	}
 
 	var signInfo []*types.SignInfo = getDidSigningInfo(didDocument, keyPair, vm.Id)
