@@ -7,8 +7,12 @@ type (
 	}
 
 	Signer struct {
-		Signer             string
-		Authentication     []string
-		VerificationMethod []*VerificationMethod
+		Signer               string
+		Authentication       []string
+		AssertionMethod      []string
+		VerificationMethod   []*VerificationMethod
+		KeyAgreement         []string
+		CapabilityInvocation []string
+		CapabilityDelegation []string
 	}
 )
