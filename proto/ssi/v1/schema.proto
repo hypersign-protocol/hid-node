@@ -2,7 +2,7 @@ syntax = "proto3";
 package hypersignprotocol.hidnode.ssi;
 option go_package = "github.com/hypersign-protocol/hid-node/x/ssi/types";
 
-message Schema {
+message SchemaDocument {
     string type = 1;
     string modelVersion = 2;
     string id = 3;
@@ -12,7 +12,6 @@ message Schema {
     SchemaProperty schema = 7;
 }
 
-
 message SchemaProperty {
     string schema = 1;
     string description = 2;
@@ -20,4 +19,23 @@ message SchemaProperty {
     string properties = 4;
     repeated string required = 5;
     bool additionalProperties = 6;
+}
+
+message SchemaProof {
+    string type = 1;
+    string created = 2;
+    string verificationMethod = 4;
+    string proofPurpose = 5;
+    string proofValue = 6;
+}
+
+message Schema {
+    string type = 1;
+    string modelVersion = 2;
+    string id = 3;
+    string name = 4;
+    string author = 5;
+    string authored = 6;
+    SchemaProperty schema = 7;
+    SchemaProof proof = 8;
 }

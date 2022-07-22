@@ -42,8 +42,8 @@ message MsgUpdateDIDResponse {
 
 message MsgCreateSchema {
   string creator = 1;
-  Schema schema = 2;
-  repeated SignInfo signatures = 3;
+  SchemaDocument schemaDoc = 2;
+  SchemaProof schemaProof = 3;
 }
 
 message MsgCreateSchemaResponse {

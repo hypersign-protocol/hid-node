@@ -9,11 +9,11 @@ const TypeMsgCreateSchema = "create_schema"
 
 var _ sdk.Msg = &MsgCreateSchema{}
 
-func NewMsgCreateSchema(creator string, schema *Schema, signatures []*SignInfo) *MsgCreateSchema {
+func NewMsgCreateSchema(creator string, schemaDoc *SchemaDocument, schemaProof *SchemaProof) *MsgCreateSchema {
 	return &MsgCreateSchema{
-		Creator:    creator,
-		Schema:     schema,
-		Signatures: signatures,
+		Creator:     creator,
+		SchemaDoc:   schemaDoc,
+		SchemaProof: schemaProof,
 	}
 }
 
@@ -38,7 +38,7 @@ func (msg *MsgCreateSchema) GetSignBytes() []byte {
 	return sdk.MustSortJSON(bz)
 }
 
-func (msg *Schema) GetSignBytes() []byte {
+func (msg *SchemaDocument) GetSignBytes() []byte {
 	return ModuleCdc.MustMarshal(msg)
 }
 

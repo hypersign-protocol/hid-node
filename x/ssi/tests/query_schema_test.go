@@ -43,12 +43,12 @@ func TestGetSchema(t *testing.T) {
 	schemaRpcElements := GenerateSchemaDocumentRPCElements(
 		keyPair1, 
 		rpcElements.DidDocument.Id,
-		rpcElements.DidDocument.VerificationMethod[0],
+		rpcElements.DidDocument.AssertionMethod[0],
 	)
 
 	msgCreateSchema := &types.MsgCreateSchema{
-		Schema: schemaRpcElements.SchemaDocument,
-		Signatures: schemaRpcElements.Signatures,
+		SchemaDoc: schemaRpcElements.SchemaDocument,
+		SchemaProof: schemaRpcElements.SchemaProof,
 		Creator: schemaRpcElements.Creator,
 	}
 
@@ -114,12 +114,12 @@ func TestSchemaParam(t *testing.T) {
 	schemaRpcElements := GenerateSchemaDocumentRPCElements(
 		keyPair1, 
 		rpcElements.DidDocument.Id,
-		rpcElements.DidDocument.VerificationMethod[0],
+		rpcElements.DidDocument.AssertionMethod[0],
 	)
 
 	msgCreateSchema := &types.MsgCreateSchema{
-		Schema: schemaRpcElements.SchemaDocument,
-		Signatures: schemaRpcElements.Signatures,
+		SchemaDoc: schemaRpcElements.SchemaDocument,
+		SchemaProof: schemaRpcElements.SchemaProof,
 		Creator: schemaRpcElements.Creator,
 	}
 

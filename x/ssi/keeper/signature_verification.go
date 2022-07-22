@@ -135,28 +135,32 @@ func (k *Keeper) VerifySignature(ctx *sdk.Context, msg *types.Did, signers []typ
 	return nil
 }
 
-func (k *Keeper) VerifySignatureOnCreateSchema(ctx *sdk.Context, msg *types.Schema, signers []types.Signer, signatures []*types.SignInfo) error {
-	if len(signers) == 0 {
-		return types.ErrInvalidSignature.Wrap("At least one signer should be present")
-	}
-
-	if len(signatures) == 0 {
-		return types.ErrInvalidSignature.Wrap("At least one signature should be present")
-	}
-
+func (k *Keeper) VerifySchemaSignature(msg *types.SchemaDocument, didDoc *types.Did, signature string, verificationMethod string) error {
 	signingInput := msg.GetSignBytes()
 
-	for _, signer := range signers {
-		valid, err := VerifyIdentitySignature(signer, signatures, signingInput)
-		if err != nil {
-			return sdkerrors.Wrap(types.ErrInvalidSignature, err.Error())
-		}
-
-		if !valid {
-			return sdkerrors.Wrap(types.ErrInvalidSignature, signer.Signer)
-		}
+	signer := types.Signer{
+		Signer:             didDoc.GetId(),
+		AssertionMethod:    didDoc.GetAssertionMethod(),
+		VerificationMethod: didDoc.GetVerificationMethod(),
 	}
 
+	signingInfo := &types.SignInfo{
+		VerificationMethodId: verificationMethod,
+		Signature:            signature,
+	}
+
+	signingInfoList := []*types.SignInfo{
+		signingInfo,
+	}
+
+	valid, err := VerifyIdentitySignature(signer, signingInfoList, signingInput)
+	if err != nil {
+		return sdkerrors.Wrap(types.ErrInvalidSignature, err.Error())
+	}
+
+	if !valid {
+		return sdkerrors.Wrap(types.ErrInvalidSignature, signer.Signer)
+	}
 	return nil
 }
 
