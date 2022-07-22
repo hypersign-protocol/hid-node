@@ -6,20 +6,21 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 	verify "github.com/hypersign-protocol/hid-node/x/ssi/keeper/document_verification"
+	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 )
 
 func (k msgServer) CreateSchema(goCtx context.Context, msg *types.MsgCreateSchema) (*types.MsgCreateSchemaResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	schemaMsg := msg.GetSchema()
-	schemaID := schemaMsg.GetId()
+	schemaDoc := msg.GetSchemaDoc()
+	schemaProof := msg.GetSchemaProof()
+	schemaID := schemaDoc.GetId()
 
 	// Get the Did Document of Schema's Author
-	authorDidDocument, err := k.GetDid(&ctx, schemaMsg.GetAuthor())
+	authorDidDocument, err := k.GetDid(&ctx, schemaDoc.GetAuthor())
 	if err != nil {
-		return nil, sdkerrors.Wrap(err, fmt.Sprintf("The DID %s is not available", schemaMsg.GetAuthor()))
+		return nil, sdkerrors.Wrap(err, fmt.Sprintf("The DID %s is not available", schemaDoc.GetAuthor()))
 	}
 
 	// Check if author's DID is deactivated
@@ -39,19 +40,19 @@ func (k msgServer) CreateSchema(goCtx context.Context, msg *types.MsgCreateSchem
 	}
 
 	// Signature check
-	didSigners := authorDidDocument.GetDid().GetSigners()
-	if err := k.VerifySignatureOnCreateSchema(&ctx, schemaMsg, didSigners, msg.GetSignatures()); err != nil {
+	if err := k.VerifySchemaSignature(schemaDoc, authorDidDocument.Did, schemaProof.ProofValue, schemaProof.VerificationMethod); err != nil {
 		return nil, err
 	}
 
 	var schema = types.Schema{
-		Type:         schemaMsg.GetType(),
-		ModelVersion: schemaMsg.GetModelVersion(),
-		Id:           schemaMsg.GetId(),
-		Name:         schemaMsg.GetName(),
-		Author:       schemaMsg.GetAuthor(),
-		Authored:     schemaMsg.GetAuthored(),
-		Schema:       schemaMsg.GetSchema(),
+		Type:         schemaDoc.GetType(),
+		ModelVersion: schemaDoc.GetModelVersion(),
+		Id:           schemaDoc.GetId(),
+		Name:         schemaDoc.GetName(),
+		Author:       schemaDoc.GetAuthor(),
+		Authored:     schemaDoc.GetAuthored(),
+		Schema:       schemaDoc.GetSchema(),
+		Proof:        schemaProof,
 	}
 
 	id := k.AppendSchema(ctx, schema)

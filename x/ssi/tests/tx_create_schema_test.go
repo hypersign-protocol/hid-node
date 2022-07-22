@@ -3,20 +3,20 @@ package tests
 import (
 	"testing"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/hypersign-protocol/hid-node/x/ssi/keeper"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 func TestCreateSchema(t *testing.T) {
 	t.Log("Running test for Valid Create Schmea Tx")
 	k, ctx := TestKeeper(t)
 	msgServer := keeper.NewMsgServerImpl(*k)
-	goCtx :=  sdk.WrapSDKContext(ctx)
-	
+	goCtx := sdk.WrapSDKContext(ctx)
+
 	k.SetDidMethod(&ctx, "hs")
 	k.SetDidNamespace(&ctx, "devnet")
-	
+
 	keyPair1 := GeneratePublicPrivateKeyPair()
 	rpcElements := GenerateDidDocumentRPCElements(keyPair1)
 	t.Logf("Registering DID with DID Id: %s", rpcElements.DidDocument.GetId())
@@ -37,15 +37,15 @@ func TestCreateSchema(t *testing.T) {
 
 	t.Log("Registering Schema")
 	schemaRpcElements := GenerateSchemaDocumentRPCElements(
-		keyPair1, 
+		keyPair1,
 		rpcElements.DidDocument.Id,
-		rpcElements.DidDocument.VerificationMethod[0],
+		rpcElements.DidDocument.AssertionMethod[0],
 	)
 
 	msgCreateSchema := &types.MsgCreateSchema{
-		Schema: schemaRpcElements.SchemaDocument,
-		Signatures: schemaRpcElements.Signatures,
-		Creator: schemaRpcElements.Creator,
+		SchemaDoc:   schemaRpcElements.SchemaDocument,
+		SchemaProof: schemaRpcElements.SchemaProof,
+		Creator:     schemaRpcElements.Creator,
 	}
 
 	_, errCreateSchema := msgServer.CreateSchema(goCtx, msgCreateSchema)
@@ -53,7 +53,7 @@ func TestCreateSchema(t *testing.T) {
 		t.Error("Schema Registeration Failed")
 		t.Error(errCreateSchema)
 		t.FailNow()
-	} 
+	}
 	t.Log("Schema Registered Successfully")
 
 	t.Log("Create Schema Tx Test Completed")

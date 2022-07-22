@@ -29,8 +29,8 @@ type DidRpcElements struct {
 }
 
 type SchemaRpcElements struct {
-	SchemaDocument *types.Schema
-	Signatures     []*types.SignInfo
+	SchemaDocument *types.SchemaDocument
+	SchemaProof    *types.SchemaProof
 	Creator        string
 }
 
@@ -42,7 +42,7 @@ type CredRpcElements struct {
 
 var Creator string = "hid1kxqk5ejca8nfpw8pg47484rppv359xh7qcasy4"
 
-func getSchemaSigningInfo(schemaDoc *types.Schema, keyPair ed25519KeyPair, vm *types.VerificationMethod) []*types.SignInfo {
+func getSchemaSigningInfo(schemaDoc *types.SchemaDocument, keyPair ed25519KeyPair, vm *types.VerificationMethod) []*types.SignInfo {
 	signature := ed25519.Sign(keyPair.privateKey, schemaDoc.GetSignBytes())
 	signInfo := &types.SignInfo{
 		VerificationMethodId: vm.GetId(),
@@ -70,7 +70,7 @@ func getMultiSigDidSigningInfo(didDoc *types.Did, keyPairs []ed25519KeyPair, vmI
 	if len(keyPairs) != len(vmIds) {
 		panic("KeyPairs and vmIds lists should be of equal lengths")
 	}
-	
+
 	var signInfoList []*types.SignInfo
 
 	for idx := range keyPairs {
@@ -84,8 +84,8 @@ func getMultiSigDidSigningInfo(didDoc *types.Did, keyPairs []ed25519KeyPair, vmI
 
 	return DidRpcElements{
 		DidDocument: didDoc,
-		Signatures: signInfoList,
-		Creator: Creator,
+		Signatures:  signInfoList,
+		Creator:     Creator,
 	}
 }
 
@@ -116,7 +116,6 @@ func GetModifiedDidDocumentSignature(modifiedDidDocument *types.Did, keyPair ed2
 		Creator:     Creator,
 	}
 }
-
 
 func GenerateDidDocumentRPCElements(keyPair ed25519KeyPair) DidRpcElements {
 	var didMethod string = "hs"
@@ -150,7 +149,7 @@ func GenerateDidDocumentRPCElements(keyPair ed25519KeyPair) DidRpcElements {
 		Service: []*types.Service{
 			service,
 		},
-		Authentication: []string{verificationMethodId},
+		Authentication:  []string{verificationMethodId},
 		AssertionMethod: []string{verificationMethodId},
 	}
 
@@ -164,8 +163,8 @@ func GenerateDidDocumentRPCElements(keyPair ed25519KeyPair) DidRpcElements {
 
 }
 
-func GenerateSchemaDocumentRPCElements(keyPair ed25519KeyPair, Id string, verficationMethod *types.VerificationMethod) SchemaRpcElements {
-	var schemaDocument *types.Schema = &types.Schema{
+func GenerateSchemaDocumentRPCElements(keyPair ed25519KeyPair, Id string, verficationMethodId string) SchemaRpcElements {
+	var schemaDocument *types.SchemaDocument = &types.SchemaDocument{
 		Type:         "https://w3c-ccg.github.io/vc-json-schemas/schema/1.0/schema.json",
 		ModelVersion: "v1.0",
 		Name:         "HS Credential",
@@ -182,11 +181,21 @@ func GenerateSchemaDocumentRPCElements(keyPair ed25519KeyPair, Id string, verfic
 		},
 	}
 
-	var signInfo []*types.SignInfo = getSchemaSigningInfo(schemaDocument, keyPair, verficationMethod)
+	var schemaDocumentSignature string = base64.StdEncoding.EncodeToString(
+		ed25519.Sign(keyPair.privateKey, schemaDocument.GetSignBytes()),
+	)
+
+	var schemaProof *types.SchemaProof = &types.SchemaProof{
+		Type:               "Ed25519VerificationKey2020",
+		Created:            "2022-04-10T04:07:12Z",
+		VerificationMethod: verficationMethodId,
+		ProofValue:         schemaDocumentSignature,
+		ProofPurpose:       "assertionMethod",
+	}
 
 	return SchemaRpcElements{
 		SchemaDocument: schemaDocument,
-		Signatures:     signInfo,
+		SchemaProof:    schemaProof,
 		Creator:        Creator,
 	}
 }
@@ -211,10 +220,9 @@ func GenerateCredStatusRPCElements(keyPair ed25519KeyPair, Id string, verficatio
 	var credentialProof *types.CredentialProof = &types.CredentialProof{
 		Type:               "Ed25519VerificationKey2020",
 		Created:            "2022-04-10T04:07:12Z",
-		Updated:            "2022-04-10T04:07:12Z",
 		VerificationMethod: verficationMethod.Id,
 		ProofValue:         credentialStatusSignature,
-		ProofPurpose:       "assertion",
+		ProofPurpose:       "assertionMethod",
 	}
 
 	return CredRpcElements{

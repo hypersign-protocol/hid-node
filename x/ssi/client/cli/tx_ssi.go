@@ -124,42 +124,36 @@ func CmdUpdateDID() *cobra.Command {
 
 func CmdCreateSchema() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "create-schema [schema] [verification-method-id]",
+		Use:   "create-schema [schema-doc] [schema-proof]",
 		Short: "Creates Schema",
-		Args:  cobra.ExactArgs(2),
+		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			argSchema := args[0]
-			argVerificationMethodId := args[1]
+			argSchemaDoc := args[0]
+			argSchemaProof := args[1]
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			// Unmarshal Schema
-			var schema types.Schema
-			err = clientCtx.Codec.UnmarshalJSON([]byte(argSchema), &schema)
+			// Unmarshal Schema Document
+			var schemaDoc types.SchemaDocument
+			err = clientCtx.Codec.UnmarshalJSON([]byte(argSchemaDoc), &schemaDoc)
 			if err != nil {
 				return err
 			}
 
-			verKeyPriv, err := getVerKey(cmd, clientCtx)
+			// Unmarshal Schema Proof
+			var schemaProof types.SchemaProof
+			err = clientCtx.Codec.UnmarshalJSON([]byte(argSchemaProof), &schemaProof)
 			if err != nil {
 				return err
-			}
-
-			signBytes := schema.GetSignBytes()
-			signatureBytes := ed25519.Sign(verKeyPriv, signBytes)
-
-			signInfo := types.SignInfo{
-				VerificationMethodId: argVerificationMethodId,
-				Signature:            base64.StdEncoding.EncodeToString(signatureBytes),
 			}
 
 			msg := types.MsgCreateSchema{
-				Schema:     &schema,
-				Signatures: []*types.SignInfo{&signInfo},
-				Creator:    clientCtx.GetFromAddress().String(),
+				SchemaDoc:   &schemaDoc,
+				SchemaProof: &schemaProof,
+				Creator:     clientCtx.GetFromAddress().String(),
 			}
 
 			if err := msg.ValidateBasic(); err != nil {
@@ -214,10 +208,10 @@ func CmdDeactivateDID() *cobra.Command {
 			}
 
 			msg := types.MsgDeactivateDID{
-				Creator:      clientCtx.GetFromAddress().String(),
-				DidId: argDidId,
-				VersionId:    argVersionId,
-				Signatures:   []*types.SignInfo{&signInfo},
+				Creator:    clientCtx.GetFromAddress().String(),
+				DidId:      argDidId,
+				VersionId:  argVersionId,
+				Signatures: []*types.SignInfo{&signInfo},
 			}
 
 			if err := msg.ValidateBasic(); err != nil {
