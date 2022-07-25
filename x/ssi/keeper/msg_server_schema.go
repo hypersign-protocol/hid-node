@@ -3,6 +3,7 @@ package keeper
 import (
 	"context"
 	"fmt"
+	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -37,6 +38,27 @@ func (k msgServer) CreateSchema(goCtx context.Context, msg *types.MsgCreateSchem
 	// Check if Schema already exists
 	if k.HasSchema(ctx, schemaID) {
 		return nil, sdkerrors.Wrap(types.ErrSchemaExists, fmt.Sprintf("Schema ID:  %s", schemaID))
+	}
+
+	// Check proper date syntax for `authored` and `created`
+	blockTime := ctx.BlockTime()
+
+	authoredDate := schemaDoc.GetAuthored()
+	authoredDateParsed, err := time.Parse(time.RFC3339, authoredDate)
+	if err != nil {
+		return nil, sdkerrors.Wrapf(types.ErrInvalidDate, fmt.Sprintf("invalid authored date format: %s", authoredDateParsed))
+	}
+	if authoredDateParsed.After(blockTime) {
+		return nil, sdkerrors.Wrapf(types.ErrInvalidDate, "authored date provided shouldn't be greater than the current block time")
+	}
+	
+	createdDate := schemaProof.GetCreated()
+	createdDateParsed, err := time.Parse(time.RFC3339, createdDate)
+	if err != nil {
+		return nil, sdkerrors.Wrapf(types.ErrInvalidDate, fmt.Sprintf("invalid created date format: %s", createdDateParsed))
+	}
+	if createdDateParsed.After(blockTime) {
+		return nil, sdkerrors.Wrapf(types.ErrInvalidDate, "created date provided shouldn't be greater than the current block time")
 	}
 
 	// Signature check

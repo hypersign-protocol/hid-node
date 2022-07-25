@@ -126,7 +126,7 @@ func CmdCreateSchema() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create-schema [schema-doc] [schema-proof]",
 		Short: "Creates Schema",
-		Args:  cobra.ExactArgs(3),
+		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argSchemaDoc := args[0]
 			argSchemaProof := args[1]
@@ -165,7 +165,6 @@ func CmdCreateSchema() *cobra.Command {
 	}
 
 	flags.AddTxFlagsToCmd(cmd)
-	cmd.Flags().String(VerKeyFlag, "", "Base64 encoded ed25519 private key to sign identity message with. ")
 	return cmd
 }
 

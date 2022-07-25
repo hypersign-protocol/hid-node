@@ -21,6 +21,9 @@ hid-noded tx ssi create-did '{
 ],
 "authentication": [
 "did:hs:devnet:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf#key-1"
+],
+"assertionMethod": [
+"did:hs:devnet:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf#key-1"
 ]
 }' did:hs:devnet:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf#key-1 --ver-key oVtY1xceDZQjkfwlbCEC2vgeADcxpgd27vtYasBhcM/JLR6PnPoD9jvjSJrMsMJwS7faPy5OlFCdj/kgLVZMEg== --from node1 --chain-id hidnode --broadcast-mode block --yes
 
@@ -51,6 +54,9 @@ hid-noded tx ssi create-did '{
 ],
 "authentication": [
 "did:hs:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4#key-1"
+],
+"assertionMethod": [
+"did:hs:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4#key-1"
 ]
 }' did:hs:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4#key-1 --ver-key bZBUkLGChnJujYHUZ4L8PECoN2Odv6adWGXc1qVWCRVqtEx0o/FmtFZnd5pT3laR518P58TRUGY5q5KSrToSmQ== --from node1 --chain-id hidnode --broadcast-mode block --yes
 
@@ -80,6 +86,9 @@ hid-noded tx ssi create-did '{
 }
 ],
 "authentication": [
+"did:hs:devnet:zE2seaoaAwBzfLaTd7oqEf5GJZdEiQgo64ayJgMstRZ91#key-1"
+],
+"assertionMethod": [
 "did:hs:devnet:zE2seaoaAwBzfLaTd7oqEf5GJZdEiQgo64ayJgMstRZ91#key-1"
 ]
 }' did:hs:devnet:zE2seaoaAwBzfLaTd7oqEf5GJZdEiQgo64ayJgMstRZ91#key-1 --ver-key JFfT5yPnBbwcDkmry9vdqX9eBKJmfnTT9C1r0LZ5S73BosdZL7AaZ9AYx6Mpvvw/ebaKPyaIiVZ3StijU8RRAA== --from node1 --chain-id hidnode --broadcast-mode block --yes
