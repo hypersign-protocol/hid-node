@@ -170,7 +170,7 @@ func GenerateSchemaDocumentRPCElements(keyPair ed25519KeyPair, Id string, verfic
 		Name:         "HS Credential",
 		Author:       Id,
 		Id:           fmt.Sprintf("%s;id=%s;version=1.0", Id, utils.UUID()),
-		Authored:     "Tue Apr 06 2021 00:09:56 GMT+0530 (India Standard Time)",
+		Authored:     "2022-04-10T04:07:12Z",
 		Schema: &types.SchemaProperty{
 			Schema:               "https://json-schema.org/draft-07/schema#",
 			Description:          "test",
