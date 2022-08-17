@@ -6,7 +6,7 @@ The Hypersign Identity Network is a permissionless blockchain network to manage 
 
 Following are the prerequisites that needs to be installed:
 
-- golang (Installation Guide: https://go.dev/doc/install) (version: 1.17.2)
+- golang (Installation Guide: https://go.dev/doc/install) (version: 1.18.5)
 
 ## Get started
 
