@@ -1,7 +1,7 @@
-FROM golang:1.16-alpine
+FROM golang:1.18
 
 # Set up dependencies
-ENV PACKAGES curl make git libc-dev bash gcc linux-headers eudev-dev python3 jq
+ENV PACKAGES curl make git libc-dev bash gcc python3 jq
 
 # Set working directory for the build
 WORKDIR /usr/local/app
@@ -10,10 +10,12 @@ WORKDIR /usr/local/app
 COPY . .
 
 # Install minimum necessary dependencies and build hid-node
-RUN apk add --no-cache $PACKAGES && make build
+RUN apt-get update
+RUN apt-get install ${PACKAGES} -y
+RUN make build 
 
 # Install ca-certificates
-RUN apk add --update ca-certificates
+# RUN apk add --update ca-certificates
 
 # Setup the node
 RUN bash ./scripts/docker-node/setup.sh
