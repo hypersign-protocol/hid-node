@@ -96,6 +96,7 @@ import (
 	ssimodule "github.com/hypersign-protocol/hid-node/x/ssi"
 	ssimodulekeeper "github.com/hypersign-protocol/hid-node/x/ssi/keeper"
 	ssimoduletypes "github.com/hypersign-protocol/hid-node/x/ssi/types"
+	appparams "github.com/hypersign-protocol/hid-node/app/params"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 )
 
@@ -219,7 +220,6 @@ type App struct {
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
 
 	SsiKeeper ssimodulekeeper.Keeper
-	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// mm is the module manager
 	mm *module.Manager
@@ -237,11 +237,11 @@ func New(
 	skipUpgradeHeights map[int64]bool,
 	homePath string,
 	invCheckPeriod uint,
-	encodingConfig cosmoscmd.EncodingConfig,
+	encodingConfig appparams.EncodingConfig,
 	appOpts servertypes.AppOptions,
 	baseAppOptions ...func(*baseapp.BaseApp),
-) cosmoscmd.App {
-	appCodec := encodingConfig.Marshaler
+) *App {
+	appCodec := encodingConfig.Codec
 	cdc := encodingConfig.Amino
 	interfaceRegistry := encodingConfig.InterfaceRegistry
 
