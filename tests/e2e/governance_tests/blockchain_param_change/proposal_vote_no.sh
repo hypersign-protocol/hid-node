@@ -22,7 +22,7 @@ echo "Waiting for the voting period to end...."
 echo ""
 sleep 65
 
-# Check if the slashing_downtime_fraction changes from 0.01 to 0.365
+# Check if the slashing_downtime_fraction changes remains 0.365
 EXPECTED_SLASH_FRACTION_DOWNTIME='"'0.365000000000000000'"'
 ACTUAL_SLASH_FRACTION_DOWNTIME=$(hid-noded q slashing params --output json | jq '.slash_fraction_downtime')
 

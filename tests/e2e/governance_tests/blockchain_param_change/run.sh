@@ -5,7 +5,7 @@ set -eu pipefail
 echo "-------------------- Starting the tests for Param Change Governance Proposals --------------------"
 echo ""
 # Running the node
-./init_node.sh
+../init_node.sh
 
 echo ""
 echo "================== Submitting a proposal and voting YES on it =================="
