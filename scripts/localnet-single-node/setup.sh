@@ -1,11 +1,17 @@
 #!/bin/bash
 
+# Use the already built binary or use a different one
+BINARY=$1
+if [ -z ${BINARY} ]; then
+	BINARY=hid-noded
+fi
+
 # Check if the binary is installed
-hid-noded &> /dev/null
+${BINARY} &> /dev/null
 
 RET_VAL=$?
 if [ ${RET_VAL} -ne 0 ]; then
-    echo "hid-noded binary not found"
+    echo "${BINARY} binary not found"
     exit 1
 fi
 
