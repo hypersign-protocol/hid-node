@@ -18,7 +18,6 @@ fi
 # Setting up config files
 rm -rf $HOME/.hid-node/
 
-
 # Make directories for hid-node config
 mkdir $HOME/.hid-node
 
