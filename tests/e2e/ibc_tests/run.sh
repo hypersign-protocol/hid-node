@@ -59,7 +59,7 @@ IBC_TRANSFER_RESULT=$(hid-noded tx ibc-transfer transfer transfer channel-0 ${OS
 
 CODE=$(echo ${IBC_TRANSFER_RESULT} | jq '.code')
 if [ ${CODE} -eq 0 ]; then
-  echo "Token is transferred successfully through IBC"
+  echo "HID Token is transferred successfully through IBC"
 else
   echo "HID Token did not went through IBC"
   exit 1
