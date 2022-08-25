@@ -18,6 +18,8 @@ func (k msgServer) CreateSchema(goCtx context.Context, msg *types.MsgCreateSchem
 	schemaProof := msg.GetSchemaProof()
 	schemaID := schemaDoc.GetId()
 
+	chainNamespace := k.GetChainNamespace(&ctx)
+
 	// Get the Did Document of Schema's Author
 	authorDidDocument, err := k.GetDid(&ctx, schemaDoc.GetAuthor())
 	if err != nil {
@@ -30,8 +32,8 @@ func (k msgServer) CreateSchema(goCtx context.Context, msg *types.MsgCreateSchem
 	}
 
 	// Check if Schema ID is valid
-	authorDid := authorDidDocument.GetDid().GetId()
-	if err := verify.IsValidSchemaID(schemaID, authorDid); err != nil {
+	err = verify.IsValidID(schemaID, chainNamespace, "schemaDocument"); 
+	if err != nil {
 		return nil, sdkerrors.Wrap(types.ErrInvalidSchemaID, err.Error())
 	}
 

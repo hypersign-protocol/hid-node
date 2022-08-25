@@ -5,7 +5,7 @@ import (
 	"crypto/ed25519"
 	"crypto/rand"
 	"encoding/base64"
-	"fmt"
+	"strings"
 
 	//"fmt"
 
@@ -13,7 +13,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/hypersign-protocol/hid-node/x/ssi/keeper"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
-	"github.com/hypersign-protocol/hid-node/x/ssi/utils"
 	//"github.com/hypersign-protocol/hid-node/x/ssi/utils"
 )
 
@@ -165,12 +164,13 @@ func GenerateDidDocumentRPCElements(keyPair ed25519KeyPair) DidRpcElements {
 }
 
 func GenerateSchemaDocumentRPCElements(keyPair ed25519KeyPair, Id string, verficationMethodId string) SchemaRpcElements {
+	var schemaId string = "sch:" + DidMethod + ":" + "devnet" + ":" + strings.Split(Id, ":")[3] 
 	var schemaDocument *types.SchemaDocument = &types.SchemaDocument{
 		Type:         "https://w3c-ccg.github.io/vc-json-schemas/schema/1.0/schema.json",
 		ModelVersion: "v1.0",
 		Name:         "HS Credential",
 		Author:       Id,
-		Id:           fmt.Sprintf("%s;id=%s;version=1.0", Id, utils.UUID()),
+		Id:           schemaId,
 		Authored:     "2022-04-10T04:07:12Z",
 		Schema: &types.SchemaProperty{
 			Schema:               "https://json-schema.org/draft-07/schema#",
@@ -202,9 +202,10 @@ func GenerateSchemaDocumentRPCElements(keyPair ed25519KeyPair, Id string, verfic
 }
 
 func GenerateCredStatusRPCElements(keyPair ed25519KeyPair, Id string, verficationMethod *types.VerificationMethod) CredRpcElements {
+	var credentialId = "vc:" + DidMethod + ":" + "devnet:" + strings.Split(Id, ":")[3]
 	var credentialStatus *types.CredentialStatus = &types.CredentialStatus{
 		Claim: &types.Claim{
-			Id:            "did:key:" + utils.UUID(),
+			Id:            credentialId,
 			CurrentStatus: "Live",
 			StatusReason:  "Valid",
 		},
