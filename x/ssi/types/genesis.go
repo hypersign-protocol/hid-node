@@ -7,10 +7,7 @@ import (
 
 // DefaultGenesis returns the default ssi genesis state
 func DefaultGenesis() *GenesisState {
-	return &GenesisState{
-		// TODO: Once did method spec has been confirmed, did_method should be removed
-		DidMethod: "hs",
-	}
+	return &GenesisState{}
 }
 
 // Validate performs basic genesis state validation returning an error upon any

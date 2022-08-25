@@ -16,7 +16,6 @@ func TestCreateDID(t *testing.T) {
 	msgServer := keeper.NewMsgServerImpl(*k)
 	goCtx := sdk.WrapSDKContext(ctx)
 
-	k.SetDidMethod(&ctx, "hs")
 	k.SetDidNamespace(&ctx, "devnet")
 
 	keyPair1 := GeneratePublicPrivateKeyPair()
@@ -48,7 +47,9 @@ func TestInvalidServiceType(t *testing.T) {
 
 	keyPair1 := GeneratePublicPrivateKeyPair()
 	rpcElements := GenerateDidDocumentRPCElements(keyPair1)
-
+	// Set Namespace
+	k.SetDidNamespace(&ctx, "devnet")
+	
 	// Changing Service Type from "LinkedDomains" to "DIDComm" which is not supported type
 	invalidServiceType := "DIDComm"
 	rpcElements.DidDocument.Service[0].Type = invalidServiceType

@@ -41,6 +41,7 @@ type CredRpcElements struct {
 }
 
 var Creator string = "hid1kxqk5ejca8nfpw8pg47484rppv359xh7qcasy4"
+var DidMethod string = "hid"
 
 func getSchemaSigningInfo(schemaDoc *types.SchemaDocument, keyPair ed25519KeyPair, vm *types.VerificationMethod) []*types.SignInfo {
 	signature := ed25519.Sign(keyPair.privateKey, schemaDoc.GetSignBytes())
@@ -118,7 +119,7 @@ func GetModifiedDidDocumentSignature(modifiedDidDocument *types.Did, keyPair ed2
 }
 
 func GenerateDidDocumentRPCElements(keyPair ed25519KeyPair) DidRpcElements {
-	var didMethod string = "hs"
+	var didMethod string = "hid"
 	var didNamespace string = "devnet"
 	var didId = "did:" + didMethod + ":" + didNamespace + ":" + keyPair.publicKey
 

@@ -12,7 +12,7 @@ import (
 
 
 // Checks whether the ID in the DidDoc is a valid string
-func IsValidDidDocID(Id string, method string, namespace string) error {
+func IsValidDidDocID(Id string, namespace string) error {
 	didElements := strings.Split(Id, ":")
 
 	didStringIndex := 0
@@ -26,9 +26,9 @@ func IsValidDidDocID(Id string, method string, namespace string) error {
 	}
 
 	// did method check
-	didMethod := didElements[didMethodIndex]
-	if method != didMethod {
-		return sdkerrors.Wrap(types.ErrInvalidDidMethod, fmt.Sprintf("expected did method %s, got %s", method, didMethod))
+	inputDidMethod := didElements[didMethodIndex]
+	if inputDidMethod != DidMethod {
+		return sdkerrors.Wrap(types.ErrInvalidDidMethod, fmt.Sprintf("expected did method %s, got %s", DidMethod, inputDidMethod))
 	}
 
 	// Mainnet namespace check
@@ -77,7 +77,7 @@ func IsValidDidFragment(didUrl string, method string, namespace string) bool {
 	}
 
 	did, _ := utils.SplitDidUrlIntoDid(didUrl)
-	err := IsValidDidDocID(did, method, namespace)
+	err := IsValidDidDocID(did, namespace)
 	if err != nil {
 		return false
 	}
@@ -107,7 +107,7 @@ func DuplicateServiceExists(serviceId string, services []*types.Service) bool {
 
 
 // Checks whether the DidDoc string is valid
-func IsValidDidDoc(didDoc *types.Did, genesisMethod string, genesisNamespace string) error {
+func IsValidDidDoc(didDoc *types.Did, genesisNamespace string) error {
 	didArrayMap := map[string][]string{
 		"authentication":       didDoc.GetAuthentication(),
 		"assertionMethod":      didDoc.GetAssertionMethod(),
@@ -121,7 +121,7 @@ func IsValidDidDoc(didDoc *types.Did, genesisMethod string, genesisNamespace str
 	}
 
 	// Did Id Format Check
-	err := IsValidDidDocID(didDoc.GetId(), genesisMethod, genesisNamespace)
+	err := IsValidDidDocID(didDoc.GetId(), genesisNamespace)
 	if err != nil {
 		return err
 	}
@@ -129,7 +129,7 @@ func IsValidDidDoc(didDoc *types.Did, genesisMethod string, genesisNamespace str
 	// Did Array Check
 	for field, didArray := range didArrayMap {
 		for _, elem := range didArray{
-			if !IsValidDidFragment(elem, genesisMethod, genesisNamespace) {
+			if !IsValidDidFragment(elem, DidMethod, genesisNamespace) {
 				return sdkerrors.Wrap(types.ErrInvalidDidDoc, fmt.Sprintf("The field %s is an invalid DID Array", field))
 			}
 		}
@@ -143,7 +143,7 @@ func IsValidDidDoc(didDoc *types.Did, genesisMethod string, genesisNamespace str
 	}
 
 	// Valid Services Check
-	err = ValidateServices(didDoc.GetService(), genesisMethod, genesisNamespace)
+	err = ValidateServices(didDoc.GetService(), DidMethod, genesisNamespace)
 	if err != nil {
 		return err
 	}
