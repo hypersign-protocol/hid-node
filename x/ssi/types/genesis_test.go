@@ -21,7 +21,6 @@ func TestGenesisState_Validate(t *testing.T) {
 		{
 			desc:     "valid did namespace",
 			genState: &types.GenesisState{
-				DidMethod: types.DefaultGenesis().DidMethod,
 				DidNamespace: "devnet",
 			},
 			valid: true,
@@ -29,7 +28,6 @@ func TestGenesisState_Validate(t *testing.T) {
 		{
 			desc:     "invalid did namespace of length more than 10",
 			genState: &types.GenesisState{
-				DidMethod: types.DefaultGenesis().DidMethod,
 				DidNamespace: "abracadabra123",
 			},
 			valid: false,
@@ -37,7 +35,6 @@ func TestGenesisState_Validate(t *testing.T) {
 		{
 			desc:     "invalid did namespace containing whitespaces",
 			genState: &types.GenesisState{
-				DidMethod: types.DefaultGenesis().DidMethod,
 				DidNamespace: "abracadabra	123",
 			},
 			valid: false,
@@ -45,7 +42,6 @@ func TestGenesisState_Validate(t *testing.T) {
 		{
 			desc:     "invalid did namespace containing underscore",
 			genState: &types.GenesisState{
-				DidMethod: types.DefaultGenesis().DidMethod,
 				DidNamespace: "xyz_123",
 			},
 			valid: false,
