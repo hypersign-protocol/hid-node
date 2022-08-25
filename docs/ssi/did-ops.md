@@ -74,7 +74,7 @@ The usage of CLI is explained through following scenarios:
 
 ### Register DID
 
-Registering a DID Document in `hid-node`. User 2 is registering a DID Document with id: `did:hs:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4`
+Registering a DID Document in `hid-node`. User 2 is registering a DID Document with id: `did:hid:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4`
 
 ```sh
 hid-noded tx ssi create-did '{
@@ -83,37 +83,37 @@ hid-noded tx ssi create-did '{
 "https://w3id.org/security/v1",
 "https://schema.org"
 ],
-"id": "did:hs:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4",
-"controller": ["did:hs:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4"],
-"alsoKnownAs": ["did:hs:devnet:1f49341a-de30993e6c52"],
+"id": "did:hid:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4",
+"controller": ["did:hid:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4"],
+"alsoKnownAs": ["did:hid:devnet:1f49341a-de30993e6c52"],
 "verificationMethod": [
 {
-"id": "did:hs:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4#key-1",
+"id": "did:hid:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4#key-1",
 "type": "Ed25519VerificationKey2020",
-"controller": "did:hs:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4",
+"controller": "did:hid:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4",
 "publicKeyMultibase": "z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4"
 }
 ],
 "service": [{
-"id":"did:hs:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4#vcs",
+"id":"did:hid:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4#vcs",
 "type": "LinkedDomains",
 "serviceEndpoint": "https://example.com/vc"
 },
 {
-"id":"did:hs:devnet:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf#file",
+"id":"did:hid:devnet:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf#file",
 "type": "LinkedDomains",
 "serviceEndpoint": "https://example.in/somefile"
 }
 ],
 "authentication": [
-"did:hs:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4#key-1"
+"did:hid:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4#key-1"
 ]
-}' did:hs:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4#key-1 --ver-key <private-key> --from alice --keyring-backend test --chain-id hidnode --yes
+}' did:hid:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4#key-1 --ver-key <private-key> --from alice --keyring-backend test --chain-id hidnode --yes
 ```
 
 ### Update DID
 
-User 2 (`did:hs:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4`) is trying to update it’s DID by adding User 1’s ID (`did:hs:devnet:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf`) to the controller group. It is assumed that User 1’s ID (`did:hs:devnet:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf`) is already registered on blockchain.
+User 2 (`did:hid:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4`) is trying to update it’s DID by adding User 1’s ID (`did:hid:devnet:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf`) to the controller group. It is assumed that User 1’s ID (`did:hid:devnet:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf`) is already registered on blockchain.
 
 ```sh
 hid-noded tx ssi update-did '{
@@ -122,31 +122,31 @@ hid-noded tx ssi update-did '{
 "https://w3id.org/security/v1",
 "https://schema.org"
 ],
-"id": "did:hs:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4",
-"controller": ["did:hs:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4","did:hs:devnet:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf"],
-"alsoKnownAs": ["did:hs:devnet:1f49341a-de30993e6c52"],
+"id": "did:hid:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4",
+"controller": ["did:hid:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4","did:hid:devnet:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf"],
+"alsoKnownAs": ["did:hid:devnet:1f49341a-de30993e6c52"],
 "verificationMethod": [
 {
-"id": "did:hs:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4#key-1",
+"id": "did:hid:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4#key-1",
 "type": "Ed25519VerificationKey2020",
-"controller": "did:hs:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4",
+"controller": "did:hid:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4",
 "publicKeyMultibase": "z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4"
 }
 ],
 "authentication": [
-"did:hs:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4#key-1"
+"did:hid:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4#key-1"
 ]
-}' "${VERSION_ID}" did:hs:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4#key-1 --ver-key <private-key> --keyring-backend test --from alice --chain-id hidnode --yes
+}' "${VERSION_ID}" did:hid:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4#key-1 --ver-key <private-key> --keyring-backend test --from alice --chain-id hidnode --yes
 ```
 
-Here, the `${VERSION_ID}` should have the version id of the latest DID of User 2 (`did:hs:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4`)
+Here, the `${VERSION_ID}` should have the version id of the latest DID of User 2 (`did:hid:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4`)
 
 ### Deactivate DID
 
-User 2 (`did:hs:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4`) is trying to deactivate it’s DID
+User 2 (`did:hid:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4`) is trying to deactivate it’s DID
 
 ```sh
-hid-noded tx ssi deactivate-did 'did:hs:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4' "${VERSION_ID}" did:hs:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4#key-1 --ver-key <private-key> --keyring-backend test --from alice --chain-id hidnode --yes
+hid-noded tx ssi deactivate-did 'did:hid:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4' "${VERSION_ID}" did:hid:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4#key-1 --ver-key <private-key> --keyring-backend test --from alice --chain-id hidnode --yes
 ```
 
 ### Query DID
@@ -169,23 +169,23 @@ Output:
                "https://w3id.org/security/v1",
                "https://schema.org"
             ],
-            "id":"did:hs:devnet:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf",
+            "id":"did:hid:devnet:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf",
             "controller":[
                
             ],
             "alsoKnownAs":[
-               "did:hs:devnet:1f49341a-de30993e6c51"
+               "did:hid:devnet:1f49341a-de30993e6c51"
             ],
             "verificationMethod":[
                {
-                  "id":"did:hs:devnet:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf#key-1",
+                  "id":"did:hid:devnet:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf#key-1",
                   "type":"Ed25519VerificationKey2020",
-                  "controller":"did:hs:devnet:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf",
+                  "controller":"did:hid:devnet:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf",
                   "publicKeyMultibase":"zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf"
                }
             ],
             "authentication":[
-               "did:hs:devnet:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf#key-1"
+               "did:hid:devnet:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf#key-1"
             ],
             "assertionMethod":[
                
@@ -222,23 +222,23 @@ Output:
                "https://w3id.org/security/v1",
                "https://schema.org"
             ],
-            "id":"did:hs:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4",
+            "id":"did:hid:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4",
             "controller":[
-               "did:hs:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4"
+               "did:hid:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4"
             ],
             "alsoKnownAs":[
-               "did:hs:devnet:1f49341a-de30993e6c52"
+               "did:hid:devnet:1f49341a-de30993e6c52"
             ],
             "verificationMethod":[
                {
-                  "id":"did:hs:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4#key-1",
+                  "id":"did:hid:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4#key-1",
                   "type":"Ed25519VerificationKey2020",
-                  "controller":"did:hs:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4",
+                  "controller":"did:hid:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4",
                   "publicKeyMultibase":"z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4"
                }
             ],
             "authentication":[
-               "did:hs:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4#key-1"
+               "did:hid:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4#key-1"
             ],
             "assertionMethod":[
                
@@ -254,12 +254,12 @@ Output:
             ],
             "service":[
                {
-                  "id":"did:hs:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4#vcs",
+                  "id":"did:hid:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4#vcs",
                   "type":"LinkedDomains",
                   "serviceEndpoint":"https://example.com/vc"
                },
                {
-                  "id":"did:hs:devnet:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf#file",
+                  "id":"did:hid:devnet:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf#file",
                   "type":"LinkedDomains",
                   "serviceEndpoint":"https://example.in/somefile"
                }
@@ -298,21 +298,21 @@ Output:
           "https://w3id.org/security/v1",
           "https://schema.org"
         ],
-        "id": "did:hs:devnet:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf",
+        "id": "did:hid:devnet:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf",
         "controller": [],
         "alsoKnownAs": [
-          "did:hs:devnet:1f49341a-de30993e6c51"
+          "did:hid:devnet:1f49341a-de30993e6c51"
         ],
         "verificationMethod": [
           {
-            "id": "did:hs:devnet:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf#key-1",
+            "id": "did:hid:devnet:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf#key-1",
             "type": "Ed25519VerificationKey2020",
-            "controller": "did:hs:devnet:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf",
+            "controller": "did:hid:devnet:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf",
             "publicKeyMultibase": "zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf"
           }
         ],
         "authentication": [
-          "did:hs:devnet:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf#key-1"
+          "did:hid:devnet:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf#key-1"
         ],
         "assertionMethod": [],
         "keyAgreement": [],
@@ -337,7 +337,7 @@ Output:
 
 3) Query the DID Document for a given DID Id
 
-URL: `http://<REST-URL>/hypersign-protocol/hidnode/ssi/did/did:hs:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4:`
+URL: `http://<REST-URL>/hypersign-protocol/hidnode/ssi/did/did:hid:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4:`
 
 <br>
 
@@ -356,23 +356,23 @@ Output:
       "https://w3id.org/security/v1",
       "https://schema.org"
     ],
-    "id": "did:hs:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4",
+    "id": "did:hid:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4",
     "controller": [
-      "did:hs:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4"
+      "did:hid:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4"
     ],
     "alsoKnownAs": [
-      "did:hs:devnet:1f49341a-de30993e6c52"
+      "did:hid:devnet:1f49341a-de30993e6c52"
     ],
     "verificationMethod": [
       {
-        "id": "did:hs:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4#key-1",
+        "id": "did:hid:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4#key-1",
         "type": "Ed25519VerificationKey2020",
-        "controller": "did:hs:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4",
+        "controller": "did:hid:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4",
         "publicKeyMultibase": "z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4"
       }
     ],
     "authentication": [
-      "did:hs:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4#key-1"
+      "did:hid:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4#key-1"
     ],
     "assertionMethod": [],
     "keyAgreement": [],
@@ -380,12 +380,12 @@ Output:
     "capabilityDelegation": [],
     "service": [
       {
-        "id": "did:hs:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4#vcs",
+        "id": "did:hid:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4#vcs",
         "type": "LinkedDomains",
         "serviceEndpoint": "https://example.com/vc"
       },
       {
-        "id": "did:hs:devnet:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf#file",
+        "id": "did:hid:devnet:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf#file",
         "type": "LinkedDomains",
         "serviceEndpoint": "https://example.in/somefile"
       }
