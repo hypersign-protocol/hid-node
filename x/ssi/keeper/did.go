@@ -12,7 +12,7 @@ import (
 
 
 // Set the DID namespace
-func (k Keeper) SetDidNamespace(ctx *sdk.Context, namespace string) {
+func (k Keeper) SetChainNamespace(ctx *sdk.Context, namespace string) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.DidNamespaceKey))
 	// Convert the DidCountKey to bytes
 	byteKey := []byte(types.DidNamespaceKey)
@@ -20,7 +20,7 @@ func (k Keeper) SetDidNamespace(ctx *sdk.Context, namespace string) {
 }
 
 // Get the DID namespace
-func (k Keeper) GetDidNamespace(ctx *sdk.Context) string {
+func (k Keeper) GetChainNamespace(ctx *sdk.Context) string {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.DidNamespaceKey))
 	byteKey := []byte(types.DidNamespaceKey)
 	bz := store.Get(byteKey)

@@ -16,7 +16,7 @@ func TestUpdateDID(t *testing.T) {
 	msgServ := keeper.NewMsgServerImpl(*k)
 	goCtx := sdk.WrapSDKContext(ctx)
 
-	k.SetDidNamespace(&ctx, "devnet")
+	k.SetChainNamespace(&ctx, "devnet")
 
 	keyPair1 := GeneratePublicPrivateKeyPair()
 	rpcElements := GenerateDidDocumentRPCElements(keyPair1)
@@ -81,7 +81,7 @@ func TestInvalidChangeByNonControllerDid(t *testing.T) {
 	msgServ := keeper.NewMsgServerImpl(*k)
 	goCtx := sdk.WrapSDKContext(ctx)
 
-	k.SetDidNamespace(&ctx, "devnet")
+	k.SetChainNamespace(&ctx, "devnet")
 
 	// Create Two DID: Alice and Charlie
 	aliceKeyPair := GeneratePublicPrivateKeyPair()
@@ -128,7 +128,7 @@ func TestValidChangeByControllerDid(t *testing.T) {
 	msgServ := keeper.NewMsgServerImpl(*k)
 	goCtx := sdk.WrapSDKContext(ctx)
 
-	k.SetDidNamespace(&ctx, "devnet")
+	k.SetChainNamespace(&ctx, "devnet")
 	
 	// Create Two DID: Alice and Charlie
 	aliceKeyPair := GeneratePublicPrivateKeyPair()
@@ -203,7 +203,7 @@ func TestMultiSigControllers(t *testing.T) {
 	msgServ := keeper.NewMsgServerImpl(*k)
 	goCtx := sdk.WrapSDKContext(ctx)
 
-	k.SetDidNamespace(&ctx, "devnet")
+	k.SetChainNamespace(&ctx, "devnet")
 	
 	// Create Two DID: Alice and Charlie
 	aliceKeyPair := GeneratePublicPrivateKeyPair()

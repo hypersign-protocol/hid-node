@@ -27,7 +27,7 @@ Usage:
 ```json
 {
     "claim": {
-            "id": "vc_example1",
+            "id": "vc:hid:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4",
             "currentStatus": "Live",
             "statusReason": "Credential Active"
         },
@@ -58,7 +58,7 @@ The field `proofValue` holds the signature that was produced by signing the `cre
 The following command registers the status of a VC with id `vc_example1`:
 
 ```sh
-hid-noded tx ssi register-credential-status '{"claim":{"id":"vc_example1","currentStatus":"Live","statusReason":"Credential Active"},"issuer":"did:hid:devnet:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf","issuanceDate":"2022-04-10T04:07:12Z","expirationDate":"2023-02-22T13:45:55Z","credentialHash":"< -- Hash -->"}' '{"type":"Ed25519VerificationKey2020","created":"2022-04-10T04:07:12Z","updated":"2022-04-10T04:07:12Z","verificationMethod":"did:hid:devnet:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf#key-1","proofValue":"<-- Base64 encoded signature -->","proofPurpose":"assertion"}' --from <hid-account>
+hid-noded tx ssi register-credential-status '{"claim":{"id":"vc:hid:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4,"currentStatus":"Live","statusReason":"Credential Active"},"issuer":"did:hid:devnet:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf","issuanceDate":"2022-04-10T04:07:12Z","expirationDate":"2023-02-22T13:45:55Z","credentialHash":"< -- Hash -->"}' '{"type":"Ed25519VerificationKey2020","created":"2022-04-10T04:07:12Z","updated":"2022-04-10T04:07:12Z","verificationMethod":"did:hid:devnet:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf#key-1","proofValue":"<-- Base64 encoded signature -->","proofPurpose":"assertion"}' --from <hid-account>
 ```
 
 ### Querying Credential Status

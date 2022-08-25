@@ -19,5 +19,5 @@ func TestGenesis(t *testing.T) {
 	ExpectedDidNamespace := ""
 
 	require.NotNil(t, exportedGenesisState)
-	require.Equal(t, ExpectedDidNamespace, genesisState.DidNamespace)
+	require.Equal(t, ExpectedDidNamespace, genesisState.ChainNamespace)
 }
