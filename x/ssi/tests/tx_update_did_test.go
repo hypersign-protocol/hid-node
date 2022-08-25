@@ -16,7 +16,6 @@ func TestUpdateDID(t *testing.T) {
 	msgServ := keeper.NewMsgServerImpl(*k)
 	goCtx := sdk.WrapSDKContext(ctx)
 
-	k.SetDidMethod(&ctx, "hs")
 	k.SetDidNamespace(&ctx, "devnet")
 
 	keyPair1 := GeneratePublicPrivateKeyPair()
@@ -82,7 +81,6 @@ func TestInvalidChangeByNonControllerDid(t *testing.T) {
 	msgServ := keeper.NewMsgServerImpl(*k)
 	goCtx := sdk.WrapSDKContext(ctx)
 
-	k.SetDidMethod(&ctx, "hs")
 	k.SetDidNamespace(&ctx, "devnet")
 
 	// Create Two DID: Alice and Charlie
@@ -130,7 +128,6 @@ func TestValidChangeByControllerDid(t *testing.T) {
 	msgServ := keeper.NewMsgServerImpl(*k)
 	goCtx := sdk.WrapSDKContext(ctx)
 
-	k.SetDidMethod(&ctx, "hs")
 	k.SetDidNamespace(&ctx, "devnet")
 	
 	// Create Two DID: Alice and Charlie
@@ -206,7 +203,6 @@ func TestMultiSigControllers(t *testing.T) {
 	msgServ := keeper.NewMsgServerImpl(*k)
 	goCtx := sdk.WrapSDKContext(ctx)
 
-	k.SetDidMethod(&ctx, "hs")
 	k.SetDidNamespace(&ctx, "devnet")
 	
 	// Create Two DID: Alice and Charlie

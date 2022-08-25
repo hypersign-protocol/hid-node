@@ -16,11 +16,10 @@ func (k msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*t
 	didMsg := msg.GetDidDocString()
 	did := didMsg.GetId()
 
-	didMethodStore := k.GetDidMethod(&ctx)
 	didNamespaceStore := k.GetDidNamespace(&ctx)
 
 	// Checks if the DidDoc is a valid format
-	err := verify.IsValidDidDoc(msg.DidDocString, didMethodStore, didNamespaceStore)
+	err := verify.IsValidDidDoc(msg.DidDocString, didNamespaceStore)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +73,6 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 	did := msg.GetDidDocString().GetId()
 	versionId := msg.GetVersionId()
 
-	didMethodStore := k.GetDidMethod(&ctx)
 	didNamespaceStore := k.GetDidNamespace(&ctx)
 
 	oldDIDDoc, err := k.GetDid(&ctx, didMsg.Id)
@@ -85,7 +83,7 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 	oldMetaData := oldDIDDoc.GetMetadata()
 
 	// Check if the didDoc is valid
-	err = verify.IsValidDidDoc(didMsg, didMethodStore, didNamespaceStore)
+	err = verify.IsValidDidDoc(didMsg, didNamespaceStore)
 	if err != nil {
 		return nil, err
 	}
@@ -158,11 +156,10 @@ func (k msgServer) DeactivateDID(goCtx context.Context, msg *types.MsgDeactivate
 	did := didDocument.GetDid()
 	metadata := didDocument.GetMetadata()
 
-	didMethodStore := k.GetDidMethod(&ctx)
 	didNamespaceStore := k.GetDidNamespace(&ctx)
 	
 	// Check if the didDoc is valid
-	err = verify.IsValidDidDoc(did, didMethodStore, didNamespaceStore)
+	err = verify.IsValidDidDoc(did, didNamespaceStore)
 	if err != nil {
 		return nil, err
 	}
