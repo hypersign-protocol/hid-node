@@ -13,7 +13,7 @@ func DefaultGenesis() *GenesisState {
 // Validate performs basic genesis state validation returning an error upon any
 // failure.
 func (gs GenesisState) Validate() error {
-	namespace := gs.DidNamespace
+	namespace := gs.ChainNamespace
 
 	regexPattern, _ := regexp.Compile("^[a-zA-Z0-9-]*$") // Matches string containing whitespaces and tabs
 	maxDidNamespaceLength := 10

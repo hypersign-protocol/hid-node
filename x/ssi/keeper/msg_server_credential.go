@@ -7,6 +7,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	verify "github.com/hypersign-protocol/hid-node/x/ssi/keeper/document_verification"
 
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 )
@@ -29,6 +30,14 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 	credProof := msg.GetProof()
 
 	credId := credMsg.GetClaim().GetId()
+
+	chainNamespace := k.GetChainNamespace(&ctx)
+
+	// Check the format of Credential ID
+	err := verify.IsValidID(credId, chainNamespace, "credDocument"); 
+	if err != nil {
+		return nil, err
+	}
 
 	// Check if the credential already exist in the store
 	if !k.HasCredential(ctx, credId) {
