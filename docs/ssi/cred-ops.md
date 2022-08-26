@@ -11,6 +11,11 @@ Following are the VC statuses supported by `hid-node`:
 -	Revoked
 -	Expired
 
+## Supported Hash Algorithm
+
+We support the following hash algorithm for the attribute `credentialHash`:
+- SHA-256
+
 ## Register VC Status
 
 For instance, an issuer with id `did:hid:devnet:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf` has issue a VC, following which they want to register it's status.
