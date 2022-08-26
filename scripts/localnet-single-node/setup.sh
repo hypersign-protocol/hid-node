@@ -1,17 +1,22 @@
 #!/bin/bash
 
-# Download the binary if it doesn't exist
-hid-noded &> /dev/null
+# Use the already built binary or use a different one
+BINARY=$1
+if [ -z ${BINARY} ]; then
+	BINARY=hid-noded
+fi
+
+# Check if the binary is installed
+${BINARY} &> /dev/null
 
 RET_VAL=$?
 if [ ${RET_VAL} -ne 0 ]; then
-    echo "hid-noded binary not found"
+    echo "${BINARY} binary not found"
     exit 1
 fi
 
 # Setting up config files
 rm -rf $HOME/.hid-node/
-
 
 # Make directories for hid-node config
 mkdir $HOME/.hid-node
@@ -33,6 +38,7 @@ cat $HOME/.hid-node/config/genesis.json | jq '.app_state["crisis"]["constant_fee
 
 # update gov genesis
 cat $HOME/.hid-node/config/genesis.json | jq '.app_state["gov"]["deposit_params"]["min_deposit"][0]["denom"]="uhid"' > $HOME/.hid-node/config/tmp_genesis.json && mv $HOME/.hid-node/config/tmp_genesis.json $HOME/.hid-node/config/genesis.json
+cat $HOME/.hid-node/config/genesis.json | jq '.app_state["gov"]["voting_params"]["voting_period"]="50s"' > $HOME/.hid-node/config/tmp_genesis.json && mv $HOME/.hid-node/config/tmp_genesis.json $HOME/.hid-node/config/genesis.json
 
 # update ssi genesis
 cat $HOME/.hid-node/config/genesis.json | jq '.app_state["ssi"]["chain_namespace"]="devnet"' > $HOME/.hid-node/config/tmp_genesis.json && mv $HOME/.hid-node/config/tmp_genesis.json $HOME/.hid-node/config/genesis.json
@@ -41,7 +47,7 @@ cat $HOME/.hid-node/config/genesis.json | jq '.app_state["ssi"]["chain_namespace
 cat $HOME/.hid-node/config/genesis.json | jq '.app_state["mint"]["params"]["mint_denom"]="uhid"' > $HOME/.hid-node/config/tmp_genesis.json && mv $HOME/.hid-node/config/tmp_genesis.json $HOME/.hid-node/config/genesis.json
 
 # create validator node with tokens
-hid-noded add-genesis-account $(hid-noded keys show node1 -a --keyring-backend=test --home=$HOME/.hid-node) 100000000000uhid,100000000000stake --home=$HOME/.hid-node
+hid-noded add-genesis-account $(hid-noded keys show node1 -a --keyring-backend=test --home=$HOME/.hid-node) 100000000000uhid --home=$HOME/.hid-node
 hid-noded gentx node1 50000000000000000uhid --keyring-backend=test --home=$HOME/.hid-node --chain-id=hidnode
 hid-noded collect-gentxs --home=$HOME/.hid-node
 

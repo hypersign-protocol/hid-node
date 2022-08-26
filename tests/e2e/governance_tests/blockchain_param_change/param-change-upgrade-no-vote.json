@@ -1,0 +1,12 @@
+{
+    "title": "Parameter changes for validator downtime",
+    "description": "This is just a test description",
+    "changes": [
+      {
+        "subspace": "slashing",
+        "key": "SlashFractionDowntime",
+        "value": "0.714000000000000000"
+      }
+    ],
+    "deposit": "51200000uhid"
+}

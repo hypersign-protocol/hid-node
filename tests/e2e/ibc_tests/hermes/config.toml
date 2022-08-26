@@ -1,0 +1,57 @@
+[global]
+log_level = 'info'
+
+[mode]
+
+[mode.clients]
+enabled = true
+refresh = true
+misbehaviour = true
+
+[mode.connections]
+enabled = true
+
+[mode.channels]
+enabled = true
+
+[mode.packets]
+enabled = true
+clear_interval = 100
+clear_on_start = true
+tx_confirmation = true
+
+[telemetry]
+enabled = true
+host = '127.0.0.1'
+port = 3001
+
+[[chains]]
+id = 'hidnode'
+rpc_addr = 'http://localhost:26657'
+grpc_addr = 'http://localhost:9090'
+websocket_addr = 'ws://localhost:26657/websocket'
+rpc_timeout = '15s'
+account_prefix = 'hid'
+key_name = 'ibcrelayer-hid'
+store_prefix = 'ibc'
+gas_price = { price = 0.01, denom = 'uhid' }
+max_gas = 10000000
+clock_drift = '5s'
+trusting_period = '14days'
+trust_threshold = { numerator = '1', denominator = '3' }
+
+[[chains]]
+id = 'osmosischain'
+rpc_addr = 'http://localhost:36657'
+grpc_addr = 'http://localhost:9086'
+websocket_addr = 'ws://localhost:36657/websocket'
+rpc_timeout = '15s'
+account_prefix = 'osmo'
+key_name = 'ibcrelayer-osmo'
+store_prefix = 'ibc'
+gas_price = { price = 0.01, denom = 'uosmo' }
+max_gas = 10000000
+clock_drift = '5s'
+trusting_period = '14days'
+trust_threshold = { numerator = '1', denominator = '3' }
+

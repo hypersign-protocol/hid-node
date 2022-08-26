@@ -17,7 +17,11 @@ vue
 # vue/src/store/generated
 release/
 .idea/
-.vscode/
+.vscode
 .DS_Store
 
+# JSON files
+tests/load_tests/*.json
+
+# Build Folder
 build
