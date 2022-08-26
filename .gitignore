@@ -19,7 +19,9 @@ release/
 .idea/
 .vscode
 .DS_Store
-wallet/node_modules
 
 # JSON files
 tests/load_tests/*.json
+
+# Build Folder
+build

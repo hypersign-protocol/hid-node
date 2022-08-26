@@ -31,4 +31,5 @@ var (
 	ErrInvalidDate                = sdkerrors.Register(ModuleName, 121, "Invalid Date")
 	ErrInvalidCredentialField     = sdkerrors.Register(ModuleName, 122, "Invalid Credential Field")
 	ErrInvalidDidNamespace        = sdkerrors.Register(ModuleName, 123, "Invalid Did Namespace")
+	ErrInvalidCredentialHash      = sdkerrors.Register(ModuleName, 124, "Invalid Credential Hash")
 )

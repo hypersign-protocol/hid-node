@@ -15,10 +15,11 @@ export GO111MODULE=on
 ###############################################################################
 ###                                  Build                                  ###
 ###############################################################################
+.PHONY: build
 
 build: go.sum
-		go build -mod=readonly $(BUILD_FLAGS) -o ${GOBIN}/hid-noded  ./cmd/hid-noded
-		
+		go build -mod=readonly $(BUILD_FLAGS) -o ./build/hid-noded ./cmd/hid-noded		
+
 go.sum: go.mod
 		@echo "--> Ensure dependencies have not been modified"
 		@go mod verify

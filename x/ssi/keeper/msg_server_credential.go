@@ -7,18 +7,10 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	verify "github.com/hypersign-protocol/hid-node/x/ssi/keeper/document_verification"
 
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 )
-
-// Acceptable Credential Status.
-// Ref: https://github.com/hypersign-protocol/hid-node/discussions/141#discussioncomment-2825349
-var acceptableCredStatuses = []string{
-	"Live",
-	"Suspended",
-	"Revoked",
-	"Expired",
-}
 
 func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.MsgRegisterCredentialStatus) (*types.MsgRegisterCredentialStatusResponse, error) {
 	var id uint64
@@ -29,6 +21,14 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 	credProof := msg.GetProof()
 
 	credId := credMsg.GetClaim().GetId()
+
+	chainNamespace := k.GetChainNamespace(&ctx)
+
+	// Check the format of Credential ID
+	err := verify.IsValidID(credId, chainNamespace, "credDocument"); 
+	if err != nil {
+		return nil, err
+	}
 
 	// Check if the credential already exist in the store
 	if !k.HasCredential(ctx, credId) {
@@ -62,7 +62,7 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 		if err != nil {
 			return nil, sdkerrors.Wrapf(types.ErrInvalidDate, fmt.Sprintf("invalid issuance date format: %s", issuanceDate))
 		}
-
+	
 		if err := VerifyCredentialStatusDates(issuanceDateParsed, expirationDateParsed); err != nil {
 			return nil, err
 		}
@@ -76,6 +76,12 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 		currentDate, _ := time.Parse(time.RFC3339, credProof.Created)
 		if currentDate.After(expirationDateParsed) || currentDate.Before(issuanceDateParsed) {
 			return nil, sdkerrors.Wrapf(types.ErrInvalidDate, "credential registeration is happening on a date which doesn`t lie between issuance date and expiration date")
+		}
+
+		// Check the hash type of credentialHash
+		isValidCredentialHash := verify.VerifyCredentialHash(credMsg.GetCredentialHash())
+		if !isValidCredentialHash {
+			return nil, sdkerrors.Wrapf(types.ErrInvalidCredentialHash, "supported hashing algorithms: sha256")
 		}
 
 		// Verify the Signature
@@ -127,7 +133,7 @@ func (k msgServer) updateCredentialStatus(ctx sdk.Context, newCredStatus *types.
 	// Check for the correct credential status
 	newClaimStatus := newCredStatus.GetClaim().GetCurrentStatus()
 	statusFound := 0
-	for _, acceptablestatus := range acceptableCredStatuses {
+	for _, acceptablestatus := range verify.AcceptedCredStatuses {
 		if newClaimStatus == acceptablestatus {
 			statusFound = 1
 		}

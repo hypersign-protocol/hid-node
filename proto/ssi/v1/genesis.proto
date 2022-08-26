@@ -9,6 +9,5 @@ option go_package = "github.com/hypersign-protocol/hid-node/x/ssi/types";
 
 // GenesisState defines the ssi module's genesis state.
 message GenesisState {
-  string did_method = 1; // TODO: Once did method spec has been confirmed, did_method should be removed
-  string did_namespace = 2;
+  string chain_namespace = 1;
 }

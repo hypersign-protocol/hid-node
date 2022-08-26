@@ -12,6 +12,12 @@ mkdir $HOME/.hid-node/node3
 hid-noded init --chain-id=hidnode node1 --home=$HOME/.hid-node/node1
 hid-noded init --chain-id=hidnode node2 --home=$HOME/.hid-node/node2
 hid-noded init --chain-id=hidnode node3 --home=$HOME/.hid-node/node3
+
+# Change hid-node minimum gas prices
+hid-noded configure min-gas-prices 0uhid --home=$HOME/.hid-node/node1
+hid-noded configure min-gas-prices 0uhid --home=$HOME/.hid-node/node2
+hid-noded configure min-gas-prices 0uhid --home=$HOME/.hid-node/node3
+
 # create keys for all three nodes
 hid-noded keys add node1 --keyring-backend=test --home=$HOME/.hid-node/node1
 hid-noded keys add node2 --keyring-backend=test --home=$HOME/.hid-node/node2
@@ -22,7 +28,7 @@ cat $HOME/.hid-node/node1/config/genesis.json | jq '.app_state["staking"]["param
 
 # create validator node with tokens to transfer to the three other nodes
 hid-noded add-genesis-account $(hid-noded keys show node1 -a --keyring-backend=test --home=$HOME/.hid-node/node1) 100000000000uhid,100000000000stake --home=$HOME/.hid-node/node1
-hid-noded gentx node1 500000000uhid --keyring-backend=test --home=$HOME/.hid-node/node1 --chain-id=hidnode
+hid-noded gentx node1 5000000000000000000uhid --keyring-backend=test --home=$HOME/.hid-node/node1 --chain-id=hidnode
 hid-noded collect-gentxs --home=$HOME/.hid-node/node1
 
 # update crisis variable to uhid
@@ -35,7 +41,6 @@ cat $HOME/.hid-node/node1/config/genesis.json | jq '.app_state["gov"]["deposit_p
 cat $HOME/.hid-node/node1/config/genesis.json | jq '.app_state["mint"]["params"]["mint_denom"]="uhid"' > $HOME/.hid-node/node1/config/tmp_genesis.json && mv $HOME/.hid-node/node1/config/tmp_genesis.json $HOME/.hid-node/node1/config/genesis.json
 
 #update ssi genesis
-cat $HOME/.hid-node/node1/config/genesis.json | jq '.app_state["ssi"]["did_method"]="hs"' > $HOME/.hid-node/node1/config/tmp_genesis.json && mv $HOME/.hid-node/node1/config/tmp_genesis.json $HOME/.hid-node/node1/config/genesis.json
 cat $HOME/.hid-node/node1/config/genesis.json | jq '.app_state["ssi"]["did_namespace"]="devnet"' > $HOME/.hid-node/node1/config/tmp_genesis.json && mv $HOME/.hid-node/node1/config/tmp_genesis.json $HOME/.hid-node/node1/config/genesis.json
 
 # change app.toml values
