@@ -25,7 +25,6 @@ import (
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	"github.com/cosmos/cosmos-sdk/x/auth/vesting"
 	"github.com/cosmos/cosmos-sdk/x/authz"
 	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
 	authzmodule "github.com/cosmos/cosmos-sdk/x/authz/module"
@@ -80,7 +79,6 @@ import (
 	ibcporttypes "github.com/cosmos/ibc-go/modules/core/05-port/types"
 	ibchost "github.com/cosmos/ibc-go/modules/core/24-host"
 	ibckeeper "github.com/cosmos/ibc-go/modules/core/keeper"
-	vestingtypes "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
 	"github.com/spf13/cast"
 	abci "github.com/tendermint/tendermint/abci/types"
 	tmjson "github.com/tendermint/tendermint/libs/json"
@@ -146,7 +144,6 @@ var (
 		upgrade.AppModuleBasic{},
 		evidence.AppModuleBasic{},
 		transfer.AppModuleBasic{},
-		vesting.AppModuleBasic{},
 		authzmodule.AppModuleBasic{},
 		ssimodule.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
@@ -391,7 +388,6 @@ func New(
 		),
 		auth.NewAppModule(appCodec, app.AccountKeeper, nil),
 		authzmodule.NewAppModule(appCodec, app.AuthzKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
-		vesting.NewAppModule(app.AccountKeeper, app.BankKeeper),
 		bank.NewAppModule(appCodec, app.BankKeeper, app.AccountKeeper),
 		capability.NewAppModule(appCodec, *app.CapabilityKeeper),
 		feegrantmodule.NewAppModule(appCodec, app.AccountKeeper, app.BankKeeper, app.FeeGrantKeeper, app.interfaceRegistry),
@@ -430,7 +426,6 @@ func New(
 		feegrant.ModuleName, 
 		authz.ModuleName,
 		ssimoduletypes.ModuleName,
-		vestingtypes.ModuleName,
 		genutiltypes.ModuleName,
 		crisistypes.ModuleName,
 		paramstypes.ModuleName,
@@ -452,7 +447,6 @@ func New(
 		paramstypes.ModuleName,
 		capabilitytypes.ModuleName,
 		evidencetypes.ModuleName,
-		vestingtypes.ModuleName,
 		slashingtypes.ModuleName,
 		ibchost.ModuleName,
 		ibctransfertypes.ModuleName,
@@ -480,7 +474,6 @@ func New(
 		ssimoduletypes.ModuleName,
 		feegrant.ModuleName, 
 		authz.ModuleName,
-		vestingtypes.ModuleName,
 		paramstypes.ModuleName,
 		upgradetypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis

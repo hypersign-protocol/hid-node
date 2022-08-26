@@ -14,7 +14,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/rpc"
 	"github.com/cosmos/cosmos-sdk/server"
 	serverconfig "github.com/cosmos/cosmos-sdk/server/config"
-	vestingcli "github.com/cosmos/cosmos-sdk/x/auth/vesting/client/cli"
 
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	"github.com/cosmos/cosmos-sdk/snapshots"
@@ -149,7 +148,6 @@ func txCommand() *cobra.Command {
 		authcmd.GetEncodeCommand(),
 		authcmd.GetDecodeCommand(),
 		flags.LineBreak,
-		vestingcli.GetTxCmd(),
 	)
 
 	hidnode.ModuleBasics.AddTxCommands(cmd)
