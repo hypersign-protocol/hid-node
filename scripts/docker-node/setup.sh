@@ -13,7 +13,7 @@ cat /root/.hid-node/config/genesis.json | jq '.app_state["staking"]["params"]["b
 
 # create validator node with tokens
 hid-noded add-genesis-account $(hid-noded keys show node1 -a --keyring-backend=test ) 100000000000uhid,100000000000stake 
-hid-noded gentx node1 500000000uhid --keyring-backend=test  --chain-id=hidnode
+hid-noded gentx node1 5000000000000000uhid --keyring-backend=test  --chain-id=hidnode
 hid-noded collect-gentxs 
 
 # update crisis variable to uhid

@@ -23,7 +23,8 @@ func configureCmd(defaultNodeHome string) *cobra.Command {
 		p2pCmd(defaultNodeHome),
 		rpcLaddrCmd(defaultNodeHome),
 		createEmptyBlocksCmd(defaultNodeHome),
-		fastsyncVersionCmd(defaultNodeHome))
+		fastsyncVersionCmd(defaultNodeHome),
+	)
 
 	return cmd
 }
@@ -52,12 +53,11 @@ func p2pCmd(defaultNodeHome string) *cobra.Command {
 func minGasPricesCmd(defaultNodeHome string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "min-gas-prices [value]",
-		Short: "The minimum gas prices a validator is willing to accept (default  \"10uhid\")",
+		Short: "The minimum gas prices a validator is willing to accept (default \"10uhid\")",
 		Example: "min-gas-prices 10uhid",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
-
 			return updateCosmConfig(clientCtx.HomeDir, func(config *cosmcfg.Config) {
 				config.MinGasPrices = args[0]
 			})
@@ -105,7 +105,6 @@ func seedsCmd(defaultNodeHome string) *cobra.Command {
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
-
 			return updateTmConfig(clientCtx.HomeDir, func(config *tmcfg.Config) {
 				config.P2P.Seeds = args[0]
 			})
@@ -125,11 +124,10 @@ func externalAddressCmd(defaultNodeHome string) *cobra.Command {
 		Long: "Address to advertise to peers for them to connect to the node. If empty, the node will use the same " +
 			"port as the laddr, and will attach it to the listener or use UPnP to figure out the address. IP " +
 			"address/DNS name P2P port are required.",
-		Example: "external-address 159.89.10.97:26656",
+		Example: "external-address 159.x.x.x:26656",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
-
 			return updateTmConfig(clientCtx.HomeDir, func(config *tmcfg.Config) {
 				config.P2P.ExternalAddress = args[0]
 			})
@@ -150,7 +148,6 @@ func persistentPeersCmd(defaultNodeHome string) *cobra.Command {
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
-
 			return updateTmConfig(clientCtx.HomeDir, func(config *tmcfg.Config) {
 				config.P2P.PersistentPeers = args[0]
 			})
@@ -171,7 +168,6 @@ func sendRateCmd(defaultNodeHome string) *cobra.Command {
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
-
 			value, err := strconv.ParseInt(args[0], 10, 64)
 			if err != nil {
 				return errors.Wrap(err, "can't parse send rate")
@@ -249,7 +245,6 @@ func p2pLaddrCmd(defaultNodeHome string) *cobra.Command {
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
-
 			return updateTmConfig(clientCtx.HomeDir, func(config *tmcfg.Config) {
 				config.P2P.ListenAddress = args[0]
 			})
@@ -296,7 +291,6 @@ func rpcLaddrCmd(defaultNodeHome string) *cobra.Command {
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
-
 			return updateTmConfig(clientCtx.HomeDir, func(config *tmcfg.Config) {
 				config.RPC.ListenAddress = args[0]
 			})
@@ -317,7 +311,6 @@ func fastsyncVersionCmd(defaultNodeHome string) *cobra.Command {
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
-
 			return updateTmConfig(clientCtx.HomeDir, func(config *tmcfg.Config) {
 				config.FastSync.Version = args[0]
 			})
