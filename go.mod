@@ -22,6 +22,7 @@ require (
 	github.com/btcsuite/btcutil v1.0.3-0.20201208143702-a53e38424cce
 	github.com/golang/protobuf v1.5.2
 	github.com/multiformats/go-multibase v0.0.3
+	github.com/spf13/viper v1.12.0
 	golang.org/x/net v0.0.0-20220624214902-1bab6f366d9e // indirect
 	gopkg.in/yaml.v2 v2.4.0
 )

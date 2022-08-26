@@ -20,5 +20,4 @@ release/
 .vscode/
 .DS_Store
 
-wallet/node_modules
-
+build

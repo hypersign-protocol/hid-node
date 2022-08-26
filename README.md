@@ -12,12 +12,18 @@ Following are the prerequisites that needs to be installed:
 
 ### Local:
 
-Clone the hid-node repository and build the binary:
+- Clone the hid-node repository and build the binary:
 
 ```sh
 git clone https://github.com/hypersign-protocol/hid-node.git
 cd hid-node
 make build
+```
+
+- Move the build to GOPATH:
+
+```sh
+cp ./build/hid-noded $(go env GOPATH)/bin/
 ```
 
 The binary `hid-noded` will be generated in `$GO_PATH/bin` directory. To explore its functionalities, type `hid-noded --help` im a seperate terminal window.

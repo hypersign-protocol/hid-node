@@ -25,7 +25,7 @@ hid-noded tx ssi create-did '{
 "assertionMethod": [
 "did:hid:devnet:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf#key-1"
 ]
-}' did:hid:devnet:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf#key-1 --ver-key oVtY1xceDZQjkfwlbCEC2vgeADcxpgd27vtYasBhcM/JLR6PnPoD9jvjSJrMsMJwS7faPy5OlFCdj/kgLVZMEg== --from node1 --chain-id hidnode --broadcast-mode block --yes
+}' did:hid:devnet:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf#key-1 --ver-key oVtY1xceDZQjkfwlbCEC2vgeADcxpgd27vtYasBhcM/JLR6PnPoD9jvjSJrMsMJwS7faPy5OlFCdj/kgLVZMEg== --from node1 --chain-id hidnode --broadcast-mode block --keyring-backend test --yes
 
 echo "\n----------- User 1 has been created ----------- "
 
@@ -58,7 +58,7 @@ hid-noded tx ssi create-did '{
 "assertionMethod": [
 "did:hid:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4#key-1"
 ]
-}' did:hid:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4#key-1 --ver-key bZBUkLGChnJujYHUZ4L8PECoN2Odv6adWGXc1qVWCRVqtEx0o/FmtFZnd5pT3laR518P58TRUGY5q5KSrToSmQ== --from node1 --chain-id hidnode --broadcast-mode block --yes
+}' did:hid:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4#key-1 --ver-key bZBUkLGChnJujYHUZ4L8PECoN2Odv6adWGXc1qVWCRVqtEx0o/FmtFZnd5pT3laR518P58TRUGY5q5KSrToSmQ== --from node1 --chain-id hidnode --broadcast-mode block --keyring-backend test --yes
 
 echo "\n ----------- User 2 has been created ----------- "
 
@@ -91,7 +91,7 @@ hid-noded tx ssi create-did '{
 "assertionMethod": [
 "did:hid:devnet:zE2seaoaAwBzfLaTd7oqEf5GJZdEiQgo64ayJgMstRZ91#key-1"
 ]
-}' did:hid:devnet:zE2seaoaAwBzfLaTd7oqEf5GJZdEiQgo64ayJgMstRZ91#key-1 --ver-key JFfT5yPnBbwcDkmry9vdqX9eBKJmfnTT9C1r0LZ5S73BosdZL7AaZ9AYx6Mpvvw/ebaKPyaIiVZ3StijU8RRAA== --from node1 --chain-id hidnode --broadcast-mode block --yes
+}' did:hid:devnet:zE2seaoaAwBzfLaTd7oqEf5GJZdEiQgo64ayJgMstRZ91#key-1 --ver-key JFfT5yPnBbwcDkmry9vdqX9eBKJmfnTT9C1r0LZ5S73BosdZL7AaZ9AYx6Mpvvw/ebaKPyaIiVZ3StijU8RRAA== --from node1 --chain-id hidnode --broadcast-mode block --keyring-backend test --yes
 
 echo "\n -----------User 3 has been created ----------- "
 
