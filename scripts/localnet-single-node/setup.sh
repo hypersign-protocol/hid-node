@@ -47,7 +47,7 @@ cat $HOME/.hid-node/config/genesis.json | jq '.app_state["ssi"]["chain_namespace
 cat $HOME/.hid-node/config/genesis.json | jq '.app_state["mint"]["params"]["mint_denom"]="uhid"' > $HOME/.hid-node/config/tmp_genesis.json && mv $HOME/.hid-node/config/tmp_genesis.json $HOME/.hid-node/config/genesis.json
 
 # create validator node with tokens
-hid-noded add-genesis-account $(hid-noded keys show node1 -a --keyring-backend=test --home=$HOME/.hid-node) 100000000000uhid --home=$HOME/.hid-node
+hid-noded add-genesis-account $(hid-noded keys show node1 -a --keyring-backend=test --home=$HOME/.hid-node) 50000000000000000uhid --home=$HOME/.hid-node
 hid-noded gentx node1 50000000000000000uhid --keyring-backend=test --home=$HOME/.hid-node --chain-id=hidnode
 hid-noded collect-gentxs --home=$HOME/.hid-node
 

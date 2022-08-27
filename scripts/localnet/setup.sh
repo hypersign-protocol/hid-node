@@ -27,7 +27,7 @@ hid-noded keys add node3 --keyring-backend=test --home=$HOME/.hid-node/node3
 cat $HOME/.hid-node/node1/config/genesis.json | jq '.app_state["staking"]["params"]["bond_denom"]="uhid"' > $HOME/.hid-node/node1/config/tmp_genesis.json && mv $HOME/.hid-node/node1/config/tmp_genesis.json $HOME/.hid-node/node1/config/genesis.json
 
 # create validator node with tokens to transfer to the three other nodes
-hid-noded add-genesis-account $(hid-noded keys show node1 -a --keyring-backend=test --home=$HOME/.hid-node/node1) 100000000000uhid,100000000000stake --home=$HOME/.hid-node/node1
+hid-noded add-genesis-account $(hid-noded keys show node1 -a --keyring-backend=test --home=$HOME/.hid-node/node1) 5000000000000000000uhid --home=$HOME/.hid-node/node1
 hid-noded gentx node1 5000000000000000000uhid --keyring-backend=test --home=$HOME/.hid-node/node1 --chain-id=hidnode
 hid-noded collect-gentxs --home=$HOME/.hid-node/node1
 
