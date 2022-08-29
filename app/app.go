@@ -25,7 +25,6 @@ import (
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	"github.com/cosmos/cosmos-sdk/x/auth/vesting"
 	"github.com/cosmos/cosmos-sdk/x/authz"
 	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
 	authzmodule "github.com/cosmos/cosmos-sdk/x/authz/module"
@@ -95,6 +94,7 @@ import (
 	ssimodule "github.com/hypersign-protocol/hid-node/x/ssi"
 	ssimodulekeeper "github.com/hypersign-protocol/hid-node/x/ssi/keeper"
 	ssimoduletypes "github.com/hypersign-protocol/hid-node/x/ssi/types"
+	appparams "github.com/hypersign-protocol/hid-node/app/params"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 )
 
@@ -144,7 +144,6 @@ var (
 		upgrade.AppModuleBasic{},
 		evidence.AppModuleBasic{},
 		transfer.AppModuleBasic{},
-		vesting.AppModuleBasic{},
 		authzmodule.AppModuleBasic{},
 		ssimodule.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
@@ -218,7 +217,6 @@ type App struct {
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
 
 	SsiKeeper ssimodulekeeper.Keeper
-	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// mm is the module manager
 	mm *module.Manager
@@ -236,11 +234,11 @@ func New(
 	skipUpgradeHeights map[int64]bool,
 	homePath string,
 	invCheckPeriod uint,
-	encodingConfig cosmoscmd.EncodingConfig,
+	encodingConfig appparams.EncodingConfig,
 	appOpts servertypes.AppOptions,
 	baseAppOptions ...func(*baseapp.BaseApp),
-) cosmoscmd.App {
-	appCodec := encodingConfig.Marshaler
+) *App {
+	appCodec := encodingConfig.Codec
 	cdc := encodingConfig.Amino
 	interfaceRegistry := encodingConfig.InterfaceRegistry
 
@@ -390,7 +388,6 @@ func New(
 		),
 		auth.NewAppModule(appCodec, app.AccountKeeper, nil),
 		authzmodule.NewAppModule(appCodec, app.AuthzKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
-		vesting.NewAppModule(app.AccountKeeper, app.BankKeeper),
 		bank.NewAppModule(appCodec, app.BankKeeper, app.AccountKeeper),
 		capability.NewAppModule(appCodec, *app.CapabilityKeeper),
 		feegrantmodule.NewAppModule(appCodec, app.AccountKeeper, app.BankKeeper, app.FeeGrantKeeper, app.interfaceRegistry),
@@ -414,12 +411,46 @@ func New(
 	// CanWithdrawInvariant invariant.
 	// NOTE: staking module is required if HistoricalEntries param > 0
 	app.mm.SetOrderBeginBlockers(
-		upgradetypes.ModuleName, capabilitytypes.ModuleName, minttypes.ModuleName, distrtypes.ModuleName, slashingtypes.ModuleName,
-		evidencetypes.ModuleName, stakingtypes.ModuleName, ibchost.ModuleName,
-		feegrant.ModuleName, authz.ModuleName, ssimoduletypes.ModuleName,
+		authtypes.ModuleName,
+		banktypes.ModuleName,
+		govtypes.ModuleName,
+		upgradetypes.ModuleName,
+		capabilitytypes.ModuleName, 
+		minttypes.ModuleName,
+		distrtypes.ModuleName,
+		slashingtypes.ModuleName,
+		evidencetypes.ModuleName,
+		stakingtypes.ModuleName,
+		ibchost.ModuleName,
+		ibctransfertypes.ModuleName,
+		feegrant.ModuleName, 
+		authz.ModuleName,
+		ssimoduletypes.ModuleName,
+		genutiltypes.ModuleName,
+		crisistypes.ModuleName,
+		paramstypes.ModuleName,
 	)
 
-	app.mm.SetOrderEndBlockers(crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName)
+	app.mm.SetOrderEndBlockers(
+		authtypes.ModuleName,
+		banktypes.ModuleName, 
+		crisistypes.ModuleName,
+		govtypes.ModuleName, 
+		stakingtypes.ModuleName,
+		minttypes.ModuleName,
+		distrtypes.ModuleName,
+		upgradetypes.ModuleName,
+		ssimoduletypes.ModuleName,
+		genutiltypes.ModuleName,
+		feegrant.ModuleName, 
+		authz.ModuleName,
+		paramstypes.ModuleName,
+		capabilitytypes.ModuleName,
+		evidencetypes.ModuleName,
+		slashingtypes.ModuleName,
+		ibchost.ModuleName,
+		ibctransfertypes.ModuleName,
+	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
 	// properly initialized with tokens from genesis accounts.
@@ -441,6 +472,10 @@ func New(
 		evidencetypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		ssimoduletypes.ModuleName,
+		feegrant.ModuleName, 
+		authz.ModuleName,
+		paramstypes.ModuleName,
+		upgradetypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	)
 

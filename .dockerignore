@@ -1,0 +1,7 @@
+# Directories to be ignored
+
+vue/
+tests/
+.github/
+.git/
+.vscode/

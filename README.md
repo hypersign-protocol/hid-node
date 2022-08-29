@@ -6,18 +6,24 @@ The Hypersign Identity Network is a permissionless blockchain network to manage 
 
 Following are the prerequisites that needs to be installed:
 
-- golang (Installation Guide: https://go.dev/doc/install) (version: 1.17.2)
+- golang (Installation Guide: https://go.dev/doc/install) (version: 1.18.5)
 
 ## Get started
 
 ### Local:
 
-Clone the hid-node repository and build the binary:
+- Clone the hid-node repository and build the binary:
 
 ```sh
 git clone https://github.com/hypersign-protocol/hid-node.git
 cd hid-node
 make build
+```
+
+- Move the build to GOPATH:
+
+```sh
+cp ./build/hid-noded $(go env GOPATH)/bin/
 ```
 
 The binary `hid-noded` will be generated in `$GO_PATH/bin` directory. To explore its functionalities, type `hid-noded --help` im a seperate terminal window.
