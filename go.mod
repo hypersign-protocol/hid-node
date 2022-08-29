@@ -14,7 +14,7 @@ require (
 	github.com/tendermint/spm v0.1.9
 	github.com/tendermint/tendermint v0.34.20
 	github.com/tendermint/tm-db v0.6.7
-	google.golang.org/genproto v0.0.0-20220719170305-83ca9fad585f
+	google.golang.org/genproto v0.0.0-20220822174746-9e6da59bd2fc
 	google.golang.org/grpc v1.48.0
 )
 
