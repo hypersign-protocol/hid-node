@@ -6,6 +6,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 func (k Keeper) GetSchemaCount(ctx sdk.Context) uint64 {
@@ -55,19 +56,15 @@ func (k Keeper) AppendSchema(ctx sdk.Context, schema types.Schema) uint64 {
 }
 
 // Get the schema from store
-func (k Keeper) GetSchemaFromStore(ctx sdk.Context, querySchemaStr string) []*types.Schema {
+func (k Keeper) GetSchemaFromStore(ctx sdk.Context, schemaId string) (*types.Schema, error) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.SchemaKey))
-	var schemas []*types.Schema
-	iterator := sdk.KVStorePrefixIterator(store, []byte{})
+	schemaBytes := store.Get([]byte(schemaId))
 
-	for ; iterator.Valid(); iterator.Next() {
-		var schema types.Schema
-		k.cdc.MustUnmarshal(iterator.Value(), &schema)
+	var schemaDoc types.Schema
 
-		if querySchemaStr == schema.Id[0:len(schema.Id)-12] || querySchemaStr == schema.Id {
-			schemas = append(schemas, &schema)
-		}
+	if err := k.cdc.Unmarshal(schemaBytes, &schemaDoc); err != nil {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidType, err.Error())
 	}
 
-	return schemas
+	return &schemaDoc, nil
 }
