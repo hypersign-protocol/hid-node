@@ -33,4 +33,5 @@ var (
 	ErrInvalidDidNamespace        = sdkerrors.Register(ModuleName, 123, "Invalid Did Namespace")
 	ErrInvalidCredentialHash      = sdkerrors.Register(ModuleName, 124, "Invalid Credential Hash")
 	ErrInvalidSchemaModelVersion  = sdkerrors.Register(ModuleName, 125, "Invalid Schema Model Version")
+	ErrNullSchemaField            = sdkerrors.Register(ModuleName, 126, "Null Schema Field")
 )
