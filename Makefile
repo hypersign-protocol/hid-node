@@ -6,7 +6,7 @@ GOBIN = $(shell go env GOPATH)/bin
 ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=hid-node \
 	-X github.com/cosmos/cosmos-sdk/version.AppName=hid-node \
 	-X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
-	-X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) 
+	-X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT)
 
 BUILD_FLAGS := -ldflags '$(ldflags)'
 

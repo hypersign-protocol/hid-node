@@ -2,6 +2,7 @@ package verification
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -20,6 +21,30 @@ func documentIdentifier(docType string) string {
 		return "vc"
 	}
 	return ""
+}
+
+func returnVersionNumIdx(namespace string) int {
+	if namespace == "mainnet"{
+		return 3
+	} else {
+		return 4
+	}
+}
+
+func schemaVersionNumberFormatCheck(docElementsList []string, namespace string) error {
+	var verNumIdx int = returnVersionNumIdx(namespace)
+
+	if (len(docElementsList) - 1) != verNumIdx {
+		return sdkerrors.Wrap(types.ErrInvalidSchemaModelVersion, "schema version number is not present in schema id") 
+	}
+
+	versionNum := docElementsList[verNumIdx]
+	versionNumPattern := regexp.MustCompile(`^(\d+\.)?(\d+)$`)
+	if !versionNumPattern.MatchString(versionNum) {
+		return sdkerrors.Wrap(types.ErrInvalidSchemaModelVersion, fmt.Sprintf("input version id: %s is invalid", versionNum))
+	}
+
+	return nil
 }
 
 // Checks whether the ID in the DidDoc is a valid string
@@ -60,7 +85,16 @@ func IsValidID(Id string, namespace string, docType string) error {
 	// Check if method-specific-id follows multibase format
 	_, _, err := multibase.Decode(docElements[docMethodSpecificId])
 	if err != nil || len(docElements[docMethodSpecificId]) != 45 {
-		return types.ErrInvalidMethodSpecificId
+		return sdkerrors.Wrap(types.ErrInvalidMethodSpecificId, docElements[docMethodSpecificId])
 	}
+
+	// Check for Schema Version Number
+	if docType == "schemaDocument" {
+		err := schemaVersionNumberFormatCheck(docElements, namespace)
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
