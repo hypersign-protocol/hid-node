@@ -4,7 +4,6 @@ on:
   push:
     branches: [ main ]
   pull_request:
-    branches: [ main, release* ]
 
 jobs:
   build:
@@ -14,7 +13,7 @@ jobs:
       - name: Set up Go 1.x
         uses: actions/setup-go@v3
         with:
-          go-version: '1.18.5'
+          go-version: 1.18.5
         id: go
 
       - name: Check out code into the Go module directory
