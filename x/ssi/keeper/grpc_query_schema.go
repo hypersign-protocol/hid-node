@@ -17,10 +17,7 @@ func (k Keeper) GetSchema(goCtx context.Context, req *types.QueryGetSchemaReques
 	}
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	schema, err := k.GetSchemaFromStore(ctx, req.SchemaId)
-	if err != nil {
-		return nil, err
-	}
+	var schema []*types.Schema = k.GetSchemaFromStore(ctx, req.SchemaId)
 
 	return &types.QueryGetSchemaResponse{
 		Schema: schema,

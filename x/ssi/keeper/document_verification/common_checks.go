@@ -2,6 +2,7 @@ package verification
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -22,11 +23,39 @@ func documentIdentifier(docType string) string {
 	return ""
 }
 
+func returnVersionNumIdx(namespace string) int {
+	if namespace == "mainnet"{
+		return 3
+	} else {
+		return 4
+	}
+}
+
+func schemaVersionNumberFormatCheck(docElementsList []string, namespace string) error {
+	var verNumIdx int = returnVersionNumIdx(namespace)
+
+	if (len(docElementsList) - 1) != verNumIdx {
+		return fmt.Errorf("schema version number is not present in schema id") 
+	}
+
+	versionNum := docElementsList[verNumIdx]
+	versionNumPattern := regexp.MustCompile(`^(\d+\.)?(\d+)$`)
+	if !versionNumPattern.MatchString(versionNum) {
+		return fmt.Errorf("input version id: %s is invalid", versionNum)
+	}
+
+	return nil
+}
+
 // Checks whether the ID in the DidDoc is a valid string
 func IsValidID(Id string, namespace string, docType string) error {
 	var docIdentifier string = documentIdentifier(docType)
 
 	docElements := strings.Split(Id, ":")
+
+	if len(docElements) == 1 {
+		return fmt.Errorf("%s id cannot be blank", docType)
+	}
 
 	docIdentifierIndex := 0
 	docMethodIndex := 1
@@ -35,32 +64,41 @@ func IsValidID(Id string, namespace string, docType string) error {
 
 	// Document Identifier check
 	if docElements[docIdentifierIndex] != docIdentifier {
-		return sdkerrors.Wrap(types.ErrInvalidDidDoc, fmt.Sprintf("expected document identifier to be %s, got %s", docIdentifier, docElements[docIdentifierIndex]))
+		return fmt.Errorf("expected document identifier to be %s, got %s", docIdentifier, docElements[docIdentifierIndex])
 	}
 
 	// did method check
 	inputDidMethod := docElements[docMethodIndex]
 	if inputDidMethod != DidMethod {
-		return sdkerrors.Wrap(types.ErrInvalidDidMethod, fmt.Sprintf("expected did method %s, got %s", DidMethod, inputDidMethod))
+		return fmt.Errorf("expected did method %s, got %s", DidMethod, inputDidMethod)
 	}
 
 	// Mainnet namespace check
 	if namespace == "mainnet" {
 		if len(docElements) != 3 {
-			return sdkerrors.Wrap(types.ErrInvalidDidNamespace, fmt.Sprintf("expected number of did id elements for mainnet to be 3, got %s", fmt.Sprint(len(docElements))))
+			return fmt.Errorf("expected number of did id elements for mainnet to be 3, got %s", fmt.Sprint(len(docElements)))
 		}
 		docMethodSpecificId = 2
 	} else {
 		docNamespace := docElements[docNamespaceIndex]
 		if namespace != docNamespace {
-			return sdkerrors.Wrap(types.ErrInvalidDidNamespace, fmt.Sprintf("expected did namespace %s, got %s", namespace, docNamespace))
+			return fmt.Errorf("expected did namespace %s, got %s", namespace, docNamespace)
 		}
 	}
 
 	// Check if method-specific-id follows multibase format
 	_, _, err := multibase.Decode(docElements[docMethodSpecificId])
 	if err != nil || len(docElements[docMethodSpecificId]) != 45 {
-		return types.ErrInvalidMethodSpecificId
+		return sdkerrors.Wrap(types.ErrInvalidMethodSpecificId, docElements[docMethodSpecificId])
 	}
+
+	// Check for Schema Version Number
+	if docType == "schemaDocument" {
+		err := schemaVersionNumberFormatCheck(docElements, namespace)
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }

@@ -14,9 +14,6 @@ RUN apt-get update
 RUN apt-get install ${PACKAGES} -y
 RUN make build 
 
-# Install ca-certificates
-# RUN apk add --update ca-certificates
-
 # Setup the node
 RUN bash ./scripts/docker-node/setup.sh
 

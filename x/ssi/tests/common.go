@@ -42,18 +42,6 @@ type CredRpcElements struct {
 var Creator string = "hid1kxqk5ejca8nfpw8pg47484rppv359xh7qcasy4"
 var DidMethod string = "hid"
 
-func getSchemaSigningInfo(schemaDoc *types.SchemaDocument, keyPair ed25519KeyPair, vm *types.VerificationMethod) []*types.SignInfo {
-	signature := ed25519.Sign(keyPair.privateKey, schemaDoc.GetSignBytes())
-	signInfo := &types.SignInfo{
-		VerificationMethodId: vm.GetId(),
-		Signature:            base64.StdEncoding.EncodeToString(signature),
-	}
-
-	return []*types.SignInfo{
-		signInfo,
-	}
-}
-
 func getDidSigningInfo(didDoc *types.Did, keyPair ed25519KeyPair, vmId string) []*types.SignInfo {
 	signature := ed25519.Sign(keyPair.privateKey, didDoc.GetSignBytes())
 	signInfo := &types.SignInfo{
@@ -164,7 +152,7 @@ func GenerateDidDocumentRPCElements(keyPair ed25519KeyPair) DidRpcElements {
 }
 
 func GenerateSchemaDocumentRPCElements(keyPair ed25519KeyPair, Id string, verficationMethodId string) SchemaRpcElements {
-	var schemaId string = "sch:" + DidMethod + ":" + "devnet" + ":" + strings.Split(Id, ":")[3] 
+	var schemaId string = "sch:" + DidMethod + ":" + "devnet" + ":" + strings.Split(Id, ":")[3] + ":1.0"
 	var schemaDocument *types.SchemaDocument = &types.SchemaDocument{
 		Type:         "https://w3c-ccg.github.io/vc-json-schemas/schema/1.0/schema.json",
 		ModelVersion: "v1.0",
