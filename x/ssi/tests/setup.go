@@ -48,7 +48,7 @@ func TestKeeper(t testing.TB) (*keeper.Keeper, sdk.Context) {
 	ctx := sdk.NewContext(stateStore,
 		tmproto.Header{
 			ChainID: "hidnode",
-			Time: blockTime,
+			Time:    blockTime,
 		}, false, log.NewNopLogger())
 
 	// Initialize params

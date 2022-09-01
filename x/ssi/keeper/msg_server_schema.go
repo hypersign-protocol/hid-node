@@ -32,7 +32,7 @@ func (k msgServer) CreateSchema(goCtx context.Context, msg *types.MsgCreateSchem
 	}
 
 	// Check if Schema ID is valid
-	err = verify.IsValidID(schemaID, chainNamespace, "schemaDocument"); 
+	err = verify.IsValidID(schemaID, chainNamespace, "schemaDocument")
 	if err != nil {
 		return nil, sdkerrors.Wrap(types.ErrInvalidSchemaID, err.Error())
 	}
@@ -53,7 +53,7 @@ func (k msgServer) CreateSchema(goCtx context.Context, msg *types.MsgCreateSchem
 	if authoredDateParsed.After(blockTime) {
 		return nil, sdkerrors.Wrapf(types.ErrInvalidDate, "authored date provided shouldn't be greater than the current block time")
 	}
-	
+
 	createdDate := schemaProof.GetCreated()
 	createdDateParsed, err := time.Parse(time.RFC3339, createdDate)
 	if err != nil {

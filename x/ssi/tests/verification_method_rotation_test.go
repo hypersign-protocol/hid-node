@@ -8,7 +8,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-
 func TestVerificationMethodRotation(t *testing.T) {
 	t.Logf("Verification Rotation Test Started")
 
@@ -17,7 +16,7 @@ func TestVerificationMethodRotation(t *testing.T) {
 	goCtx := sdk.WrapSDKContext(ctx)
 
 	k.SetChainNamespace(&ctx, "devnet")
-	
+
 	// Create a DID with pubKey1
 	keyPair1 := GeneratePublicPrivateKeyPair()
 	didId1, err := CreateDidTx(msgServer, goCtx, keyPair1)
@@ -27,7 +26,7 @@ func TestVerificationMethodRotation(t *testing.T) {
 	}
 	t.Logf("DID registerd with ID: %s", didId1)
 
-	// Update the DID by adding pubKey2 
+	// Update the DID by adding pubKey2
 	keyPair2 := GeneratePublicPrivateKeyPair()
 
 	resolvedDidDocument := QueryDid(k, ctx, didId1)
@@ -35,9 +34,9 @@ func TestVerificationMethodRotation(t *testing.T) {
 
 	// Replace the old public key with new one
 	resolvedDidDocument.Did.VerificationMethod[0].PublicKeyMultibase = keyPair2.publicKey
-	
+
 	updatedDidRpcElements := GetModifiedDidDocumentSignature(
-		resolvedDidDocument.Did, 
+		resolvedDidDocument.Did,
 		keyPair1,
 		resolvedDidDocument.Did.VerificationMethod[0].Id,
 	)

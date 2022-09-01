@@ -40,15 +40,15 @@ func TestGetSchema(t *testing.T) {
 
 	t.Log("Registering Schema")
 	schemaRpcElements := GenerateSchemaDocumentRPCElements(
-		keyPair1, 
+		keyPair1,
 		rpcElements.DidDocument.Id,
 		rpcElements.DidDocument.AssertionMethod[0],
 	)
 
 	msgCreateSchema := &types.MsgCreateSchema{
-		SchemaDoc: schemaRpcElements.SchemaDocument,
+		SchemaDoc:   schemaRpcElements.SchemaDocument,
 		SchemaProof: schemaRpcElements.SchemaProof,
-		Creator: schemaRpcElements.Creator,
+		Creator:     schemaRpcElements.Creator,
 	}
 
 	_, errCreateSchema := msgServer.CreateSchema(goCtx, msgCreateSchema)
@@ -56,9 +56,8 @@ func TestGetSchema(t *testing.T) {
 		t.Error("Schema Registeration Failed")
 		t.Error(errCreateSchema)
 		t.FailNow()
-	} 
+	}
 	t.Log("Schema Registered Successfully")
-
 
 	t.Log("Querying the Schema from store")
 
@@ -87,7 +86,7 @@ func TestSchemaParam(t *testing.T) {
 	goCtx := sdk.WrapSDKContext(ctx)
 
 	k.SetChainNamespace(&ctx, "devnet")
-	
+
 	keyPair1 := GeneratePublicPrivateKeyPair()
 	rpcElements := GenerateDidDocumentRPCElements(keyPair1)
 	didId := rpcElements.DidDocument.GetId()
@@ -105,20 +104,20 @@ func TestSchemaParam(t *testing.T) {
 		t.Error(errCreateDID)
 		t.FailNow()
 	}
-	
+
 	t.Log("Did Registeration Successful")
 
 	t.Log("Registering Schema")
 	schemaRpcElements := GenerateSchemaDocumentRPCElements(
-		keyPair1, 
+		keyPair1,
 		rpcElements.DidDocument.Id,
 		rpcElements.DidDocument.AssertionMethod[0],
 	)
 
 	msgCreateSchema := &types.MsgCreateSchema{
-		SchemaDoc: schemaRpcElements.SchemaDocument,
+		SchemaDoc:   schemaRpcElements.SchemaDocument,
 		SchemaProof: schemaRpcElements.SchemaProof,
-		Creator: schemaRpcElements.Creator,
+		Creator:     schemaRpcElements.Creator,
 	}
 
 	_, errCreateSchema := msgServer.CreateSchema(goCtx, msgCreateSchema)
@@ -126,7 +125,7 @@ func TestSchemaParam(t *testing.T) {
 		t.Error("Schema Registeration Failed")
 		t.Error(errCreateSchema)
 		t.FailNow()
-	} 
+	}
 	t.Log("Schema Registered Successfully")
 
 	t.Log("Querying the list of Schema Documents")
@@ -142,7 +141,7 @@ func TestSchemaParam(t *testing.T) {
 
 	t.Log("Querying successful")
 
-	// Schema Document Count should't be zero 
+	// Schema Document Count should't be zero
 	assert.NotEqual(t, "0", res.TotalCount)
 	// List should be populated with a single Schema Document
 	assert.Equal(t, 1, len(res.SchemaList))

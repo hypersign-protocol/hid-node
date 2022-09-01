@@ -24,7 +24,7 @@ func documentIdentifier(docType string) string {
 }
 
 func returnVersionNumIdx(namespace string) int {
-	if namespace == "mainnet"{
+	if namespace == "mainnet" {
 		return 3
 	} else {
 		return 4
@@ -35,7 +35,7 @@ func schemaVersionNumberFormatCheck(docElementsList []string, namespace string) 
 	var verNumIdx int = returnVersionNumIdx(namespace)
 
 	if (len(docElementsList) - 1) != verNumIdx {
-		return fmt.Errorf("schema version number is not present in schema id") 
+		return fmt.Errorf("schema version number is not present in schema id")
 	}
 
 	versionNum := docElementsList[verNumIdx]

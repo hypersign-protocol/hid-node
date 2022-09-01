@@ -40,8 +40,8 @@ func TestQueryCredential(t *testing.T) {
 	t.Log("Did Registeration Successful")
 
 	credRpcElements := GenerateCredStatusRPCElements(
-		keyPair1, 
-		didRpcElements.DidDocument.Id, 
+		keyPair1,
+		didRpcElements.DidDocument.Id,
 		didRpcElements.DidDocument.VerificationMethod[0],
 	)
 
@@ -52,7 +52,6 @@ func TestQueryCredential(t *testing.T) {
 	}
 	credId := credRpcElements.Status.GetClaim().GetId()
 	t.Logf("Registering Credential Status with Id: %s", credId)
-
 
 	t.Logf("Block Time: %s", ctx.BlockTime().Format(time.RFC3339))
 
@@ -89,9 +88,9 @@ func TestQueryCredentials(t *testing.T) {
 	k, ctx := TestKeeper(t)
 	msgServer := keeper.NewMsgServerImpl(*k)
 	goCtx := sdk.WrapSDKContext(ctx)
-	
+
 	k.SetChainNamespace(&ctx, "devnet")
-	
+
 	keyPair1 := GeneratePublicPrivateKeyPair()
 	didRpcElements := GenerateDidDocumentRPCElements(keyPair1)
 	didId := didRpcElements.DidDocument.GetId()
@@ -113,8 +112,8 @@ func TestQueryCredentials(t *testing.T) {
 	t.Log("Did Registeration Successful")
 
 	credRpcElements := GenerateCredStatusRPCElements(
-		keyPair1, 
-		didRpcElements.DidDocument.Id, 
+		keyPair1,
+		didRpcElements.DidDocument.Id,
 		didRpcElements.DidDocument.VerificationMethod[0],
 	)
 
@@ -148,7 +147,7 @@ func TestQueryCredentials(t *testing.T) {
 	}
 	t.Log("Querying successful")
 
-	// Schema Document Count should't be zero 
+	// Schema Document Count should't be zero
 	assert.NotEqual(t, "0", res.TotalCount)
 	// List should be populated with a single Schema Document
 	assert.Equal(t, 1, len(res.Credentials))

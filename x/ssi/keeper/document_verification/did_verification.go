@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 	utils "github.com/hypersign-protocol/hid-node/x/ssi/utils"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 // Cheks whether the Service is valid
@@ -62,7 +62,6 @@ func DuplicateServiceExists(serviceId string, services []*types.Service) bool {
 	return false
 }
 
-
 // Checks whether the DidDoc string is valid
 func IsValidDidDoc(didDoc *types.Did, genesisNamespace string) error {
 	didArrayMap := map[string][]string{
@@ -85,7 +84,7 @@ func IsValidDidDoc(didDoc *types.Did, genesisNamespace string) error {
 
 	// Did Array Check
 	for field, didArray := range didArrayMap {
-		for _, elem := range didArray{
+		for _, elem := range didArray {
 			if !IsValidDidFragment(elem, DidMethod, genesisNamespace) {
 				return sdkerrors.Wrap(types.ErrInvalidDidDoc, fmt.Sprintf("The field %s is an invalid DID Array", field))
 			}

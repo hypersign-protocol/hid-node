@@ -50,7 +50,7 @@ func TestUpdateDID(t *testing.T) {
 	resolvedDidDocument.Did.Context = append(resolvedDidDocument.Did.Context, "http://www.example.com")
 
 	updateRpcElements := GetModifiedDidDocumentSignature(
-		resolvedDidDocument.Did, 
+		resolvedDidDocument.Did,
 		keyPair1,
 		resolvedDidDocument.Did.VerificationMethod[0].Id,
 	)
@@ -73,7 +73,6 @@ func TestUpdateDID(t *testing.T) {
 
 	t.Log("Update DID Tx Test Completed")
 }
-
 
 func TestInvalidChangeByNonControllerDid(t *testing.T) {
 	t.Log("Running test for DID Controller (Non-controller DID attempting to make changes)")
@@ -106,7 +105,7 @@ func TestInvalidChangeByNonControllerDid(t *testing.T) {
 	aliceDidDocument.Did.Context = append(aliceDidDocument.Did.Context, newContextElement)
 	versionId := aliceDidDocument.Metadata.VersionId
 	updatedRpcElements := GetModifiedDidDocumentSignature(
-		aliceDidDocument.Did, 
+		aliceDidDocument.Did,
 		charlieKeyPair,
 		charlieDidDocument.Did.VerificationMethod[0].Id,
 	)
@@ -129,7 +128,7 @@ func TestValidChangeByControllerDid(t *testing.T) {
 	goCtx := sdk.WrapSDKContext(ctx)
 
 	k.SetChainNamespace(&ctx, "devnet")
-	
+
 	// Create Two DID: Alice and Charlie
 	aliceKeyPair := GeneratePublicPrivateKeyPair()
 	aliceDidId, err := CreateDidTx(msgServ, goCtx, aliceKeyPair)
@@ -151,7 +150,7 @@ func TestValidChangeByControllerDid(t *testing.T) {
 	aliceDidDocument.Did.Controller = append(aliceDidDocument.Did.Controller, charlieDidId)
 	versionId := aliceDidDocument.Metadata.VersionId
 	updatedRpcElements := GetModifiedDidDocumentSignature(
-		aliceDidDocument.Did, 
+		aliceDidDocument.Did,
 		aliceKeyPair,
 		aliceDidDocument.Did.VerificationMethod[0].Id,
 	)
@@ -172,7 +171,7 @@ func TestValidChangeByControllerDid(t *testing.T) {
 	aliceDidDocument.Did.Context = append(aliceDidDocument.Did.Context, newContextElement)
 	versionId = aliceDidDocument.Metadata.VersionId
 	updatedRpcElements = GetModifiedDidDocumentSignature(
-		aliceDidDocument.Did, 
+		aliceDidDocument.Did,
 		charlieKeyPair,
 		charlieDidDocument.Did.VerificationMethod[0].Id,
 	)
@@ -186,8 +185,8 @@ func TestValidChangeByControllerDid(t *testing.T) {
 
 	aliceDidDocument = QueryDid(k, ctx, aliceDidId)
 	require.Equal(
-		t, 
-		aliceDidDocument.Did.Context[len(aliceDidDocument.Did.Context) - 1], 
+		t,
+		aliceDidDocument.Did.Context[len(aliceDidDocument.Did.Context)-1],
 		newContextElement,
 	)
 
@@ -196,7 +195,7 @@ func TestValidChangeByControllerDid(t *testing.T) {
 
 }
 
-// In this test, we are looking to test the scenario where multiple signatures are passed 
+// In this test, we are looking to test the scenario where multiple signatures are passed
 func TestMultiSigControllers(t *testing.T) {
 	t.Log("Multiple signatures test")
 	k, ctx := testkeeper.SsiKeeper(t)
@@ -204,7 +203,7 @@ func TestMultiSigControllers(t *testing.T) {
 	goCtx := sdk.WrapSDKContext(ctx)
 
 	k.SetChainNamespace(&ctx, "devnet")
-	
+
 	// Create Two DID: Alice and Charlie
 	aliceKeyPair := GeneratePublicPrivateKeyPair()
 	aliceDidId, err := CreateDidTx(msgServ, goCtx, aliceKeyPair)
@@ -234,7 +233,7 @@ func TestMultiSigControllers(t *testing.T) {
 	fileDidDocument.Did.Controller = []string{aliceDidId, charlieDidId}
 	versionId := fileDidDocument.Metadata.VersionId
 	updatedRpcElements := GetModifiedDidDocumentSignature(
-		fileDidDocument.Did, 
+		fileDidDocument.Did,
 		fileKeyPair,
 		fileDidDocument.Did.VerificationMethod[0].Id,
 	)
@@ -246,15 +245,14 @@ func TestMultiSigControllers(t *testing.T) {
 		t.Error(errDidUpdate)
 		t.FailNow()
 	}
-	t.Log("Charlie and Alice are now part of File's Controller group")	
-
+	t.Log("Charlie and Alice are now part of File's Controller group")
 
 	// File is trying to make changes in it's DID Document
 	// Since, File's Did Id is not part of its controller group, it is expected to fail
 	fileDidDocument.Did.Context = append(fileDidDocument.Did.Context, "something.com")
 	versionId = fileDidDocument.Metadata.VersionId
 	updatedRpcElements = GetModifiedDidDocumentSignature(
-		fileDidDocument.Did, 
+		fileDidDocument.Did,
 		fileKeyPair,
 		fileDidDocument.Did.VerificationMethod[0].Id,
 	)
@@ -266,7 +264,7 @@ func TestMultiSigControllers(t *testing.T) {
 		t.FailNow()
 	}
 	t.Log("As expected, File's Did Id was unable to make any changes")
-	
+
 	// Charlie and File both attempt to sign the change to be made in File's Did Document
 	// It is also expected to fail, since File isn't part of the Did Controller Group
 	fileDidDocument.Did.Context = append(fileDidDocument.Did.Context, "something.com")
@@ -290,7 +288,7 @@ func TestMultiSigControllers(t *testing.T) {
 	fileDidDocument.Did.Context = append(fileDidDocument.Did.Context, "something.com")
 	versionId = fileDidDocument.Metadata.VersionId
 	updatedRpcElements = getMultiSigDidSigningInfo(
-		fileDidDocument.Did, 
+		fileDidDocument.Did,
 		[]ed25519KeyPair{charlieKeyPair, aliceKeyPair},
 		[]string{charlieDidDocument.Did.VerificationMethod[0].Id, aliceDidDocument.Did.VerificationMethod[0].Id},
 	)

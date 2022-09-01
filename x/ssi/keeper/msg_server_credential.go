@@ -25,7 +25,7 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 	chainNamespace := k.GetChainNamespace(&ctx)
 
 	// Check the format of Credential ID
-	err := verify.IsValidID(credId, chainNamespace, "credDocument"); 
+	err := verify.IsValidID(credId, chainNamespace, "credDocument")
 	if err != nil {
 		return nil, err
 	}
@@ -45,8 +45,7 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 		}
 
 		// Check if issuer's DID is deactivated
-		if issuerDidDocument, _ := k.GetDid(&ctx, issuerId); 
-		issuerDidDocument.Metadata.Deactivated {
+		if issuerDidDocument, _ := k.GetDid(&ctx, issuerId); issuerDidDocument.Metadata.Deactivated {
 			return nil, sdkerrors.Wrap(types.ErrDidDocDeactivated, fmt.Sprintf("%s is deactivated and cannot used be used to register credential status", issuerDidDocument.Did.Id))
 		}
 
@@ -62,7 +61,7 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 		if err != nil {
 			return nil, sdkerrors.Wrapf(types.ErrInvalidDate, fmt.Sprintf("invalid issuance date format: %s", issuanceDate))
 		}
-	
+
 		if err := VerifyCredentialStatusDates(issuanceDateParsed, expirationDateParsed); err != nil {
 			return nil, err
 		}
@@ -149,8 +148,7 @@ func (k msgServer) updateCredentialStatus(ctx sdk.Context, newCredStatus *types.
 	}
 
 	// Check if issuer's DID is deactivated
-	if issuerDidDocument, _ := k.GetDid(&ctx, issuerId); 
-	issuerDidDocument.Metadata.Deactivated {
+	if issuerDidDocument, _ := k.GetDid(&ctx, issuerId); issuerDidDocument.Metadata.Deactivated {
 		return nil, sdkerrors.Wrap(types.ErrDidDocDeactivated, fmt.Sprintf("%s is deactivated and cannot used be used to register credential status", issuerDidDocument.Did.Id))
 	}
 

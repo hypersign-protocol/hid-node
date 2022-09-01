@@ -60,7 +60,7 @@ func (k msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*t
 		Did:      &didSpec,
 		Metadata: &metadata,
 	}
-	// Add a DID to the store 
+	// Add a DID to the store
 	id := k.AppendDID(ctx, &didDoc)
 	// Return the Id of the DID
 	return &types.MsgCreateDIDResponse{Id: id}, nil
@@ -87,7 +87,7 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 	if err != nil {
 		return nil, err
 	}
-	
+
 	// Checks if the DID is not present in the store
 	if !k.HasDid(ctx, did) {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("DID doesnt exists %s", did))
@@ -157,7 +157,7 @@ func (k msgServer) DeactivateDID(goCtx context.Context, msg *types.MsgDeactivate
 	metadata := didDocument.GetMetadata()
 
 	chainNamespace := k.GetChainNamespace(&ctx)
-	
+
 	// Check if the didDoc is valid
 	err = verify.IsValidDidDoc(did, chainNamespace)
 	if err != nil {

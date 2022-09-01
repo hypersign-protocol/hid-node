@@ -136,10 +136,10 @@ var _ sdk.Msg = &MsgDeactivateDID{}
 
 func NewMsgDeactivateDID(creator string, didId string, versionId string, signatures []*SignInfo) *MsgDeactivateDID {
 	return &MsgDeactivateDID{
-		Creator:      creator,
-		DidId: didId,
-		VersionId:    versionId,
-		Signatures:   signatures,
+		Creator:    creator,
+		DidId:      didId,
+		VersionId:  versionId,
+		Signatures: signatures,
 	}
 }
 

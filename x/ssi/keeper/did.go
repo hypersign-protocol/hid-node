@@ -10,7 +10,6 @@ import (
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 )
 
-
 // Set the DID namespace
 func (k Keeper) SetChainNamespace(ctx *sdk.Context, namespace string) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.DidNamespaceKey))

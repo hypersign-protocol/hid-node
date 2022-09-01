@@ -18,7 +18,7 @@ func (gs GenesisState) Validate() error {
 	regexPattern, _ := regexp.Compile("^[a-zA-Z0-9-]*$") // Matches string containing whitespaces and tabs
 	maxDidNamespaceLength := 10
 
-	if len(namespace) > maxDidNamespaceLength  {
+	if len(namespace) > maxDidNamespaceLength {
 		return fmt.Errorf("Did Namespace shouldn't shouldn't be more than 10, namespace recieved %s", namespace)
 	}
 

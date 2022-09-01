@@ -62,7 +62,7 @@ func TestDidParam(t *testing.T) {
 	goCtx := sdk.WrapSDKContext(ctx)
 
 	k.SetChainNamespace(&ctx, "devnet")
-	
+
 	keyPair1 := GeneratePublicPrivateKeyPair()
 	rpcElements := GenerateDidDocumentRPCElements(keyPair1)
 	didId := rpcElements.DidDocument.GetId()
@@ -81,7 +81,7 @@ func TestDidParam(t *testing.T) {
 		t.Error(errCreateDID)
 		t.FailNow()
 	}
-	
+
 	t.Log("Did Registeration Successful")
 	t.Log("Querying the list of Did Documents")
 
@@ -96,7 +96,7 @@ func TestDidParam(t *testing.T) {
 
 	t.Log("Querying successful")
 
-	// Did Document Count should't be zero 
+	// Did Document Count should't be zero
 	assert.NotEqual(t, "0", res.TotalDidCount)
 	// List should be populated with a single Did Document
 	assert.Equal(t, 1, len(res.DidDocList))

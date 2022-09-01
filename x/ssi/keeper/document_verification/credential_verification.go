@@ -10,7 +10,7 @@ func VerifyCredentialHash(credHash string) bool {
 		"sha256": "[a-f0-9]{64}",
 	}
 
-	for _, regexPattern := range supportedCredentialHash{
+	for _, regexPattern := range supportedCredentialHash {
 		matchFound, _ = regexp.MatchString(regexPattern, credHash)
 		if matchFound {
 			return true
