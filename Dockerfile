@@ -12,13 +12,13 @@ COPY . .
 # Install minimum necessary dependencies and build hid-node
 RUN apt-get update
 RUN apt-get install ${PACKAGES} -y
-RUN make build 
+RUN make install 
 
 # Setup the node
 RUN bash ./scripts/docker-node/setup.sh
 
-# Entry for containers, Run the single-node script
-ENTRYPOINT [ "hid-noded" ]
-
 # Expose Ports
 EXPOSE 26657 1317 9090 9091 26656
+
+# Entry for containers
+ENTRYPOINT [ "hid-noded" ]
