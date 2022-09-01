@@ -35,10 +35,7 @@ func IsValidDidFragment(didUrl string, method string, namespace string) bool {
 
 	did, _ := utils.SplitDidUrlIntoDid(didUrl)
 	err := IsValidID(did, namespace, "didDocument")
-	if err != nil {
-		return false
-	}
-	return true
+	return err == nil
 }
 
 // Check Valid DID service type
