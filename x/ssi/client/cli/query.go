@@ -19,7 +19,6 @@ func GetQueryCmd(queryRoute string) *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 
-	cmd.AddCommand(CmdQueryParams())
 	cmd.AddCommand(CmdGetSchema())
 	cmd.AddCommand(CmdResolveDID())
 	cmd.AddCommand(CmdGetCredentialStatus())

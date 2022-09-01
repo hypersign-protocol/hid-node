@@ -4,9 +4,8 @@ import (
 	"fmt"
 
 	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/spf13/cobra"
-	// "github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
+	"github.com/spf13/cobra"
 )
 
 // GetTxCmd returns the transaction commands for this module

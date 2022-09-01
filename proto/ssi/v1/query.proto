@@ -4,7 +4,6 @@ package hypersignprotocol.hidnode.ssi;
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
-import "ssi/v1/params.proto";
 import "ssi/v1/schema.proto";
 import "ssi/v1/did.proto";
 import "ssi/v1/tx.proto";
@@ -16,11 +15,6 @@ option go_package = "github.com/hypersign-protocol/hid-node/x/ssi/types";
 
 // Query defines the gRPC querier service.
 service Query {
-  // Parameters queries the parameters of the module.
-  rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
-    option (google.api.http).get = "/hypersignprotocol/hidnode/ssi/params";
-  }
-
   // Get the Schema for a specified Schema Id
 	rpc GetSchema(QueryGetSchemaRequest) returns (QueryGetSchemaResponse) {
 		option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/schema/{schemaId}";
@@ -60,15 +54,6 @@ message QueryCredentialRequest {
 
 message QueryCredentialResponse {
   Credential credStatus = 1;
-}
-
-// QueryParamsRequest is request type for the Query/Params RPC method.
-message QueryParamsRequest {}
-
-// QueryParamsResponse is response type for the Query/Params RPC method.
-message QueryParamsResponse {
-  // params holds all the parameters of this module.
-  Params params = 1 [(gogoproto.nullable) = false];
 }
 
 message QueryGetSchemaRequest {
