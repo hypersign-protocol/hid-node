@@ -185,8 +185,8 @@ func CmdDeactivateDID() *cobra.Command {
 
 			// Query Did Document from store using Did Id
 			queryClient := types.NewQueryClient(clientCtx)
-			requestParams := &types.QueryGetDidDocByIdRequest{DidId: argDidId}
-			resolvedDidDocument, err := queryClient.ResolveDid(cmd.Context(), requestParams)
+			requestParams := &types.QueryDidDocumentRequest{DidId: argDidId}
+			resolvedDidDocument, err := queryClient.QueryDidDocument(cmd.Context(), requestParams)
 			if err != nil {
 				return err
 			}

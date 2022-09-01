@@ -11,7 +11,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (k Keeper) GetSchema(goCtx context.Context, req *types.QueryGetSchemaRequest) (*types.QueryGetSchemaResponse, error) {
+func (k Keeper) QuerySchema(goCtx context.Context, req *types.QuerySchemaRequest) (*types.QuerySchemaResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -19,12 +19,12 @@ func (k Keeper) GetSchema(goCtx context.Context, req *types.QueryGetSchemaReques
 
 	var schema []*types.Schema = k.GetSchemaFromStore(ctx, req.SchemaId)
 
-	return &types.QueryGetSchemaResponse{
+	return &types.QuerySchemaResponse{
 		Schema: schema,
 	}, nil
 }
 
-func (k Keeper) SchemaParam(goCtx context.Context, req *types.QuerySchemaParamRequest) (*types.QuerySchemaParamResponse, error) {
+func (k Keeper) QuerySchemas(goCtx context.Context, req *types.QuerySchemasRequest) (*types.QuerySchemasResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -50,5 +50,5 @@ func (k Keeper) SchemaParam(goCtx context.Context, req *types.QuerySchemaParamRe
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
-	return &types.QuerySchemaParamResponse{SchemaList: schemas, TotalCount: k.GetSchemaCount(ctx)}, nil
+	return &types.QuerySchemasResponse{SchemaList: schemas, TotalCount: k.GetSchemaCount(ctx)}, nil
 }

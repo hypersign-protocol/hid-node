@@ -9,8 +9,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGetSchema(t *testing.T) {
-	t.Log("Running test for GetSchema (Query)")
+func TestQuerySchema(t *testing.T) {
+	t.Log("Running test for QuerySchema (Query)")
 	k, ctx := TestKeeper(t)
 	msgServer := keeper.NewMsgServerImpl(*k)
 	goCtx := sdk.WrapSDKContext(ctx)
@@ -61,11 +61,11 @@ func TestGetSchema(t *testing.T) {
 
 	t.Log("Querying the Schema from store")
 
-	req := &types.QueryGetSchemaRequest{
+	req := &types.QuerySchemaRequest{
 		SchemaId: schemaRpcElements.SchemaDocument.GetId(),
 	}
 
-	res, errResponse := k.GetSchema(goCtx, req)
+	res, errResponse := k.QuerySchema(goCtx, req)
 	if errResponse != nil {
 		t.Error("Schema Resolve Failed")
 		t.Error(errResponse)
@@ -79,8 +79,8 @@ func TestGetSchema(t *testing.T) {
 	t.Log("GetSchema Test Completed")
 }
 
-func TestSchemaParam(t *testing.T) {
-	t.Log("Running test for SchemaParam (Query)")
+func TestQuerySchemas(t *testing.T) {
+	t.Log("Running test for QuerySchemas (Query)")
 	k, ctx := TestKeeper(t)
 	msgServer := keeper.NewMsgServerImpl(*k)
 	goCtx := sdk.WrapSDKContext(ctx)
@@ -130,9 +130,9 @@ func TestSchemaParam(t *testing.T) {
 
 	t.Log("Querying the list of Schema Documents")
 
-	req := &types.QuerySchemaParamRequest{}
+	req := &types.QuerySchemasRequest{}
 
-	res, errResponse := k.SchemaParam(goCtx, req)
+	res, errResponse := k.QuerySchemas(goCtx, req)
 	if errResponse != nil {
 		t.Error("Schema List Resolve Failed")
 		t.Error(errResponse)
