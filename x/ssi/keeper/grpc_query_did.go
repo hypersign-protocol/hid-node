@@ -24,14 +24,14 @@ func (k Keeper) QueryDidDocuments(goCtx context.Context, req *types.QueryDidDocu
 	_, err := query.Paginate(store, req.Pagination, func(key []byte, value []byte) error {
 		var (
 			didResolve types.QueryDidDocumentResponse
-			didDoc     types.DidDocument
+			didDoc     types.DidDocumentState
 		)
 		if err := k.cdc.Unmarshal(value, &didDoc); err != nil {
 			return err
 		}
 
-		didResolve.DidDocument = didDoc.Did
-		didResolve.DidDocumentMetadata = didDoc.Metadata
+		didResolve.DidDocument = didDoc.DidDocument
+		didResolve.DidDocumentMetadata = didDoc.DidDocumentMetadata
 
 		didResolveList = append(didResolveList, &didResolve)
 		return nil
@@ -64,7 +64,7 @@ func (k Keeper) QueryDidDocument(goCtx context.Context, req *types.QueryDidDocum
 	}
 
 	return &types.QueryDidDocumentResponse{
-		DidDocument:         didDoc.GetDid(),
-		DidDocumentMetadata: didDoc.GetMetadata(),
+		DidDocument:         didDoc.GetDidDocument(),
+		DidDocumentMetadata: didDoc.GetDidDocumentMetadata(),
 	}, nil
 }

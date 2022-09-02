@@ -102,3 +102,12 @@ func IsValidID(Id string, namespace string, docType string) error {
 
 	return nil
 }
+
+func HasAtleastOneTrueSigner(s []types.ValidDid) types.ValidDid {
+	for _, v := range s {
+		if v.IsValid {
+			return v
+		}
+	}
+	return types.ValidDid{}
+}

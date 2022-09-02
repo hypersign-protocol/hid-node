@@ -30,15 +30,15 @@ func TestVerificationMethodRotation(t *testing.T) {
 	keyPair2 := GeneratePublicPrivateKeyPair()
 
 	resolvedDidDocument := QueryDid(k, ctx, didId1)
-	versionId := resolvedDidDocument.GetMetadata().GetVersionId()
+	versionId := resolvedDidDocument.GetDidDocumentMetadata().GetVersionId()
 
 	// Replace the old public key with new one
-	resolvedDidDocument.Did.VerificationMethod[0].PublicKeyMultibase = keyPair2.publicKey
+	resolvedDidDocument.DidDocument.VerificationMethod[0].PublicKeyMultibase = keyPair2.publicKey
 
 	updatedDidRpcElements := GetModifiedDidDocumentSignature(
-		resolvedDidDocument.Did,
+		resolvedDidDocument.DidDocument,
 		keyPair1,
-		resolvedDidDocument.Did.VerificationMethod[0].Id,
+		resolvedDidDocument.DidDocument.VerificationMethod[0].Id,
 	)
 
 	err = UpdateDidTx(msgServer, goCtx, updatedDidRpcElements, versionId)
@@ -50,5 +50,5 @@ func TestVerificationMethodRotation(t *testing.T) {
 
 	resolvedDidDocument = QueryDid(k, ctx, didId1)
 	// Assert if the update was successful
-	assert.Equal(t, keyPair2.publicKey, resolvedDidDocument.Did.VerificationMethod[0].PublicKeyMultibase)
+	assert.Equal(t, keyPair2.publicKey, resolvedDidDocument.DidDocument.VerificationMethod[0].PublicKeyMultibase)
 }

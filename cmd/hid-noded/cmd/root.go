@@ -31,6 +31,7 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 	dbm "github.com/tendermint/tm-db"
 
+	"github.com/hypersign-protocol/hid-node/app"
 	hidnode "github.com/hypersign-protocol/hid-node/app"
 	"github.com/hypersign-protocol/hid-node/app/params"
 )
@@ -38,6 +39,9 @@ import (
 // NewRootCmd creates a new root command for simd. It is called once in the
 // main function.
 func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
+	// Set config for prefixes
+	app.SetConfig()
+
 	encodingConfig := hidnode.MakeTestEncodingConfig()
 	initClientCtx := client.Context{}.
 		WithCodec(encodingConfig.Codec).

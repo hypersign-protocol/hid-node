@@ -60,7 +60,7 @@ func DuplicateServiceExists(serviceId string, services []*types.Service) bool {
 }
 
 // Checks whether the DidDoc string is valid
-func IsValidDidDoc(didDoc *types.Did, genesisNamespace string) error {
+func ValidateDidDocument(didDoc *types.Did, genesisNamespace string) error {
 	didArrayMap := map[string][]string{
 		"authentication":       didDoc.GetAuthentication(),
 		"assertionMethod":      didDoc.GetAssertionMethod(),
@@ -73,13 +73,13 @@ func IsValidDidDoc(didDoc *types.Did, genesisNamespace string) error {
 		"id": didDoc.GetId(),
 	}
 
-	// Did Id Format Check
+	// Format Check for Did Id
 	err := IsValidID(didDoc.GetId(), genesisNamespace, "didDocument")
 	if err != nil {
 		return err
 	}
 
-	// Did Array Check
+	// Verification Method Relationships Check
 	for field, didArray := range didArrayMap {
 		for _, elem := range didArray {
 			if !IsValidDidFragment(elem, DidMethod, genesisNamespace) {

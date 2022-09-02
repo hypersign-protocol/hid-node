@@ -83,6 +83,7 @@ func TestDuplicateServiceId(t *testing.T) {
 	k, ctx := TestKeeper(t)
 	msgServer := keeper.NewMsgServerImpl(*k)
 	goCtx := sdk.WrapSDKContext(ctx)
+	k.SetChainNamespace(&ctx, "devnet")
 
 	keyPair1 := GeneratePublicPrivateKeyPair()
 	rpcElements := GenerateDidDocumentRPCElements(keyPair1)

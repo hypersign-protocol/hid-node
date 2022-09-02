@@ -5,8 +5,8 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-// Did Type Methods
-
+// Returns a list of controllers present in the Did document along with
+// their verification methods.
 func (msg *Did) GetSigners() []Signer {
 	if len(msg.Controller) > 0 {
 		result := make([]Signer, len(msg.Controller))

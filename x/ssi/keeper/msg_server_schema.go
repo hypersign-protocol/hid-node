@@ -27,8 +27,8 @@ func (k msgServer) CreateSchema(goCtx context.Context, msg *types.MsgCreateSchem
 	}
 
 	// Check if author's DID is deactivated
-	if authorDidDocument.Metadata.Deactivated {
-		return nil, sdkerrors.Wrap(types.ErrDidDocDeactivated, fmt.Sprintf("%s is deactivated and cannot used be used to create schema", authorDidDocument.Did.Id))
+	if authorDidDocument.DidDocumentMetadata.Deactivated {
+		return nil, sdkerrors.Wrap(types.ErrDidDocDeactivated, fmt.Sprintf("%s is deactivated and cannot used be used to create schema", authorDidDocument.DidDocument.Id))
 	}
 
 	// Check if Schema ID is valid
@@ -64,7 +64,7 @@ func (k msgServer) CreateSchema(goCtx context.Context, msg *types.MsgCreateSchem
 	}
 
 	// Signature check
-	if err := k.VerifySchemaSignature(schemaDoc, authorDidDocument.Did, schemaProof.ProofValue, schemaProof.VerificationMethod); err != nil {
+	if err := k.VerifySchemaSignature(schemaDoc, authorDidDocument.DidDocument, schemaProof.ProofValue, schemaProof.VerificationMethod); err != nil {
 		return nil, err
 	}
 

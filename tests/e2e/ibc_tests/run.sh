@@ -12,11 +12,13 @@ echo "Running hid-node"
 echo ""
 tmux new -s hidnode -d hid-noded start
 sleep 5
-if [[ -n $(hid-noded status) ]]; then
-  echo "hid-noded daemon is now running"
+hid-noded status &> /dev/null
+RET_VAL=$?
+if [ ${RET_VAL} -eq 0 ]; then
+  echo "hid-node daemon is now running"
   echo ""
 else
-  echo "hid-noded daemon failed to start, exiting...."
+  echo "hid-node daemon failed to start, exiting...."
   exit 1
 fi
 
@@ -44,7 +46,7 @@ fi
 
 # Run Hermes Relayer
 echo "Setting up hermes relayer"
-HID_NODE_VALIDATOR_WALLET=$(hid-noded keys show node1 -a)
+HID_NODE_VALIDATOR_WALLET=$(hid-noded keys show node1 -a --keyring-backend test)
 OSMOSIS_VALIDATOR_WALLET=$(osmosisd keys show osmonode1 -a)
 ./hermes/setup.sh ${HID_NODE_VALIDATOR_WALLET} ${OSMOSIS_VALIDATOR_WALLET}
 echo ""
@@ -58,7 +60,7 @@ echo ""
 
 echo "Transferring tokens from HID Node to Osmosis"
 echo ""
-IBC_TRANSFER_RESULT=$(hid-noded tx ibc-transfer transfer transfer channel-0 ${OSMOSIS_VALIDATOR_WALLET} 1234uhid --broadcast-mode block --from ${HID_NODE_VALIDATOR_WALLET} --output json --yes)
+IBC_TRANSFER_RESULT=$(hid-noded tx ibc-transfer transfer transfer channel-0 ${OSMOSIS_VALIDATOR_WALLET} 1234uhid --broadcast-mode block --from ${HID_NODE_VALIDATOR_WALLET} --output json --keyring-backend test --chain-id hidnode --yes)
 
 CODE=$(echo ${IBC_TRANSFER_RESULT} | jq '.code')
 TXHASH=$(echo ${IBC_TRANSFER_RESULT} | jq '.txhash')

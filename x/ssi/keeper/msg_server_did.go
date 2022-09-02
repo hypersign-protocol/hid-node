@@ -10,191 +10,190 @@ import (
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 )
 
+// RPC controller for registering DID document on hid-node
 func (k msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*types.MsgCreateDIDResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	didMsg := msg.GetDidDocString()
-	did := didMsg.GetId()
-
+	didId := didMsg.GetId()
 	chainNamespace := k.GetChainNamespace(&ctx)
 
-	// Checks if the DidDoc is a valid format
-	err := verify.IsValidDidDoc(msg.DidDocString, chainNamespace)
+	didSigners := didMsg.GetSigners()
+	signatures := msg.GetSignatures()
+
+	// Checks if the Did Document is valid
+	err := verify.ValidateDidDocument(msg.DidDocString, chainNamespace)
 	if err != nil {
 		return nil, err
 	}
 
-	// Checks if the DID is already present in the store
-	if k.HasDid(ctx, did) {
-		return nil, sdkerrors.Wrap(types.ErrDidDocExists, fmt.Sprintf("DID already exists %s", did))
+	// Checks if the Did Document is already registered
+	if k.HasDid(ctx, didId) {
+		return nil, sdkerrors.Wrap(types.ErrDidDocExists, fmt.Sprintf("DID already exists %s", didId))
 	}
 
-	// Signature check
-	if err := k.VerifySignature(&ctx, didMsg, didMsg.GetSigners(), msg.GetSignatures()); err != nil {
-		return nil, err
-	}
-
-	if k.ValidateDidControllers(&ctx, did, didMsg.GetController(), didMsg.GetVerificationMethod()) != nil {
+	// Checks if the Controllers are valid
+	didController := didMsg.GetController()
+	didVerificationMethod := didMsg.GetVerificationMethod()
+	if k.ValidateDidControllers(&ctx, didId, didController, didVerificationMethod) != nil {
 		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, "DID controller is not valid")
 	}
 
-	var didSpec = types.Did{
-		Context:              didMsg.GetContext(),
-		Id:                   didMsg.GetId(),
-		Controller:           didMsg.GetController(),
-		AlsoKnownAs:          didMsg.GetAlsoKnownAs(),
-		VerificationMethod:   didMsg.GetVerificationMethod(),
-		Authentication:       didMsg.GetAuthentication(),
-		AssertionMethod:      didMsg.GetAssertionMethod(),
-		KeyAgreement:         didMsg.GetKeyAgreement(),
-		CapabilityInvocation: didMsg.GetCapabilityInvocation(),
-		CapabilityDelegation: didMsg.GetCapabilityDelegation(),
-		Service:              didMsg.GetService(),
+	// Verification of Did Document Signature
+	if err := k.VerifySignature(&ctx, didMsg, didSigners, signatures); err != nil {
+		return nil, err
 	}
 
 	// Create the Metadata
 	metadata := types.CreateNewMetadata(ctx)
 
-	// Form the DID Document
-	didDoc := types.DidDocument{
-		Did:      &didSpec,
-		Metadata: &metadata,
+	// Form the Completet DID Document
+	didDocument := types.DidDocumentState{
+		DidDocument:         didMsg,
+		DidDocumentMetadata: &metadata,
 	}
-	// Add a DID to the store
-	id := k.AppendDID(ctx, &didDoc)
-	// Return the Id of the DID
+
+	// Set the DID Document to KVStore
+	id := k.CreateDidDocumentInStore(ctx, &didDocument)
+
 	return &types.MsgCreateDIDResponse{Id: id}, nil
 }
 
+// RPC controller for updating an existing DID document registered on hid-node
 func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*types.MsgUpdateDIDResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	didMsg := msg.GetDidDocString()
-	did := msg.GetDidDocString().GetId()
 	versionId := msg.GetVersionId()
-
+	didId := didMsg.GetId()
 	chainNamespace := k.GetChainNamespace(&ctx)
 
-	oldDIDDoc, err := k.GetDid(&ctx, didMsg.Id)
-	if err != nil {
-		return nil, err
-	}
-	oldDid := oldDIDDoc.GetDid()
-	oldMetaData := oldDIDDoc.GetMetadata()
-
-	// Check if the didDoc is valid
-	err = verify.IsValidDidDoc(didMsg, chainNamespace)
+	// Check if the input DID Document is valid
+	err := verify.ValidateDidDocument(didMsg, chainNamespace)
 	if err != nil {
 		return nil, err
 	}
 
-	// Checks if the DID is not present in the store
-	if !k.HasDid(ctx, did) {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("DID doesnt exists %s", did))
+	// Checks whether the DID Document exists in the store
+	if !k.HasDid(ctx, didId) {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("DID doesnt exists %s", didId))
 	}
 
-	// Check if the DID is already deactivated
-	if err := VerifyDidDeactivate(oldMetaData, didMsg.Id); err != nil {
+	// Retrieve existing Did Document from store
+	oldDIDDoc, err := k.GetDid(&ctx, didId)
+	if err != nil {
+		return nil, err
+	}
+	oldDid := oldDIDDoc.GetDidDocument()
+	oldMetaData := oldDIDDoc.GetDidDocumentMetadata()
+
+	// Check if the status of DID Document is deactivated
+	if err := VerifyDidDeactivate(oldMetaData, didId); err != nil {
 		return nil, err
 	}
 
-	if k.ValidateDidControllers(&ctx, did, didMsg.GetController(), didMsg.GetVerificationMethod()) != nil {
-		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, "DID controller is not valid")
-	}
-
-	if err := k.VerifySignatureOnDidUpdate(&ctx, oldDid, didMsg, msg.Signatures); err != nil {
-		return nil, err
-	}
-
-	// Check if the versionId passed is the same as the one in the Latest DID Document in store
+	// Check if the version id of existing Did Document matches with the current one
 	if oldMetaData.VersionId != versionId {
 		errMsg := fmt.Sprintf("Expected %s with version %s. Got version %s", didMsg.Id, oldMetaData.VersionId, versionId)
 		return nil, sdkerrors.Wrap(types.ErrUnexpectedDidVersion, errMsg)
 	}
 
-	var didSpec = types.Did{
-		Context:              didMsg.GetContext(),
-		Id:                   didMsg.GetId(),
-		Controller:           didMsg.GetController(),
-		AlsoKnownAs:          didMsg.GetAlsoKnownAs(),
-		VerificationMethod:   didMsg.GetVerificationMethod(),
-		Authentication:       didMsg.GetAuthentication(),
-		AssertionMethod:      didMsg.GetAssertionMethod(),
-		KeyAgreement:         didMsg.GetKeyAgreement(),
-		CapabilityInvocation: didMsg.GetCapabilityInvocation(),
-		Service:              didMsg.GetService(),
+	// Check if the controllers are valid
+	if k.ValidateDidControllers(&ctx, didId, didMsg.GetController(), didMsg.GetVerificationMethod()) != nil {
+		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, "DID controller is not valid")
+	}
+
+	// Validate Signatures
+	if err := k.VerifySignatureOnDidUpdate(&ctx, oldDid, didMsg, msg.Signatures); err != nil {
+		return nil, err
 	}
 
 	// Create the Metadata
 	metadata := types.CreateNewMetadata(ctx)
 	// Assign `created` and `deactivated` to previous DIDDoc's metadata values
-	metadata.Created = oldDIDDoc.GetMetadata().Created
-	metadata.Deactivated = oldDIDDoc.GetMetadata().Deactivated
+	metadata.Created = oldDIDDoc.GetDidDocumentMetadata().GetCreated()
+	metadata.Deactivated = oldDIDDoc.GetDidDocumentMetadata().GetDeactivated()
 
 	// Form the DID Document
-	didDoc := types.DidDocument{
-		Did:      &didSpec,
-		Metadata: &metadata,
+	didDoc := types.DidDocumentState{
+		DidDocument:         didMsg,
+		DidDocumentMetadata: &metadata,
 	}
-	if err := k.SetDid(ctx, didDoc); err != nil {
+
+	// Update the DID Document in store
+	if err := k.UpdateDidDocumentInStore(ctx, didDoc); err != nil {
 		return nil, err
 	}
 
-	return &types.MsgUpdateDIDResponse{UpdateId: didSpec.Id}, nil
+	return &types.MsgUpdateDIDResponse{UpdateId: didId}, nil
 }
 
+// RPC controller for deactivating an existing DID document registered on hid-node
 func (k msgServer) DeactivateDID(goCtx context.Context, msg *types.MsgDeactivateDID) (*types.MsgDeactivateDIDResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	id := msg.GetDidId()
+	didId := msg.GetDidId()
 	versionId := msg.GetVersionId()
-
-	didDocument, err := k.GetDid(&ctx, id)
-	if err != nil {
-		return nil, err
-	}
-	did := didDocument.GetDid()
-	metadata := didDocument.GetMetadata()
-
 	chainNamespace := k.GetChainNamespace(&ctx)
 
-	// Check if the didDoc is valid
-	err = verify.IsValidDidDoc(did, chainNamespace)
+	// Check if the Did id format is valid
+	err := verify.IsValidID(didId, chainNamespace, "didDocument")
 	if err != nil {
 		return nil, err
 	}
 
-	if k.ValidateDidControllers(&ctx, id, did.GetController(), did.GetVerificationMethod()) != nil {
-		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, "DID controller is not valid")
+	// Checks whether the DID Document exists in the store
+	if !k.HasDid(ctx, didId) {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("DID doesnt exists %s", didId))
 	}
 
-	if err := k.VerifySignature(&ctx, did, did.GetSigners(), msg.Signatures); err != nil {
+	// Retrieve the DID Document from store
+	didDocumentState, err := k.GetDid(&ctx, didId)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch DID Document with Did Id %s from store", didId)
+	}
+	didDoc := didDocumentState.GetDidDocument()
+	metadata := didDocumentState.GetDidDocumentMetadata()
+	oldVersionId := metadata.GetVersionId()
+
+	// Check if the DID is already deactivated
+	if err := VerifyDidDeactivate(metadata, didId); err != nil {
 		return nil, err
 	}
 
 	// Check if the versionId passed is the same as the one in the Latest DID Document in store
-	if metadata.GetVersionId() != versionId {
-		errMsg := fmt.Sprintf("Expected %s with version %s. Got version %s", did.GetId(), metadata.GetVersionId(), versionId)
+	if oldVersionId != versionId {
+		errMsg := fmt.Sprintf("Expected %s with version %s. Got version %s", didId, oldVersionId, versionId)
 		return nil, sdkerrors.Wrap(types.ErrUnexpectedDidVersion, errMsg)
 	}
 
-	// Check if the DID is already deactivated
-	if err := VerifyDidDeactivate(metadata, did.GetId()); err != nil {
+	// Check the validity of DID Controllers
+	didController := didDoc.GetController()
+	didVerificationMethod := didDoc.GetVerificationMethod()
+	if k.ValidateDidControllers(&ctx, didId, didController, didVerificationMethod) != nil {
+		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, "DID controller is not valid")
+	}
+
+	// Signature Verification
+	signers := didDoc.GetSigners()
+	signatures := msg.Signatures
+	if err := k.VerifySignature(&ctx, didDoc, signers, signatures); err != nil {
 		return nil, err
 	}
 
 	// Create updated metadata
 	updatedMetadata := types.CreateNewMetadata(ctx)
-	updatedMetadata.Created = didDocument.GetMetadata().Created
+	updatedMetadata.Created = didDocumentState.GetDidDocumentMetadata().GetCreated()
 	updatedMetadata.Deactivated = true
 
 	// Form the updated DID Document
-	updatedDidDocument := types.DidDocument{
-		Did:      did,
-		Metadata: &updatedMetadata,
+	updatedDidDocument := types.DidDocumentState{
+		DidDocument:         didDoc,
+		DidDocumentMetadata: &updatedMetadata,
 	}
 
-	if err := k.SetDidDeactivate(ctx, updatedDidDocument, id); err != nil {
+	// Update the DID Document in Store
+	if err := k.UpdateDidDocumentInStore(ctx, updatedDidDocument); err != nil {
 		return nil, err
 	}
 
