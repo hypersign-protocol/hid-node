@@ -268,7 +268,7 @@ func UpdateDidTx(msgServer types.MsgServer, ctx context.Context, rpcElements Did
 	return nil
 }
 
-func QueryDid(k *keeper.Keeper, ctx sdk.Context, Id string) *types.DidDocument {
+func QueryDid(k *keeper.Keeper, ctx sdk.Context, Id string) *types.DidDocumentState {
 	resolvedDidDocument, errResolve := k.GetDid(&ctx, Id)
 	if errResolve != nil {
 		panic(errResolve)

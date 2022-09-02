@@ -15,4 +15,9 @@ type (
 		CapabilityInvocation []string
 		CapabilityDelegation []string
 	}
+
+	ValidDid struct {
+		DidId   string
+		IsValid bool
+	}
 )

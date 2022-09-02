@@ -19,7 +19,7 @@ Following are the prerequisites that needs to be installed:
 ```sh
 git clone https://github.com/hypersign-protocol/hid-node.git
 cd hid-node
-make build
+make install
 ```
 
 - Move the build to GOPATH:

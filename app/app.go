@@ -91,16 +91,15 @@ import (
 
 	"github.com/hypersign-protocol/hid-node/docs"
 
+	appparams "github.com/hypersign-protocol/hid-node/app/params"
 	ssimodule "github.com/hypersign-protocol/hid-node/x/ssi"
 	ssimodulekeeper "github.com/hypersign-protocol/hid-node/x/ssi/keeper"
 	ssimoduletypes "github.com/hypersign-protocol/hid-node/x/ssi/types"
-	appparams "github.com/hypersign-protocol/hid-node/app/params"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 )
 
 const (
-	AccountAddressPrefix = "hid"
-	Name                 = "hid-node"
+	Name = "hid-node"
 )
 
 // this line is used by starport scaffolding # stargate/wasm/app/enabledProposals
@@ -327,7 +326,7 @@ func New(
 		keys[authzkeeper.StoreKey], appCodec, app.MsgServiceRouter(),
 	)
 	app.AuthzKeeper = authzKeeper
-	
+
 	// register the proposal types
 	govRouter := govtypes.NewRouter()
 	govRouter.AddRoute(govtypes.RouterKey, govtypes.ProposalHandler).
@@ -415,7 +414,7 @@ func New(
 		banktypes.ModuleName,
 		govtypes.ModuleName,
 		upgradetypes.ModuleName,
-		capabilitytypes.ModuleName, 
+		capabilitytypes.ModuleName,
 		minttypes.ModuleName,
 		distrtypes.ModuleName,
 		slashingtypes.ModuleName,
@@ -423,7 +422,7 @@ func New(
 		stakingtypes.ModuleName,
 		ibchost.ModuleName,
 		ibctransfertypes.ModuleName,
-		feegrant.ModuleName, 
+		feegrant.ModuleName,
 		authz.ModuleName,
 		ssimoduletypes.ModuleName,
 		genutiltypes.ModuleName,
@@ -433,16 +432,16 @@ func New(
 
 	app.mm.SetOrderEndBlockers(
 		authtypes.ModuleName,
-		banktypes.ModuleName, 
+		banktypes.ModuleName,
 		crisistypes.ModuleName,
-		govtypes.ModuleName, 
+		govtypes.ModuleName,
 		stakingtypes.ModuleName,
 		minttypes.ModuleName,
 		distrtypes.ModuleName,
 		upgradetypes.ModuleName,
 		ssimoduletypes.ModuleName,
 		genutiltypes.ModuleName,
-		feegrant.ModuleName, 
+		feegrant.ModuleName,
 		authz.ModuleName,
 		paramstypes.ModuleName,
 		capabilitytypes.ModuleName,
@@ -472,7 +471,7 @@ func New(
 		evidencetypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		ssimoduletypes.ModuleName,
-		feegrant.ModuleName, 
+		feegrant.ModuleName,
 		authz.ModuleName,
 		paramstypes.ModuleName,
 		upgradetypes.ModuleName,

@@ -18,15 +18,15 @@ const (
 )
 
 const (
-	DidKey      = "Did-value-"
-	DidCountKey = "Did-count-"
-	DidNamespaceKey = "Did-namespace-" 
-	DidMethodKey = "Did-method-"
+	DidKey          = "Did-value-"
+	DidCountKey     = "Did-count-"
+	DidNamespaceKey = "Did-namespace-"
+	DidMethodKey    = "Did-method-"
 
 	SchemaKey      = "Schema-value-"
 	SchemaCountKey = "Schema-count-"
 
-	CredKey = "Cred-value-"
+	CredKey      = "Cred-value-"
 	CredCountKey = "Cred-count-"
 )
 

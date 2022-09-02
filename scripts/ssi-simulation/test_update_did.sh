@@ -1,7 +1,5 @@
 #!bin/sh
 
-# TODO: Need to use Assertion
-
 echo "----------- Testing for DID Controller -----------"
 
 first_test_case () {

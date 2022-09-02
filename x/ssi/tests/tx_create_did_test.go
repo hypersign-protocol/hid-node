@@ -49,13 +49,13 @@ func TestInvalidServiceType(t *testing.T) {
 	rpcElements := GenerateDidDocumentRPCElements(keyPair1)
 	// Set Namespace
 	k.SetChainNamespace(&ctx, "devnet")
-	
+
 	// Changing Service Type from "LinkedDomains" to "DIDComm" which is not supported type
 	invalidServiceType := "DIDComm"
 	rpcElements.DidDocument.Service[0].Type = invalidServiceType
-	
+
 	updatedRpcElements := GetModifiedDidDocumentSignature(
-		rpcElements.DidDocument, 
+		rpcElements.DidDocument,
 		keyPair1,
 		rpcElements.DidDocument.VerificationMethod[0].Id,
 	)
@@ -83,12 +83,13 @@ func TestDuplicateServiceId(t *testing.T) {
 	k, ctx := TestKeeper(t)
 	msgServer := keeper.NewMsgServerImpl(*k)
 	goCtx := sdk.WrapSDKContext(ctx)
+	k.SetChainNamespace(&ctx, "devnet")
 
 	keyPair1 := GeneratePublicPrivateKeyPair()
 	rpcElements := GenerateDidDocumentRPCElements(keyPair1)
 
 	// Appending a types.Service object with Service Id similar as the first service object
-	duplicateServiceId :=  rpcElements.DidDocument.Service[0].Id
+	duplicateServiceId := rpcElements.DidDocument.Service[0].Id
 	newService := &types.Service{
 		Id:              duplicateServiceId,
 		Type:            "LinkedDomains",
@@ -103,7 +104,7 @@ func TestDuplicateServiceId(t *testing.T) {
 	t.Logf("Registering DID with DID Id: %s", rpcElements.DidDocument.GetId())
 
 	updatedDidRpcElements := GetModifiedDidDocumentSignature(
-		rpcElements.DidDocument, 
+		rpcElements.DidDocument,
 		keyPair1,
 		rpcElements.DidDocument.VerificationMethod[0].Id,
 	)
@@ -114,13 +115,12 @@ func TestDuplicateServiceId(t *testing.T) {
 		Creator:      rpcElements.Creator,
 	}
 
-
 	_, err := msgServer.CreateDID(goCtx, msgCreateDID)
 	if err == nil {
 		t.Error("DID Document Registeration was expected to fail, as no two or more service endpoints can have similar service Id")
 		t.FailNow()
 	}
-	
+
 	assert.Contains(t, err.Error(), fmt.Sprintf("Service with Id: %s is duplicate: Invalid Service", duplicateServiceId))
 
 	t.Log("Invalid Duplicate Service Id Test Completed")

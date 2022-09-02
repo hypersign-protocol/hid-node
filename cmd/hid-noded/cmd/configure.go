@@ -52,8 +52,8 @@ func p2pCmd(defaultNodeHome string) *cobra.Command {
 // minGasPricesCmd returns configuration cobra Command.
 func minGasPricesCmd(defaultNodeHome string) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "min-gas-prices [value]",
-		Short: "The minimum gas prices a validator is willing to accept (default \"10uhid\")",
+		Use:     "min-gas-prices [value]",
+		Short:   "The minimum gas prices a validator is willing to accept (default \"10uhid\")",
 		Example: "min-gas-prices 10uhid",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -102,7 +102,7 @@ func seedsCmd(defaultNodeHome string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "seeds [value]",
 		Short: "Comma separated list of seed nodes to connect to in <node-id@ip-address-or-dns-name:port> format",
-		Args: cobra.ExactArgs(1),
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 			return updateTmConfig(clientCtx.HomeDir, func(config *tmcfg.Config) {

@@ -4,7 +4,6 @@ package hypersignprotocol.hidnode.ssi;
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
-import "ssi/v1/params.proto";
 import "ssi/v1/schema.proto";
 import "ssi/v1/did.proto";
 import "ssi/v1/tx.proto";
@@ -16,32 +15,27 @@ option go_package = "github.com/hypersign-protocol/hid-node/x/ssi/types";
 
 // Query defines the gRPC querier service.
 service Query {
-  // Parameters queries the parameters of the module.
-  rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
-    option (google.api.http).get = "/hypersignprotocol/hidnode/ssi/params";
-  }
-
-  // Get the Schema for a specified Schema Id
-	rpc GetSchema(QueryGetSchemaRequest) returns (QueryGetSchemaResponse) {
+  // Get the Schema Document for a specified schema id
+	rpc QuerySchema(QuerySchemaRequest) returns (QuerySchemaResponse) {
 		option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/schema/{schemaId}";
 	}
 
-// Get the list of Schemas and count
-	rpc SchemaParam(QuerySchemaParamRequest) returns (QuerySchemaParamResponse) {
+// Get the count and list of registered Schemas
+	rpc QuerySchemas(QuerySchemasRequest) returns (QuerySchemasResponse) {
 		option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/schema";
 	}
 
-// Get the Did Document for a specified Did Id
-	rpc ResolveDid(QueryGetDidDocByIdRequest) returns (DidResolutionResponse) {
+// Get the Did Document for a specified DID id
+	rpc QueryDidDocument(QueryDidDocumentRequest) returns (QueryDidDocumentResponse) {
 		option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/did/{didId}";
 	}
 
-// Get the list of registered Did Documents and count
-  rpc DidParam(QueryDidParamRequest) returns (QueryDidParamResponse) {
+// Get the count and list of registered Did Documents
+  rpc QueryDidDocuments(QueryDidDocumentsRequest) returns (QueryDidDocumentsResponse) {
     option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/did";
   }
 
-// Get the Credential Status for a given credential Id
+// Get the Credential Status for a given credential id
   rpc QueryCredential(QueryCredentialRequest) returns (QueryCredentialResponse) {
     option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/credential/{credId}";
   }
@@ -54,57 +48,33 @@ service Query {
 // this line is used by starport scaffolding # 2
 }
 
+// Schema Messages
+
+message QuerySchemaRequest {
+  string schemaId = 1;
+}
+
+message QuerySchemaResponse {
+  repeated Schema schema = 1;
+}
+
+message QuerySchemasRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QuerySchemasResponse {
+  uint64 totalCount = 1;
+  repeated Schema schemaList = 2;
+}
+
+// Credential Messages
+
 message QueryCredentialRequest {
   string credId = 1;
 }
 
 message QueryCredentialResponse {
   Credential credStatus = 1;
-}
-
-// QueryParamsRequest is request type for the Query/Params RPC method.
-message QueryParamsRequest {}
-
-// QueryParamsResponse is response type for the Query/Params RPC method.
-message QueryParamsResponse {
-  // params holds all the parameters of this module.
-  Params params = 1 [(gogoproto.nullable) = false];
-}
-
-message QueryGetSchemaRequest {
-  string schemaId = 1;
-}
-
-message QueryGetSchemaResponse {
-  repeated Schema schema = 1;
-}
-
-message QuerySchemaParamRequest {
-  cosmos.base.query.v1beta1.PageRequest pagination = 1;
-}
-
-message QuerySchemaParamResponse {
-  uint64 totalCount = 1;
-  repeated Schema schemaList = 2;
-}
-
-message QueryGetDidDocByIdRequest {
-  string didId = 1;
-}
-
-message QueryDidParamRequest {
-  bool count = 1;
-  cosmos.base.query.v1beta1.PageRequest pagination = 2;
-}
-
-message QueryDidParamResponse {
-  uint64 totalDidCount = 1;
-  repeated DidResolutionResponse didDocList = 2;
-}
-
-message DidResolutionResponse {
-  Did didDocument = 1;
-  Metadata didDocumentMetadata = 2;
 }
 
 message QueryCredentialsRequest {
@@ -116,12 +86,25 @@ message QueryCredentialsResponse {
   repeated Credential credentials = 2;
 }
 
-message MarshalInput {
-  string stringInput = 1;
+// Did Document Messages
+
+message QueryDidDocumentRequest {
+  string didId = 1;
 }
 
-message MarshalOutput {
-  string unmarshalOutput = 1;
+message QueryDidDocumentResponse {
+  Did didDocument = 1;
+  Metadata didDocumentMetadata = 2;
+}
+
+message QueryDidDocumentsRequest {
+  bool count = 1;
+  cosmos.base.query.v1beta1.PageRequest pagination = 2;
+}
+
+message QueryDidDocumentsResponse {
+  uint64 totalDidCount = 1;
+  repeated QueryDidDocumentResponse didDocList = 2;
 }
 
 // this line is used by starport scaffolding # 3

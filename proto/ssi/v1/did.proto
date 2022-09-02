@@ -42,7 +42,7 @@ message SignInfo {
   string signature = 2;
 }
 
-message DidDocument {
-  Did did = 1;
-  Metadata metadata = 2;
+message DidDocumentState {
+  Did didDocument = 1;
+  Metadata didDocumentMetadata = 2;
 }

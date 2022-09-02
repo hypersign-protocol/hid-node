@@ -2,7 +2,6 @@ syntax = "proto3";
 package hypersignprotocol.hidnode.ssi;
 
 import "gogoproto/gogo.proto";
-import "ssi/v1/params.proto";
 // this line is used by starport scaffolding # genesis/proto/import
 
 option go_package = "github.com/hypersign-protocol/hid-node/x/ssi/types";

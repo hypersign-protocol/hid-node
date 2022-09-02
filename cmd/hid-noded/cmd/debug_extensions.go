@@ -102,7 +102,7 @@ func multibase58toBase64Cmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			multibase58Str := args[0][1:]
 			multibase58Bytes := base58.Decode(multibase58Str)
-			
+
 			base64Str := base64.StdEncoding.EncodeToString(multibase58Bytes)
 
 			_, err := fmt.Fprintln(cmd.OutOrStdout(), base64Str)

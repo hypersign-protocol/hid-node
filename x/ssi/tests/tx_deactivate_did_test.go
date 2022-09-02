@@ -42,7 +42,7 @@ func TestDeactivateDID(t *testing.T) {
 		t.Error(errResolve)
 		t.FailNow()
 	}
-	versionId := resolvedDidDocument.GetMetadata().GetVersionId()
+	versionId := resolvedDidDocument.GetDidDocumentMetadata().GetVersionId()
 
 	t.Logf("Deactivating DID with Id: %s", rpcElements.DidDocument.GetId())
 	msgDeactivateDID := &types.MsgDeactivateDID{

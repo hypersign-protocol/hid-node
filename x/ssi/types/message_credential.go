@@ -11,7 +11,7 @@ var _ sdk.Msg = &MsgRegisterCredentialStatus{}
 
 func NewMsgRegisterCredentialStatus(creator string, credentialStatus *CredentialStatus) *MsgRegisterCredentialStatus {
 	return &MsgRegisterCredentialStatus{
-		Creator:    creator,
+		Creator:          creator,
 		CredentialStatus: credentialStatus,
 	}
 }
