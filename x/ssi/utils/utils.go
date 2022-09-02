@@ -2,8 +2,8 @@ package utils
 
 import (
 	"crypto/ed25519"
-	"strings"
 	"os/exec"
+	"strings"
 
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 )
@@ -63,9 +63,9 @@ func SplitDidUrlIntoDid(didUrl string) (string, string) {
 }
 
 func UUID() string {
-    out, err := exec.Command("uuidgen").Output()
-    if err != nil {
-        panic(err)
-    }
-    return string(out)
+	out, err := exec.Command("uuidgen").Output()
+	if err != nil {
+		panic(err)
+	}
+	return string(out)
 }

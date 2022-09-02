@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 	utils "github.com/hypersign-protocol/hid-node/x/ssi/utils"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 // Cheks whether the Service is valid
@@ -35,10 +35,7 @@ func IsValidDidFragment(didUrl string, method string, namespace string) bool {
 
 	did, _ := utils.SplitDidUrlIntoDid(didUrl)
 	err := IsValidID(did, namespace, "didDocument")
-	if err != nil {
-		return false
-	}
-	return true
+	return err == nil
 }
 
 // Check Valid DID service type
@@ -62,9 +59,8 @@ func DuplicateServiceExists(serviceId string, services []*types.Service) bool {
 	return false
 }
 
-
 // Checks whether the DidDoc string is valid
-func IsValidDidDoc(didDoc *types.Did, genesisNamespace string) error {
+func ValidateDidDocument(didDoc *types.Did, genesisNamespace string) error {
 	didArrayMap := map[string][]string{
 		"authentication":       didDoc.GetAuthentication(),
 		"assertionMethod":      didDoc.GetAssertionMethod(),
@@ -77,15 +73,15 @@ func IsValidDidDoc(didDoc *types.Did, genesisNamespace string) error {
 		"id": didDoc.GetId(),
 	}
 
-	// Did Id Format Check
+	// Format Check for Did Id
 	err := IsValidID(didDoc.GetId(), genesisNamespace, "didDocument")
 	if err != nil {
 		return err
 	}
 
-	// Did Array Check
+	// Verification Method Relationships Check
 	for field, didArray := range didArrayMap {
-		for _, elem := range didArray{
+		for _, elem := range didArray {
 			if !IsValidDidFragment(elem, DidMethod, genesisNamespace) {
 				return sdkerrors.Wrap(types.ErrInvalidDidDoc, fmt.Sprintf("The field %s is an invalid DID Array", field))
 			}

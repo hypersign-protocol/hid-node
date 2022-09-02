@@ -37,8 +37,8 @@ func TestRegisterCredentialStatus(t *testing.T) {
 	t.Log("Did Registeration Successful")
 
 	credRpcElements := GenerateCredStatusRPCElements(
-		keyPair1, 
-		didRpcElements.DidDocument.Id, 
+		keyPair1,
+		didRpcElements.DidDocument.Id,
 		didRpcElements.DidDocument.VerificationMethod[0],
 	)
 
@@ -69,7 +69,7 @@ func TestUpdateCredentialStatus(t *testing.T) {
 	goCtx := sdk.WrapSDKContext(ctx)
 
 	k.SetChainNamespace(&ctx, "devnet")
-	
+
 	keyPair1 := GeneratePublicPrivateKeyPair()
 	didRpcElements := GenerateDidDocumentRPCElements(keyPair1)
 	t.Logf("Registering DID with DID Id: %s", didRpcElements.DidDocument.GetId())
@@ -90,8 +90,8 @@ func TestUpdateCredentialStatus(t *testing.T) {
 	t.Log("Did Registeration Successful")
 
 	credRpcElements := GenerateCredStatusRPCElements(
-		keyPair1, 
-		didRpcElements.DidDocument.Id, 
+		keyPair1,
+		didRpcElements.DidDocument.Id,
 		didRpcElements.DidDocument.VerificationMethod[0],
 	)
 
@@ -113,9 +113,9 @@ func TestUpdateCredentialStatus(t *testing.T) {
 	t.Log("Credential Status Registeration Successful")
 
 	t.Logf("Updating Credential Status (Id: %s) from Live to Revoked", credRpcElements.Status.GetClaim().GetId())
-	
+
 	updatedRpcCredElements := UpdateCredStatus("Revoked", credRpcElements, keyPair1)
-	
+
 	msgUpdateCredentialStatus := &types.MsgRegisterCredentialStatus{
 		CredentialStatus: updatedRpcCredElements.Status,
 		Proof:            updatedRpcCredElements.Proof,

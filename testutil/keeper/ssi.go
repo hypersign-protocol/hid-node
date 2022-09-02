@@ -48,8 +48,5 @@ func SsiKeeper(t testing.TB) (*keeper.Keeper, sdk.Context) {
 			ChainID: "hidnode",
 		}, false, log.NewNopLogger())
 
-	// Initialize params
-	k.SetParams(ctx, types.DefaultParams())
-
 	return k, ctx
 }

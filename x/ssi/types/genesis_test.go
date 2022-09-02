@@ -19,28 +19,28 @@ func TestGenesisState_Validate(t *testing.T) {
 			valid:    true,
 		},
 		{
-			desc:     "valid did namespace",
+			desc: "valid did namespace",
 			genState: &types.GenesisState{
 				ChainNamespace: "devnet",
 			},
 			valid: true,
 		},
 		{
-			desc:     "invalid did namespace of length more than 10",
+			desc: "invalid did namespace of length more than 10",
 			genState: &types.GenesisState{
 				ChainNamespace: "abracadabra123",
 			},
 			valid: false,
 		},
 		{
-			desc:     "invalid did namespace containing whitespaces",
+			desc: "invalid did namespace containing whitespaces",
 			genState: &types.GenesisState{
 				ChainNamespace: "abracadabra	123",
 			},
 			valid: false,
 		},
 		{
-			desc:     "invalid did namespace containing underscore",
+			desc: "invalid did namespace containing underscore",
 			genState: &types.GenesisState{
 				ChainNamespace: "xyz_123",
 			},

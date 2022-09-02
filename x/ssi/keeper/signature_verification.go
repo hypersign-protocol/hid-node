@@ -9,13 +9,13 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	verify "github.com/hypersign-protocol/hid-node/x/ssi/keeper/document_verification"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 	"github.com/hypersign-protocol/hid-node/x/ssi/utils"
 )
 
 func VerifyIdentitySignature(signer types.Signer, signatures []*types.SignInfo, signingInput []byte) (bool, error) {
 	result := false
-	matchFound := false
 
 	for _, info := range signatures {
 		did, _ := utils.SplitDidUrlIntoDid(info.VerificationMethodId)
@@ -31,12 +31,7 @@ func VerifyIdentitySignature(signer types.Signer, signatures []*types.SignInfo, 
 			}
 
 			result = ed25519.Verify(pubKey, signingInput, signature)
-			matchFound = true
 		}
-	}
-
-	if !matchFound {
-		return false, fmt.Errorf("signature for %s not found", signer.Signer)
 	}
 
 	return result, nil
@@ -101,6 +96,8 @@ func AppendSignerIfNeed(signers []types.Signer, controller string, msg *types.Di
 }
 
 func (k *Keeper) VerifySignature(ctx *sdk.Context, msg *types.Did, signers []types.Signer, signatures []*types.SignInfo) error {
+	var validArr []types.ValidDid
+
 	if len(signers) == 0 {
 		return types.ErrInvalidSignature.Wrap("At least one signer should be present")
 	}
@@ -118,18 +115,21 @@ func (k *Keeper) VerifySignature(ctx *sdk.Context, msg *types.Did, signers []typ
 				return types.ErrDidDocNotFound.Wrap(signer.Signer)
 			}
 
-			signer.Authentication = didDoc.Did.Authentication
-			signer.VerificationMethod = didDoc.Did.VerificationMethod
+			signer.Authentication = didDoc.DidDocument.Authentication
+			signer.VerificationMethod = didDoc.DidDocument.VerificationMethod
 		}
 
 		valid, err := VerifyIdentitySignature(signer, signatures, signingInput)
 		if err != nil {
 			return sdkerrors.Wrap(types.ErrInvalidSignature, err.Error())
 		}
+		validArr = append(validArr, types.ValidDid{DidId: signer.Signer, IsValid: valid})
+	}
 
-		if !valid {
-			return types.ErrInvalidSignature
-		}
+	validDid := verify.HasAtleastOneTrueSigner(validArr)
+
+	if validDid == (types.ValidDid{}) {
+		return sdkerrors.Wrap(types.ErrInvalidSignature, validDid.DidId)
 	}
 
 	return nil
@@ -172,7 +172,7 @@ func (k *Keeper) ValidateController(ctx *sdk.Context, id string, controller stri
 	if err != nil {
 		return types.ErrDidDocNotFound.Wrap(controller)
 	}
-	if len(didDoc.Did.Authentication) == 0 {
+	if len(didDoc.DidDocument.Authentication) == 0 {
 		return types.ErrBadRequestInvalidVerMethod.Wrap(
 			fmt.Sprintf("Verificatition method controller %s doesn't have an authentication keys", controller))
 	}

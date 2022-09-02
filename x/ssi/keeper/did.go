@@ -10,16 +10,14 @@ import (
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 )
 
-
-// Set the DID namespace
+// Set the Chain namespace
 func (k Keeper) SetChainNamespace(ctx *sdk.Context, namespace string) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.DidNamespaceKey))
-	// Convert the DidCountKey to bytes
 	byteKey := []byte(types.DidNamespaceKey)
 	store.Set(byteKey, []byte(namespace))
 }
 
-// Get the DID namespace
+// Get the Chain namespace
 func (k Keeper) GetChainNamespace(ctx *sdk.Context) string {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.DidNamespaceKey))
 	byteKey := []byte(types.DidNamespaceKey)
@@ -27,83 +25,62 @@ func (k Keeper) GetChainNamespace(ctx *sdk.Context) string {
 	return string(bz)
 }
 
+// Get the count of registered Did Documents
 func (k Keeper) GetDidCount(ctx sdk.Context) uint64 {
-	// Get the store using storeKey and DidCountKey (which is "Did-count-")
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.DidCountKey))
-	// Convert the DidCountKey to bytes
 	byteKey := []byte(types.DidCountKey)
-	// Get the value of the count
 	bz := store.Get(byteKey)
-	// Return zero if the count value is not found
 	if bz == nil {
 		return 0
 	}
-	// Convert the count into a uint64
 	return binary.BigEndian.Uint64(bz)
 }
 
-// Check whether the given DID is already present in the store
+// Check whether the Did document exist in the store
 func (k Keeper) HasDid(ctx sdk.Context, id string) bool {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidKey))
 	return store.Has(utils.UnsafeStrToBytes(id))
 }
 
 // Retrieves the DID from the store
-func (k Keeper) GetDid(ctx *sdk.Context, id string) (*types.DidDocument, error) {
+func (k Keeper) GetDid(ctx *sdk.Context, id string) (*types.DidDocumentState, error) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidKey))
 
-	if !k.HasDid(*ctx, id) {
-		return nil, sdkerrors.ErrNotFound
-	}
-
-	var value types.DidDocument
+	var didDocState types.DidDocumentState
 	var bytes = store.Get([]byte(id))
-	if err := k.cdc.Unmarshal(bytes, &value); err != nil {
+	if err := k.cdc.Unmarshal(bytes, &didDocState); err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidType, err.Error())
 	}
 
-	return &value, nil
+	return &didDocState, nil
 }
 
+// Sets the Did Document Count
 func (k Keeper) SetDidCount(ctx sdk.Context, count uint64) {
-	// Get the store using storeKey and SchemaCountKey (which is "Did-count-")
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.DidCountKey))
-	// Convert the DidCountKey to bytes
 	byteKey := []byte(types.DidCountKey)
-	// Convert count from uint64 to string and get bytes
 	bz := make([]byte, 8)
 	binary.BigEndian.PutUint64(bz, count)
-	// Set the value of Did-count- to count
 	store.Set(byteKey, bz)
 }
 
-// SetDid set a specific did in the store
-func (k Keeper) SetDid(ctx sdk.Context, didDoc types.DidDocument) error {
+// Updates an existing Did document present in the store
+func (k Keeper) UpdateDidDocumentInStore(ctx sdk.Context, didDoc types.DidDocumentState) error {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidKey))
 	b := k.cdc.MustMarshal(&didDoc)
-	store.Set([]byte(didDoc.Did.Id), b)
+	store.Set([]byte(didDoc.DidDocument.Id), b)
 	return nil
 }
 
-// SetDid set a specific did in the store
-func (k Keeper) SetDidDeactivate(ctx sdk.Context, didDoc types.DidDocument, id string) error {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidKey))
-	b := k.cdc.MustMarshal(&didDoc)
-	store.Set([]byte(id), b)
-	return nil
-}
-
-func (k Keeper) AppendDID(ctx sdk.Context, didDoc *types.DidDocument) uint64 {
-	// Get the current number of DIDs in the store
+// Creates record for a new DID Document
+func (k Keeper) CreateDidDocumentInStore(ctx sdk.Context, didDoc *types.DidDocumentState) uint64 {
 	count := k.GetDidCount(ctx)
-	// Get the store
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.DidKey))
-	// Get ID from DID Doc
-	id := didDoc.GetDid().GetId()
-	// Marshal the DID into bytes
+
+	id := didDoc.GetDidDocument().GetId()
 	didDocBytes := k.cdc.MustMarshal(didDoc)
+
 	store.Set([]byte(id), didDocBytes)
-	// Update the Did count
 	k.SetDidCount(ctx, count+1)
 	return count
 }

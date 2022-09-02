@@ -26,9 +26,9 @@ func CmdGetSchema() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			params := &types.QueryGetSchemaRequest{SchemaId: argSchemaId}
+			params := &types.QuerySchemaRequest{SchemaId: argSchemaId}
 
-			res, err := queryClient.GetSchema(cmd.Context(), params)
+			res, err := queryClient.QuerySchema(cmd.Context(), params)
 			if err != nil {
 				return err
 			}
@@ -57,9 +57,9 @@ func CmdResolveDID() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			params := &types.QueryGetDidDocByIdRequest{DidId: argDidDocId}
+			params := &types.QueryDidDocumentRequest{DidId: argDidDocId}
 
-			res, err := queryClient.ResolveDid(cmd.Context(), params)
+			res, err := queryClient.QueryDidDocument(cmd.Context(), params)
 			if err != nil {
 				return err
 			}

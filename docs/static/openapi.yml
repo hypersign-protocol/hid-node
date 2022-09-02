@@ -20251,7 +20251,7 @@ paths:
         - Query
   '/hypersign-protocol/hidnode/ssi/credential/{credId}':
     get:
-      summary: Get the Credential Status for a given credential Id
+      summary: Get the Credential Status for a given credential id
       operationId: HypersignprotocolHidnodeSsiQueryCredential
       responses:
         '200':
@@ -20322,7 +20322,7 @@ paths:
   /hypersign-protocol/hidnode/ssi/did:
     get:
       summary: Get the list of registered Did Documents and count
-      operationId: HypersignprotocolHidnodeSsiDidParam
+      operationId: HypersignprotocolHidnodeSsiQueryDidDocuments
       responses:
         '200':
           description: A successful response.
@@ -20492,8 +20492,8 @@ paths:
         - Query
   '/hypersign-protocol/hidnode/ssi/did/{didId}':
     get:
-      summary: Get the Did Document for a specified Did Id
-      operationId: HypersignprotocolHidnodeSsiResolveDid
+      summary: Get the Did Document for a specified Did id
+      operationId: HypersignprotocolHidnodeSsiQueryDidDocument
       responses:
         '200':
           description: A successful response.
@@ -20599,8 +20599,8 @@ paths:
         - Query
   /hypersign-protocol/hidnode/ssi/schema:
     get:
-      summary: Get the list of Schemas and count
-      operationId: HypersignprotocolHidnodeSsiSchemaParam
+      summary: Get the list of registered Schemas and count
+      operationId: HypersignprotocolHidnodeSsiQuerySchemas
       responses:
         '200':
           description: A successful response.
@@ -20737,7 +20737,7 @@ paths:
   '/hypersign-protocol/hidnode/ssi/schema/{schemaId}':
     get:
       summary: Get the Schema for a specified Schema Id
-      operationId: HypersignprotocolHidnodeSsiGetSchema
+      operationId: HypersignprotocolHidnodeSsiQuerySchema
       responses:
         '200':
           description: A successful response.
@@ -20814,42 +20814,6 @@ paths:
           in: path
           required: true
           type: string
-      tags:
-        - Query
-  /hypersignprotocol/hidnode/ssi/params:
-    get:
-      summary: Parameters queries the parameters of the module.
-      operationId: HypersignprotocolHidnodeSsiParams
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              params:
-                description: params holds all the parameters of this module.
-                type: object
-            description: >-
-              QueryParamsResponse is response type for the Query/Params RPC
-              method.
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    '@type':
-                      type: string
-                  additionalProperties: {}
       tags:
         - Query
   /ibc/apps/transfer/v1/denom_traces:
@@ -47629,9 +47593,6 @@ definitions:
     properties:
       updateId:
         type: string
-  hypersignprotocol.hidnode.ssi.Params:
-    type: object
-    description: Params defines the parameters for the module.
   hypersignprotocol.hidnode.ssi.QueryCredentialResponse:
     type: object
     properties:
@@ -47846,13 +47807,6 @@ definitions:
                   type: string
                 proofValue:
                   type: string
-  hypersignprotocol.hidnode.ssi.QueryParamsResponse:
-    type: object
-    properties:
-      params:
-        description: params holds all the parameters of this module.
-        type: object
-    description: QueryParamsResponse is response type for the Query/Params RPC method.
   hypersignprotocol.hidnode.ssi.QuerySchemaParamResponse:
     type: object
     properties:
