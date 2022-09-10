@@ -4,7 +4,7 @@ Requires=network-online.target
 After=network-online.target
 
 [Service]
-Environment="DAEMON_HOME=<Provide the full path to hid-node config; Default is $HOME/.hid-node>"
+Environment="DAEMON_HOME=/home/ubuntu/.hid-node"
 Environment="DAEMON_NAME=hid-noded"
 User=ubuntu
 Type=simple
