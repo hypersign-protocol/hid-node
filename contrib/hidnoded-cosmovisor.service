@@ -1,0 +1,18 @@
+[Unit]
+Description=Hypersign Identity Network - Jagrat Chain
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+Environment="DAEMON_HOME=<Provide the full path to hid-node config>"
+Environment="DAEMON_NAME=hid-noded"
+User=ubuntu
+Type=simple
+Restart=on-failure
+RestartSec=3
+MemoryDenyWriteExecute=yes
+LimitNOFILE=65535
+ExecStart=cosmovisor run start
+
+[Install]
+WantedBy=multi-user.target
