@@ -9,11 +9,7 @@ import (
 // InitGenesis initializes the ssi module's state from a provided genesis
 // state.
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) {
-	if genState.ChainNamespace != "" {
-		k.SetChainNamespace(&ctx, genState.ChainNamespace)
-	} else {
-		k.SetChainNamespace(&ctx, "mainnet")
-	}
+	k.SetChainNamespace(&ctx, genState.ChainNamespace)
 }
 
 // ExportGenesis returns the ssi module's exported genesis.
