@@ -19,5 +19,11 @@ jobs:
       - name: Check out code into the Go module directory
         uses: actions/checkout@v2
 
-      - name: Build
+      - name: Generate Protobuf Golang Code
+        run: make proto-gen
+      
+      - name: Generate Swagger Docs
+        run: make swagger-docs-gen
+
+      - name: Build hid-node
         run: make build
