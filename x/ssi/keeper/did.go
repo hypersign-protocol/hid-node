@@ -12,15 +12,15 @@ import (
 
 // Set the Chain namespace
 func (k Keeper) SetChainNamespace(ctx *sdk.Context, namespace string) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.DidNamespaceKey))
-	byteKey := []byte(types.DidNamespaceKey)
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.ChainNamespaceKey))
+	byteKey := []byte(types.ChainNamespaceKey)
 	store.Set(byteKey, []byte(namespace))
 }
 
 // Get the Chain namespace
 func (k Keeper) GetChainNamespace(ctx *sdk.Context) string {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.DidNamespaceKey))
-	byteKey := []byte(types.DidNamespaceKey)
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.ChainNamespaceKey))
+	byteKey := []byte(types.ChainNamespaceKey)
 	bz := store.Get(byteKey)
 	return string(bz)
 }
