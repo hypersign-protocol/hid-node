@@ -22,7 +22,7 @@ Mgoogle/protobuf/any.proto=github.com/cosmos/cosmos-sdk/codec/types:. \
   -I "third_party/proto" \
   -I "$cosmos_sdk_dir/third_party/proto" \
   -I "$cosmos_sdk_dir/proto" \
-  --grpc-gateway_out=logtostderr=true:. \
+  --grpc-gateway_out=logtostderr=true,allow_colon_final_segments=true:. \
   $(find "${dir}" -maxdepth 1 -name '*.proto')
 done
 
