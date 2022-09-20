@@ -21,11 +21,12 @@ The Hypersign Identity Network is a permissionless blockchain network to manage 
 
 Following are the prerequisites that needs to be installed:
 
-- golang (Installation Guide: https://go.dev/doc/install) (version: 1.18+)
+- Golang (Installation Guide: https://go.dev/doc/install) (version: 1.18+)
+- make
 
 ## Get started
 
-### Local:
+### Local
 
 Clone the repository and build the binary:
 
@@ -44,13 +45,16 @@ To start a single-node blockchain, run the following command to initialize the n
 ```sh
 sh ./scripts/localnet-single-node/setup.sh
 ```
+
+> Note: The above script requires `jq` to be installed.
+
 Run the hid-node:
 
 ```sh
 hid-noded start --home ~/.hid-node
 ```
 
-### Docker:
+### Docker
 
 To run a single node `hid-node` docker container, run the following:
 
