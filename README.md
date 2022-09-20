@@ -4,6 +4,12 @@
 
 The Hypersign Identity Network is a permissionless blockchain network to manage digital identity and access rights. It aims to empower humans to gain control of their data and access on the internet by providing scalable, interoperable and secure [verifiable data registry (VDR)](https://www.w3.org/TR/did-core/#dfn-verifiable-data-registry) to implement use cases on Self Sovereign Identity (SSI) principles. The Hypersign Identity Network is built using [Cosmos-SDK](https://tendermint.com/sdk/) and is fully compatible with [W3C DID specifications](https://www.w3.org/TR/did-core/).
 
+## Features
+
+- Register, Update and Deactivate DID Documents
+- Store/Update Credential Schema
+- Store/Update status of a Verifiable Credential
+
 ## Prerequisite
 
 Following are the prerequisites that needs to be installed:
@@ -20,12 +26,6 @@ Following are the prerequisites that needs to be installed:
 git clone https://github.com/hypersign-protocol/hid-node.git
 cd hid-node
 make install
-```
-
-- Move the build to GOPATH:
-
-```sh
-cp ./build/hid-noded $(go env GOPATH)/bin/
 ```
 
 The binary `hid-noded` will be generated in `$GO_PATH/bin` directory. To explore its functionalities, type `hid-noded --help` im a seperate terminal window.
