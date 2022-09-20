@@ -28,7 +28,7 @@ Following are the prerequisites that needs to be installed:
 
 ### Local
 
-Clone the repository and build the binary:
+Clone the repository and install the binary:
 
 ```sh
 git clone https://github.com/hypersign-protocol/hid-node.git
@@ -36,7 +36,7 @@ cd hid-node
 make install
 ```
 
-The binary `hid-noded` will be generated in `$GO_PATH/bin` directory. To explore its functionalities, type `hid-noded --help` im a seperate terminal window.
+The binary `hid-noded` will be generated in `$GO_PATH/bin` directory. To explore its functionalities, type `hid-noded --help` in a seperate terminal window.
 
 #### Running the Blockchain
 
