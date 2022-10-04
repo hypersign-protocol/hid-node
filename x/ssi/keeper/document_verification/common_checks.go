@@ -67,14 +67,15 @@ func IsValidID(Id string, namespace string, docType string) error {
 		return fmt.Errorf("expected document identifier to be %s, got %s", docIdentifier, docElements[docIdentifierIndex])
 	}
 
-	// did method check
+	// Document method check
 	inputDidMethod := docElements[docMethodIndex]
 	if inputDidMethod != DidMethod {
 		return fmt.Errorf("expected did method %s, got %s", DidMethod, inputDidMethod)
 	}
 
-	// Mainnet namespace check
-	if namespace == "mainnet" {
+	// Mainnet Chain namespace check. If the document is registered on the mainnet chain,
+	// the namespace should be empty
+	if namespace == "" {
 		if len(docElements) != 3 {
 			return fmt.Errorf("expected number of did id elements for mainnet to be 3, got %s", fmt.Sprint(len(docElements)))
 		}
