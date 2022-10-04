@@ -16,8 +16,8 @@ func TestGenesis(t *testing.T) {
 	ssi.InitGenesis(ctx, *k, *genesisState)
 	exportedGenesisState := ssi.ExportGenesis(ctx, *k)
 
-	ExpectedDidNamespace := ""
+	ExpectedChainNamespace := ""
 
 	require.NotNil(t, exportedGenesisState)
-	require.Equal(t, ExpectedDidNamespace, genesisState.ChainNamespace)
+	require.Equal(t, ExpectedChainNamespace, genesisState.ChainNamespace)
 }

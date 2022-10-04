@@ -26,3 +26,6 @@ tests/load_tests/*.json
 # Build Folder
 build
 dist/
+
+# Misc
+.cache/

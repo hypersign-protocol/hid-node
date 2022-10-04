@@ -6,10 +6,7 @@ import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 import "ssi/v1/schema.proto";
 import "ssi/v1/did.proto";
-import "ssi/v1/tx.proto";
 import "ssi/v1/credential.proto";
-
-// this line is used by starport scaffolding # 1
 
 option go_package = "github.com/hypersign-protocol/hid-node/x/ssi/types";
 
@@ -20,32 +17,30 @@ service Query {
 		option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/schema/{schemaId}";
 	}
 
-// Get the count and list of registered Schemas
+  // Get the count and list of registered Schemas
 	rpc QuerySchemas(QuerySchemasRequest) returns (QuerySchemasResponse) {
 		option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/schema";
 	}
 
-// Get the Did Document for a specified DID id
+  // Get the Did Document for a specified DID id
 	rpc QueryDidDocument(QueryDidDocumentRequest) returns (QueryDidDocumentResponse) {
 		option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/did/{didId}";
 	}
 
-// Get the count and list of registered Did Documents
+  // Get the count and list of registered Did Documents
   rpc QueryDidDocuments(QueryDidDocumentsRequest) returns (QueryDidDocumentsResponse) {
     option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/did";
   }
 
-// Get the Credential Status for a given credential id
+  // Get the Credential Status for a given credential id
   rpc QueryCredential(QueryCredentialRequest) returns (QueryCredentialResponse) {
     option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/credential/{credId}";
   }
 
-// Get all the registed Credential Statuses
+  // Get all the registed Credential Statuses
   rpc QueryCredentials(QueryCredentialsRequest) returns (QueryCredentialsResponse) {
     option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/credential";
   }
-
-// this line is used by starport scaffolding # 2
 }
 
 // Schema Messages
