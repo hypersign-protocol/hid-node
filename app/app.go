@@ -89,7 +89,7 @@ import (
 	"github.com/tendermint/spm/cosmoscmd"
 	"github.com/tendermint/spm/openapiconsole"
 
-	"github.com/hypersign-protocol/hid-node/docs"
+	"github.com/hypersign-protocol/hid-node/client/docs"
 
 	appparams "github.com/hypersign-protocol/hid-node/app/params"
 	ssimodule "github.com/hypersign-protocol/hid-node/x/ssi"
@@ -628,8 +628,8 @@ func (app *App) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIConfig
 	ModuleBasics.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
 
 	// register app's OpenAPI routes.
-	apiSvr.Router.Handle("/static/openapi.yml", http.FileServer(http.FS(docs.Docs)))
-	apiSvr.Router.HandleFunc("/", openapiconsole.Handler(Name, "/static/openapi.yml"))
+	apiSvr.Router.Handle("/swagger-ui/swagger.yaml", http.FileServer(http.FS(docs.Docs)))
+	apiSvr.Router.HandleFunc("/", openapiconsole.Handler(Name, "/swagger-ui/swagger.yaml"))
 }
 
 // RegisterTxService implements the Application.RegisterTxService method.

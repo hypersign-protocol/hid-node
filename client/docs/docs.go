@@ -2,5 +2,5 @@ package docs
 
 import "embed"
 
-//go:embed static
+//go:embed swagger-ui
 var Docs embed.FS
