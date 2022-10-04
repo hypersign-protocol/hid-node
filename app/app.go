@@ -307,7 +307,7 @@ func New(
 	app.UpgradeKeeper = upgradekeeper.NewKeeper(skipUpgradeHeights, keys[upgradetypes.StoreKey], appCodec, homePath, app.BaseApp)
 
 	app.UpgradeKeeper.SetUpgradeHandler("v011", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-		ctx.Logger().Info("v0.0.1 upgrade")
+		ctx.Logger().Info("IBC upgrade to v3")
 		return fromVM, nil
 	})
 
