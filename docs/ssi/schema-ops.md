@@ -1,46 +1,78 @@
-# Schema Operation
+# Schema Operations Walkthrough
 
-## Features
+> In Progress
 
-- Transaction Based
-    - Create Schema
-- Query Based
+## Syntax of Schema ID 
 
-## CLI Signature
+The syntax of Schema ID is as follows:
 
-### Create Schema
+```
+sch:hid:<chain-namespace>:<method-specific-id>:<version-number>
+```
+
+- `sch:hid` - Schema Method, where `sch` is the document identifier and `hid` is the method name
+- `<chain-namespace>` - *(Optional)* Name of the blockchain where the schema document is registered. It is omitted for the document registered on mainnet chain
+- `<method-specific-id>` - Multibase-encoded unique identifier of length 45
+- `<version-number>` - Model version of schema. For instance, `1.0`, `1.1` and `2.1`
+
+## Schema Operations
+
+- **Transaction Based**
+  - Register/Update a Schema Document
+- **Query Based**
+  - Query a Schema Document
+  - Query Registered Schema Documents
+
+## Usage
+
+### Register/Update Schema
+
+Both registration and update of Schema happens through the RPC `CreateSchema`
+
+**CLI Signature**
 
 ```
 Usage:
-  hid-noded tx ssi create-schema [schema] [verification-method-id] [flags]
+  hid-noded tx ssi create-schema [schema-doc] [schema-proof] [flags]
 
 Params:
  - schema-doc : Schema Document
  - schema-proof : Schema Proof
- - verification-method-id : Verification Method ID
 ```
 
-## Usage
-
-### Create Schema
-
-Command:
+**Example**
 
 ```sh
-hid-noded tx ssi create-schema '{"type":"https://w3c-ccg.github.io/vc-json-schemas/schema/1.0/schema.json","modelVersion":"v1.0","id":"sch:hid:devnet:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf","name":"HS credential template","author":"did:hid:devnet:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf","authored":"2022-04-10T04:07:12Z","schema":{"schema":"https://json-schema.org/draft-07/schema#","description":"test","type":"object","properties":"{myString:{type:string},myNumner:{type:number},myBool:{type:boolean}}","required":["myString","myNumner","myBool"],"additionalProperties":false}}' '{"type":"Ed25519VerificationKey2020","created":"2022-04-10T04:07:12Z","verificationMethod":"did:hid:devnet:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf#key-1","proofValue":"gLFhwYfObNJEOjNDaeYjprv7FpK0lIhZnFwgOsdRqRHOjQswfm3Hk9EehcYGePrFFwgy4lna73iA5J0BtjfCAw==","proofPurpose":"assertionMethod"}' --from node1 --broadcast-mode block --chain-id hidnode
+hid-noded tx ssi create-schema '{"type":"https://w3c-ccg.github.io/vc-json-schemas/schema/1.0/schema.json","modelVersion":"v1.0","id":"sch:hid:devnet:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf:1.0","name":"HS credential template","author":"did:hid:devnet:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf","authored":"2022-04-10T04:07:12Z","schema":{"schema":"https://json-schema.org/draft-07/schema#","description":"test","type":"object","properties":"{myString:{type:string},myNumner:{type:number},myBool:{type:boolean}}","required":["myString","myNumner","myBool"],"additionalProperties":false}}' '{"type":"Ed25519VerificationKey2020","created":"2022-04-10T04:07:12Z","verificationMethod":"did:hid:devnet:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf#key-1","proofValue":"gLFhwYfObNJEOjNDaeYjprv7FpK0lIhZnFwgOsdRqRHOjQswfm3Hk9EehcYGePrFFwgy4lna73iA5J0BtjfCAw==","proofPurpose":"assertionMethod"}' --from <key-name-or-address> --chain-id <Chain ID> --yes
 ```
 
-The above command will fail if the User's (`did:hid:devnet:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf`) DID is not registered on chain
+### Register/Update Schema
 
-### CLI
+**CLI Signature**
 
-1. Query schema for given schema id:
+```
+Usage:
+  hid-noded query ssi schema [schema-id]
+
+Params:
+ - schema-id : Schema ID
+```
+
+**Example**
+
+```
+hid-noded query ssi schema sch:hid:devnet:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf:1.0
+```
+
+**REST**
+
+1. Query a schema document for given schema id:
 
 ```
 http://<REST-URL>/hypersign-protocol/hidnode/ssi/schema/{schemaId}
 ```
 
-2. Query list of registered schema(s):
+2. Query a list of registered schema documents:
 
 ```
 http://<REST-URL>/hypersign-protocol/hidnode/ssi/schema
