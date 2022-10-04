@@ -18,9 +18,9 @@ const (
 )
 
 const (
-	DidKey          = "Did-value-"
-	DidCountKey     = "Did-count-"
-	
+	DidKey      = "Did-value-"
+	DidCountKey = "Did-count-"
+
 	ChainNamespaceKey = "Did-namespace-"
 
 	SchemaKey      = "Schema-value-"
