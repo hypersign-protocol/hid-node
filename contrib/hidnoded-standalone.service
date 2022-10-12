@@ -1,0 +1,15 @@
+[Unit]
+Description= Jagrat Network node
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+User=ubuntu
+Restart=on-failure
+RestartSec=3
+MemoryDenyWriteExecute=yes
+LimitNOFILE=65535
+ExecStart=hid-noded start
+
+[Install]
+WantedBy=multi-user.target
