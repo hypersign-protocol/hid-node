@@ -64,7 +64,12 @@ func (k msgServer) CreateSchema(goCtx context.Context, msg *types.MsgCreateSchem
 	}
 
 	// Signature check
-	if err := k.VerifySchemaSignature(schemaDoc, authorDidDocument.DidDocument, schemaProof.ProofValue, schemaProof.VerificationMethod); err != nil {
+	signature := &types.SignInfo{
+		VerificationMethodId: schemaProof.VerificationMethod,
+		Signature:            schemaProof.ProofValue,
+	}
+	signatures := []*types.SignInfo{signature}
+	if err := k.VerifyDocumentSignature(&ctx, schemaDoc, authorDidDocument.DidDocument, signatures); err != nil {
 		return nil, err
 	}
 

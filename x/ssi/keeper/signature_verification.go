@@ -5,7 +5,6 @@ import (
 	"encoding/base64"
 	"fmt"
 	"reflect"
-	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -14,6 +13,8 @@ import (
 	"github.com/hypersign-protocol/hid-node/x/ssi/utils"
 )
 
+// Verify signatures against signer's public keys
+// If atleast one of the signatures is valid, return true
 func VerifyIdentitySignature(signer types.Signer, signatures []*types.SignInfo, signingInput []byte) (bool, error) {
 	result := false
 
@@ -54,48 +55,29 @@ func (k msgServer) VerifySignatureOnDidUpdate(ctx *sdk.Context, oldDIDDoc *types
 
 		// Verification Method has been deleted
 		if newVM == nil {
-			signers = AppendSignerIfNeed(signers, oldVM.Controller, newDIDDoc)
+			signers = appendSignerIfNeed(signers, oldVM.Controller, newDIDDoc)
 			continue
 		}
 
 		// Verification Method has been changed
 		if !reflect.DeepEqual(oldVM, newVM) {
-			signers = AppendSignerIfNeed(signers, newVM.Controller, newDIDDoc)
+			signers = appendSignerIfNeed(signers, newVM.Controller, newDIDDoc)
 		}
 
 		// Verification Method Controller has been changed, need to add old controller
 		if newVM.Controller != oldVM.Controller {
-			signers = AppendSignerIfNeed(signers, oldVM.Controller, newDIDDoc)
+			signers = appendSignerIfNeed(signers, oldVM.Controller, newDIDDoc)
 		}
 	}
 
-	if err := k.VerifySignature(ctx, newDIDDoc, signers, signatures); err != nil {
+	if err := k.VerifyDidSignature(ctx, newDIDDoc, signers, signatures); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func AppendSignerIfNeed(signers []types.Signer, controller string, msg *types.Did) []types.Signer {
-	for _, signer := range signers {
-		if signer.Signer == controller {
-			return signers
-		}
-	}
-
-	signer := types.Signer{
-		Signer: controller,
-	}
-
-	if controller == msg.Id {
-		signer.VerificationMethod = msg.VerificationMethod
-		signer.Authentication = msg.Authentication
-	}
-
-	return append(signers, signer)
-}
-
-func (k *Keeper) VerifySignature(ctx *sdk.Context, msg *types.Did, signers []types.Signer, signatures []*types.SignInfo) error {
+func (k *Keeper) VerifyDidSignature(ctx *sdk.Context, msg *types.Did, signers []types.Signer, signatures []*types.SignInfo) error {
 	var validArr []types.ValidDid
 
 	if len(signers) == 0 {
@@ -135,36 +117,56 @@ func (k *Keeper) VerifySignature(ctx *sdk.Context, msg *types.Did, signers []typ
 	return nil
 }
 
-func (k *Keeper) VerifySchemaSignature(msg *types.SchemaDocument, didDoc *types.Did, signature string, verificationMethod string) error {
+// Verify Signature for Credential Schema and Credential Status Documents
+func (k *Keeper) VerifyDocumentSignature(ctx *sdk.Context, msg types.IdentityMsg, didDoc *types.Did, signatures []*types.SignInfo) error {
+	var validArr []types.ValidDid
 	signingInput := msg.GetSignBytes()
+	signers := didDoc.GetSigners()
 
-	signer := types.Signer{
-		Signer:             didDoc.GetId(),
-		AssertionMethod:    didDoc.GetAssertionMethod(),
-		VerificationMethod: didDoc.GetVerificationMethod(),
+	for _, signer := range signers {
+		if signer.VerificationMethod == nil {
+			fetchedDidDoc, err := k.GetDid(ctx, signer.Signer)
+			if err != nil {
+				return types.ErrDidDocNotFound.Wrap(signer.Signer)
+			}
+
+			signer.Authentication = fetchedDidDoc.DidDocument.Authentication
+			signer.VerificationMethod = fetchedDidDoc.DidDocument.VerificationMethod
+		}
+
+		valid, err := VerifyIdentitySignature(signer, signatures, signingInput)
+		if err != nil {
+			return sdkerrors.Wrap(types.ErrInvalidSignature, err.Error())
+		}
+		validArr = append(validArr, types.ValidDid{DidId: signer.Signer, IsValid: valid})
+	}
+	
+	validDid := verify.HasAtleastOneTrueSigner(validArr)
+
+	if validDid == (types.ValidDid{}) {
+		return sdkerrors.Wrap(types.ErrInvalidSignature, validDid.DidId)
 	}
 
-	signingInfo := &types.SignInfo{
-		VerificationMethodId: verificationMethod,
-		Signature:            signature,
+	return nil
+}
+
+func (k msgServer) ValidateDidControllers(ctx *sdk.Context, id string, controllers []string, verMethods []*types.VerificationMethod) error {
+
+	for _, verificationMethod := range verMethods {
+		if err := k.validateController(ctx, id, verificationMethod.Controller); err != nil {
+			return err
+		}
 	}
 
-	signingInfoList := []*types.SignInfo{
-		signingInfo,
-	}
-
-	valid, err := VerifyIdentitySignature(signer, signingInfoList, signingInput)
-	if err != nil {
-		return sdkerrors.Wrap(types.ErrInvalidSignature, err.Error())
-	}
-
-	if !valid {
-		return sdkerrors.Wrap(types.ErrInvalidSignature, signer.Signer)
+	for _, didController := range controllers {
+		if err := k.validateController(ctx, id, didController); err != nil {
+			return err
+		}
 	}
 	return nil
 }
 
-func (k *Keeper) ValidateController(ctx *sdk.Context, id string, controller string) error {
+func (k *Keeper) validateController(ctx *sdk.Context, id string, controller string) error {
 	if id == controller {
 		return nil
 	}
@@ -179,96 +181,21 @@ func (k *Keeper) ValidateController(ctx *sdk.Context, id string, controller stri
 	return nil
 }
 
-func (k msgServer) ValidateDidControllers(ctx *sdk.Context, id string, controllers []string, verMethods []*types.VerificationMethod) error {
-
-	for _, verificationMethod := range verMethods {
-		if err := k.ValidateController(ctx, id, verificationMethod.Controller); err != nil {
-			return err
+func appendSignerIfNeed(signers []types.Signer, controller string, msg *types.Did) []types.Signer {
+	for _, signer := range signers {
+		if signer.Signer == controller {
+			return signers
 		}
 	}
-
-	for _, didController := range controllers {
-		if err := k.ValidateController(ctx, id, didController); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-// Check the Deactivate status of DID
-func VerifyDidDeactivate(metadata *types.Metadata, id string) error {
-	if metadata.GetDeactivated() {
-		return sdkerrors.Wrap(types.ErrDidDocDeactivated, fmt.Sprintf("DidDoc ID: %s", id))
-	}
-	return nil
-}
-
-// Verify Credential Signature
-func (k msgServer) VerifyCredentialSignature(msg *types.CredentialStatus, didDoc *types.Did, signature string, verificationMethod string) error {
-	signingInput := msg.GetSignBytes()
 
 	signer := types.Signer{
-		Signer:             didDoc.GetId(),
-		AssertionMethod:    didDoc.GetAssertionMethod(),
-		VerificationMethod: didDoc.GetVerificationMethod(),
+		Signer: controller,
 	}
 
-	signingInfo := &types.SignInfo{
-		VerificationMethodId: verificationMethod,
-		Signature:            signature,
+	if controller == msg.Id {
+		signer.VerificationMethod = msg.VerificationMethod
+		signer.Authentication = msg.Authentication
 	}
 
-	signingInfoList := []*types.SignInfo{
-		signingInfo,
-	}
-
-	valid, err := VerifyIdentitySignature(signer, signingInfoList, signingInput)
-	if err != nil {
-		return sdkerrors.Wrap(types.ErrInvalidSignature, err.Error())
-	}
-
-	if !valid {
-		return sdkerrors.Wrap(types.ErrInvalidSignature, signer.Signer)
-	}
-	return nil
-}
-
-func VerifyCredentialStatusDates(issuanceDate time.Time, expirationDate time.Time) error {
-	var dateDiff int64 = int64(expirationDate.Sub(issuanceDate)) / 1e9 // converting nanoseconds to seconds
-	if dateDiff < 0 {
-		return sdkerrors.Wrapf(types.ErrInvalidDate, fmt.Sprintf("expiration date %s cannot be less than issuance date %s", expirationDate, issuanceDate))
-	}
-
-	return nil
-}
-
-func VerifyCredentialProofDates(credProof *types.CredentialProof, credRegistration bool) error {
-	var dateDiff int64
-
-	proofCreatedDate := credProof.GetCreated()
-	proofCreatedDateParsed, err := time.Parse(time.RFC3339, proofCreatedDate)
-	if err != nil {
-		return sdkerrors.Wrapf(types.ErrInvalidDate, fmt.Sprintf("invalid created date format: %s", proofCreatedDate))
-	}
-
-	proofUpdatedDate := credProof.GetUpdated()
-	proofUpdatedDateParsed, err := time.Parse(time.RFC3339, proofUpdatedDate)
-	if err != nil {
-		return sdkerrors.Wrapf(types.ErrInvalidDate, fmt.Sprintf("invalid created date format: %s", proofUpdatedDate))
-	}
-
-	// If credRegistration is True, check for equity of updated and created dates will proceeed
-	// Else, check for updated date being greater than created date will proceeed
-	if credRegistration {
-		if !proofUpdatedDateParsed.Equal(proofCreatedDateParsed) {
-			return sdkerrors.Wrapf(types.ErrInvalidDate, fmt.Sprintf("updated date %s should be similar to created date %s", proofUpdatedDate, proofCreatedDate))
-		}
-	} else {
-		dateDiff = int64(proofUpdatedDateParsed.Sub(proofCreatedDateParsed)) / 1e9 // converting nanoseconds to seconds
-		if dateDiff <= 0 {
-			return sdkerrors.Wrapf(types.ErrInvalidDate, fmt.Sprintf("update date %s cannot be less than or equal to created date %s in case of credential status update", proofUpdatedDate, proofCreatedDate))
-		}
-	}
-
-	return nil
+	return append(signers, signer)
 }

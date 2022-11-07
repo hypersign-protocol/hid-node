@@ -40,7 +40,7 @@ func (k msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*t
 	}
 
 	// Verification of Did Document Signature
-	if err := k.VerifySignature(&ctx, didMsg, didSigners, signatures); err != nil {
+	if err := k.VerifyDidSignature(&ctx, didMsg, didSigners, signatures); err != nil {
 		return nil, err
 	}
 
@@ -88,7 +88,7 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 	oldMetaData := oldDIDDoc.GetDidDocumentMetadata()
 
 	// Check if the status of DID Document is deactivated
-	if err := VerifyDidDeactivate(oldMetaData, didId); err != nil {
+	if err := verify.VerifyDidDeactivate(oldMetaData, didId); err != nil {
 		return nil, err
 	}
 
@@ -157,7 +157,7 @@ func (k msgServer) DeactivateDID(goCtx context.Context, msg *types.MsgDeactivate
 	oldVersionId := metadata.GetVersionId()
 
 	// Check if the DID is already deactivated
-	if err := VerifyDidDeactivate(metadata, didId); err != nil {
+	if err := verify.VerifyDidDeactivate(metadata, didId); err != nil {
 		return nil, err
 	}
 
@@ -177,7 +177,7 @@ func (k msgServer) DeactivateDID(goCtx context.Context, msg *types.MsgDeactivate
 	// Signature Verification
 	signers := didDoc.GetSigners()
 	signatures := msg.Signatures
-	if err := k.VerifySignature(&ctx, didDoc, signers, signatures); err != nil {
+	if err := k.VerifyDidSignature(&ctx, didDoc, signers, signatures); err != nil {
 		return nil, err
 	}
 

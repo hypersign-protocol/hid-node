@@ -2,7 +2,6 @@ package types
 
 type (
 	IdentityMsg interface {
-		GetSigners() []Signer
 		GetSignBytes() []byte
 	}
 
