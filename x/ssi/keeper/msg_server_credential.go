@@ -62,12 +62,12 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 			return nil, sdkerrors.Wrapf(types.ErrInvalidDate, fmt.Sprintf("invalid issuance date format: %s", issuanceDate))
 		}
 
-		if err := VerifyCredentialStatusDates(issuanceDateParsed, expirationDateParsed); err != nil {
+		if err := verify.VerifyCredentialStatusDates(issuanceDateParsed, expirationDateParsed); err != nil {
 			return nil, err
 		}
 
 		// Check if updated date iss imilar to created date
-		if err := VerifyCredentialProofDates(credProof, true); err != nil {
+		if err := verify.VerifyCredentialProofDates(credProof, true); err != nil {
 			return nil, err
 		}
 
@@ -90,10 +90,14 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 		}
 
 		did := didDocument.GetDidDocument()
-		signature := credProof.GetProofValue()
-		verificationMethod := credProof.GetVerificationMethod()
 
-		err = k.VerifyCredentialSignature(credMsg, did, signature, verificationMethod)
+		// Verify Signature
+		signature := &types.SignInfo{
+			VerificationMethodId: credProof.GetVerificationMethod(),
+			Signature:            credProof.GetProofValue(),
+		}
+		signatures := []*types.SignInfo{signature}
+		err = k.VerifyDocumentSignature(&ctx, credMsg, did, signatures)
 		if err != nil {
 			return nil, err
 		}
@@ -190,12 +194,12 @@ func (k msgServer) updateCredentialStatus(ctx sdk.Context, newCredStatus *types.
 	}
 
 	// Check if new expiration date isn't less than new issuance date
-	if err := VerifyCredentialStatusDates(newIssuanceDateParsed, newExpirationDateParsed); err != nil {
+	if err := verify.VerifyCredentialStatusDates(newIssuanceDateParsed, newExpirationDateParsed); err != nil {
 		return nil, err
 	}
 
 	// Check if updated date iss imilar to created date
-	if err := VerifyCredentialProofDates(newCredProof, false); err != nil {
+	if err := verify.VerifyCredentialProofDates(newCredProof, false); err != nil {
 		return nil, err
 	}
 
@@ -257,10 +261,14 @@ func (k msgServer) updateCredentialStatus(ctx sdk.Context, newCredStatus *types.
 	}
 
 	did := didDocument.GetDidDocument()
-	signature := newCredProof.GetProofValue()
-	verificationMethod := newCredProof.GetVerificationMethod()
 
-	err = k.VerifyCredentialSignature(newCredStatus, did, signature, verificationMethod)
+	// Verify Signature
+	signature := &types.SignInfo{
+		VerificationMethodId: newCredProof.GetVerificationMethod(),
+		Signature:            newCredProof.GetProofValue(),
+	}
+	signatures := []*types.SignInfo{signature}
+	err = k.VerifyDocumentSignature(&ctx, newCredStatus, did, signatures)
 	if err != nil {
 		return nil, err
 	}
