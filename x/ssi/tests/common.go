@@ -229,6 +229,9 @@ func GeneratePublicPrivateKeyPair() ed25519KeyPair {
 	}
 
 	publicKeyBase58Encoded := "z" + base58.Encode(publicKey)
+	if len(publicKeyBase58Encoded) != 45 {
+		return GeneratePublicPrivateKeyPair()
+	}
 
 	return ed25519KeyPair{
 		publicKey:  publicKeyBase58Encoded,
