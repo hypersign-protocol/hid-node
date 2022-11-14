@@ -54,29 +54,6 @@ func getDidSigningInfo(didDoc *types.Did, keyPair ed25519KeyPair, vmId string) [
 	}
 }
 
-func getMultiSigDidSigningInfo(didDoc *types.Did, keyPairs []ed25519KeyPair, vmIds []string) DidRpcElements {
-	if len(keyPairs) != len(vmIds) {
-		panic("KeyPairs and vmIds lists should be of equal lengths")
-	}
-
-	var signInfoList []*types.SignInfo
-
-	for idx := range keyPairs {
-		signature := ed25519.Sign(keyPairs[idx].privateKey, didDoc.GetSignBytes())
-		signInfo := &types.SignInfo{
-			VerificationMethodId: vmIds[idx],
-			Signature:            base64.StdEncoding.EncodeToString(signature),
-		}
-		signInfoList = append(signInfoList, signInfo)
-	}
-
-	return DidRpcElements{
-		DidDocument: didDoc,
-		Signatures:  signInfoList,
-		Creator:     Creator,
-	}
-}
-
 func UpdateCredStatus(newStatus string, credRpcElem CredRpcElements, keyPair ed25519KeyPair) CredRpcElements {
 	credRpcElem.Status.Claim.CurrentStatus = newStatus
 	credRpcElem.Status.Claim.StatusReason = "Status changed for Testing"
@@ -229,6 +206,9 @@ func GeneratePublicPrivateKeyPair() ed25519KeyPair {
 	}
 
 	publicKeyBase58Encoded := "z" + base58.Encode(publicKey)
+	if len(publicKeyBase58Encoded) != 45 {
+		return GeneratePublicPrivateKeyPair()
+	}
 
 	return ed25519KeyPair{
 		publicKey:  publicKeyBase58Encoded,

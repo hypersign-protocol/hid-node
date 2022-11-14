@@ -8,6 +8,8 @@ import (
 	"fmt"
 
 	"github.com/btcsuite/btcutil/base58"
+	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 	"github.com/multiformats/go-multibase"
 	"github.com/spf13/cobra"
 )
@@ -28,8 +30,97 @@ func ed25519Cmd() *cobra.Command {
 		ed25519RandomCmd(),
 		base64toMultibase58Cmd(),
 		multibase58toBase64Cmd(),
+		signSSIDocCmd(),
 	)
 
+	return cmd
+}
+
+// Generate signature for Schema and VC Status Document
+func signSSIDocCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "sign-ssi-doc",
+		Short: "Get signature for the signed document",
+	}
+
+	cmd.AddCommand(
+		signSchemaDocCmd(),
+		signCredStatusDocCmd(),
+	)
+	return cmd
+}
+
+func signSchemaDocCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "schema-doc [doc] [base64 encoded private-key]",
+		Short: "Schema Document signature",
+		Args:  cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			argSchemaDoc := args[0]
+			privateKey, err := base64.StdEncoding.DecodeString(args[1])
+			if err != nil {
+				return err
+			}
+
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			// Unmarshal Schema Document
+			var schemaDoc types.SchemaDocument
+			err = clientCtx.Codec.UnmarshalJSON([]byte(argSchemaDoc), &schemaDoc)
+			if err != nil {
+				return err
+			}
+
+			// Sign Schema Document
+			schemaDocBytes := schemaDoc.GetSignBytes()
+			signature := base64.StdEncoding.EncodeToString(
+				ed25519.Sign(privateKey, schemaDocBytes),
+			)
+
+			_, err = fmt.Fprintln(cmd.OutOrStdout(), signature)
+			return err
+		},
+	}
+	return cmd
+}
+
+func signCredStatusDocCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "cred-status-doc [doc] [base64 encoded private-key]",
+		Short: "Credential Status Document signature",
+		Args:  cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			argCredStatusDoc := args[0]
+			privateKey, err := base64.StdEncoding.DecodeString(args[1])
+			if err != nil {
+				return err
+			}
+
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			// Unmarshal Credential Status Document
+			var credStatusDoc types.CredentialStatus
+			err = clientCtx.Codec.UnmarshalJSON([]byte(argCredStatusDoc), &credStatusDoc)
+			if err != nil {
+				return err
+			}
+
+			// Sign Credential Status Document
+			credStatusDocBytes := credStatusDoc.GetSignBytes()
+			signature := base64.StdEncoding.EncodeToString(
+				ed25519.Sign(privateKey, credStatusDocBytes),
+			)
+
+			_, err = fmt.Fprintln(cmd.OutOrStdout(), signature)
+			return err
+		},
+	}
 	return cmd
 }
 
