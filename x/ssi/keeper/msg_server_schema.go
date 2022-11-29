@@ -7,7 +7,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	verify "github.com/hypersign-protocol/hid-node/x/ssi/keeper/document_verification"
+	docVerify "github.com/hypersign-protocol/hid-node/x/ssi/keeper/document_verification"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 )
 
@@ -28,11 +28,11 @@ func (k msgServer) CreateSchema(goCtx context.Context, msg *types.MsgCreateSchem
 
 	// Check if author's DID is deactivated
 	if authorDidDocument.DidDocumentMetadata.Deactivated {
-		return nil, sdkerrors.Wrap(types.ErrDidDocDeactivated, fmt.Sprintf("%s is deactivated and cannot used be used to create schema", authorDidDocument.DidDocument.Id))
+		return nil, sdkerrors.Wrap(types.ErrDidDocDeactivated, fmt.Sprintf("%s is deactivated and cannot be used to create schema", authorDidDocument.DidDocument.Id))
 	}
 
 	// Check if Schema ID is valid
-	err = verify.IsValidID(schemaID, chainNamespace, "schemaDocument")
+	err = docVerify.IsValidID(schemaID, chainNamespace, "schemaDocument")
 	if err != nil {
 		return nil, sdkerrors.Wrap(types.ErrInvalidSchemaID, err.Error())
 	}

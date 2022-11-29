@@ -104,7 +104,6 @@ func ValidateDidDocument(didDoc *types.Did, genesisNamespace string) error {
 	return nil
 }
 
-
 // Check the Deactivate status of DID
 func VerifyDidDeactivate(metadata *types.Metadata, id string) error {
 	if metadata.GetDeactivated() {

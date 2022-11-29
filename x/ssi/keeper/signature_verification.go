@@ -1,14 +1,12 @@
 package keeper
 
 import (
-	"crypto/ed25519"
-	"encoding/base64"
 	"fmt"
 	"reflect"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	verify "github.com/hypersign-protocol/hid-node/x/ssi/keeper/document_verification"
+	docVerify "github.com/hypersign-protocol/hid-node/x/ssi/keeper/document_verification"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 	"github.com/hypersign-protocol/hid-node/x/ssi/utils"
 )
@@ -18,20 +16,18 @@ import (
 func VerifyIdentitySignature(signer types.Signer, signatures []*types.SignInfo, signingInput []byte) (bool, error) {
 	result := false
 
-	for _, info := range signatures {
-		did, _ := utils.SplitDidUrlIntoDid(info.VerificationMethodId)
+	for _, signature := range signatures {
+		did, _ := utils.SplitDidUrlIntoDid(signature.VerificationMethodId)
 		if did == signer.Signer {
-			pubKey, err := utils.FindPublicKey(signer, info.VerificationMethodId)
+			pubKey, vmType, err := utils.FindPublicKeyAndVerificationMethodType(signer, signature.VerificationMethodId)
 			if err != nil {
 				return false, err
 			}
 
-			signature, err := base64.StdEncoding.DecodeString(info.Signature)
+			result, err = verify(vmType, pubKey, signature.Signature, signingInput)
 			if err != nil {
 				return false, err
 			}
-
-			result = ed25519.Verify(pubKey, signingInput, signature)
 		}
 	}
 
@@ -108,7 +104,7 @@ func (k *Keeper) VerifyDidSignature(ctx *sdk.Context, msg *types.Did, signers []
 		validArr = append(validArr, types.ValidDid{DidId: signer.Signer, IsValid: valid})
 	}
 
-	validDid := verify.HasAtleastOneTrueSigner(validArr)
+	validDid := docVerify.HasAtleastOneTrueSigner(validArr)
 
 	if validDid == (types.ValidDid{}) {
 		return sdkerrors.Wrap(types.ErrInvalidSignature, validDid.DidId)
@@ -140,8 +136,8 @@ func (k *Keeper) VerifyDocumentSignature(ctx *sdk.Context, msg types.IdentityMsg
 		}
 		validArr = append(validArr, types.ValidDid{DidId: signer.Signer, IsValid: valid})
 	}
-	
-	validDid := verify.HasAtleastOneTrueSigner(validArr)
+
+	validDid := docVerify.HasAtleastOneTrueSigner(validArr)
 
 	if validDid == (types.ValidDid{}) {
 		return sdkerrors.Wrap(types.ErrInvalidSignature, validDid.DidId)

@@ -9,14 +9,73 @@ import (
 
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/cosmos/cosmos-sdk/client"
+	secp256k1 "github.com/decred/dcrd/dcrec/secp256k1/v4"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 	"github.com/multiformats/go-multibase"
 	"github.com/spf13/cobra"
 )
 
 func extendDebug(debugCmd *cobra.Command) *cobra.Command {
-	debugCmd.AddCommand(ed25519Cmd())
+	debugCmd.AddCommand(
+		ed25519Cmd(),
+		secp256k1Cmd(),
+	)
+
 	return debugCmd
+}
+
+func secp256k1Cmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "secp256k1",
+		Short: "secp256k1 debug commands",
+	}
+
+	cmd.AddCommand(
+		secp256k1RandomCmd(),
+	)
+
+	return cmd
+}
+
+func secp256k1RandomCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "random",
+		Short: "Generate random secp256k1 keypair",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			secp256k1PrivateKey, err := secp256k1.GeneratePrivateKey()
+			if err != nil {
+				panic(err)
+			}
+			privateKey := secp256k1PrivateKey.Serialize()
+
+			publicKeyCompressed := secp256k1PrivateKey.PubKey().SerializeCompressed()
+
+			publicKeyMultibase, err := multibase.Encode(multibase.Base58BTC, publicKeyCompressed)
+			if err != nil {
+				panic(err)
+			}
+
+			keyInfo := struct {
+				PubKeyBase64    string `json:"pub_key_base_64"`
+				PubKeyMultibase string `json:"pub_key_multibase"`
+				PrivKeyBase64   string `json:"priv_key_base_64"`
+			}{
+				PubKeyBase64:    base64.StdEncoding.EncodeToString(publicKeyCompressed),
+				PubKeyMultibase: publicKeyMultibase,
+				PrivKeyBase64:   base64.StdEncoding.EncodeToString(privateKey),
+			}
+
+			keyInfoJson, err := json.Marshal(keyInfo)
+			if err != nil {
+				return err
+			}
+
+			_, err = fmt.Fprintln(cmd.OutOrStdout(), string(keyInfoJson))
+			return err
+		},
+	}
+
+	return cmd
 }
 
 // ed25519Cmd returns cobra Command.

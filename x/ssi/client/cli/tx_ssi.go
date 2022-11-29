@@ -1,9 +1,6 @@
 package cli
 
 import (
-	"crypto/ed25519"
-	"encoding/base64"
-
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
@@ -11,16 +8,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const VerKeyFlag = "ver-key"
-
 func CmdCreateDID() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "create-did [did-doc-string] [verification-method-id]",
-		Short: "Registers Did Document",
-		Args:  cobra.ExactArgs(2),
+		Use:   "create-did [did-doc-string] [vm-id-1] [sign-key-1] [sign-key-algo-1] ... [vm-id-N] [sign-key-N] [sign-key-algo-N]",
+		Short: "Registers a DID Document",
+		Args:  cobra.MinimumNArgs(4),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argDidDocString := args[0]
-			verificationMethodId := args[1]
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -34,23 +28,15 @@ func CmdCreateDID() *cobra.Command {
 				return err
 			}
 
-			verKeyPriv, err := getVerKey(cmd, clientCtx)
+			// Prepare Signatures
+			signInfos, err := getSignatures(cmd, didDoc.GetSignBytes(), args[1:])
 			if err != nil {
 				return err
 			}
 
-			// // Build identity message
-			signBytes := didDoc.GetSignBytes()
-			signatureBytes := ed25519.Sign(verKeyPriv, signBytes)
-
-			signInfo := types.SignInfo{
-				VerificationMethodId: verificationMethodId,
-				Signature:            base64.StdEncoding.EncodeToString(signatureBytes),
-			}
-
 			msg := types.MsgCreateDID{
 				DidDocString: &didDoc,
-				Signatures:   []*types.SignInfo{&signInfo},
+				Signatures:   signInfos,
 				Creator:      clientCtx.GetFromAddress().String(),
 			}
 
@@ -62,19 +48,17 @@ func CmdCreateDID() *cobra.Command {
 	}
 
 	flags.AddTxFlagsToCmd(cmd)
-	cmd.Flags().String(VerKeyFlag, "", "Base64 encoded ed25519 private key to sign identity message with. ")
 	return cmd
 }
 
 func CmdUpdateDID() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "update-did [did-doc-string] [version-id] [verification-method-id]",
+		Use:   "update-did [did-doc-string] [version-id] [vm-id-1] [sign-key-1] [sign-key-algo-1] ... [vm-id-N] [sign-key-N] [sign-key-algo-N]",
 		Short: "Updates Did Document",
-		Args:  cobra.ExactArgs(3),
+		Args:  cobra.MinimumNArgs(5),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argDidDocString := args[0]
 			argVersionId := args[1]
-			argVerificationMethodId := args[2]
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -88,25 +72,16 @@ func CmdUpdateDID() *cobra.Command {
 				return err
 			}
 
-			verKeyPriv, err := getVerKey(cmd, clientCtx)
+			signInfos, err := getSignatures(cmd, didDoc.GetSignBytes(), args[2:])
 			if err != nil {
 				return err
-			}
-
-			// // Build identity message
-			signBytes := didDoc.GetSignBytes()
-			signatureBytes := ed25519.Sign(verKeyPriv, signBytes)
-
-			signInfo := types.SignInfo{
-				VerificationMethodId: argVerificationMethodId,
-				Signature:            base64.StdEncoding.EncodeToString(signatureBytes),
 			}
 
 			msg := types.MsgUpdateDID{
 				Creator:      clientCtx.GetFromAddress().String(),
 				DidDocString: &didDoc,
 				VersionId:    argVersionId,
-				Signatures:   []*types.SignInfo{&signInfo},
+				Signatures:   signInfos,
 			}
 
 			if err := msg.ValidateBasic(); err != nil {
@@ -118,7 +93,6 @@ func CmdUpdateDID() *cobra.Command {
 	}
 
 	flags.AddTxFlagsToCmd(cmd)
-	cmd.Flags().String(VerKeyFlag, "", "Base64 encoded ed25519 private key to sign identity message with. ")
 	return cmd
 }
 
@@ -170,13 +144,12 @@ func CmdCreateSchema() *cobra.Command {
 
 func CmdDeactivateDID() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "deactivate-did [did-id] [version-id] [verification-method-id]",
+		Use:   "deactivate-did [did-id] [version-id] [vm-id-1] [sign-key-1] [sign-key-algo-1] ... [vm-id-N] [sign-key-N] [sign-key-algo-N]",
 		Short: "Deactivates Did Document",
-		Args:  cobra.ExactArgs(3),
+		Args:  cobra.MinimumNArgs(5),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argDidId := args[0]
 			argVersionId := args[1]
-			argVerificationMethodId := args[2]
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -192,25 +165,16 @@ func CmdDeactivateDID() *cobra.Command {
 			}
 			didDoc := resolvedDidDocument.GetDidDocument()
 
-			verKeyPriv, err := getVerKey(cmd, clientCtx)
+			signInfos, err := getSignatures(cmd, didDoc.GetSignBytes(), args[2:])
 			if err != nil {
 				return err
-			}
-
-			// Sign the Did Document
-			signBytes := didDoc.GetSignBytes()
-			signatureBytes := ed25519.Sign(verKeyPriv, signBytes)
-
-			signInfo := types.SignInfo{
-				VerificationMethodId: argVerificationMethodId,
-				Signature:            base64.StdEncoding.EncodeToString(signatureBytes),
 			}
 
 			msg := types.MsgDeactivateDID{
 				Creator:    clientCtx.GetFromAddress().String(),
 				DidId:      argDidId,
 				VersionId:  argVersionId,
-				Signatures: []*types.SignInfo{&signInfo},
+				Signatures: signInfos,
 			}
 
 			if err := msg.ValidateBasic(); err != nil {
@@ -222,7 +186,6 @@ func CmdDeactivateDID() *cobra.Command {
 	}
 
 	flags.AddTxFlagsToCmd(cmd)
-	cmd.Flags().String(VerKeyFlag, "", "Base64 encoded ed25519 private key to sign identity message with. ")
 	return cmd
 }
 

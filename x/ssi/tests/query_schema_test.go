@@ -17,7 +17,7 @@ func TestQuerySchema(t *testing.T) {
 
 	k.SetChainNamespace(&ctx, "devnet")
 
-	keyPair1 := GeneratePublicPrivateKeyPair()
+	keyPair1 := GenerateEd25519KeyPair()
 	rpcElements := GenerateDidDocumentRPCElements(keyPair1)
 	didId := rpcElements.DidDocument.GetId()
 	t.Logf("Registering DID with DID Id: %s", didId)
@@ -87,7 +87,7 @@ func TestQuerySchemas(t *testing.T) {
 
 	k.SetChainNamespace(&ctx, "devnet")
 
-	keyPair1 := GeneratePublicPrivateKeyPair()
+	keyPair1 := GenerateEd25519KeyPair()
 	rpcElements := GenerateDidDocumentRPCElements(keyPair1)
 	didId := rpcElements.DidDocument.GetId()
 	t.Logf("Registering DID with DID Id: %s", didId)

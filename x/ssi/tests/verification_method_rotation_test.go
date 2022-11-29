@@ -18,7 +18,7 @@ func TestVerificationMethodRotation(t *testing.T) {
 	k.SetChainNamespace(&ctx, "devnet")
 
 	// Create a DID with pubKey1
-	keyPair1 := GeneratePublicPrivateKeyPair()
+	keyPair1 := GenerateEd25519KeyPair()
 	didId1, err := CreateDidTx(msgServer, goCtx, keyPair1)
 	if err != nil {
 		t.Error(err)
@@ -27,7 +27,7 @@ func TestVerificationMethodRotation(t *testing.T) {
 	t.Logf("DID registerd with ID: %s", didId1)
 
 	// Update the DID by adding pubKey2
-	keyPair2 := GeneratePublicPrivateKeyPair()
+	keyPair2 := GenerateSecp256k1KeyPair()
 
 	resolvedDidDocument := QueryDid(k, ctx, didId1)
 	versionId := resolvedDidDocument.GetDidDocumentMetadata().GetVersionId()

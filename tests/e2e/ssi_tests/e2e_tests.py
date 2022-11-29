@@ -340,3 +340,36 @@ def invalid_case_controller_creates_schema_cred_status():
 
     print("\n-------Test Completed------\n")
 
+def did_operations_using_secp256k1():
+    print("\n--- Test: DID Operations using Secp256k1 Key Pair ---\n")
+    
+    kp_algo = "secp256k1"
+    kp = generate_key_pair(algo=kp_algo)
+
+    print("Registering a DID Document")
+    did_doc_string = generate_did_document(kp, kp_algo)
+    did_doc_id = did_doc_string["id"]
+    create_tx_cmd = form_did_create_tx(did_doc_string, kp, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME, signing_algo=kp_algo)
+    run_blockchain_command(create_tx_cmd, f"Registering DID with Id: {did_doc_id}")
+    
+    print("Updating the Registered DID Document")
+    registered_did_doc = query_did(did_doc_id)["didDocument"]
+    registered_did_doc["context"] = registered_did_doc["context"].append("newwebsite.com")
+    update_did_tx_cmd = form_did_update_tx(
+        registered_did_doc, 
+        kp, 
+        DEFAULT_BLOCKCHAIN_ACCOUNT_NAME,
+        signing_algo=kp_algo
+    )
+    run_blockchain_command(update_did_tx_cmd, f"Updating DID Document with Id: {did_doc_id}")
+
+    print("Deactivating the Registered DID Document")
+    deactivate_did_tx_cmd = form_did_deactivate_tx(
+        did_doc_id, 
+        kp, 
+        DEFAULT_BLOCKCHAIN_ACCOUNT_NAME,
+        signing_algo=kp_algo
+    )
+    run_blockchain_command(deactivate_did_tx_cmd, f"Deactivating DID Document with Id: {did_doc_id}")
+
+    print("\n-------Test Completed------\n")

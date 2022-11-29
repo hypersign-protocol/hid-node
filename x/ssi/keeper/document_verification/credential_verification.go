@@ -1,12 +1,12 @@
 package verification
 
 import (
+	"fmt"
 	"regexp"
 	"time"
-	"fmt"
 
-	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 )
 
 func VerifyCredentialHash(credHash string) bool {

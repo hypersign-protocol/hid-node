@@ -10,7 +10,36 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCreateDID(t *testing.T) {
+func TestCreateDIDUsingSecp256k1KeyPair(t *testing.T) {
+	t.Log("Create DID with Secp256k1")
+
+	k, ctx := TestKeeper(t)
+	msgServer := keeper.NewMsgServerImpl(*k)
+	goCtx := sdk.WrapSDKContext(ctx)
+
+	k.SetChainNamespace(&ctx, "devnet")
+
+	keyPair1 := GenerateSecp256k1KeyPair()
+	rpcElements := GenerateDidDocumentRPCElements(keyPair1)
+
+	msgCreateDID := &types.MsgCreateDID{
+		DidDocString: rpcElements.DidDocument,
+		Signatures:   rpcElements.Signatures,
+		Creator:      rpcElements.Creator,
+	}
+	t.Logf("Signature in base64: %v", msgCreateDID.Signatures[0].Signature)
+	_, err := msgServer.CreateDID(goCtx, msgCreateDID)
+	if err != nil {
+		t.Error("DID Registeration Failed")
+		t.Error(err)
+		t.FailNow()
+	}
+	t.Log("Did Registeration Successful")
+
+	t.Log("Create DID Tx Test Completed")
+}
+
+func TestCreateDIDUsingEd25519KeyPair(t *testing.T) {
 	t.Log("Running test for Valid Create DID Tx")
 	k, ctx := TestKeeper(t)
 	msgServer := keeper.NewMsgServerImpl(*k)
@@ -18,7 +47,7 @@ func TestCreateDID(t *testing.T) {
 
 	k.SetChainNamespace(&ctx, "devnet")
 
-	keyPair1 := GeneratePublicPrivateKeyPair()
+	keyPair1 := GenerateEd25519KeyPair()
 	rpcElements := GenerateDidDocumentRPCElements(keyPair1)
 	t.Logf("Registering DID with DID Id: %s", rpcElements.DidDocument.GetId())
 
@@ -45,7 +74,7 @@ func TestInvalidServiceType(t *testing.T) {
 	msgServer := keeper.NewMsgServerImpl(*k)
 	goCtx := sdk.WrapSDKContext(ctx)
 
-	keyPair1 := GeneratePublicPrivateKeyPair()
+	keyPair1 := GenerateEd25519KeyPair()
 	rpcElements := GenerateDidDocumentRPCElements(keyPair1)
 	// Set Namespace
 	k.SetChainNamespace(&ctx, "devnet")
