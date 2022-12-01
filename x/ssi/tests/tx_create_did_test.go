@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCreateDID(t *testing.T) {
+func TestCreateDIDUsingEd25519KeyPair(t *testing.T) {
 	t.Log("Running test for Valid Create DID Tx")
 	k, ctx := TestKeeper(t)
 	msgServer := keeper.NewMsgServerImpl(*k)
@@ -18,7 +18,7 @@ func TestCreateDID(t *testing.T) {
 
 	k.SetChainNamespace(&ctx, "devnet")
 
-	keyPair1 := GeneratePublicPrivateKeyPair()
+	keyPair1 := GenerateEd25519KeyPair()
 	rpcElements := GenerateDidDocumentRPCElements(keyPair1)
 	t.Logf("Registering DID with DID Id: %s", rpcElements.DidDocument.GetId())
 
@@ -45,7 +45,7 @@ func TestInvalidServiceType(t *testing.T) {
 	msgServer := keeper.NewMsgServerImpl(*k)
 	goCtx := sdk.WrapSDKContext(ctx)
 
-	keyPair1 := GeneratePublicPrivateKeyPair()
+	keyPair1 := GenerateEd25519KeyPair()
 	rpcElements := GenerateDidDocumentRPCElements(keyPair1)
 	// Set Namespace
 	k.SetChainNamespace(&ctx, "devnet")

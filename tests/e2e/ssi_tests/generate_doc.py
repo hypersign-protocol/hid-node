@@ -5,7 +5,7 @@ sys.path.insert(1, os.getcwd())
 import json
 from utils import run_command, generate_document_id, get_document_signature
 
-def generate_did_document(key_pair):
+def generate_did_document(key_pair, algo="ed25519"):
     base_document = {
         "context" : [
             "https://www.w3.org/ns/did/v1"
@@ -19,9 +19,15 @@ def generate_did_document(key_pair):
     did_id = generate_document_id("did", key_pair)
 
     # Form the DID Document
+    vm_type = ""
+    if algo == "secp256k1":
+        vm_type = "EcdsaSecp256k1VerificationKey2019"
+    else:
+        vm_type = "Ed25519VerificationKey2020"
+
     verification_method = {
         "id": did_id + "#key-1",
-        "type": "Ed25519VerificationKey2020",
+        "type": vm_type,
         "controller": did_id,
         "publicKeyMultibase": key_pair["pub_key_multibase"]
     }

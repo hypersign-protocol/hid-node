@@ -17,7 +17,7 @@ func TestRegisterCredentialStatus(t *testing.T) {
 
 	k.SetChainNamespace(&ctx, "devnet")
 
-	keyPair1 := GeneratePublicPrivateKeyPair()
+	keyPair1 := GenerateEd25519KeyPair()
 	didRpcElements := GenerateDidDocumentRPCElements(keyPair1)
 	t.Logf("Registering DID with DID Id: %s", didRpcElements.DidDocument.GetId())
 
@@ -70,7 +70,7 @@ func TestUpdateCredentialStatus(t *testing.T) {
 
 	k.SetChainNamespace(&ctx, "devnet")
 
-	keyPair1 := GeneratePublicPrivateKeyPair()
+	keyPair1 := GenerateEd25519KeyPair()
 	didRpcElements := GenerateDidDocumentRPCElements(keyPair1)
 	t.Logf("Registering DID with DID Id: %s", didRpcElements.DidDocument.GetId())
 
