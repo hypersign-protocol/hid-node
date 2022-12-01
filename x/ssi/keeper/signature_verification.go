@@ -34,7 +34,6 @@ func VerifyIdentitySignature(signer types.Signer, signatures []*types.SignInfo, 
 	return result, nil
 }
 
-
 func (k msgServer) VerifySignatureOnDidUpdate(ctx *sdk.Context, oldDIDDoc *types.Did, newDIDDoc *types.Did, signatures []*types.SignInfo) error {
 	var signers []types.Signer
 
@@ -137,7 +136,7 @@ func (k *Keeper) VerifyDocumentSignature(ctx *sdk.Context, msg types.IdentityMsg
 		}
 		validArr = append(validArr, types.ValidDid{DidId: signer.Signer, IsValid: valid})
 	}
-	
+
 	validDid := docVerify.HasAtleastOneTrueSigner(validArr)
 
 	if validDid == (types.ValidDid{}) {
