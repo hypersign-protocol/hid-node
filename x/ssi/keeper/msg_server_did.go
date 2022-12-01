@@ -6,7 +6,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	verify "github.com/hypersign-protocol/hid-node/x/ssi/keeper/document_verification"
+	docVerify "github.com/hypersign-protocol/hid-node/x/ssi/keeper/document_verification"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 )
 
@@ -22,7 +22,7 @@ func (k msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*t
 	signatures := msg.GetSignatures()
 
 	// Checks if the Did Document is valid
-	err := verify.ValidateDidDocument(msg.DidDocString, chainNamespace)
+	err := docVerify.ValidateDidDocument(msg.DidDocString, chainNamespace)
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +69,7 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 	chainNamespace := k.GetChainNamespace(&ctx)
 
 	// Check if the input DID Document is valid
-	err := verify.ValidateDidDocument(didMsg, chainNamespace)
+	err := docVerify.ValidateDidDocument(didMsg, chainNamespace)
 	if err != nil {
 		return nil, err
 	}
@@ -88,7 +88,7 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 	oldMetaData := oldDIDDoc.GetDidDocumentMetadata()
 
 	// Check if the status of DID Document is deactivated
-	if err := verify.VerifyDidDeactivate(oldMetaData, didId); err != nil {
+	if err := docVerify.VerifyDidDeactivate(oldMetaData, didId); err != nil {
 		return nil, err
 	}
 
@@ -137,7 +137,7 @@ func (k msgServer) DeactivateDID(goCtx context.Context, msg *types.MsgDeactivate
 	chainNamespace := k.GetChainNamespace(&ctx)
 
 	// Check if the Did id format is valid
-	err := verify.IsValidID(didId, chainNamespace, "didDocument")
+	err := docVerify.IsValidID(didId, chainNamespace, "didDocument")
 	if err != nil {
 		return nil, err
 	}
@@ -157,7 +157,7 @@ func (k msgServer) DeactivateDID(goCtx context.Context, msg *types.MsgDeactivate
 	oldVersionId := metadata.GetVersionId()
 
 	// Check if the DID is already deactivated
-	if err := verify.VerifyDidDeactivate(metadata, didId); err != nil {
+	if err := docVerify.VerifyDidDeactivate(metadata, didId); err != nil {
 		return nil, err
 	}
 

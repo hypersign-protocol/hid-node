@@ -7,7 +7,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	verify "github.com/hypersign-protocol/hid-node/x/ssi/keeper/document_verification"
+	docVerify "github.com/hypersign-protocol/hid-node/x/ssi/keeper/document_verification"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 )
 
@@ -32,7 +32,7 @@ func (k msgServer) CreateSchema(goCtx context.Context, msg *types.MsgCreateSchem
 	}
 
 	// Check if Schema ID is valid
-	err = verify.IsValidID(schemaID, chainNamespace, "schemaDocument")
+	err = docVerify.IsValidID(schemaID, chainNamespace, "schemaDocument")
 	if err != nil {
 		return nil, sdkerrors.Wrap(types.ErrInvalidSchemaID, err.Error())
 	}
