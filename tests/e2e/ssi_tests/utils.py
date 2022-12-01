@@ -46,8 +46,6 @@ def generate_key_pair(algo="ed25519"):
         raise Exception(algo + " is not a supported signing algorithm")
     result_str = run_command(cmd)
     kp = json.loads(result_str)
-    if len(kp["pub_key_multibase"]) != 45:
-        return generate_key_pair()
     return kp
 
 def generate_document_id(doc_type: str, kp: dict = None):

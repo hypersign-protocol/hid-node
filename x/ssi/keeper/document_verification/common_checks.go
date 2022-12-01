@@ -89,7 +89,7 @@ func IsValidID(Id string, namespace string, docType string) error {
 
 	// Check if method-specific-id follows multibase format
 	_, _, err := multibase.Decode(docElements[docMethodSpecificId])
-	if err != nil || len(docElements[docMethodSpecificId]) != 45 {
+	if err != nil {
 		return sdkerrors.Wrap(types.ErrInvalidMethodSpecificId, docElements[docMethodSpecificId])
 	}
 
