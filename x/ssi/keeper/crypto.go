@@ -2,14 +2,12 @@ package keeper
 
 import (
 	"crypto/ed25519"
-	sha256 "crypto/sha256"
 	"encoding/base64"
 	"fmt"
 
-	secp256k1 "github.com/decred/dcrd/dcrec/secp256k1/v4"
-	ecdsa "github.com/decred/dcrd/dcrec/secp256k1/v4/ecdsa"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 	"github.com/multiformats/go-multibase"
+	secp256k1 "github.com/tendermint/tendermint/crypto/secp256k1"
 )
 
 func verify(verificationMethodType string, verificationKey string, signature string, data []byte) (bool, error) {
@@ -49,24 +47,14 @@ func verifySecp256k1(publicKey string, signature string, documentBytes []byte) (
 	if err != nil {
 		return false, err
 	}
-	pubKeyObject, err := secp256k1.ParsePubKey(publicKeyBytes)
-	if err != nil {
-		return false, err
-	}
+	var pubKeyObj secp256k1.PubKey = publicKeyBytes
 
 	// Decode and Parse Signature
 	signatureBytes, err := base64.StdEncoding.DecodeString(signature)
 	if err != nil {
 		return false, err
 	}
-	signatureSecpObject, err := ecdsa.ParseDERSignature(signatureBytes)
-	if err != nil {
-		return false, err
-	}
 
-	// Hash Document Bytes with SHA-256
-	documentHash := sha256.Sum256(documentBytes)
-
-	isValidSignature := signatureSecpObject.Verify(documentHash[:], pubKeyObject)
+	isValidSignature := pubKeyObj.VerifySignature(documentBytes, signatureBytes)
 	return isValidSignature, nil
 }

@@ -2,9 +2,6 @@ package tests
 
 import (
 	"crypto/ed25519"
-
-	sha256 "crypto/sha256"
-	ecdsa "github.com/decred/dcrd/dcrec/secp256k1/v4/ecdsa"
 )
 
 func SignGeneric(keyPair GenericKeyPair, data []byte) []byte {
@@ -13,9 +10,10 @@ func SignGeneric(keyPair GenericKeyPair, data []byte) []byte {
 		signature := ed25519.Sign(kp.privateKey, data)
 		return signature
 	case secp256k1KeyPair:
-		dataHash := sha256.Sum256(data)
-		secp256kSignature := ecdsa.Sign(kp.privateKey, dataHash[:])
-		signature := secp256kSignature.Serialize()
+		signature, err := kp.privateKey.Sign(data)
+		if err != nil {
+			panic(err)
+		}
 		return signature
 	default:
 		panic("Unsupported Key Pair Type")

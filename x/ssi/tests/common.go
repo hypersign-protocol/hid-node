@@ -9,12 +9,11 @@ import (
 	"encoding/hex"
 	"strings"
 
-	//"github.com/btcsuite/btcutil/base58"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	secp256k1 "github.com/decred/dcrd/dcrec/secp256k1/v4"
 	"github.com/hypersign-protocol/hid-node/x/ssi/keeper"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 	"github.com/multiformats/go-multibase"
+	secp256k1 "github.com/tendermint/tendermint/crypto/secp256k1"
 )
 
 func getDidSigningInfo(didDoc *types.Did, signingElements []DidSigningElements) []*types.SignInfo {
@@ -196,21 +195,17 @@ func GenerateCredStatusRPCElements(keyPair GenericKeyPair, Id string, verficatio
 }
 
 func GenerateSecp256k1KeyPair() secp256k1KeyPair {
-	privateKey, err := secp256k1.GeneratePrivateKey()
-	if err != nil {
-		panic(err)
-	}
+	privateKey := secp256k1.GenPrivKey()
 
-	publicKey := privateKey.PubKey()
-	publicKeyCompressed := publicKey.SerializeCompressed()
+	publicKey := privateKey.PubKey().Bytes()
 
-	publicKeyMultibase, err := multibase.Encode(multibase.Base58BTC, publicKeyCompressed)
+	publicKeyMultibase, err := multibase.Encode(multibase.Base58BTC, publicKey)
 	if err != nil {
 		panic("Error while encoding multibase string")
 	}
 	return secp256k1KeyPair{
 		publicKey:  publicKeyMultibase,
-		privateKey: privateKey,
+		privateKey: &privateKey,
 	}
 }
 

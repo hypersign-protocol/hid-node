@@ -2,13 +2,11 @@ package cli
 
 import (
 	"crypto/ed25519"
-	"crypto/sha256"
 	"encoding/base64"
 	"fmt"
 
-	secp256k1 "github.com/decred/dcrd/dcrec/secp256k1/v4"
-	ecdsa "github.com/decred/dcrd/dcrec/secp256k1/v4/ecdsa"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
+	secp256k1 "github.com/tendermint/tendermint/crypto/secp256k1"
 
 	"github.com/spf13/cobra"
 )
@@ -48,16 +46,14 @@ func getSecp256k1Signature(privateKey string, message []byte) (string, error) {
 	}
 
 	// Convert private key string to Secp256k1 object
-	privKeyObject := secp256k1.PrivKeyFromBytes(privKeyBytes)
-
-	// Secp256k1 requires the message
-	dataHash := sha256.Sum256(message)
+	var privKeyObject secp256k1.PrivKey = privKeyBytes
 
 	// Sign Message
-	signature := ecdsa.Sign(privKeyObject, dataHash[:])
-	serialisedSignature := signature.Serialize()
-
-	return base64.StdEncoding.EncodeToString(serialisedSignature), nil
+	signature, err := privKeyObject.Sign(message)
+	if err != nil {
+		return "", err
+	}
+	return base64.StdEncoding.EncodeToString(signature), nil
 }
 
 func getEd25519Signature(privateKey string, message []byte) (string, error) {
@@ -100,7 +96,7 @@ func getSignatures(cmd *cobra.Command, message []byte, cmdArgs []string) ([]*typ
 				return nil, err
 			}
 		default:
-			return nil, fmt.Errorf("Unsupported signing algorithm %s", didSigningElementsList[i].SignAlgo)
+			return nil, fmt.Errorf("unsupported signing algorithm %s", didSigningElementsList[i].SignAlgo)
 		}
 	}
 
