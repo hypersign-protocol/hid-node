@@ -38,8 +38,12 @@ def run_blockchain_command(cmd_string: str, transaction_name: str = None, expect
             print(f"{transaction_name} : Error while executing transaction command\n")
             raise(e)
 
-def generate_key_pair():
-    cmd = "hid-noded debug ed25519 random"
+def generate_key_pair(algo="ed25519"):
+    cmd = ""
+    if algo == "ed25519":
+        cmd = "hid-noded debug ed25519 random"
+    else:
+        raise Exception(algo + " is not a supported signing algorithm")
     result_str = run_command(cmd)
     kp = json.loads(result_str)
     if len(kp["pub_key_multibase"]) != 45:
