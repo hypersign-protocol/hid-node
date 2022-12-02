@@ -9,6 +9,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	docVerify "github.com/hypersign-protocol/hid-node/x/ssi/keeper/document_verification"
 
+	sigVerify "github.com/hypersign-protocol/hid-node/x/ssi/signature"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 )
 
@@ -91,13 +92,25 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 
 		did := didDocument.GetDidDocument()
 
-		// Verify Signature
 		signature := &types.SignInfo{
 			VerificationMethodId: credProof.GetVerificationMethod(),
 			Signature:            credProof.GetProofValue(),
 		}
 		signatures := []*types.SignInfo{signature}
-		err = k.VerifyDocumentSignature(&ctx, credMsg, did, signatures)
+		signers := did.GetSigners()
+		signersWithVM, err := k.GetVMForSigners(&ctx, signers)
+		if err != nil {
+			return nil, err
+		}
+
+		// Proof Type Check
+		err = sigVerify.DocumentProofTypeCheck(credProof.Type, signersWithVM, credProof.VerificationMethod)
+		if err != nil {
+			return nil, err
+		}
+
+		// Verify Signature
+		err = sigVerify.VerifyDocumentSignature(&ctx, credMsg, signersWithVM, signatures)
 		if err != nil {
 			return nil, err
 		}
@@ -262,13 +275,25 @@ func (k msgServer) updateCredentialStatus(ctx sdk.Context, newCredStatus *types.
 
 	did := didDocument.GetDidDocument()
 
-	// Verify Signature
 	signature := &types.SignInfo{
 		VerificationMethodId: newCredProof.GetVerificationMethod(),
 		Signature:            newCredProof.GetProofValue(),
 	}
 	signatures := []*types.SignInfo{signature}
-	err = k.VerifyDocumentSignature(&ctx, newCredStatus, did, signatures)
+	signers := did.GetSigners()
+	signersWithVM, err := k.GetVMForSigners(&ctx, signers)
+	if err != nil {
+		return nil, err
+	}
+
+	// Proof Type Check
+	err = sigVerify.DocumentProofTypeCheck(newCredProof.Type, signersWithVM, newCredProof.VerificationMethod)
+	if err != nil {
+		return nil, err
+	}
+
+	// Verify Signature
+	err = sigVerify.VerifyDocumentSignature(&ctx, newCredStatus, signersWithVM, signatures)
 	if err != nil {
 		return nil, err
 	}

@@ -8,34 +8,28 @@ import (
 // Returns a list of controllers present in the Did document along with
 // their verification methods.
 func (msg *Did) GetSigners() []Signer {
-	if len(msg.Controller) > 0 {
-		result := make([]Signer, len(msg.Controller))
+	nControllers := len(msg.Controller)
 
+	if nControllers > 0 {
+		signers := make([]Signer, nControllers)
 		for i, controller := range msg.Controller {
 			if controller == msg.Id {
-				result[i] = Signer{
-					Signer:             controller,
-					Authentication:     msg.Authentication,
-					VerificationMethod: msg.VerificationMethod,
+				signers[i] = Signer{
+					Signer:               controller,
+					Authentication:       msg.Authentication,
+					AssertionMethod:      msg.AssertionMethod,
+					KeyAgreement:         msg.KeyAgreement,
+					CapabilityInvocation: msg.CapabilityInvocation,
+					CapabilityDelegation: msg.CapabilityDelegation,
+					VerificationMethod:   msg.VerificationMethod,
 				}
 			} else {
-				result[i] = Signer{
+				signers[i] = Signer{
 					Signer: controller,
 				}
 			}
 		}
-
-		return result
-	}
-
-	if len(msg.Authentication) > 0 {
-		return []Signer{
-			{
-				Signer:             msg.Id,
-				Authentication:     msg.Authentication,
-				VerificationMethod: msg.VerificationMethod,
-			},
-		}
+		return signers
 	}
 
 	return []Signer{}
