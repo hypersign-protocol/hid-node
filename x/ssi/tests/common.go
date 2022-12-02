@@ -11,6 +11,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/hypersign-protocol/hid-node/x/ssi/keeper"
+	"github.com/hypersign-protocol/hid-node/x/ssi/signature"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 	"github.com/multiformats/go-multibase"
 )
@@ -72,7 +73,7 @@ func GenerateDidDocumentRPCElements(keyPair GenericKeyPair) DidRpcElements {
 	var vmType string
 	switch keyPair.(type) {
 	case ed25519KeyPair:
-		vmType = keeper.Ed25519VerificationKey2020
+		vmType = signature.Ed25519VerificationKey2020
 	}
 
 	var vm = &types.VerificationMethod{
@@ -144,7 +145,7 @@ func GenerateSchemaDocumentRPCElements(keyPair ed25519KeyPair, Id string, verfic
 	)
 
 	var schemaProof *types.SchemaProof = &types.SchemaProof{
-		Type:               "Ed25519VerificationKey2020",
+		Type:               "Ed25519Signature2020",
 		Created:            "2022-04-10T04:07:12Z",
 		VerificationMethod: verficationMethodId,
 		ProofValue:         schemaDocumentSignature,

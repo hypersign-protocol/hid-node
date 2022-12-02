@@ -20,10 +20,10 @@ def generate_did_document(key_pair, algo="ed25519"):
 
     # Form the DID Document
     vm_type = ""
-    if algo == "secp256k1":
-        vm_type = "EcdsaSecp256k1VerificationKey2019"
-    else:
+    if algo == "ed25519":
         vm_type = "Ed25519VerificationKey2020"
+    else:
+        raise Exception("unknown signing algorithm: " + key_pair)
 
     verification_method = {
         "id": did_id + "#key-1",
@@ -34,6 +34,7 @@ def generate_did_document(key_pair, algo="ed25519"):
     authentication_verification_method_id = verification_method["id"]
     
     base_document["id"] = did_id
+    base_document["controller"] = [did_id]
     base_document["verificationMethod"] = [verification_method]
     base_document["authentication"] = [authentication_verification_method_id]
     base_document["assertionMethod"] = [authentication_verification_method_id]
@@ -57,7 +58,7 @@ def generate_schema_document(key_pair, schema_author, vm, signature=None):
     }
     
     base_schema_proof = {
-        "type": "Ed25519VerificationKey2020",
+        "type": "Ed25519Signature2020",
         "created": "2022-08-16T10:22:12Z",
         "verificationMethod": "",
         "proofValue": "",
@@ -91,7 +92,7 @@ def generate_cred_status_document(key_pair, cred_author, vm, signature=None):
     }
     
     base_cred_status_proof = {
-        "type": "Ed25519VerificationKey2020",
+        "type": "Ed25519Signature2020",
         "created": "2022-08-16T09:37:12Z",
         "updated": "2022-08-16T09:37:12Z",
         "verificationMethod": "",

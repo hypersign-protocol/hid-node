@@ -1,4 +1,4 @@
-package keeper
+package signature
 
 import (
 	"crypto/ed25519"

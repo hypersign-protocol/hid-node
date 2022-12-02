@@ -6,13 +6,13 @@ import (
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 )
 
-func FindPublicKeyAndVerificationMethodType(signer types.Signer, id string) (string, string, error) {
+func FindPublicKeyAndVerificationMethodType(signer types.Signer, vmId string) (string, string, error) {
 	if signer.Authentication != nil {
 		for _, authentication := range signer.Authentication {
-			if authentication == id {
-				vm := FindVerificationMethod(signer.VerificationMethod, id)
+			if authentication == vmId {
+				vm := FindVerificationMethod(signer.VerificationMethod, vmId)
 				if vm == nil {
-					return "", "", types.ErrVerificationMethodNotFound.Wrap(id)
+					return "", "", types.ErrVerificationMethodNotFound.Wrap(vmId)
 				}
 				return vm.GetPublicKeyAndVerificationMethodType()
 			}
@@ -21,16 +21,16 @@ func FindPublicKeyAndVerificationMethodType(signer types.Signer, id string) (str
 
 	if signer.AssertionMethod != nil {
 		for _, assertionMethod := range signer.AssertionMethod {
-			if assertionMethod == id {
-				vm := FindVerificationMethod(signer.VerificationMethod, id)
+			if assertionMethod == vmId {
+				vm := FindVerificationMethod(signer.VerificationMethod, vmId)
 				if vm == nil {
-					return "", "", types.ErrVerificationMethodNotFound.Wrap(id)
+					return "", "", types.ErrVerificationMethodNotFound.Wrap(vmId)
 				}
 				return vm.GetPublicKeyAndVerificationMethodType()
 			}
 		}
 	}
-	return "", "", types.ErrVerificationMethodNotFound.Wrap(id)
+	return "", "", types.ErrVerificationMethodNotFound.Wrap(vmId)
 }
 
 func FindVerificationMethod(vms []*types.VerificationMethod, id string) *types.VerificationMethod {
