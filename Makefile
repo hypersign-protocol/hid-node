@@ -5,6 +5,7 @@ COMMIT := $(shell git rev-parse --short HEAD)
 
 BUILD_DIR ?= $(CURDIR)/build
 HIDNODE_CMD_DIR := $(CURDIR)/cmd/hid-noded
+E2E_SSI_TESTS_DIR := $(CURDIR)/tests/e2e/ssi_tests
 
 GOBIN = $(shell go env GOPATH)/bin
 GOOS = $(shell go env GOOS)
@@ -55,3 +56,20 @@ proto-gen:
 swagger-docs-gen:
 	@echo "Generating swagger docs"
 	./scripts/protoc-swagger-gen.sh
+
+
+###############################################################################
+###                                  Docker                                 ###
+###############################################################################
+DOCKER_IMAGE_NAME := hid-node-image
+
+docker-all: docker-build docker-run
+
+docker-build:
+	docker build -t $(DOCKER_IMAGE_NAME) .
+
+docker-run:
+	docker run --rm -d \
+	-p 26657:26657 -p 1317:1317 -p 26656:26656 -p 9090:9090 \
+	--name hid-node-container \
+	$(DOCKER_IMAGE_NAME) start
