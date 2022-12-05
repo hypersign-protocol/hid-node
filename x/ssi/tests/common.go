@@ -179,7 +179,7 @@ func GenerateCredStatusRPCElements(keyPair ed25519KeyPair, Id string, verficatio
 	)
 
 	var credentialProof *types.CredentialProof = &types.CredentialProof{
-		Type:               "Ed25519VerificationKey2020",
+		Type:               "Ed25519Signature2020",
 		Created:            "2022-04-10T04:07:12Z",
 		Updated:            "2022-04-10T04:07:12Z",
 		VerificationMethod: verficationMethod.Id,
