@@ -56,16 +56,19 @@ hid-noded start --home ~/.hid-node
 
 ### Docker
 
-To run a single node `hid-node` docker container, run the following:
+To run a single node `hid-node` docker container, follow the below steps:
 
 1. Pull the image:
    ```sh
    docker pull ghcr.io/hypersign-protocol/hid-node:latest
    ```
 
-2. Open a separate terminal window. Run the node:
+2. Run the following:
    ```sh
-   docker run -it ghcr.io/hypersign-protocol/hid-node start
+   docker run --rm -d \
+	-p 26657:26657 -p 1317:1317 -p 26656:26656 -p 9090:9090 \
+	--name hid-node-container \
+	ghcr.io/hypersign-protocol/hid-node start
    ```
 
 ## Documentation

@@ -38,7 +38,7 @@ cat /root/.hid-node/config/genesis.json | jq '.app_state["crisis"]["constant_fee
 
 # update gov genesis
 cat /root/.hid-node/config/genesis.json | jq '.app_state["gov"]["deposit_params"]["min_deposit"][0]["denom"]="uhid"' > /root/.hid-node/config/tmp_genesis.json && mv /root/.hid-node/config/tmp_genesis.json /root/.hid-node/config/genesis.json
-cat /root/.hid-node/config/genesis.json | jq '.app_state["gov"]["voting_params"]["voting_period"]="50s"' > /root/.hid-node/config/tmp_genesis.json && mv /root/.hid-node/config/tmp_genesis.json /root/.hid-node/config/genesis.json
+cat /root/.hid-node/config/genesis.json | jq '.app_state["gov"]["voting_params"]["voting_period"]="500s"' > /root/.hid-node/config/tmp_genesis.json && mv /root/.hid-node/config/tmp_genesis.json /root/.hid-node/config/genesis.json
 
 # update ssi genesis
 cat /root/.hid-node/config/genesis.json | jq '.app_state["ssi"]["chain_namespace"]="devnet"' > /root/.hid-node/config/tmp_genesis.json && mv /root/.hid-node/config/tmp_genesis.json /root/.hid-node/config/genesis.json
@@ -47,8 +47,8 @@ cat /root/.hid-node/config/genesis.json | jq '.app_state["ssi"]["chain_namespace
 cat /root/.hid-node/config/genesis.json | jq '.app_state["mint"]["params"]["mint_denom"]="uhid"' > /root/.hid-node/config/tmp_genesis.json && mv /root/.hid-node/config/tmp_genesis.json /root/.hid-node/config/genesis.json
 
 # create validator node with tokens
-hid-noded add-genesis-account $(hid-noded keys show node1 -a --keyring-backend=test --home=/root/.hid-node) 50000000000000000uhid --home=/root/.hid-node
-hid-noded gentx node1 50000000000000000uhid --keyring-backend=test --home=/root/.hid-node --chain-id=hidnode
+hid-noded add-genesis-account $(hid-noded keys show node1 -a --keyring-backend=test --home=/root/.hid-node) 110000000000uhid --home=/root/.hid-node
+hid-noded gentx node1 100000000000uhid --keyring-backend=test --home=/root/.hid-node --chain-id=hidnode
 hid-noded collect-gentxs --home=/root/.hid-node
 
 # change app.toml values
@@ -57,6 +57,7 @@ sed -i -E '107s/swagger = false/swagger = true/' /root/.hid-node/config/app.toml
 
 
 # change config.toml values
+sed -i -E 's|tcp://127.0.0.1:26657|tcp://0.0.0.0:26657|g' /root/.hid-node/config/config.toml
 sed -i -E 's|allow_duplicate_ip = false|allow_duplicate_ip = true|g' /root/.hid-node/config/config.toml
 sed -i -E 's|addr_book_strict = true|addr_book_strict = false|g' /root/.hid-node/config/config.toml
 sed -i -E 's|cors_allowed_origins = \[\]|cors_allowed_origins = \[\"\*\"\]|g' /root/.hid-node/config/config.toml
