@@ -4,77 +4,29 @@ import (
 	"context"
 	"crypto/ed25519"
 	"crypto/rand"
+	"crypto/sha256"
 	"encoding/base64"
+	"encoding/hex"
 	"strings"
 
-	//"fmt"
-
-	"github.com/btcsuite/btcutil/base58"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/hypersign-protocol/hid-node/x/ssi/keeper"
+	"github.com/hypersign-protocol/hid-node/x/ssi/signature"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
-	//"github.com/hypersign-protocol/hid-node/x/ssi/utils"
+	"github.com/multiformats/go-multibase"
 )
 
-type ed25519KeyPair struct {
-	publicKey  string
-	privateKey ed25519.PrivateKey
-}
+func getDidSigningInfo(didDoc *types.Did, signingElements []DidSigningElements) []*types.SignInfo {
+	var signingInfos []*types.SignInfo
 
-type DidRpcElements struct {
-	DidDocument *types.Did
-	Signatures  []*types.SignInfo
-	Creator     string
-}
-
-type SchemaRpcElements struct {
-	SchemaDocument *types.SchemaDocument
-	SchemaProof    *types.SchemaProof
-	Creator        string
-}
-
-type CredRpcElements struct {
-	Status  *types.CredentialStatus
-	Proof   *types.CredentialProof
-	Creator string
-}
-
-var Creator string = "hid1kxqk5ejca8nfpw8pg47484rppv359xh7qcasy4"
-var DidMethod string = "hid"
-
-func getDidSigningInfo(didDoc *types.Did, keyPair ed25519KeyPair, vmId string) []*types.SignInfo {
-	signature := ed25519.Sign(keyPair.privateKey, didDoc.GetSignBytes())
-	signInfo := &types.SignInfo{
-		VerificationMethodId: vmId,
-		Signature:            base64.StdEncoding.EncodeToString(signature),
-	}
-
-	return []*types.SignInfo{
-		signInfo,
-	}
-}
-
-func getMultiSigDidSigningInfo(didDoc *types.Did, keyPairs []ed25519KeyPair, vmIds []string) DidRpcElements {
-	if len(keyPairs) != len(vmIds) {
-		panic("KeyPairs and vmIds lists should be of equal lengths")
-	}
-
-	var signInfoList []*types.SignInfo
-
-	for idx := range keyPairs {
-		signature := ed25519.Sign(keyPairs[idx].privateKey, didDoc.GetSignBytes())
-		signInfo := &types.SignInfo{
-			VerificationMethodId: vmIds[idx],
+	for i := 0; i < len(signingElements); i++ {
+		signature := SignGeneric(signingElements[i].keyPair, didDoc.GetSignBytes())
+		signingInfos = append(signingInfos, &types.SignInfo{
+			VerificationMethodId: signingElements[i].vmId,
 			Signature:            base64.StdEncoding.EncodeToString(signature),
-		}
-		signInfoList = append(signInfoList, signInfo)
+		})
 	}
-
-	return DidRpcElements{
-		DidDocument: didDoc,
-		Signatures:  signInfoList,
-		Creator:     Creator,
-	}
+	return signingInfos
 }
 
 func UpdateCredStatus(newStatus string, credRpcElem CredRpcElements, keyPair ed25519KeyPair) CredRpcElements {
@@ -92,10 +44,17 @@ func UpdateCredStatus(newStatus string, credRpcElem CredRpcElements, keyPair ed2
 }
 
 func GetModifiedDidDocumentSignature(modifiedDidDocument *types.Did, keyPair ed25519KeyPair, verificationMethodId string) DidRpcElements {
+	var signingElements []DidSigningElements
+
+	signingElements = append(signingElements,
+		DidSigningElements{
+			keyPair: keyPair,
+			vmId:    verificationMethodId,
+		})
+
 	var signatures []*types.SignInfo = getDidSigningInfo(
 		modifiedDidDocument,
-		keyPair,
-		verificationMethodId,
+		signingElements,
 	)
 
 	return DidRpcElements{
@@ -105,18 +64,23 @@ func GetModifiedDidDocumentSignature(modifiedDidDocument *types.Did, keyPair ed2
 	}
 }
 
-func GenerateDidDocumentRPCElements(keyPair ed25519KeyPair) DidRpcElements {
-	var didMethod string = "hid"
-	var chainNamespace string = "devnet"
-	var didId = "did:" + didMethod + ":" + chainNamespace + ":" + keyPair.publicKey
+func GenerateDidDocumentRPCElements(keyPair GenericKeyPair) DidRpcElements {
+	var publicKey string = GetPublicKeyGeneric(keyPair)
+	var didId = "did:" + DidMethod + ":" + ChainNamespace + ":" + publicKey
 
 	var verificationMethodId string = didId + "#" + "key-1"
 
+	var vmType string
+	switch keyPair.(type) {
+	case ed25519KeyPair:
+		vmType = signature.Ed25519VerificationKey2020
+	}
+
 	var vm = &types.VerificationMethod{
 		Id:                 verificationMethodId,
-		Type:               "Ed25519VerificationKey2020",
+		Type:               vmType,
 		Controller:         didId,
-		PublicKeyMultibase: keyPair.publicKey,
+		PublicKeyMultibase: publicKey,
 	}
 
 	var service *types.Service = &types.Service{
@@ -141,14 +105,20 @@ func GenerateDidDocumentRPCElements(keyPair ed25519KeyPair) DidRpcElements {
 		AssertionMethod: []string{verificationMethodId},
 	}
 
-	var signInfo []*types.SignInfo = getDidSigningInfo(didDocument, keyPair, vm.Id)
+	signingElements := []DidSigningElements{
+		DidSigningElements{
+			keyPair: keyPair,
+			vmId:    vm.Id,
+		},
+	}
+
+	var signInfo []*types.SignInfo = getDidSigningInfo(didDocument, signingElements)
 
 	return DidRpcElements{
 		DidDocument: didDocument,
 		Signatures:  signInfo,
 		Creator:     Creator,
 	}
-
 }
 
 func GenerateSchemaDocumentRPCElements(keyPair ed25519KeyPair, Id string, verficationMethodId string) SchemaRpcElements {
@@ -175,7 +145,7 @@ func GenerateSchemaDocumentRPCElements(keyPair ed25519KeyPair, Id string, verfic
 	)
 
 	var schemaProof *types.SchemaProof = &types.SchemaProof{
-		Type:               "Ed25519VerificationKey2020",
+		Type:               "Ed25519Signature2020",
 		Created:            "2022-04-10T04:07:12Z",
 		VerificationMethod: verficationMethodId,
 		ProofValue:         schemaDocumentSignature,
@@ -191,6 +161,7 @@ func GenerateSchemaDocumentRPCElements(keyPair ed25519KeyPair, Id string, verfic
 
 func GenerateCredStatusRPCElements(keyPair ed25519KeyPair, Id string, verficationMethod *types.VerificationMethod) CredRpcElements {
 	var credentialId = "vc:" + DidMethod + ":" + "devnet:" + strings.Split(Id, ":")[3]
+	var credHash = sha256.Sum256([]byte("Hash1234"))
 	var credentialStatus *types.CredentialStatus = &types.CredentialStatus{
 		Claim: &types.Claim{
 			Id:            credentialId,
@@ -200,7 +171,7 @@ func GenerateCredStatusRPCElements(keyPair ed25519KeyPair, Id string, verficatio
 		Issuer:         Id,
 		IssuanceDate:   "2022-04-10T04:07:12Z",
 		ExpirationDate: "2023-02-22T13:45:55Z",
-		CredentialHash: "Hash234",
+		CredentialHash: hex.EncodeToString(credHash[:]),
 	}
 
 	var credentialStatusSignature string = base64.StdEncoding.EncodeToString(
@@ -208,8 +179,9 @@ func GenerateCredStatusRPCElements(keyPair ed25519KeyPair, Id string, verficatio
 	)
 
 	var credentialProof *types.CredentialProof = &types.CredentialProof{
-		Type:               "Ed25519VerificationKey2020",
+		Type:               "Ed25519Signature2020",
 		Created:            "2022-04-10T04:07:12Z",
+		Updated:            "2022-04-10T04:07:12Z",
 		VerificationMethod: verficationMethod.Id,
 		ProofValue:         credentialStatusSignature,
 		ProofPurpose:       "assertionMethod",
@@ -222,13 +194,16 @@ func GenerateCredStatusRPCElements(keyPair ed25519KeyPair, Id string, verficatio
 	}
 }
 
-func GeneratePublicPrivateKeyPair() ed25519KeyPair {
+func GenerateEd25519KeyPair() ed25519KeyPair {
 	publicKey, privateKey, err := ed25519.GenerateKey(rand.Reader)
 	if err != nil {
 		panic(err)
 	}
 
-	publicKeyBase58Encoded := "z" + base58.Encode(publicKey)
+	publicKeyBase58Encoded, err := multibase.Encode(multibase.Base58BTC, publicKey)
+	if err != nil {
+		panic("Error while encoding multibase string")
+	}
 
 	return ed25519KeyPair{
 		publicKey:  publicKeyBase58Encoded,

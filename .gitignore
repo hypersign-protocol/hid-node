@@ -29,3 +29,4 @@ dist/
 
 # Misc
 .cache/
+__pycache__

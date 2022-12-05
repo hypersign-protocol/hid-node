@@ -7,8 +7,9 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	verify "github.com/hypersign-protocol/hid-node/x/ssi/keeper/document_verification"
+	docVerify "github.com/hypersign-protocol/hid-node/x/ssi/document_verification"
 
+	sigVerify "github.com/hypersign-protocol/hid-node/x/ssi/signature"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 )
 
@@ -25,7 +26,7 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 	chainNamespace := k.GetChainNamespace(&ctx)
 
 	// Check the format of Credential ID
-	err := verify.IsValidID(credId, chainNamespace, "credDocument")
+	err := docVerify.IsValidID(credId, chainNamespace, "credDocument")
 	if err != nil {
 		return nil, err
 	}
@@ -62,12 +63,12 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 			return nil, sdkerrors.Wrapf(types.ErrInvalidDate, fmt.Sprintf("invalid issuance date format: %s", issuanceDate))
 		}
 
-		if err := verify.VerifyCredentialStatusDates(issuanceDateParsed, expirationDateParsed); err != nil {
+		if err := docVerify.VerifyCredentialStatusDates(issuanceDateParsed, expirationDateParsed); err != nil {
 			return nil, err
 		}
 
 		// Check if updated date iss imilar to created date
-		if err := verify.VerifyCredentialProofDates(credProof, true); err != nil {
+		if err := docVerify.VerifyCredentialProofDates(credProof, true); err != nil {
 			return nil, err
 		}
 
@@ -78,7 +79,7 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 		}
 
 		// Check the hash type of credentialHash
-		isValidCredentialHash := verify.VerifyCredentialHash(credMsg.GetCredentialHash())
+		isValidCredentialHash := docVerify.VerifyCredentialHash(credMsg.GetCredentialHash())
 		if !isValidCredentialHash {
 			return nil, sdkerrors.Wrapf(types.ErrInvalidCredentialHash, "supported hashing algorithms: sha256")
 		}
@@ -91,13 +92,25 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 
 		did := didDocument.GetDidDocument()
 
-		// Verify Signature
 		signature := &types.SignInfo{
 			VerificationMethodId: credProof.GetVerificationMethod(),
 			Signature:            credProof.GetProofValue(),
 		}
 		signatures := []*types.SignInfo{signature}
-		err = k.VerifyDocumentSignature(&ctx, credMsg, did, signatures)
+		signers := did.GetSigners()
+		signersWithVM, err := k.GetVMForSigners(&ctx, signers)
+		if err != nil {
+			return nil, err
+		}
+
+		// Proof Type Check
+		err = sigVerify.DocumentProofTypeCheck(credProof.Type, signersWithVM, credProof.VerificationMethod)
+		if err != nil {
+			return nil, err
+		}
+
+		// Verify Signature
+		err = sigVerify.VerifyDocumentSignature(&ctx, credMsg, signersWithVM, signatures)
 		if err != nil {
 			return nil, err
 		}
@@ -136,7 +149,7 @@ func (k msgServer) updateCredentialStatus(ctx sdk.Context, newCredStatus *types.
 	// Check for the correct credential status
 	newClaimStatus := newCredStatus.GetClaim().GetCurrentStatus()
 	statusFound := 0
-	for _, acceptablestatus := range verify.AcceptedCredStatuses {
+	for _, acceptablestatus := range docVerify.AcceptedCredStatuses {
 		if newClaimStatus == acceptablestatus {
 			statusFound = 1
 		}
@@ -194,12 +207,12 @@ func (k msgServer) updateCredentialStatus(ctx sdk.Context, newCredStatus *types.
 	}
 
 	// Check if new expiration date isn't less than new issuance date
-	if err := verify.VerifyCredentialStatusDates(newIssuanceDateParsed, newExpirationDateParsed); err != nil {
+	if err := docVerify.VerifyCredentialStatusDates(newIssuanceDateParsed, newExpirationDateParsed); err != nil {
 		return nil, err
 	}
 
 	// Check if updated date iss imilar to created date
-	if err := verify.VerifyCredentialProofDates(newCredProof, false); err != nil {
+	if err := docVerify.VerifyCredentialProofDates(newCredProof, false); err != nil {
 		return nil, err
 	}
 
@@ -262,13 +275,25 @@ func (k msgServer) updateCredentialStatus(ctx sdk.Context, newCredStatus *types.
 
 	did := didDocument.GetDidDocument()
 
-	// Verify Signature
 	signature := &types.SignInfo{
 		VerificationMethodId: newCredProof.GetVerificationMethod(),
 		Signature:            newCredProof.GetProofValue(),
 	}
 	signatures := []*types.SignInfo{signature}
-	err = k.VerifyDocumentSignature(&ctx, newCredStatus, did, signatures)
+	signers := did.GetSigners()
+	signersWithVM, err := k.GetVMForSigners(&ctx, signers)
+	if err != nil {
+		return nil, err
+	}
+
+	// Proof Type Check
+	err = sigVerify.DocumentProofTypeCheck(newCredProof.Type, signersWithVM, newCredProof.VerificationMethod)
+	if err != nil {
+		return nil, err
+	}
+
+	// Verify Signature
+	err = sigVerify.VerifyDocumentSignature(&ctx, newCredStatus, signersWithVM, signatures)
 	if err != nil {
 		return nil, err
 	}

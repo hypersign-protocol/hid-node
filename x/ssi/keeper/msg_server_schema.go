@@ -7,7 +7,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	verify "github.com/hypersign-protocol/hid-node/x/ssi/keeper/document_verification"
+	docVerify "github.com/hypersign-protocol/hid-node/x/ssi/document_verification"
+	sigVerify "github.com/hypersign-protocol/hid-node/x/ssi/signature"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 )
 
@@ -19,7 +20,6 @@ func (k msgServer) CreateSchema(goCtx context.Context, msg *types.MsgCreateSchem
 	schemaID := schemaDoc.GetId()
 
 	chainNamespace := k.GetChainNamespace(&ctx)
-
 	// Get the Did Document of Schema's Author
 	authorDidDocument, err := k.GetDid(&ctx, schemaDoc.GetAuthor())
 	if err != nil {
@@ -32,7 +32,7 @@ func (k msgServer) CreateSchema(goCtx context.Context, msg *types.MsgCreateSchem
 	}
 
 	// Check if Schema ID is valid
-	err = verify.IsValidID(schemaID, chainNamespace, "schemaDocument")
+	err = docVerify.IsValidID(schemaID, chainNamespace, "schemaDocument")
 	if err != nil {
 		return nil, sdkerrors.Wrap(types.ErrInvalidSchemaID, err.Error())
 	}
@@ -63,13 +63,25 @@ func (k msgServer) CreateSchema(goCtx context.Context, msg *types.MsgCreateSchem
 		return nil, sdkerrors.Wrapf(types.ErrInvalidDate, "created date provided shouldn't be greater than the current block time")
 	}
 
-	// Signature check
 	signature := &types.SignInfo{
 		VerificationMethodId: schemaProof.VerificationMethod,
 		Signature:            schemaProof.ProofValue,
 	}
 	signatures := []*types.SignInfo{signature}
-	if err := k.VerifyDocumentSignature(&ctx, schemaDoc, authorDidDocument.DidDocument, signatures); err != nil {
+	signers := authorDidDocument.DidDocument.GetSigners()
+	signersWithVM, err := k.GetVMForSigners(&ctx, signers)
+	if err != nil {
+		return nil, err
+	}
+
+	// Proof Type Check
+	err = sigVerify.DocumentProofTypeCheck(schemaProof.Type, signersWithVM, schemaProof.VerificationMethod)
+	if err != nil {
+		return nil, err
+	}
+
+	// Signature check
+	if err := sigVerify.VerifyDocumentSignature(&ctx, schemaDoc, signersWithVM, signatures); err != nil {
 		return nil, err
 	}
 
