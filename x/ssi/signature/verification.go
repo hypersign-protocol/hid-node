@@ -5,7 +5,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	docVerify "github.com/hypersign-protocol/hid-node/x/ssi/keeper/document_verification"
+	docVerify "github.com/hypersign-protocol/hid-node/x/ssi/document_verification"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 	"github.com/hypersign-protocol/hid-node/x/ssi/utils"
 )
