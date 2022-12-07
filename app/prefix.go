@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	AccountAddressPrefix = "hid"
+	AccountAddressPrefix = "vid"
 )
 
 var (

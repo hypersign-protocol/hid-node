@@ -10,8 +10,8 @@ import (
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	typesparams "github.com/cosmos/cosmos-sdk/x/params/types"
-	"github.com/hypersign-protocol/hid-node/x/ssi/keeper"
-	"github.com/hypersign-protocol/hid-node/x/ssi/types"
+	"github.com/hypersign-protocol/vid-node/x/ssi/keeper"
+	"github.com/hypersign-protocol/vid-node/x/ssi/types"
 	"github.com/stretchr/testify/require"
 	"github.com/tendermint/tendermint/libs/log"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
@@ -47,7 +47,7 @@ func TestKeeper(t testing.TB) (*keeper.Keeper, sdk.Context) {
 	blockTime, _ := time.Parse(time.RFC3339, "2022-05-10T00:00:00Z")
 	ctx := sdk.NewContext(stateStore,
 		tmproto.Header{
-			ChainID: "hidnode",
+			ChainID: "vidnode",
 			Time:    blockTime,
 		}, false, log.NewNopLogger())
 

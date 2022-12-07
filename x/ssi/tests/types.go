@@ -3,7 +3,7 @@ package tests
 import (
 	"crypto/ed25519"
 
-	"github.com/hypersign-protocol/hid-node/x/ssi/types"
+	"github.com/hypersign-protocol/vid-node/x/ssi/types"
 )
 
 // Structs

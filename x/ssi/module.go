@@ -19,9 +19,9 @@ import (
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
-	"github.com/hypersign-protocol/hid-node/x/ssi/client/cli"
-	"github.com/hypersign-protocol/hid-node/x/ssi/keeper"
-	"github.com/hypersign-protocol/hid-node/x/ssi/types"
+	"github.com/hypersign-protocol/vid-node/x/ssi/client/cli"
+	"github.com/hypersign-protocol/vid-node/x/ssi/keeper"
+	"github.com/hypersign-protocol/vid-node/x/ssi/types"
 )
 
 var (

@@ -21,12 +21,12 @@
 
 ### step 1: Install Golang (ver 1.17.2)
 
-### step 2: Setup `hid-noded` binary 
+### step 2: Setup `vid-noded` binary 
 
 ```bash
-wget https://github.com/hypersign-protocol/hid-node/releases/download/latest/hid-node_latest_linux_amd64.tar.gz
-tar -xvzf hid-node_latest_linux_amd64.tar.gz
-mv hid-noded ~/go/bin
+wget https://github.com/hypersign-protocol/vid-node/releases/download/latest/vid-node_latest_linux_amd64.tar.gz
+tar -xvzf vid-node_latest_linux_amd64.tar.gz
+mv vid-noded ~/go/bin
 ```
 ### step 3: Install `tmux` and `jq`
 

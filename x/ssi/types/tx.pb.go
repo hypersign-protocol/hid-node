@@ -564,16 +564,16 @@ func (m *MsgRegisterCredentialStatusResponse) GetId() uint64 {
 }
 
 func init() {
-	proto.RegisterType((*MsgCreateDID)(nil), "hypersignprotocol.hidnode.ssi.MsgCreateDID")
-	proto.RegisterType((*MsgCreateDIDResponse)(nil), "hypersignprotocol.hidnode.ssi.MsgCreateDIDResponse")
-	proto.RegisterType((*MsgUpdateDID)(nil), "hypersignprotocol.hidnode.ssi.MsgUpdateDID")
-	proto.RegisterType((*MsgUpdateDIDResponse)(nil), "hypersignprotocol.hidnode.ssi.MsgUpdateDIDResponse")
-	proto.RegisterType((*MsgCreateSchema)(nil), "hypersignprotocol.hidnode.ssi.MsgCreateSchema")
-	proto.RegisterType((*MsgCreateSchemaResponse)(nil), "hypersignprotocol.hidnode.ssi.MsgCreateSchemaResponse")
-	proto.RegisterType((*MsgDeactivateDID)(nil), "hypersignprotocol.hidnode.ssi.MsgDeactivateDID")
-	proto.RegisterType((*MsgDeactivateDIDResponse)(nil), "hypersignprotocol.hidnode.ssi.MsgDeactivateDIDResponse")
-	proto.RegisterType((*MsgRegisterCredentialStatus)(nil), "hypersignprotocol.hidnode.ssi.MsgRegisterCredentialStatus")
-	proto.RegisterType((*MsgRegisterCredentialStatusResponse)(nil), "hypersignprotocol.hidnode.ssi.MsgRegisterCredentialStatusResponse")
+	proto.RegisterType((*MsgCreateDID)(nil), "hypersignprotocol.vidnode.ssi.MsgCreateDID")
+	proto.RegisterType((*MsgCreateDIDResponse)(nil), "hypersignprotocol.vidnode.ssi.MsgCreateDIDResponse")
+	proto.RegisterType((*MsgUpdateDID)(nil), "hypersignprotocol.vidnode.ssi.MsgUpdateDID")
+	proto.RegisterType((*MsgUpdateDIDResponse)(nil), "hypersignprotocol.vidnode.ssi.MsgUpdateDIDResponse")
+	proto.RegisterType((*MsgCreateSchema)(nil), "hypersignprotocol.vidnode.ssi.MsgCreateSchema")
+	proto.RegisterType((*MsgCreateSchemaResponse)(nil), "hypersignprotocol.vidnode.ssi.MsgCreateSchemaResponse")
+	proto.RegisterType((*MsgDeactivateDID)(nil), "hypersignprotocol.vidnode.ssi.MsgDeactivateDID")
+	proto.RegisterType((*MsgDeactivateDIDResponse)(nil), "hypersignprotocol.vidnode.ssi.MsgDeactivateDIDResponse")
+	proto.RegisterType((*MsgRegisterCredentialStatus)(nil), "hypersignprotocol.vidnode.ssi.MsgRegisterCredentialStatus")
+	proto.RegisterType((*MsgRegisterCredentialStatusResponse)(nil), "hypersignprotocol.vidnode.ssi.MsgRegisterCredentialStatusResponse")
 }
 
 func init() { proto.RegisterFile("ssi/v1/tx.proto", fileDescriptor_73a1aa6c7279248b) }
@@ -651,7 +651,7 @@ func NewMsgClient(cc grpc1.ClientConn) MsgClient {
 
 func (c *msgClient) CreateDID(ctx context.Context, in *MsgCreateDID, opts ...grpc.CallOption) (*MsgCreateDIDResponse, error) {
 	out := new(MsgCreateDIDResponse)
-	err := c.cc.Invoke(ctx, "/hypersignprotocol.hidnode.ssi.Msg/CreateDID", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/hypersignprotocol.vidnode.ssi.Msg/CreateDID", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -660,7 +660,7 @@ func (c *msgClient) CreateDID(ctx context.Context, in *MsgCreateDID, opts ...grp
 
 func (c *msgClient) UpdateDID(ctx context.Context, in *MsgUpdateDID, opts ...grpc.CallOption) (*MsgUpdateDIDResponse, error) {
 	out := new(MsgUpdateDIDResponse)
-	err := c.cc.Invoke(ctx, "/hypersignprotocol.hidnode.ssi.Msg/UpdateDID", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/hypersignprotocol.vidnode.ssi.Msg/UpdateDID", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -669,7 +669,7 @@ func (c *msgClient) UpdateDID(ctx context.Context, in *MsgUpdateDID, opts ...grp
 
 func (c *msgClient) CreateSchema(ctx context.Context, in *MsgCreateSchema, opts ...grpc.CallOption) (*MsgCreateSchemaResponse, error) {
 	out := new(MsgCreateSchemaResponse)
-	err := c.cc.Invoke(ctx, "/hypersignprotocol.hidnode.ssi.Msg/CreateSchema", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/hypersignprotocol.vidnode.ssi.Msg/CreateSchema", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -678,7 +678,7 @@ func (c *msgClient) CreateSchema(ctx context.Context, in *MsgCreateSchema, opts 
 
 func (c *msgClient) DeactivateDID(ctx context.Context, in *MsgDeactivateDID, opts ...grpc.CallOption) (*MsgDeactivateDIDResponse, error) {
 	out := new(MsgDeactivateDIDResponse)
-	err := c.cc.Invoke(ctx, "/hypersignprotocol.hidnode.ssi.Msg/DeactivateDID", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/hypersignprotocol.vidnode.ssi.Msg/DeactivateDID", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -687,7 +687,7 @@ func (c *msgClient) DeactivateDID(ctx context.Context, in *MsgDeactivateDID, opt
 
 func (c *msgClient) RegisterCredentialStatus(ctx context.Context, in *MsgRegisterCredentialStatus, opts ...grpc.CallOption) (*MsgRegisterCredentialStatusResponse, error) {
 	out := new(MsgRegisterCredentialStatusResponse)
-	err := c.cc.Invoke(ctx, "/hypersignprotocol.hidnode.ssi.Msg/RegisterCredentialStatus", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/hypersignprotocol.vidnode.ssi.Msg/RegisterCredentialStatus", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -737,7 +737,7 @@ func _Msg_CreateDID_Handler(srv interface{}, ctx context.Context, dec func(inter
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/hypersignprotocol.hidnode.ssi.Msg/CreateDID",
+		FullMethod: "/hypersignprotocol.vidnode.ssi.Msg/CreateDID",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(MsgServer).CreateDID(ctx, req.(*MsgCreateDID))
@@ -755,7 +755,7 @@ func _Msg_UpdateDID_Handler(srv interface{}, ctx context.Context, dec func(inter
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/hypersignprotocol.hidnode.ssi.Msg/UpdateDID",
+		FullMethod: "/hypersignprotocol.vidnode.ssi.Msg/UpdateDID",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(MsgServer).UpdateDID(ctx, req.(*MsgUpdateDID))
@@ -773,7 +773,7 @@ func _Msg_CreateSchema_Handler(srv interface{}, ctx context.Context, dec func(in
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/hypersignprotocol.hidnode.ssi.Msg/CreateSchema",
+		FullMethod: "/hypersignprotocol.vidnode.ssi.Msg/CreateSchema",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(MsgServer).CreateSchema(ctx, req.(*MsgCreateSchema))
@@ -791,7 +791,7 @@ func _Msg_DeactivateDID_Handler(srv interface{}, ctx context.Context, dec func(i
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/hypersignprotocol.hidnode.ssi.Msg/DeactivateDID",
+		FullMethod: "/hypersignprotocol.vidnode.ssi.Msg/DeactivateDID",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(MsgServer).DeactivateDID(ctx, req.(*MsgDeactivateDID))
@@ -809,7 +809,7 @@ func _Msg_RegisterCredentialStatus_Handler(srv interface{}, ctx context.Context,
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/hypersignprotocol.hidnode.ssi.Msg/RegisterCredentialStatus",
+		FullMethod: "/hypersignprotocol.vidnode.ssi.Msg/RegisterCredentialStatus",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(MsgServer).RegisterCredentialStatus(ctx, req.(*MsgRegisterCredentialStatus))
@@ -818,7 +818,7 @@ func _Msg_RegisterCredentialStatus_Handler(srv interface{}, ctx context.Context,
 }
 
 var _Msg_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "hypersignprotocol.hidnode.ssi.Msg",
+	ServiceName: "hypersignprotocol.vidnode.ssi.Msg",
 	HandlerType: (*MsgServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

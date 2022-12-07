@@ -12,7 +12,7 @@ VALIDATOR_DELEGATED_SHARES="480000000000.000000000000000000"
 
 sleep 70
 
-IS_JAILED=$(hid-noded q staking validators --home $HOME/.hid-node/val1 --node tcp://localhost:36657 --output json | jq '.validators' | jq -c '.[] | select(.delegator_shares=="'"${VALIDATOR_DELEGATED_SHARES}"'")' | jq '.jailed')
+IS_JAILED=$(vid-noded q staking validators --home $HOME/.vid-node/val1 --node tcp://localhost:36657 --output json | jq '.validators' | jq -c '.[] | select(.delegator_shares=="'"${VALIDATOR_DELEGATED_SHARES}"'")' | jq '.jailed')
 if [ $IS_JAILED == true ]; then
     echo "Success: Validator is Jailed!"
 else

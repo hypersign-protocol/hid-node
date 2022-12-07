@@ -5,8 +5,8 @@ import (
 	"strings"
 
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/hypersign-protocol/hid-node/x/ssi/types"
-	utils "github.com/hypersign-protocol/hid-node/x/ssi/utils"
+	"github.com/hypersign-protocol/vid-node/x/ssi/types"
+	utils "github.com/hypersign-protocol/vid-node/x/ssi/utils"
 )
 
 // Cheks whether the Service is valid

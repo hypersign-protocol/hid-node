@@ -93,16 +93,16 @@ import (
 	"github.com/tendermint/spm/cosmoscmd"
 	"github.com/tendermint/spm/openapiconsole"
 
-	"github.com/hypersign-protocol/hid-node/client/docs"
+	"github.com/hypersign-protocol/vid-node/client/docs"
 
-	appparams "github.com/hypersign-protocol/hid-node/app/params"
-	ssimodule "github.com/hypersign-protocol/hid-node/x/ssi"
-	ssimodulekeeper "github.com/hypersign-protocol/hid-node/x/ssi/keeper"
-	ssimoduletypes "github.com/hypersign-protocol/hid-node/x/ssi/types"
+	appparams "github.com/hypersign-protocol/vid-node/app/params"
+	ssimodule "github.com/hypersign-protocol/vid-node/x/ssi"
+	ssimodulekeeper "github.com/hypersign-protocol/vid-node/x/ssi/keeper"
+	ssimoduletypes "github.com/hypersign-protocol/vid-node/x/ssi/types"
 )
 
 const (
-	Name = "hid-node"
+	Name = "vid-node"
 )
 
 func getGovProposalHandlers() []govclient.ProposalHandler {

@@ -4,7 +4,7 @@ VERSION := $(shell git describe --tags --abbrev=0)
 COMMIT := $(shell git rev-parse --short HEAD)
 
 BUILD_DIR ?= $(CURDIR)/build
-HIDNODE_CMD_DIR := $(CURDIR)/cmd/hid-noded
+vidNODE_CMD_DIR := $(CURDIR)/cmd/vid-noded
 E2E_SSI_TESTS_DIR := $(CURDIR)/tests/e2e/ssi_tests
 
 GOBIN = $(shell go env GOPATH)/bin
@@ -14,8 +14,8 @@ GOARCH = $(shell go env GOARCH)
 SDK_VERSION := $(shell go list -m github.com/cosmos/cosmos-sdk | sed 's:.* ::')
 TM_VERSION := $(shell go list -m github.com/tendermint/tendermint | sed 's:.* ::')
 
-ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=hid-node \
-	-X github.com/cosmos/cosmos-sdk/version.AppName=hid-node \
+ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=vid-node \
+	-X github.com/cosmos/cosmos-sdk/version.AppName=vid-node \
 	-X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
 	-X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
 	-X github.com/tendermint/tendermint/version.TMCoreSemVer=$(TM_VERSION)
@@ -36,10 +36,10 @@ go.sum: go.mod
 		@go mod verify
 
 install: go.sum
-	go install -mod=readonly $(BUILD_FLAGS) $(HIDNODE_CMD_DIR)	
+	go install -mod=readonly $(BUILD_FLAGS) $(vidNODE_CMD_DIR)	
 
 build:
-	go build -mod=readonly $(BUILD_FLAGS) -o $(BUILD_DIR)/hid-noded $(HIDNODE_CMD_DIR)
+	go build -mod=readonly $(BUILD_FLAGS) -o $(BUILD_DIR)/vid-noded $(vidNODE_CMD_DIR)
 
 ###############################################################################
 ###                                  Proto                                  ###
@@ -61,7 +61,7 @@ swagger-docs-gen:
 ###############################################################################
 ###                                  Docker                                 ###
 ###############################################################################
-DOCKER_IMAGE_NAME := hid-node-image
+DOCKER_IMAGE_NAME := vid-node-image
 
 docker-all: docker-build docker-run
 
@@ -71,5 +71,5 @@ docker-build:
 docker-run:
 	docker run --rm -d \
 	-p 26657:26657 -p 1317:1317 -p 26656:26656 -p 9090:9090 \
-	--name hid-node-container \
+	--name vid-node-container \
 	$(DOCKER_IMAGE_NAME) start

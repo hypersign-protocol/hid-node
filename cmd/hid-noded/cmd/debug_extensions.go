@@ -9,7 +9,7 @@ import (
 
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/hypersign-protocol/hid-node/x/ssi/types"
+	"github.com/hypersign-protocol/vid-node/x/ssi/types"
 	"github.com/multiformats/go-multibase"
 	"github.com/spf13/cobra"
 )

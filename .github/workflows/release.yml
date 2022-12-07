@@ -80,7 +80,7 @@ jobs:
             org.opencontainers.image.vendor="Hypermine Limited"
             org.opencontainers.image.title="Hypersign Identity Network"
             org.opencontainers.image.description="A permissionless blockchain network to manage digital identity and access rights"
-            org.opencontainers.image.source="https://github.com/hypersign-protocol/hid-node"
+            org.opencontainers.image.source="https://github.com/hypersign-protocol/vid-node"
             org.opencontainers.image.documentation="https://docs.hypersign.id"
       
       - name: Build and push image

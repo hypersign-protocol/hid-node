@@ -1,7 +1,7 @@
 syntax = "proto3";
-package hypersignprotocol.hidnode.ssi;
+package hypersignprotocol.vidnode.ssi;
 
-option go_package = "github.com/hypersign-protocol/hid-node/x/ssi/types";
+option go_package = "github.com/hypersign-protocol/vid-node/x/ssi/types";
 
 message Did {
   repeated string context = 1;

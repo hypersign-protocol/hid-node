@@ -4,7 +4,7 @@ info:
   description: A REST interface for gRPC queries
   version: 1.0.0
 paths:
-  /hypersign-protocol/hidnode/ssi/credential:
+  /hypersign-protocol/vidnode/ssi/credential:
     get:
       summary: Get all the registed Credential Statuses
       operationId: QueryCredentials
@@ -135,7 +135,7 @@ paths:
           type: boolean
       tags:
         - Query
-  /hypersign-protocol/hidnode/ssi/credential/{credId}:
+  /hypersign-protocol/vidnode/ssi/credential/{credId}:
     get:
       summary: Get the Credential Status for a given credential id
       operationId: QueryCredential
@@ -209,7 +209,7 @@ paths:
           type: string
       tags:
         - Query
-  /hypersign-protocol/hidnode/ssi/did:
+  /hypersign-protocol/vidnode/ssi/did:
     get:
       summary: Get the count and list of registered Did Documents
       operationId: QueryDidDocuments
@@ -384,7 +384,7 @@ paths:
           type: boolean
       tags:
         - Query
-  /hypersign-protocol/hidnode/ssi/did/{didId}:
+  /hypersign-protocol/vidnode/ssi/did/{didId}:
     get:
       summary: Get the Did Document for a specified DID id
       operationId: QueryDidDocument
@@ -495,7 +495,7 @@ paths:
           type: string
       tags:
         - Query
-  /hypersign-protocol/hidnode/ssi/schema:
+  /hypersign-protocol/vidnode/ssi/schema:
     get:
       summary: Get the count and list of registered Schemas
       operationId: QuerySchemas
@@ -636,7 +636,7 @@ paths:
           type: boolean
       tags:
         - Query
-  /hypersign-protocol/hidnode/ssi/schema/{schemaId}:
+  /hypersign-protocol/vidnode/ssi/schema/{schemaId}:
     get:
       summary: Get the Schema Document for a specified schema id
       operationId: QuerySchema
@@ -24519,7 +24519,7 @@ definitions:
                   "@type": "type.googleapis.com/google.protobuf.Duration",
                   "value": "1.212s"
                 }
-  hypersignprotocol.hidnode.ssi.Claim:
+  hypersignprotocol.vidnode.ssi.Claim:
     type: object
     properties:
       id:
@@ -24528,7 +24528,7 @@ definitions:
         type: string
       statusReason:
         type: string
-  hypersignprotocol.hidnode.ssi.Credential:
+  hypersignprotocol.vidnode.ssi.Credential:
     type: object
     properties:
       claim:
@@ -24563,7 +24563,7 @@ definitions:
             type: string
           proofValue:
             type: string
-  hypersignprotocol.hidnode.ssi.CredentialProof:
+  hypersignprotocol.vidnode.ssi.CredentialProof:
     type: object
     properties:
       type:
@@ -24578,7 +24578,7 @@ definitions:
         type: string
       proofValue:
         type: string
-  hypersignprotocol.hidnode.ssi.Did:
+  hypersignprotocol.vidnode.ssi.Did:
     type: object
     properties:
       context:
@@ -24639,7 +24639,7 @@ definitions:
               type: string
             serviceEndpoint:
               type: string
-  hypersignprotocol.hidnode.ssi.Metadata:
+  hypersignprotocol.vidnode.ssi.Metadata:
     type: object
     properties:
       created:
@@ -24650,7 +24650,7 @@ definitions:
         type: boolean
       versionId:
         type: string
-  hypersignprotocol.hidnode.ssi.QueryCredentialResponse:
+  hypersignprotocol.vidnode.ssi.QueryCredentialResponse:
     type: object
     properties:
       credStatus:
@@ -24688,7 +24688,7 @@ definitions:
                 type: string
               proofValue:
                 type: string
-  hypersignprotocol.hidnode.ssi.QueryCredentialsResponse:
+  hypersignprotocol.vidnode.ssi.QueryCredentialsResponse:
     type: object
     properties:
       totalCount:
@@ -24731,7 +24731,7 @@ definitions:
                   type: string
                 proofValue:
                   type: string
-  hypersignprotocol.hidnode.ssi.QueryDidDocumentResponse:
+  hypersignprotocol.vidnode.ssi.QueryDidDocumentResponse:
     type: object
     properties:
       didDocument:
@@ -24806,7 +24806,7 @@ definitions:
             type: boolean
           versionId:
             type: string
-  hypersignprotocol.hidnode.ssi.QueryDidDocumentsResponse:
+  hypersignprotocol.vidnode.ssi.QueryDidDocumentsResponse:
     type: object
     properties:
       totalDidCount:
@@ -24889,7 +24889,7 @@ definitions:
                   type: boolean
                 versionId:
                   type: string
-  hypersignprotocol.hidnode.ssi.QuerySchemaResponse:
+  hypersignprotocol.vidnode.ssi.QuerySchemaResponse:
     type: object
     properties:
       schema:
@@ -24939,7 +24939,7 @@ definitions:
                   type: string
                 proofValue:
                   type: string
-  hypersignprotocol.hidnode.ssi.QuerySchemasResponse:
+  hypersignprotocol.vidnode.ssi.QuerySchemasResponse:
     type: object
     properties:
       totalCount:
@@ -24992,7 +24992,7 @@ definitions:
                   type: string
                 proofValue:
                   type: string
-  hypersignprotocol.hidnode.ssi.Schema:
+  hypersignprotocol.vidnode.ssi.Schema:
     type: object
     properties:
       type:
@@ -25037,7 +25037,7 @@ definitions:
             type: string
           proofValue:
             type: string
-  hypersignprotocol.hidnode.ssi.SchemaProof:
+  hypersignprotocol.vidnode.ssi.SchemaProof:
     type: object
     properties:
       type:
@@ -25050,7 +25050,7 @@ definitions:
         type: string
       proofValue:
         type: string
-  hypersignprotocol.hidnode.ssi.SchemaProperty:
+  hypersignprotocol.vidnode.ssi.SchemaProperty:
     type: object
     properties:
       schema:
@@ -25067,7 +25067,7 @@ definitions:
           type: string
       additionalProperties:
         type: boolean
-  hypersignprotocol.hidnode.ssi.Service:
+  hypersignprotocol.vidnode.ssi.Service:
     type: object
     properties:
       id:
@@ -25076,7 +25076,7 @@ definitions:
         type: string
       serviceEndpoint:
         type: string
-  hypersignprotocol.hidnode.ssi.VerificationMethod:
+  hypersignprotocol.vidnode.ssi.VerificationMethod:
     type: object
     properties:
       id:

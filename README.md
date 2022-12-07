@@ -1,6 +1,6 @@
 # Hypersign Identity Network
 
-[![build-test](https://github.com/hypersign-protocol/hid-node/actions/workflows/build.yml/badge.svg)](https://github.com/hypersign-protocol/hid-node/actions/workflows/build.yml) [![GitHub license](https://img.shields.io/github/license/hypersign-protocol/hid-node?color=blue&style=flat-square)](https://github.com/hypersign-protocol/hid-node/blob/main/LICENSE) ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/hypersign-protocol/hid-node?style=flat-square) [![Go Report Card](https://goreportcard.com/badge/github.com/hypersign-protocol/hid-node)](https://goreportcard.com/report/github.com/hypersign-protocol/hid-node) [![GoDoc](https://img.shields.io/badge/godoc-reference-blue?style=flat-square&logo=go)](https://pkg.go.dev/github.com/hypersign-protocol/hid-node)
+[![build-test](https://github.com/hypersign-protocol/vid-node/actions/workflows/build.yml/badge.svg)](https://github.com/hypersign-protocol/vid-node/actions/workflows/build.yml) [![GitHub license](https://img.shields.io/github/license/hypersign-protocol/vid-node?color=blue&style=flat-square)](https://github.com/hypersign-protocol/vid-node/blob/main/LICENSE) ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/hypersign-protocol/vid-node?style=flat-square) [![Go Report Card](https://goreportcard.com/badge/github.com/hypersign-protocol/vid-node)](https://goreportcard.com/report/github.com/hypersign-protocol/vid-node) [![GoDoc](https://img.shields.io/badge/godoc-reference-blue?style=flat-square&logo=go)](https://pkg.go.dev/github.com/hypersign-protocol/vid-node)
 
 <a href="https://discord.gg/CCjJPUuVUz"><img src="https://img.shields.io/discord/308323056592486420?logo=discord" alt="Discord"></a>
 <a href="https://twitter.com/intent/follow?screen_name=hypersignchain"> <img src="https://img.shields.io/twitter/follow/hypersignchain?style=social&logo=twitter" alt="follow on Twitter"></a>
@@ -13,9 +13,9 @@ The Hypersign Identity Network is a permissionless blockchain network to manage 
 - Register, Update and Deactivate DID Documents
 - Store/Update Credential Schema
 - Store/Update status of a Verifiable Credential
-- Stake `$HID` tokens
+- Stake `$vid` tokens
 - Submit Governance Proposals
-- Transfer `$HID` tokens within and across different Tendermint-based blockchains
+- Transfer `$vid` tokens within and across different Tendermint-based blockchains
 
 ## Prerequisite
 
@@ -31,12 +31,12 @@ Following are the prerequisites that needs to be installed:
 Clone the repository and install the binary:
 
 ```sh
-git clone https://github.com/hypersign-protocol/hid-node.git
-cd hid-node
+git clone https://github.com/hypersign-protocol/vid-node.git
+cd vid-node
 make install
 ```
 
-The binary `hid-noded` will be generated in `$GO_PATH/bin` directory. To explore its functionalities, type `hid-noded --help` in a seperate terminal window.
+The binary `vid-noded` will be generated in `$GO_PATH/bin` directory. To explore its functionalities, type `vid-noded --help` in a seperate terminal window.
 
 #### Running the Blockchain
 
@@ -48,27 +48,27 @@ sh ./scripts/localnet-single-node/setup.sh
 
 > Note: The above script requires `jq` to be installed.
 
-Run the hid-node:
+Run the vid-node:
 
 ```sh
-hid-noded start --home ~/.hid-node
+vid-noded start --home ~/.vid-node
 ```
 
 ### Docker
 
-To run a single node `hid-node` docker container, follow the below steps:
+To run a single node `vid-node` docker container, follow the below steps:
 
 1. Pull the image:
    ```sh
-   docker pull ghcr.io/hypersign-protocol/hid-node:latest
+   docker pull ghcr.io/hypersign-protocol/vid-node:latest
    ```
 
 2. Run the following:
    ```sh
    docker run --rm -d \
 	-p 26657:26657 -p 1317:1317 -p 26656:26656 -p 9090:9090 \
-	--name hid-node-container \
-	ghcr.io/hypersign-protocol/hid-node start
+	--name vid-node-container \
+	ghcr.io/hypersign-protocol/vid-node start
    ```
 
 ## Documentation

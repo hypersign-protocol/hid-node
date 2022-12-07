@@ -375,10 +375,10 @@ func (m *Schema) GetProof() *SchemaProof {
 }
 
 func init() {
-	proto.RegisterType((*SchemaDocument)(nil), "hypersignprotocol.hidnode.ssi.SchemaDocument")
-	proto.RegisterType((*SchemaProperty)(nil), "hypersignprotocol.hidnode.ssi.SchemaProperty")
-	proto.RegisterType((*SchemaProof)(nil), "hypersignprotocol.hidnode.ssi.SchemaProof")
-	proto.RegisterType((*Schema)(nil), "hypersignprotocol.hidnode.ssi.Schema")
+	proto.RegisterType((*SchemaDocument)(nil), "hypersignprotocol.vidnode.ssi.SchemaDocument")
+	proto.RegisterType((*SchemaProperty)(nil), "hypersignprotocol.vidnode.ssi.SchemaProperty")
+	proto.RegisterType((*SchemaProof)(nil), "hypersignprotocol.vidnode.ssi.SchemaProof")
+	proto.RegisterType((*Schema)(nil), "hypersignprotocol.vidnode.ssi.Schema")
 }
 
 func init() { proto.RegisterFile("ssi/v1/schema.proto", fileDescriptor_3d55333c8301c7bb) }

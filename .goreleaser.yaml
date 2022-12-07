@@ -1,4 +1,4 @@
-project_name: hid-node
+project_name: vid-node
 
 env:
   - GO111MODULE=on
@@ -9,8 +9,8 @@ before:
 
 builds:
   - id: ubuntu-amd64
-    main: ./cmd/hid-noded
-    binary: hid-noded
+    main: ./cmd/vid-noded
+    binary: vid-noded
     goos:
       - linux
     goarch:
@@ -22,14 +22,14 @@ builds:
       - -mod=readonly
     ldflags:
       - -s -w
-      - -X github.com/cosmos/cosmos-sdk/version.Name=hid-node
-      - -X github.com/cosmos/cosmos-sdk/version.AppName=hid-node
+      - -X github.com/cosmos/cosmos-sdk/version.Name=vid-node
+      - -X github.com/cosmos/cosmos-sdk/version.AppName=vid-node
       - -X github.com/cosmos/cosmos-sdk/version.Version={{ .Version }}
       - -X github.com/cosmos/cosmos-sdk/version.Commit={{ .Commit }}
 
   - id: ubuntu-arm64
-    main: ./cmd/hid-noded
-    binary: hid-noded
+    main: ./cmd/vid-noded
+    binary: vid-noded
     goos:
       - linux
     goarch:
@@ -38,14 +38,14 @@ builds:
       - -mod=readonly
     ldflags:
       - -s -w
-      - -X github.com/cosmos/cosmos-sdk/version.Name=hid-node 
-      - -X github.com/cosmos/cosmos-sdk/version.AppName=hid-node 
+      - -X github.com/cosmos/cosmos-sdk/version.Name=vid-node 
+      - -X github.com/cosmos/cosmos-sdk/version.AppName=vid-node 
       - -X github.com/cosmos/cosmos-sdk/version.Version={{ .Version }}
       - -X github.com/cosmos/cosmos-sdk/version.Commit={{ .Commit }}
 
   - id: darwin-amd64
-    main: ./cmd/hid-noded
-    binary: hid-noded
+    main: ./cmd/vid-noded
+    binary: vid-noded
     goos:
       - darwin
     goarch:
@@ -54,8 +54,8 @@ builds:
       - -mod=readonly
     ldflags:
       - -s -w
-      - -X github.com/cosmos/cosmos-sdk/version.Name=hid-node 
-      - -X github.com/cosmos/cosmos-sdk/version.AppName=hid-node 
+      - -X github.com/cosmos/cosmos-sdk/version.Name=vid-node 
+      - -X github.com/cosmos/cosmos-sdk/version.AppName=vid-node 
       - -X github.com/cosmos/cosmos-sdk/version.Version={{ .Version }}
       - -X github.com/cosmos/cosmos-sdk/version.Commit={{ .Commit }}
 
@@ -85,7 +85,7 @@ changelog:
 release:
   github:
     owner: hypersign-protocol
-    name: hid-node
+    name: vid-node
   
   draft: false
   prerelease: false

@@ -25,5 +25,5 @@ Mgoogle/protobuf/any.proto=github.com/cosmos/cosmos-sdk/codec/types:. \
   $(find "${dir}" -maxdepth 1 -name '*.proto')
 done
 
-cp -r ./github.com/hypersign-protocol/hid-node/* ./
+cp -r ./github.com/hypersign-protocol/vid-node/* ./
 rm -rf ./github.com

@@ -1,9 +1,9 @@
 syntax = "proto3";
-package hypersignprotocol.hidnode.ssi;
+package hypersignprotocol.vidnode.ssi;
 
 // this line is used by starport scaffolding # proto/tx/import
 
-option go_package = "github.com/hypersign-protocol/hid-node/x/ssi/types";
+option go_package = "github.com/hypersign-protocol/vid-node/x/ssi/types";
 
 import "ssi/v1/schema.proto";
 import "ssi/v1/did.proto";

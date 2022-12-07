@@ -7,10 +7,10 @@ Storing Verifiable Credential on a distributed ledger could lead to privacy viol
 The syntax for Verifiable Credential ID is as follows:
 
 ```
-vc:hid:<chain-namespace>:<method-specific-id>
+vc:vid:<chain-namespace>:<method-specific-id>
 ```
 
-- `vc:hid` - VC Method, where `vc` is the document identifier and `hid` is the method name
+- `vc:vid` - VC Method, where `vc` is the document identifier and `vid` is the method name
 - `<chain-namespace>` - *(Optional)* Name of the blockchain where the VC status is registered. It is omitted for the document registered on mainnet chain
 - `<method-specific-id>` - Multibase-encoded unique identifier of length 45
 
@@ -24,7 +24,7 @@ vc:hid:<chain-namespace>:<method-specific-id>
 
 ## Supported VC Statuses
 
-Following are the VC statuses supported by `hid-node`:
+Following are the VC statuses supported by `vid-node`:
 
 - **Live**
 - **Suspended**
@@ -45,7 +45,7 @@ Both registeration and update of VC Status happens through the RPC `RegisterCred
 
 ```
 Usage:
-  hid-noded tx ssi register-credential-status [credential-status] [proof]
+  vid-noded tx ssi register-credential-status [credential-status] [proof]
 
 Params:
  - credential-status : Credential Status Document
@@ -57,11 +57,11 @@ Params:
 ```json
 {
     "claim": {
-        "id": "vc:hid:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4",
+        "id": "vc:vid:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4",
         "currentStatus": "Live",
         "statusReason": "Credential Active"
     },
-    "issuer": "did:hid:devnet:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf",
+    "issuer": "did:vid:devnet:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf",
     "issuanceDate": "2022-04-10T04:07:12Z",
     "expirationDate": "2023-02-22T13:45:55Z",
     "credentialHash": "< -- SHA-256 Hash of VC -->"
@@ -75,7 +75,7 @@ Params:
     "type": "Ed25519VerificationKey2020",
     "created": "2022-04-10T04:07:12Z",
     "updated": "2022-04-10T04:07:12Z",
-    "verificationMethod": "did:hid:devnet:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf#key-1",
+    "verificationMethod": "did:vid:devnet:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf#key-1",
     "proofValue": "<-- Base64 encoded signature -->",
     "proofPurpose": "assertion"
 }
@@ -86,7 +86,7 @@ The field `proofValue` holds the signature that was produced by signing the `cre
 **Example**
 
 ```sh
-hid-noded tx ssi register-credential-status '{"claim":{"id":"vc:hid:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4","currentStatus":"Live","statusReason":"Credential Active"},"issuer":"did:hid:devnet:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf","issuanceDate":"2022-04-10T04:07:12Z","expirationDate":"2023-02-22T13:45:55Z","credentialHash":"< -- SHA-256 Hash of VC -->"}' '{"type":"Ed25519VerificationKey2020","created":"2022-04-10T04:07:12Z","updated":"2022-04-10T04:07:12Z","verificationMethod":"did:hid:devnet:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf#key-1","proofValue":"<-- Base64 encoded signature -->","proofPurpose":"assertion"}' --from <hid-account>
+vid-noded tx ssi register-credential-status '{"claim":{"id":"vc:vid:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4","currentStatus":"Live","statusReason":"Credential Active"},"issuer":"did:vid:devnet:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf","issuanceDate":"2022-04-10T04:07:12Z","expirationDate":"2023-02-22T13:45:55Z","credentialHash":"< -- SHA-256 Hash of VC -->"}' '{"type":"Ed25519VerificationKey2020","created":"2022-04-10T04:07:12Z","updated":"2022-04-10T04:07:12Z","verificationMethod":"did:vid:devnet:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf#key-1","proofValue":"<-- Base64 encoded signature -->","proofPurpose":"assertion"}' --from <vid-account>
 ```
 
 ## Query VC Status
@@ -95,13 +95,13 @@ hid-noded tx ssi register-credential-status '{"claim":{"id":"vc:hid:devnet:z8BXg
 
 ```
 Usage:
-  hid-noded q ssi credential-status [credential-id]
+  vid-noded q ssi credential-status [credential-id]
 ```
 
 **Example**
 
 ```
-hid-noded q ssi credential-status vc:hid:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4
+vid-noded q ssi credential-status vc:vid:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4
 ```
 
 **REST**
@@ -109,11 +109,11 @@ hid-noded q ssi credential-status vc:hid:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14
 1. Query credential status for an inpug credential id:
 
 ```
-http://<REST-URL>/hypersign-protocol/hidnode/ssi/credential/{credId}
+http://<REST-URL>/hypersign-protocol/vidnode/ssi/credential/{credId}
 ```
 
 2. Query list of registered credential statuses:
 
 ```
-http://<REST-URL>/hypersign-protocol/hidnode/ssi/credential
+http://<REST-URL>/hypersign-protocol/vidnode/ssi/credential
 ```

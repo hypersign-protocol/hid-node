@@ -24,7 +24,7 @@ sleep 5
 
 echo "===================================================="
 
-echo "Stopping any hid-node instance"
+echo "Stopping any vid-node instance"
 
 sleep 2
 

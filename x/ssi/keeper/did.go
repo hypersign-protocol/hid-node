@@ -6,8 +6,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/hypersign-protocol/hid-node/utils"
-	"github.com/hypersign-protocol/hid-node/x/ssi/types"
+	"github.com/hypersign-protocol/vid-node/utils"
+	"github.com/hypersign-protocol/vid-node/x/ssi/types"
 )
 
 // Set the Chain namespace

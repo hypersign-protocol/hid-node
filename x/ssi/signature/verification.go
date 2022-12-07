@@ -5,9 +5,9 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	docVerify "github.com/hypersign-protocol/hid-node/x/ssi/document_verification"
-	"github.com/hypersign-protocol/hid-node/x/ssi/types"
-	"github.com/hypersign-protocol/hid-node/x/ssi/utils"
+	docVerify "github.com/hypersign-protocol/vid-node/x/ssi/document_verification"
+	"github.com/hypersign-protocol/vid-node/x/ssi/types"
+	"github.com/hypersign-protocol/vid-node/x/ssi/utils"
 )
 
 // Verify signatures against signer's public keys

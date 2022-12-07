@@ -7,10 +7,10 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	docVerify "github.com/hypersign-protocol/hid-node/x/ssi/document_verification"
+	docVerify "github.com/hypersign-protocol/vid-node/x/ssi/document_verification"
 
-	sigVerify "github.com/hypersign-protocol/hid-node/x/ssi/signature"
-	"github.com/hypersign-protocol/hid-node/x/ssi/types"
+	sigVerify "github.com/hypersign-protocol/vid-node/x/ssi/signature"
+	"github.com/hypersign-protocol/vid-node/x/ssi/types"
 )
 
 func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.MsgRegisterCredentialStatus) (*types.MsgRegisterCredentialStatusResponse, error) {

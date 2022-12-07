@@ -31,9 +31,9 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 	dbm "github.com/tendermint/tm-db"
 
-	"github.com/hypersign-protocol/hid-node/app"
-	hidnode "github.com/hypersign-protocol/hid-node/app"
-	"github.com/hypersign-protocol/hid-node/app/params"
+	"github.com/hypersign-protocol/vid-node/app"
+	vidnode "github.com/hypersign-protocol/vid-node/app"
+	"github.com/hypersign-protocol/vid-node/app/params"
 )
 
 // NewRootCmd creates a new root command for simd. It is called once in the
@@ -42,7 +42,7 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 	// Set config for prefixes
 	app.SetConfig()
 
-	encodingConfig := hidnode.MakeTestEncodingConfig()
+	encodingConfig := vidnode.MakeTestEncodingConfig()
 	initClientCtx := client.Context{}.
 		WithCodec(encodingConfig.Codec).
 		WithInterfaceRegistry(encodingConfig.InterfaceRegistry).
@@ -51,11 +51,11 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 		WithInput(os.Stdin).
 		WithAccountRetriever(types.AccountRetriever{}).
 		WithBroadcastMode(flags.BroadcastBlock).
-		WithHomeDir(hidnode.DefaultNodeHome)
+		WithHomeDir(vidnode.DefaultNodeHome)
 
 	rootCmd := &cobra.Command{
-		Use:   "hid-noded",
-		Short: "Hypersign Identity Network (hid-noded) CLI",
+		Use:   "vid-noded",
+		Short: "Hypersign Identity Network (vid-noded) CLI",
 		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
 			if err := client.SetCmdClientContextHandler(initClientCtx, cmd); err != nil {
 				return err
@@ -79,13 +79,13 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 	cfg.Seal()
 
 	rootCmd.AddCommand(
-		extendInit(genutilcli.InitCmd(hidnode.ModuleBasics, hidnode.DefaultNodeHome)),
-		configureCmd(hidnode.DefaultNodeHome),
-		genutilcli.CollectGenTxsCmd(banktypes.GenesisBalancesIterator{}, hidnode.DefaultNodeHome),
+		extendInit(genutilcli.InitCmd(vidnode.ModuleBasics, vidnode.DefaultNodeHome)),
+		configureCmd(vidnode.DefaultNodeHome),
+		genutilcli.CollectGenTxsCmd(banktypes.GenesisBalancesIterator{}, vidnode.DefaultNodeHome),
 		genutilcli.MigrateGenesisCmd(),
-		genutilcli.GenTxCmd(hidnode.ModuleBasics, encodingConfig.TxConfig, banktypes.GenesisBalancesIterator{}, hidnode.DefaultNodeHome),
-		genutilcli.ValidateGenesisCmd(hidnode.ModuleBasics),
-		AddGenesisAccountCmd(hidnode.DefaultNodeHome),
+		genutilcli.GenTxCmd(vidnode.ModuleBasics, encodingConfig.TxConfig, banktypes.GenesisBalancesIterator{}, vidnode.DefaultNodeHome),
+		genutilcli.ValidateGenesisCmd(vidnode.ModuleBasics),
+		AddGenesisAccountCmd(vidnode.DefaultNodeHome),
 		tmcli.NewCompletionCmd(rootCmd, true),
 		extendDebug(debug.Cmd()),
 	)
@@ -93,13 +93,13 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 	ac := appCreator{
 		encCfg: encodingConfig,
 	}
-	server.AddCommands(rootCmd, hidnode.DefaultNodeHome, ac.newApp, ac.appExport, addModuleInitFlags)
+	server.AddCommands(rootCmd, vidnode.DefaultNodeHome, ac.newApp, ac.appExport, addModuleInitFlags)
 
 	rootCmd.AddCommand(
 		rpc.StatusCommand(),
 		queryCommand(),
 		txCommand(),
-		keys.Commands(hidnode.DefaultNodeHome),
+		keys.Commands(vidnode.DefaultNodeHome),
 	)
 
 	rootCmd.AddCommand(server.RosettaCommand(encodingConfig.InterfaceRegistry, encodingConfig.Codec))
@@ -127,7 +127,7 @@ func queryCommand() *cobra.Command {
 		authcmd.QueryTxCmd(),
 	)
 
-	hidnode.ModuleBasics.AddQueryCommands(cmd)
+	vidnode.ModuleBasics.AddQueryCommands(cmd)
 	cmd.PersistentFlags().String(flags.FlagChainID, "", "The network chain ID")
 
 	return cmd
@@ -154,7 +154,7 @@ func txCommand() *cobra.Command {
 		flags.LineBreak,
 	)
 
-	hidnode.ModuleBasics.AddTxCommands(cmd)
+	vidnode.ModuleBasics.AddTxCommands(cmd)
 	cmd.PersistentFlags().String(flags.FlagChainID, "", "The network chain ID")
 
 	return cmd
@@ -196,7 +196,7 @@ func (ac appCreator) newApp(
 		panic(err)
 	}
 
-	return hidnode.New(
+	return vidnode.New(
 		logger, db, traceStore, true, skipUpgradeHeights,
 		cast.ToString(appOpts.Get(flags.FlagHome)),
 		cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)),
@@ -235,7 +235,7 @@ func (ac appCreator) appExport(
 		loadLatest = true
 	}
 
-	gaiaApp := hidnode.New(
+	gaiaApp := vidnode.New(
 		logger,
 		db,
 		traceStore,

@@ -2,7 +2,7 @@ package app
 
 import (
 	"github.com/cosmos/cosmos-sdk/std"
-	"github.com/hypersign-protocol/hid-node/app/params"
+	"github.com/hypersign-protocol/vid-node/app/params"
 )
 
 // MakeTestEncodingConfig creates an EncodingConfig for testing. This function

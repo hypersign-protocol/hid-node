@@ -447,12 +447,12 @@ func (m *DidDocumentState) GetDidDocumentMetadata() *Metadata {
 }
 
 func init() {
-	proto.RegisterType((*Did)(nil), "hypersignprotocol.hidnode.ssi.Did")
-	proto.RegisterType((*Metadata)(nil), "hypersignprotocol.hidnode.ssi.Metadata")
-	proto.RegisterType((*VerificationMethod)(nil), "hypersignprotocol.hidnode.ssi.VerificationMethod")
-	proto.RegisterType((*Service)(nil), "hypersignprotocol.hidnode.ssi.Service")
-	proto.RegisterType((*SignInfo)(nil), "hypersignprotocol.hidnode.ssi.SignInfo")
-	proto.RegisterType((*DidDocumentState)(nil), "hypersignprotocol.hidnode.ssi.DidDocumentState")
+	proto.RegisterType((*Did)(nil), "hypersignprotocol.vidnode.ssi.Did")
+	proto.RegisterType((*Metadata)(nil), "hypersignprotocol.vidnode.ssi.Metadata")
+	proto.RegisterType((*VerificationMethod)(nil), "hypersignprotocol.vidnode.ssi.VerificationMethod")
+	proto.RegisterType((*Service)(nil), "hypersignprotocol.vidnode.ssi.Service")
+	proto.RegisterType((*SignInfo)(nil), "hypersignprotocol.vidnode.ssi.SignInfo")
+	proto.RegisterType((*DidDocumentState)(nil), "hypersignprotocol.vidnode.ssi.DidDocumentState")
 }
 
 func init() { proto.RegisterFile("ssi/v1/did.proto", fileDescriptor_cddfa22cf6c6aba3) }

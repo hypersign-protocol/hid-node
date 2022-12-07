@@ -599,18 +599,18 @@ func (m *QueryDidDocumentsResponse) GetDidDocList() []*QueryDidDocumentResponse 
 }
 
 func init() {
-	proto.RegisterType((*QuerySchemaRequest)(nil), "hypersignprotocol.hidnode.ssi.QuerySchemaRequest")
-	proto.RegisterType((*QuerySchemaResponse)(nil), "hypersignprotocol.hidnode.ssi.QuerySchemaResponse")
-	proto.RegisterType((*QuerySchemasRequest)(nil), "hypersignprotocol.hidnode.ssi.QuerySchemasRequest")
-	proto.RegisterType((*QuerySchemasResponse)(nil), "hypersignprotocol.hidnode.ssi.QuerySchemasResponse")
-	proto.RegisterType((*QueryCredentialRequest)(nil), "hypersignprotocol.hidnode.ssi.QueryCredentialRequest")
-	proto.RegisterType((*QueryCredentialResponse)(nil), "hypersignprotocol.hidnode.ssi.QueryCredentialResponse")
-	proto.RegisterType((*QueryCredentialsRequest)(nil), "hypersignprotocol.hidnode.ssi.QueryCredentialsRequest")
-	proto.RegisterType((*QueryCredentialsResponse)(nil), "hypersignprotocol.hidnode.ssi.QueryCredentialsResponse")
-	proto.RegisterType((*QueryDidDocumentRequest)(nil), "hypersignprotocol.hidnode.ssi.QueryDidDocumentRequest")
-	proto.RegisterType((*QueryDidDocumentResponse)(nil), "hypersignprotocol.hidnode.ssi.QueryDidDocumentResponse")
-	proto.RegisterType((*QueryDidDocumentsRequest)(nil), "hypersignprotocol.hidnode.ssi.QueryDidDocumentsRequest")
-	proto.RegisterType((*QueryDidDocumentsResponse)(nil), "hypersignprotocol.hidnode.ssi.QueryDidDocumentsResponse")
+	proto.RegisterType((*QuerySchemaRequest)(nil), "hypersignprotocol.vidnode.ssi.QuerySchemaRequest")
+	proto.RegisterType((*QuerySchemaResponse)(nil), "hypersignprotocol.vidnode.ssi.QuerySchemaResponse")
+	proto.RegisterType((*QuerySchemasRequest)(nil), "hypersignprotocol.vidnode.ssi.QuerySchemasRequest")
+	proto.RegisterType((*QuerySchemasResponse)(nil), "hypersignprotocol.vidnode.ssi.QuerySchemasResponse")
+	proto.RegisterType((*QueryCredentialRequest)(nil), "hypersignprotocol.vidnode.ssi.QueryCredentialRequest")
+	proto.RegisterType((*QueryCredentialResponse)(nil), "hypersignprotocol.vidnode.ssi.QueryCredentialResponse")
+	proto.RegisterType((*QueryCredentialsRequest)(nil), "hypersignprotocol.vidnode.ssi.QueryCredentialsRequest")
+	proto.RegisterType((*QueryCredentialsResponse)(nil), "hypersignprotocol.vidnode.ssi.QueryCredentialsResponse")
+	proto.RegisterType((*QueryDidDocumentRequest)(nil), "hypersignprotocol.vidnode.ssi.QueryDidDocumentRequest")
+	proto.RegisterType((*QueryDidDocumentResponse)(nil), "hypersignprotocol.vidnode.ssi.QueryDidDocumentResponse")
+	proto.RegisterType((*QueryDidDocumentsRequest)(nil), "hypersignprotocol.vidnode.ssi.QueryDidDocumentsRequest")
+	proto.RegisterType((*QueryDidDocumentsResponse)(nil), "hypersignprotocol.vidnode.ssi.QueryDidDocumentsResponse")
 }
 
 func init() { proto.RegisterFile("ssi/v1/query.proto", fileDescriptor_0f525f26163d85f3) }
@@ -705,7 +705,7 @@ func NewQueryClient(cc grpc1.ClientConn) QueryClient {
 
 func (c *queryClient) QuerySchema(ctx context.Context, in *QuerySchemaRequest, opts ...grpc.CallOption) (*QuerySchemaResponse, error) {
 	out := new(QuerySchemaResponse)
-	err := c.cc.Invoke(ctx, "/hypersignprotocol.hidnode.ssi.Query/QuerySchema", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/hypersignprotocol.vidnode.ssi.Query/QuerySchema", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -714,7 +714,7 @@ func (c *queryClient) QuerySchema(ctx context.Context, in *QuerySchemaRequest, o
 
 func (c *queryClient) QuerySchemas(ctx context.Context, in *QuerySchemasRequest, opts ...grpc.CallOption) (*QuerySchemasResponse, error) {
 	out := new(QuerySchemasResponse)
-	err := c.cc.Invoke(ctx, "/hypersignprotocol.hidnode.ssi.Query/QuerySchemas", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/hypersignprotocol.vidnode.ssi.Query/QuerySchemas", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -723,7 +723,7 @@ func (c *queryClient) QuerySchemas(ctx context.Context, in *QuerySchemasRequest,
 
 func (c *queryClient) QueryDidDocument(ctx context.Context, in *QueryDidDocumentRequest, opts ...grpc.CallOption) (*QueryDidDocumentResponse, error) {
 	out := new(QueryDidDocumentResponse)
-	err := c.cc.Invoke(ctx, "/hypersignprotocol.hidnode.ssi.Query/QueryDidDocument", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/hypersignprotocol.vidnode.ssi.Query/QueryDidDocument", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -732,7 +732,7 @@ func (c *queryClient) QueryDidDocument(ctx context.Context, in *QueryDidDocument
 
 func (c *queryClient) QueryDidDocuments(ctx context.Context, in *QueryDidDocumentsRequest, opts ...grpc.CallOption) (*QueryDidDocumentsResponse, error) {
 	out := new(QueryDidDocumentsResponse)
-	err := c.cc.Invoke(ctx, "/hypersignprotocol.hidnode.ssi.Query/QueryDidDocuments", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/hypersignprotocol.vidnode.ssi.Query/QueryDidDocuments", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -741,7 +741,7 @@ func (c *queryClient) QueryDidDocuments(ctx context.Context, in *QueryDidDocumen
 
 func (c *queryClient) QueryCredential(ctx context.Context, in *QueryCredentialRequest, opts ...grpc.CallOption) (*QueryCredentialResponse, error) {
 	out := new(QueryCredentialResponse)
-	err := c.cc.Invoke(ctx, "/hypersignprotocol.hidnode.ssi.Query/QueryCredential", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/hypersignprotocol.vidnode.ssi.Query/QueryCredential", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -750,7 +750,7 @@ func (c *queryClient) QueryCredential(ctx context.Context, in *QueryCredentialRe
 
 func (c *queryClient) QueryCredentials(ctx context.Context, in *QueryCredentialsRequest, opts ...grpc.CallOption) (*QueryCredentialsResponse, error) {
 	out := new(QueryCredentialsResponse)
-	err := c.cc.Invoke(ctx, "/hypersignprotocol.hidnode.ssi.Query/QueryCredentials", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/hypersignprotocol.vidnode.ssi.Query/QueryCredentials", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -810,7 +810,7 @@ func _Query_QuerySchema_Handler(srv interface{}, ctx context.Context, dec func(i
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/hypersignprotocol.hidnode.ssi.Query/QuerySchema",
+		FullMethod: "/hypersignprotocol.vidnode.ssi.Query/QuerySchema",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(QueryServer).QuerySchema(ctx, req.(*QuerySchemaRequest))
@@ -828,7 +828,7 @@ func _Query_QuerySchemas_Handler(srv interface{}, ctx context.Context, dec func(
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/hypersignprotocol.hidnode.ssi.Query/QuerySchemas",
+		FullMethod: "/hypersignprotocol.vidnode.ssi.Query/QuerySchemas",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(QueryServer).QuerySchemas(ctx, req.(*QuerySchemasRequest))
@@ -846,7 +846,7 @@ func _Query_QueryDidDocument_Handler(srv interface{}, ctx context.Context, dec f
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/hypersignprotocol.hidnode.ssi.Query/QueryDidDocument",
+		FullMethod: "/hypersignprotocol.vidnode.ssi.Query/QueryDidDocument",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(QueryServer).QueryDidDocument(ctx, req.(*QueryDidDocumentRequest))
@@ -864,7 +864,7 @@ func _Query_QueryDidDocuments_Handler(srv interface{}, ctx context.Context, dec 
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/hypersignprotocol.hidnode.ssi.Query/QueryDidDocuments",
+		FullMethod: "/hypersignprotocol.vidnode.ssi.Query/QueryDidDocuments",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(QueryServer).QueryDidDocuments(ctx, req.(*QueryDidDocumentsRequest))
@@ -882,7 +882,7 @@ func _Query_QueryCredential_Handler(srv interface{}, ctx context.Context, dec fu
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/hypersignprotocol.hidnode.ssi.Query/QueryCredential",
+		FullMethod: "/hypersignprotocol.vidnode.ssi.Query/QueryCredential",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(QueryServer).QueryCredential(ctx, req.(*QueryCredentialRequest))
@@ -900,7 +900,7 @@ func _Query_QueryCredentials_Handler(srv interface{}, ctx context.Context, dec f
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/hypersignprotocol.hidnode.ssi.Query/QueryCredentials",
+		FullMethod: "/hypersignprotocol.vidnode.ssi.Query/QueryCredentials",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(QueryServer).QueryCredentials(ctx, req.(*QueryCredentialsRequest))
@@ -909,7 +909,7 @@ func _Query_QueryCredentials_Handler(srv interface{}, ctx context.Context, dec f
 }
 
 var _Query_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "hypersignprotocol.hidnode.ssi.Query",
+	ServiceName: "hypersignprotocol.vidnode.ssi.Query",
 	HandlerType: (*QueryServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

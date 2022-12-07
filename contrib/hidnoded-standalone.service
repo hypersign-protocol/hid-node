@@ -9,7 +9,7 @@ Restart=on-failure
 RestartSec=3
 MemoryDenyWriteExecute=yes
 LimitNOFILE=65535
-ExecStart=hid-noded start
+ExecStart=vid-noded start
 
 [Install]
 WantedBy=multi-user.target

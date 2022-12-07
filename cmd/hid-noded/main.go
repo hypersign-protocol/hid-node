@@ -4,8 +4,8 @@ import (
 	"os"
 
 	svrcmd "github.com/cosmos/cosmos-sdk/server/cmd"
-	"github.com/hypersign-protocol/hid-node/app"
-	"github.com/hypersign-protocol/hid-node/cmd/hid-noded/cmd"
+	"github.com/hypersign-protocol/vid-node/app"
+	"github.com/hypersign-protocol/vid-node/cmd/vid-noded/cmd"
 )
 
 func main() {

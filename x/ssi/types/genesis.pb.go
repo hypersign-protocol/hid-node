@@ -69,7 +69,7 @@ func (m *GenesisState) GetChainNamespace() string {
 }
 
 func init() {
-	proto.RegisterType((*GenesisState)(nil), "hypersignprotocol.hidnode.ssi.GenesisState")
+	proto.RegisterType((*GenesisState)(nil), "hypersignprotocol.vidnode.ssi.GenesisState")
 }
 
 func init() { proto.RegisterFile("ssi/v1/genesis.proto", fileDescriptor_3cbaf0a49767e32e) }

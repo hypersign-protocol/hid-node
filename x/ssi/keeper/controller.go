@@ -5,8 +5,8 @@ import (
 	"reflect"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/hypersign-protocol/hid-node/x/ssi/types"
-	"github.com/hypersign-protocol/hid-node/x/ssi/utils"
+	"github.com/hypersign-protocol/vid-node/x/ssi/types"
+	"github.com/hypersign-protocol/vid-node/x/ssi/utils"
 )
 
 func (k msgServer) ValidateDidControllers(ctx *sdk.Context, id string, controllers []string, verMethods []*types.VerificationMethod) error {

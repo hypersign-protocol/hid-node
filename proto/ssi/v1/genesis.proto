@@ -1,10 +1,10 @@
 syntax = "proto3";
-package hypersignprotocol.hidnode.ssi;
+package hypersignprotocol.vidnode.ssi;
 
 import "gogoproto/gogo.proto";
 // this line is used by starport scaffolding # genesis/proto/import
 
-option go_package = "github.com/hypersign-protocol/hid-node/x/ssi/types";
+option go_package = "github.com/hypersign-protocol/vid-node/x/ssi/types";
 
 // GenesisState defines the ssi module's genesis state.
 message GenesisState {

@@ -6,12 +6,12 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	docVerify "github.com/hypersign-protocol/hid-node/x/ssi/document_verification"
-	"github.com/hypersign-protocol/hid-node/x/ssi/signature"
-	"github.com/hypersign-protocol/hid-node/x/ssi/types"
+	docVerify "github.com/hypersign-protocol/vid-node/x/ssi/document_verification"
+	"github.com/hypersign-protocol/vid-node/x/ssi/signature"
+	"github.com/hypersign-protocol/vid-node/x/ssi/types"
 )
 
-// RPC controller for registering DID document on hid-node
+// RPC controller for registering DID document on vid-node
 func (k msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*types.MsgCreateDIDResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
@@ -63,7 +63,7 @@ func (k msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*t
 	return &types.MsgCreateDIDResponse{Id: id}, nil
 }
 
-// RPC controller for updating an existing DID document registered on hid-node
+// RPC controller for updating an existing DID document registered on vid-node
 func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*types.MsgUpdateDIDResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
@@ -137,7 +137,7 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 	return &types.MsgUpdateDIDResponse{UpdateId: didId}, nil
 }
 
-// RPC controller for deactivating an existing DID document registered on hid-node
+// RPC controller for deactivating an existing DID document registered on vid-node
 func (k msgServer) DeactivateDID(goCtx context.Context, msg *types.MsgDeactivateDID) (*types.MsgDeactivateDIDResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 

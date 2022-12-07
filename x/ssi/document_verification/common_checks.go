@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/hypersign-protocol/hid-node/x/ssi/types"
+	"github.com/hypersign-protocol/vid-node/x/ssi/types"
 	"github.com/multiformats/go-multibase"
 )
 

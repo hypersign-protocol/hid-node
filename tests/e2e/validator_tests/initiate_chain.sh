@@ -13,8 +13,8 @@ VALIDATOR_1_WALLET="validator1"
 VALIDATOR_2_NAME="val2"
 VALIDATOR_2_WALLET="validator2"
 
-VAL_1_HOME_DIR=$HOME/.hid-node/$VALIDATOR_1_NAME
-VAL_2_HOME_DIR=$HOME/.hid-node/$VALIDATOR_2_NAME
+VAL_1_HOME_DIR=$HOME/.vid-node/$VALIDATOR_1_NAME
+VAL_2_HOME_DIR=$HOME/.vid-node/$VALIDATOR_2_NAME
 
 init_node ${VALIDATOR_1_NAME} ${VALIDATOR_1_WALLET} 36657 36656 10090 10091
 
@@ -44,7 +44,7 @@ sleep 5
 cp ${VAL_1_HOME_DIR}/config/genesis.json ${VAL_2_HOME_DIR}/config/genesis.json
 
 # add peers
-sed -i -E "s|persistent_peers = \"\"|persistent_peers = \"$(hid-noded tendermint show-node-id --home=${VAL_1_HOME_DIR})@127.0.0.1:36656\"|g" ${VAL_2_HOME_DIR}/config/config.toml
+sed -i -E "s|persistent_peers = \"\"|persistent_peers = \"$(vid-noded tendermint show-node-id --home=${VAL_1_HOME_DIR})@127.0.0.1:36656\"|g" ${VAL_2_HOME_DIR}/config/config.toml
 
 run_chain ${VALIDATOR_2_NAME} ${VALIDATOR_2_WALLET} 46657 46656 11090 11091
 

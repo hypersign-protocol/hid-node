@@ -1,5 +1,5 @@
 syntax = "proto3";
-package hypersignprotocol.hidnode.ssi;
+package hypersignprotocol.vidnode.ssi;
 
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
@@ -8,38 +8,38 @@ import "ssi/v1/schema.proto";
 import "ssi/v1/did.proto";
 import "ssi/v1/credential.proto";
 
-option go_package = "github.com/hypersign-protocol/hid-node/x/ssi/types";
+option go_package = "github.com/hypersign-protocol/vid-node/x/ssi/types";
 
 // Query defines the gRPC querier service.
 service Query {
   // Get the Schema Document for a specified schema id
 	rpc QuerySchema(QuerySchemaRequest) returns (QuerySchemaResponse) {
-		option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/schema/{schemaId}";
+		option (google.api.http).get = "/hypersign-protocol/vidnode/ssi/schema/{schemaId}";
 	}
 
   // Get the count and list of registered Schemas
 	rpc QuerySchemas(QuerySchemasRequest) returns (QuerySchemasResponse) {
-		option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/schema";
+		option (google.api.http).get = "/hypersign-protocol/vidnode/ssi/schema";
 	}
 
   // Get the Did Document for a specified DID id
 	rpc QueryDidDocument(QueryDidDocumentRequest) returns (QueryDidDocumentResponse) {
-		option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/did/{didId}";
+		option (google.api.http).get = "/hypersign-protocol/vidnode/ssi/did/{didId}";
 	}
 
   // Get the count and list of registered Did Documents
   rpc QueryDidDocuments(QueryDidDocumentsRequest) returns (QueryDidDocumentsResponse) {
-    option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/did";
+    option (google.api.http).get = "/hypersign-protocol/vidnode/ssi/did";
   }
 
   // Get the Credential Status for a given credential id
   rpc QueryCredential(QueryCredentialRequest) returns (QueryCredentialResponse) {
-    option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/credential/{credId}";
+    option (google.api.http).get = "/hypersign-protocol/vidnode/ssi/credential/{credId}";
   }
 
   // Get all the registed Credential Statuses
   rpc QueryCredentials(QueryCredentialsRequest) returns (QueryCredentialsResponse) {
-    option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/credential";
+    option (google.api.http).get = "/hypersign-protocol/vidnode/ssi/credential";
   }
 }
 

@@ -11,11 +11,11 @@ echo ""
 # Running the node
 echo "Starting the node..."
 echo ""
-tmux new -s node1 -d hid-noded start
+tmux new -s node1 -d vid-noded start
 sleep 6
-if [[ -n $(hid-noded status) ]]; then
-  echo "hid-noded daemon is now running"
+if [[ -n $(vid-noded status) ]]; then
+  echo "vid-noded daemon is now running"
 else
-  echo "hid-noded daemon failed to start, exiting...."
+  echo "vid-noded daemon failed to start, exiting...."
   exit 1
 fi

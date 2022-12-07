@@ -3,8 +3,8 @@
 echo "-------- Starting Test For Multiple Messages in a Tx ---------"
 echo ""
 
-SOURCE_ADDRESS=$(hid-noded keys show node1 -a)
-DESTINATION_ADDRESS="hid17h4zk54wlayhfla7pdxxfqej3ra0rx5j6305hg"
+SOURCE_ADDRESS=$(vid-noded keys show node1 -a)
+DESTINATION_ADDRESS="vid17h4zk54wlayhfla7pdxxfqej3ra0rx5j6305hg"
 BROADCAST=""
 
 check_tx() {
@@ -26,19 +26,19 @@ sign_and_broadcast() {
     # Signing the Tx
     echo "Signing the batch txs"
     echo ""
-    hid-noded tx sign ./multiple_bank_msgs.json --from ${1} --chain-id hidnode > signed_tx.json
+    vid-noded tx sign ./multiple_bank_msgs.json --from ${1} --chain-id vidnode > signed_tx.json
     echo ""
     echo "Transaction Signed"
 
     # Broadcasting the Tx
     echo "Broadcasting Batch Tx"
     echo ""
-    BROADCAST=$(hid-noded tx broadcast ./signed_tx.json --broadcast-mode block --output json)
+    BROADCAST=$(vid-noded tx broadcast ./signed_tx.json --broadcast-mode block --output json)
 }
 
 # Generate Tx
 rm -rf ./multiple_bank_msgs.json
-hid-noded tx bank send ${SOURCE_ADDRESS} ${DESTINATION_ADDRESS} 10uhid --chain-id hidnode --generate-only > multiple_bank_msgs.json
+vid-noded tx bank send ${SOURCE_ADDRESS} ${DESTINATION_ADDRESS} 10uvid --chain-id vidnode --generate-only > multiple_bank_msgs.json
 
 # Replicating Valid Transactions
 echo "Replicating Valid Transactions"

@@ -3,7 +3,7 @@
 # Use the already built binary or use a different one
 BINARY=$1
 if [ -z ${BINARY} ]; then
-	BINARY=hid-noded
+	BINARY=vid-noded
 fi
 
 # Check if the binary is installed
@@ -16,48 +16,48 @@ if [ ${RET_VAL} -ne 0 ]; then
 fi
 
 # Setting up config files
-rm -rf /root/.hid-node/
+rm -rf /root/.vid-node/
 
-# Make directories for hid-node config
-mkdir /root/.hid-node
+# Make directories for vid-node config
+mkdir /root/.vid-node
 
 # Init node
-hid-noded init --chain-id=hidnode node1 --home=/root/.hid-node
+vid-noded init --chain-id=vidnode node1 --home=/root/.vid-node
 
-# Change hid-node config
-hid-noded configure min-gas-prices 0uhid
+# Change vid-node config
+vid-noded configure min-gas-prices 0uvid
 
 # Create key for the node
-hid-noded keys add node1 --keyring-backend=test --home=/root/.hid-node
+vid-noded keys add node1 --keyring-backend=test --home=/root/.vid-node
 
-# change staking denom to uhid
-cat /root/.hid-node/config/genesis.json | jq '.app_state["staking"]["params"]["bond_denom"]="uhid"' > /root/.hid-node/config/tmp_genesis.json && mv /root/.hid-node/config/tmp_genesis.json /root/.hid-node/config/genesis.json
+# change staking denom to uvid
+cat /root/.vid-node/config/genesis.json | jq '.app_state["staking"]["params"]["bond_denom"]="uvid"' > /root/.vid-node/config/tmp_genesis.json && mv /root/.vid-node/config/tmp_genesis.json /root/.vid-node/config/genesis.json
 
-# update crisis variable to uhid
-cat /root/.hid-node/config/genesis.json | jq '.app_state["crisis"]["constant_fee"]["denom"]="uhid"' > /root/.hid-node/config/tmp_genesis.json && mv /root/.hid-node/config/tmp_genesis.json /root/.hid-node/config/genesis.json
+# update crisis variable to uvid
+cat /root/.vid-node/config/genesis.json | jq '.app_state["crisis"]["constant_fee"]["denom"]="uvid"' > /root/.vid-node/config/tmp_genesis.json && mv /root/.vid-node/config/tmp_genesis.json /root/.vid-node/config/genesis.json
 
 # update gov genesis
-cat /root/.hid-node/config/genesis.json | jq '.app_state["gov"]["deposit_params"]["min_deposit"][0]["denom"]="uhid"' > /root/.hid-node/config/tmp_genesis.json && mv /root/.hid-node/config/tmp_genesis.json /root/.hid-node/config/genesis.json
-cat /root/.hid-node/config/genesis.json | jq '.app_state["gov"]["voting_params"]["voting_period"]="500s"' > /root/.hid-node/config/tmp_genesis.json && mv /root/.hid-node/config/tmp_genesis.json /root/.hid-node/config/genesis.json
+cat /root/.vid-node/config/genesis.json | jq '.app_state["gov"]["deposit_params"]["min_deposit"][0]["denom"]="uvid"' > /root/.vid-node/config/tmp_genesis.json && mv /root/.vid-node/config/tmp_genesis.json /root/.vid-node/config/genesis.json
+cat /root/.vid-node/config/genesis.json | jq '.app_state["gov"]["voting_params"]["voting_period"]="500s"' > /root/.vid-node/config/tmp_genesis.json && mv /root/.vid-node/config/tmp_genesis.json /root/.vid-node/config/genesis.json
 
 # update ssi genesis
-cat /root/.hid-node/config/genesis.json | jq '.app_state["ssi"]["chain_namespace"]="devnet"' > /root/.hid-node/config/tmp_genesis.json && mv /root/.hid-node/config/tmp_genesis.json /root/.hid-node/config/genesis.json
+cat /root/.vid-node/config/genesis.json | jq '.app_state["ssi"]["chain_namespace"]="devnet"' > /root/.vid-node/config/tmp_genesis.json && mv /root/.vid-node/config/tmp_genesis.json /root/.vid-node/config/genesis.json
 
 # update mint genesis
-cat /root/.hid-node/config/genesis.json | jq '.app_state["mint"]["params"]["mint_denom"]="uhid"' > /root/.hid-node/config/tmp_genesis.json && mv /root/.hid-node/config/tmp_genesis.json /root/.hid-node/config/genesis.json
+cat /root/.vid-node/config/genesis.json | jq '.app_state["mint"]["params"]["mint_denom"]="uvid"' > /root/.vid-node/config/tmp_genesis.json && mv /root/.vid-node/config/tmp_genesis.json /root/.vid-node/config/genesis.json
 
 # create validator node with tokens
-hid-noded add-genesis-account $(hid-noded keys show node1 -a --keyring-backend=test --home=/root/.hid-node) 110000000000uhid --home=/root/.hid-node
-hid-noded gentx node1 100000000000uhid --keyring-backend=test --home=/root/.hid-node --chain-id=hidnode
-hid-noded collect-gentxs --home=/root/.hid-node
+vid-noded add-genesis-account $(vid-noded keys show node1 -a --keyring-backend=test --home=/root/.vid-node) 110000000000uvid --home=/root/.vid-node
+vid-noded gentx node1 100000000000uvid --keyring-backend=test --home=/root/.vid-node --chain-id=vidnode
+vid-noded collect-gentxs --home=/root/.vid-node
 
 # change app.toml values
-sed -i -E '104s/enable = false/enable = true/' /root/.hid-node/config/app.toml
-sed -i -E '107s/swagger = false/swagger = true/' /root/.hid-node/config/app.toml
+sed -i -E '104s/enable = false/enable = true/' /root/.vid-node/config/app.toml
+sed -i -E '107s/swagger = false/swagger = true/' /root/.vid-node/config/app.toml
 
 
 # change config.toml values
-sed -i -E 's|tcp://127.0.0.1:26657|tcp://0.0.0.0:26657|g' /root/.hid-node/config/config.toml
-sed -i -E 's|allow_duplicate_ip = false|allow_duplicate_ip = true|g' /root/.hid-node/config/config.toml
-sed -i -E 's|addr_book_strict = true|addr_book_strict = false|g' /root/.hid-node/config/config.toml
-sed -i -E 's|cors_allowed_origins = \[\]|cors_allowed_origins = \[\"\*\"\]|g' /root/.hid-node/config/config.toml
+sed -i -E 's|tcp://127.0.0.1:26657|tcp://0.0.0.0:26657|g' /root/.vid-node/config/config.toml
+sed -i -E 's|allow_duplicate_ip = false|allow_duplicate_ip = true|g' /root/.vid-node/config/config.toml
+sed -i -E 's|addr_book_strict = true|addr_book_strict = false|g' /root/.vid-node/config/config.toml
+sed -i -E 's|cors_allowed_origins = \[\]|cors_allowed_origins = \[\"\*\"\]|g' /root/.vid-node/config/config.toml

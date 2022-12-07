@@ -4,8 +4,8 @@ import (
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/hypersign-protocol/hid-node/x/ssi/keeper"
-	"github.com/hypersign-protocol/hid-node/x/ssi/types"
+	"github.com/hypersign-protocol/vid-node/x/ssi/keeper"
+	"github.com/hypersign-protocol/vid-node/x/ssi/types"
 )
 
 func TestDeactivateDID(t *testing.T) {

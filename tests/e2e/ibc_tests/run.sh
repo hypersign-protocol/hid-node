@@ -1,24 +1,24 @@
 #!/bin/bash
 
-# Run HID-Node Chain
-echo "Setting up hid-node chain"
+# Run vid-Node Chain
+echo "Setting up vid-node chain"
 echo ""
 ../../../scripts/localnet-single-node/setup.sh
 echo ""
 echo "Setup Done"
 echo ""
 
-echo "Running hid-node"
+echo "Running vid-node"
 echo ""
-tmux new -s hidnode -d hid-noded start
+tmux new -s vidnode -d vid-noded start
 sleep 5
-hid-noded status &> /dev/null
+vid-noded status &> /dev/null
 RET_VAL=$?
 if [ ${RET_VAL} -eq 0 ]; then
-  echo "hid-node daemon is now running"
+  echo "vid-node daemon is now running"
   echo ""
 else
-  echo "hid-node daemon failed to start, exiting...."
+  echo "vid-node daemon failed to start, exiting...."
   exit 1
 fi
 
@@ -46,9 +46,9 @@ fi
 
 # Run Hermes Relayer
 echo "Setting up hermes relayer"
-HID_NODE_VALIDATOR_WALLET=$(hid-noded keys show node1 -a --keyring-backend test)
+vid_NODE_VALIDATOR_WALLET=$(vid-noded keys show node1 -a --keyring-backend test)
 OSMOSIS_VALIDATOR_WALLET=$(osmosisd keys show osmonode1 -a)
-./hermes/setup.sh ${HID_NODE_VALIDATOR_WALLET} ${OSMOSIS_VALIDATOR_WALLET}
+./hermes/setup.sh ${vid_NODE_VALIDATOR_WALLET} ${OSMOSIS_VALIDATOR_WALLET}
 echo ""
 sleep 3
 echo "Starting hermes relayer"
@@ -58,21 +58,21 @@ sleep 2
 echo "Hermes has been started"
 echo ""
 
-echo "Transferring tokens from HID Node to Osmosis"
+echo "Transferring tokens from vid Node to Osmosis"
 echo ""
-IBC_TRANSFER_RESULT=$(hid-noded tx ibc-transfer transfer transfer channel-0 ${OSMOSIS_VALIDATOR_WALLET} 1234uhid --broadcast-mode block --from ${HID_NODE_VALIDATOR_WALLET} --output json --keyring-backend test --chain-id hidnode --yes)
+IBC_TRANSFER_RESULT=$(vid-noded tx ibc-transfer transfer transfer channel-0 ${OSMOSIS_VALIDATOR_WALLET} 1234uvid --broadcast-mode block --from ${vid_NODE_VALIDATOR_WALLET} --output json --keyring-backend test --chain-id vidnode --yes)
 
 CODE=$(echo ${IBC_TRANSFER_RESULT} | jq '.code')
 TXHASH=$(echo ${IBC_TRANSFER_RESULT} | jq '.txhash')
 if [ ${CODE} -eq 0 ]; then
-  echo "HID Token is transferred successfully through IBC. Tx Hash: ${TXHASH}"
+  echo "vid Token is transferred successfully through IBC. Tx Hash: ${TXHASH}"
   echo ""
 else
-  echo "HID Token did not went through IBC. Tx Hash: ${TXHASH}"
+  echo "vid Token did not went through IBC. Tx Hash: ${TXHASH}"
   exit 1
 fi
 
-echo "Stopping hid-node chain"
+echo "Stopping vid-node chain"
 echo ""
 kill -9 $(lsof -t -i:26657)
 echo "Stopping osmosis chain"

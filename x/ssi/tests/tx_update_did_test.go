@@ -4,9 +4,9 @@ import (
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	testkeeper "github.com/hypersign-protocol/hid-node/testutil/keeper"
-	"github.com/hypersign-protocol/hid-node/x/ssi/keeper"
-	"github.com/hypersign-protocol/hid-node/x/ssi/types"
+	testkeeper "github.com/hypersign-protocol/vid-node/testutil/keeper"
+	"github.com/hypersign-protocol/vid-node/x/ssi/keeper"
+	"github.com/hypersign-protocol/vid-node/x/ssi/types"
 )
 
 func TestUpdateDID(t *testing.T) {

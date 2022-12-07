@@ -41,7 +41,7 @@ def run_blockchain_command(cmd_string: str, transaction_name: str = None, expect
 def generate_key_pair(algo="ed25519"):
     cmd = ""
     if algo == "ed25519":
-        cmd = "hid-noded debug ed25519 random"
+        cmd = "vid-noded debug ed25519 random"
     else:
         raise Exception(algo + " is not a supported signing algorithm")
     result_str = run_command(cmd)
@@ -59,11 +59,11 @@ def generate_document_id(doc_type: str, kp: dict = None):
         raise Exception("Public key is empty")
     
     if doc_type == "did":
-        id = "did:hid:devnet:" + public_key_multibase
+        id = "did:vid:devnet:" + public_key_multibase
     elif doc_type == "schema":
-        id = "sch:hid:devnet:" + public_key_multibase + ":1.0"
+        id = "sch:vid:devnet:" + public_key_multibase + ":1.0"
     elif doc_type == "cred-status":
-        id = "vc:hid:devnet:" + public_key_multibase
+        id = "vc:vid:devnet:" + public_key_multibase
     else:
         raise Exception("The argument `doc_type` only accepts the values: did, schema and cred-status")
     
@@ -72,7 +72,7 @@ def generate_document_id(doc_type: str, kp: dict = None):
 def is_blockchain_active(rpc_port):
     import socket
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        assert s.connect_ex(('localhost', rpc_port)) == 0, f"hid-noded is not running"
+        assert s.connect_ex(('localhost', rpc_port)) == 0, f"vid-noded is not running"
 
 def get_document_signature(doc: dict, doc_type: str, key_pair: dict):
     private_key = key_pair["priv_key_base_64"]
@@ -84,6 +84,6 @@ def get_document_signature(doc: dict, doc_type: str, key_pair: dict):
     else:
         raise Exception("Invalid value for doc_type param: " + doc_type)
     
-    cmd_string = f"hid-noded debug ed25519 sign-ssi-doc {doc_cmd} '{json.dumps(doc)}' {private_key}"
+    cmd_string = f"vid-noded debug ed25519 sign-ssi-doc {doc_cmd} '{json.dumps(doc)}' {private_key}"
     signature = run_command(cmd_string)
     return signature

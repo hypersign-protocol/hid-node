@@ -53,8 +53,8 @@ func p2pCmd(defaultNodeHome string) *cobra.Command {
 func minGasPricesCmd(defaultNodeHome string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "min-gas-prices [value]",
-		Short:   "The minimum gas prices a validator is willing to accept (default \"10uhid\")",
-		Example: "min-gas-prices 10uhid",
+		Short:   "The minimum gas prices a validator is willing to accept (default \"10uvid\")",
+		Example: "min-gas-prices 10uvid",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)

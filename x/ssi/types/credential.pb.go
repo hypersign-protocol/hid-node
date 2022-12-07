@@ -327,10 +327,10 @@ func (m *Credential) GetProof() *CredentialProof {
 }
 
 func init() {
-	proto.RegisterType((*Claim)(nil), "hypersignprotocol.hidnode.ssi.Claim")
-	proto.RegisterType((*CredentialStatus)(nil), "hypersignprotocol.hidnode.ssi.CredentialStatus")
-	proto.RegisterType((*CredentialProof)(nil), "hypersignprotocol.hidnode.ssi.CredentialProof")
-	proto.RegisterType((*Credential)(nil), "hypersignprotocol.hidnode.ssi.Credential")
+	proto.RegisterType((*Claim)(nil), "hypersignprotocol.vidnode.ssi.Claim")
+	proto.RegisterType((*CredentialStatus)(nil), "hypersignprotocol.vidnode.ssi.CredentialStatus")
+	proto.RegisterType((*CredentialProof)(nil), "hypersignprotocol.vidnode.ssi.CredentialProof")
+	proto.RegisterType((*Credential)(nil), "hypersignprotocol.vidnode.ssi.Credential")
 }
 
 func init() { proto.RegisterFile("ssi/v1/credential.proto", fileDescriptor_ad0debf69e83e4bb) }

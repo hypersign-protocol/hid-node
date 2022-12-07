@@ -11,8 +11,8 @@ echo ""
 echo ""
 echo "Creating a wallet for the recipient"
 echo ""
-hid-noded keys add recipient
-RECIPIENT_ADDRESS=$(hid-noded keys show recipient -a)
+vid-noded keys add recipient
+RECIPIENT_ADDRESS=$(vid-noded keys show recipient -a)
 GRANTS=$(cat ./community-pool-spend-proposal.json | jq ".amount")
 cat ./community-pool-spend-proposal.json | jq ".recipient=\"${RECIPIENT_ADDRESS}\"" > ./tmp-community-pool-spend-proposal.json && mv ./tmp-community-pool-spend-proposal.json ./community-pool-spend-proposal.json
 

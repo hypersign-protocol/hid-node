@@ -4,8 +4,8 @@ Requires=network-online.target
 After=network-online.target
 
 [Service]
-Environment="DAEMON_HOME=/home/ubuntu/.hid-node"
-Environment="DAEMON_NAME=hid-noded"
+Environment="DAEMON_HOME=/home/ubuntu/.vid-node"
+Environment="DAEMON_NAME=vid-noded"
 User=ubuntu
 Type=simple
 Restart=on-failure
