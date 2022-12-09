@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
+	secp256k1 "github.com/tendermint/tendermint/crypto/secp256k1"
 
 	"github.com/spf13/cobra"
 )
@@ -37,7 +38,25 @@ func extractDIDSigningElements(cmdArgs []string) ([]DIDSigningElements, error) {
 	return didSigningElementsList, nil
 }
 
-func getEd25519Signature(privateKey string, message []byte) (string, error) {
+func GetSecp256k1Signature(privateKey string, message []byte) (string, error) {
+	// Decode key into bytes
+	privKeyBytes, err := base64.StdEncoding.DecodeString(privateKey)
+	if err != nil {
+		return "", err
+	}
+
+	// Convert private key string to Secp256k1 object
+	var privKeyObject secp256k1.PrivKey = privKeyBytes
+
+	// Sign Message
+	signature, err := privKeyObject.Sign(message)
+	if err != nil {
+		return "", err
+	}
+	return base64.StdEncoding.EncodeToString(signature), nil
+}
+
+func GetEd25519Signature(privateKey string, message []byte) (string, error) {
 	// Decode key into bytes
 	privKeyBytes, err := base64.StdEncoding.DecodeString(privateKey)
 	if err != nil {
@@ -67,12 +86,17 @@ func getSignatures(cmd *cobra.Command, message []byte, cmdArgs []string) ([]*typ
 		// Sign based on the Signing Algorithm
 		switch didSigningElementsList[i].SignAlgo {
 		case "ed25519":
-			signInfoList[i].Signature, err = getEd25519Signature(didSigningElementsList[i].SignKey, message)
+			signInfoList[i].Signature, err = GetEd25519Signature(didSigningElementsList[i].SignKey, message)
+			if err != nil {
+				return nil, err
+			}
+		case "secp256k1":
+			signInfoList[i].Signature, err = GetSecp256k1Signature(didSigningElementsList[i].SignKey, message)
 			if err != nil {
 				return nil, err
 			}
 		default:
-			return nil, fmt.Errorf("unsupported signing algorithm %s", didSigningElementsList[i].SignAlgo)
+			return nil, fmt.Errorf("unsupported signing algorithm %s, supported signing algorithms: ['ed25519','secp256k1']", didSigningElementsList[i].SignAlgo)
 		}
 	}
 

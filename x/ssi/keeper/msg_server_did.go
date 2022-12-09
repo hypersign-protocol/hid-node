@@ -44,7 +44,20 @@ func (k msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*t
 	}
 
 	// Verification of Did Document Signature
-	if err := signature.VerifyDidSignature(&ctx, didMsg, didSignersWithVM, signatures); err != nil {
+
+	// ClientSpec check
+	clientSpecType := msg.ClientSpec
+	clientSpecOpts := types.ClientSpecOpts{
+		SSIDocBytes:   didMsg.GetSignBytes(),
+		SignerAddress: msg.Creator,
+	}
+
+	didDocBytes, err := getClientSpecDocBytes(clientSpecType, clientSpecOpts)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := signature.VerifyDidSignature(&ctx, didDocBytes, didSignersWithVM, signatures); err != nil {
 		return nil, err
 	}
 
@@ -113,7 +126,20 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 	if err != nil {
 		return nil, err
 	}
-	if err := signature.VerifyDidSignature(&ctx, didMsg, signersWithVm, msg.Signatures); err != nil {
+
+	// ClientSpec check
+	clientSpecType := msg.ClientSpec
+	clientSpecOpts := types.ClientSpecOpts{
+		SSIDocBytes:   didMsg.GetSignBytes(),
+		SignerAddress: msg.Creator,
+	}
+
+	didDocBytes, err := getClientSpecDocBytes(clientSpecType, clientSpecOpts)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := signature.VerifyDidSignature(&ctx, didDocBytes, signersWithVm, msg.Signatures); err != nil {
 		return nil, err
 	}
 
@@ -190,7 +216,19 @@ func (k msgServer) DeactivateDID(goCtx context.Context, msg *types.MsgDeactivate
 		return nil, err
 	}
 	signatures := msg.Signatures
-	if err := signature.VerifyDidSignature(&ctx, didDoc, signersWithVM, signatures); err != nil {
+	// ClientSpec check
+	clientSpecType := msg.ClientSpec
+	clientSpecOpts := types.ClientSpecOpts{
+		SSIDocBytes:   didDoc.GetSignBytes(),
+		SignerAddress: msg.Creator,
+	}
+
+	didDocBytes, err := getClientSpecDocBytes(clientSpecType, clientSpecOpts)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := signature.VerifyDidSignature(&ctx, didDocBytes, signersWithVM, signatures); err != nil {
 		return nil, err
 	}
 

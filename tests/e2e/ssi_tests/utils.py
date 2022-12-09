@@ -42,6 +42,8 @@ def generate_key_pair(algo="ed25519"):
     cmd = ""
     if algo == "ed25519":
         cmd = "hid-noded debug ed25519 random"
+    elif algo == "secp256k1":
+        cmd = "hid-noded debug secp256k1 random"
     else:
         raise Exception(algo + " is not a supported signing algorithm")
     result_str = run_command(cmd)
@@ -74,7 +76,7 @@ def is_blockchain_active(rpc_port):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         assert s.connect_ex(('localhost', rpc_port)) == 0, f"hid-noded is not running"
 
-def get_document_signature(doc: dict, doc_type: str, key_pair: dict):
+def get_document_signature(doc: dict, doc_type: str, key_pair: dict, algo: str = "ed25519"):
     private_key = key_pair["priv_key_base_64"]
 
     if doc_type == "cred-status":
@@ -84,6 +86,6 @@ def get_document_signature(doc: dict, doc_type: str, key_pair: dict):
     else:
         raise Exception("Invalid value for doc_type param: " + doc_type)
     
-    cmd_string = f"hid-noded debug ed25519 sign-ssi-doc {doc_cmd} '{json.dumps(doc)}' {private_key}"
+    cmd_string = f"hid-noded debug sign-ssi-doc {doc_cmd} '{json.dumps(doc)}' {private_key} {algo}"
     signature = run_command(cmd_string)
     return signature

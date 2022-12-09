@@ -52,8 +52,9 @@ hid-noded gentx node1 50000000000000000uhid --keyring-backend=test --home=$HOME/
 hid-noded collect-gentxs --home=$HOME/.hid-node
 
 # change app.toml values
-sed -i -E '104s/enable = false/enable = true/' $HOME/.hid-node/config/app.toml
-sed -i -E '107s/swagger = false/swagger = true/' $HOME/.hid-node/config/app.toml
+sed -i -E '108s/enable = false/enable = true/' $HOME/.hid-node/config/app.toml
+sed -i -E '111s/swagger = false/swagger = true/' $HOME/.hid-node/config/app.toml
+sed -i -E '129s/enabled-unsafe-cors = false/enabled-unsafe-cors = true/' $HOME/.hid-node/config/app.toml
 
 
 # change config.toml values

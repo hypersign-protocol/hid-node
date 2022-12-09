@@ -17,7 +17,7 @@ func TestRegisterCredentialStatus(t *testing.T) {
 
 	k.SetChainNamespace(&ctx, "devnet")
 
-	keyPair1 := GenerateEd25519KeyPair()
+	keyPair1 := GenerateSecp256k1KeyPair()
 	didRpcElements := GenerateDidDocumentRPCElements(keyPair1)
 	t.Logf("Registering DID with DID Id: %s", didRpcElements.DidDocument.GetId())
 
