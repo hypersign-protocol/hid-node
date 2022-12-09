@@ -20,12 +20,12 @@ func SignGeneric(keyPair GenericKeyPair, data []byte) []byte {
 	}
 }
 
-func GetPublicKeyGeneric(keyPair GenericKeyPair) string {
+func GetPublicKeyAndOptionalID(keyPair GenericKeyPair) (string, string) {
 	switch kp := keyPair.(type) {
 	case ed25519KeyPair:
-		return kp.publicKey
+		return kp.publicKey, kp.optionalID
 	case secp256k1KeyPair:
-		return kp.publicKey
+		return kp.publicKey, kp.optionalID
 	default:
 		panic("Unsupported Key Pair Type")
 	}
