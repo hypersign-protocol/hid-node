@@ -1,11 +1,10 @@
-package signature
+package verification
 
 import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	docVerify "github.com/hypersign-protocol/hid-node/x/ssi/document_verification"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 	"github.com/hypersign-protocol/hid-node/x/ssi/utils"
 )
@@ -52,7 +51,7 @@ func VerifyDidSignature(ctx *sdk.Context, didDocBytes []byte, signers []types.Si
 		validArr = append(validArr, types.ValidDid{DidId: signer.Signer, IsValid: valid})
 	}
 
-	validDid := docVerify.HasAtleastOneTrueSigner(validArr)
+	validDid := HasAtleastOneTrueSigner(validArr)
 
 	if validDid == (types.ValidDid{}) {
 		return sdkerrors.Wrap(types.ErrInvalidSignature, validDid.DidId)
@@ -99,7 +98,7 @@ func VerifyDocumentSignature(ctx *sdk.Context, docBytes []byte, signers []types.
 		validArr = append(validArr, types.ValidDid{DidId: signer.Signer, IsValid: valid})
 	}
 
-	validDid := docVerify.HasAtleastOneTrueSigner(validArr)
+	validDid := HasAtleastOneTrueSigner(validArr)
 
 	if validDid == (types.ValidDid{}) {
 		return sdkerrors.Wrap(types.ErrInvalidSignature, validDid.DidId)

@@ -1,4 +1,4 @@
-package signature
+package verification
 
 import (
 	"crypto/ed25519"

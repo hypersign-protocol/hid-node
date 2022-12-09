@@ -7,9 +7,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	docVerify "github.com/hypersign-protocol/hid-node/x/ssi/document_verification"
-
-	sigVerify "github.com/hypersign-protocol/hid-node/x/ssi/signature"
+	"github.com/hypersign-protocol/hid-node/x/ssi/verification"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 )
 
@@ -26,7 +24,7 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 	chainNamespace := k.GetChainNamespace(&ctx)
 
 	// Check the format of Credential ID
-	err := docVerify.IsValidID(credId, chainNamespace, "credDocument")
+	err := verification.IsValidID(credId, chainNamespace, "credDocument")
 	if err != nil {
 		return nil, err
 	}
@@ -63,12 +61,12 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 			return nil, sdkerrors.Wrapf(types.ErrInvalidDate, fmt.Sprintf("invalid issuance date format: %s", issuanceDate))
 		}
 
-		if err := docVerify.VerifyCredentialStatusDates(issuanceDateParsed, expirationDateParsed); err != nil {
+		if err := verification.VerifyCredentialStatusDates(issuanceDateParsed, expirationDateParsed); err != nil {
 			return nil, err
 		}
 
 		// Check if updated date iss imilar to created date
-		if err := docVerify.VerifyCredentialProofDates(credProof, true); err != nil {
+		if err := verification.VerifyCredentialProofDates(credProof, true); err != nil {
 			return nil, err
 		}
 
@@ -79,7 +77,7 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 		}
 
 		// Check the hash type of credentialHash
-		isValidCredentialHash := docVerify.VerifyCredentialHash(credMsg.GetCredentialHash())
+		isValidCredentialHash := verification.VerifyCredentialHash(credMsg.GetCredentialHash())
 		if !isValidCredentialHash {
 			return nil, sdkerrors.Wrapf(types.ErrInvalidCredentialHash, "supported hashing algorithms: sha256")
 		}
@@ -116,13 +114,13 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 		}
 
 		// Proof Type Check
-		err = sigVerify.DocumentProofTypeCheck(credProof.Type, signersWithVM, credProof.VerificationMethod)
+		err = verification.DocumentProofTypeCheck(credProof.Type, signersWithVM, credProof.VerificationMethod)
 		if err != nil {
 			return nil, err
 		}
 
 		// Verify Signature
-		err = sigVerify.VerifyDocumentSignature(&ctx, credDocBytes, signersWithVM, signatures)
+		err = verification.VerifyDocumentSignature(&ctx, credDocBytes, signersWithVM, signatures)
 		if err != nil {
 			return nil, err
 		}
@@ -164,7 +162,7 @@ func (k msgServer) updateCredentialStatus(ctx sdk.Context, msg *types.MsgRegiste
 	// Check for the correct credential status
 	newClaimStatus := newCredStatus.GetClaim().GetCurrentStatus()
 	statusFound := 0
-	for _, acceptablestatus := range docVerify.AcceptedCredStatuses {
+	for _, acceptablestatus := range verification.AcceptedCredStatuses {
 		if newClaimStatus == acceptablestatus {
 			statusFound = 1
 		}
@@ -222,12 +220,12 @@ func (k msgServer) updateCredentialStatus(ctx sdk.Context, msg *types.MsgRegiste
 	}
 
 	// Check if new expiration date isn't less than new issuance date
-	if err := docVerify.VerifyCredentialStatusDates(newIssuanceDateParsed, newExpirationDateParsed); err != nil {
+	if err := verification.VerifyCredentialStatusDates(newIssuanceDateParsed, newExpirationDateParsed); err != nil {
 		return nil, err
 	}
 
 	// Check if updated date iss imilar to created date
-	if err := docVerify.VerifyCredentialProofDates(newCredProof, false); err != nil {
+	if err := verification.VerifyCredentialProofDates(newCredProof, false); err != nil {
 		return nil, err
 	}
 
@@ -314,13 +312,13 @@ func (k msgServer) updateCredentialStatus(ctx sdk.Context, msg *types.MsgRegiste
 	}
 
 	// Proof Type Check
-	err = sigVerify.DocumentProofTypeCheck(newCredProof.Type, signersWithVM, newCredProof.VerificationMethod)
+	err = verification.DocumentProofTypeCheck(newCredProof.Type, signersWithVM, newCredProof.VerificationMethod)
 	if err != nil {
 		return nil, err
 	}
 
 	// Verify Signature
-	err = sigVerify.VerifyDocumentSignature(&ctx, credDocBytes, signersWithVM, signatures)
+	err = verification.VerifyDocumentSignature(&ctx, credDocBytes, signersWithVM, signatures)
 	if err != nil {
 		return nil, err
 	}

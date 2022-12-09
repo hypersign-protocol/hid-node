@@ -11,7 +11,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/hypersign-protocol/hid-node/x/ssi/keeper"
-	"github.com/hypersign-protocol/hid-node/x/ssi/signature"
+	"github.com/hypersign-protocol/hid-node/x/ssi/verification"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 	"github.com/multiformats/go-multibase"
 	secp256k1 "github.com/tendermint/tendermint/crypto/secp256k1"
@@ -79,9 +79,9 @@ func GenerateDidDocumentRPCElements(keyPair GenericKeyPair) DidRpcElements {
 	var vmType string
 	switch keyPair.(type) {
 	case ed25519KeyPair:
-		vmType = signature.Ed25519VerificationKey2020
+		vmType = verification.Ed25519VerificationKey2020
 	case secp256k1KeyPair:
-		vmType = signature.EcdsaSecp256k1VerificationKey2019
+		vmType = verification.EcdsaSecp256k1VerificationKey2019
 	}
 
 	var vm = &types.VerificationMethod{
@@ -155,9 +155,9 @@ func GenerateSchemaDocumentRPCElements(keyPair GenericKeyPair, Id string, verfic
 	var proofType string
 	switch keyPair.(type) {
 	case ed25519KeyPair:
-		proofType = signature.VerificationKeySignatureMap["Ed25519VerificationKey2020"]
+		proofType = verification.VerificationKeySignatureMap["Ed25519VerificationKey2020"]
 	case secp256k1KeyPair:
-		proofType = signature.VerificationKeySignatureMap["EcdsaSecp256k1VerificationKey2019"]
+		proofType = verification.VerificationKeySignatureMap["EcdsaSecp256k1VerificationKey2019"]
 	}
 
 	var schemaProof *types.SchemaProof = &types.SchemaProof{
@@ -197,9 +197,9 @@ func GenerateCredStatusRPCElements(keyPair GenericKeyPair, Id string, verficatio
 	var proofType string
 	switch keyPair.(type) {
 	case ed25519KeyPair:
-		proofType = signature.VerificationKeySignatureMap["Ed25519VerificationKey2020"]
+		proofType = verification.VerificationKeySignatureMap["Ed25519VerificationKey2020"]
 	case secp256k1KeyPair:
-		proofType = signature.VerificationKeySignatureMap["EcdsaSecp256k1VerificationKey2019"]
+		proofType = verification.VerificationKeySignatureMap["EcdsaSecp256k1VerificationKey2019"]
 	}
 
 	var credentialProof *types.CredentialProof = &types.CredentialProof{
