@@ -66,8 +66,13 @@ func GetModifiedDidDocumentSignature(modifiedDidDocument *types.Did, keyPair ed2
 }
 
 func GenerateDidDocumentRPCElements(keyPair GenericKeyPair) DidRpcElements {
-	var publicKey string = GetPublicKeyGeneric(keyPair)
-	var didId = "did:" + DidMethod + ":" + ChainNamespace + ":" + publicKey
+	publicKey, optionalID := GetPublicKeyAndOptionalID(keyPair)
+	var didId string
+	if optionalID == "" {
+		didId = "did:" + DidMethod + ":" + ChainNamespace + ":" + publicKey
+	} else {
+		didId = "did:" + DidMethod + ":" + ChainNamespace + ":" + optionalID
+	}
 
 	var verificationMethodId string = didId + "#" + "key-1"
 
