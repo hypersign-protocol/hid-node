@@ -14,6 +14,7 @@ import (
 	"github.com/hypersign-protocol/hid-node/x/ssi/signature"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 	"github.com/multiformats/go-multibase"
+	secp256k1 "github.com/tendermint/tendermint/crypto/secp256k1"
 )
 
 func getDidSigningInfo(didDoc *types.Did, signingElements []DidSigningElements) []*types.SignInfo {
@@ -74,6 +75,8 @@ func GenerateDidDocumentRPCElements(keyPair GenericKeyPair) DidRpcElements {
 	switch keyPair.(type) {
 	case ed25519KeyPair:
 		vmType = signature.Ed25519VerificationKey2020
+	case secp256k1KeyPair:
+		vmType = signature.EcdsaSecp256k1VerificationKey2019
 	}
 
 	var vm = &types.VerificationMethod{
@@ -121,7 +124,7 @@ func GenerateDidDocumentRPCElements(keyPair GenericKeyPair) DidRpcElements {
 	}
 }
 
-func GenerateSchemaDocumentRPCElements(keyPair ed25519KeyPair, Id string, verficationMethodId string) SchemaRpcElements {
+func GenerateSchemaDocumentRPCElements(keyPair GenericKeyPair, Id string, verficationMethodId string) SchemaRpcElements {
 	var schemaId string = "sch:" + DidMethod + ":" + "devnet" + ":" + strings.Split(Id, ":")[3] + ":1.0"
 	var schemaDocument *types.SchemaDocument = &types.SchemaDocument{
 		Type:         "https://w3c-ccg.github.io/vc-json-schemas/schema/1.0/schema.json",
@@ -141,11 +144,19 @@ func GenerateSchemaDocumentRPCElements(keyPair ed25519KeyPair, Id string, verfic
 	}
 
 	var schemaDocumentSignature string = base64.StdEncoding.EncodeToString(
-		ed25519.Sign(keyPair.privateKey, schemaDocument.GetSignBytes()),
+		SignGeneric(keyPair, schemaDocument.GetSignBytes()),
 	)
 
+	var proofType string
+	switch keyPair.(type) {
+	case ed25519KeyPair:
+		proofType = signature.VerificationKeySignatureMap["Ed25519VerificationKey2020"]
+	case secp256k1KeyPair:
+		proofType = signature.VerificationKeySignatureMap["EcdsaSecp256k1VerificationKey2019"]
+	}
+
 	var schemaProof *types.SchemaProof = &types.SchemaProof{
-		Type:               "Ed25519Signature2020",
+		Type:               proofType,
 		Created:            "2022-04-10T04:07:12Z",
 		VerificationMethod: verficationMethodId,
 		ProofValue:         schemaDocumentSignature,
@@ -159,7 +170,7 @@ func GenerateSchemaDocumentRPCElements(keyPair ed25519KeyPair, Id string, verfic
 	}
 }
 
-func GenerateCredStatusRPCElements(keyPair ed25519KeyPair, Id string, verficationMethod *types.VerificationMethod) CredRpcElements {
+func GenerateCredStatusRPCElements(keyPair GenericKeyPair, Id string, verficationMethod *types.VerificationMethod) CredRpcElements {
 	var credentialId = "vc:" + DidMethod + ":" + "devnet:" + strings.Split(Id, ":")[3]
 	var credHash = sha256.Sum256([]byte("Hash1234"))
 	var credentialStatus *types.CredentialStatus = &types.CredentialStatus{
@@ -175,11 +186,19 @@ func GenerateCredStatusRPCElements(keyPair ed25519KeyPair, Id string, verficatio
 	}
 
 	var credentialStatusSignature string = base64.StdEncoding.EncodeToString(
-		ed25519.Sign(keyPair.privateKey, credentialStatus.GetSignBytes()),
+		SignGeneric(keyPair, credentialStatus.GetSignBytes()),
 	)
 
+	var proofType string
+	switch keyPair.(type) {
+	case ed25519KeyPair:
+		proofType = signature.VerificationKeySignatureMap["Ed25519VerificationKey2020"]
+	case secp256k1KeyPair:
+		proofType = signature.VerificationKeySignatureMap["EcdsaSecp256k1VerificationKey2019"]
+	}
+
 	var credentialProof *types.CredentialProof = &types.CredentialProof{
-		Type:               "Ed25519Signature2020",
+		Type:               proofType,
 		Created:            "2022-04-10T04:07:12Z",
 		Updated:            "2022-04-10T04:07:12Z",
 		VerificationMethod: verficationMethod.Id,
@@ -208,6 +227,21 @@ func GenerateEd25519KeyPair() ed25519KeyPair {
 	return ed25519KeyPair{
 		publicKey:  publicKeyBase58Encoded,
 		privateKey: privateKey,
+	}
+}
+
+func GenerateSecp256k1KeyPair() secp256k1KeyPair {
+	privateKey := secp256k1.GenPrivKey()
+
+	publicKey := privateKey.PubKey().Bytes()
+
+	publicKeyMultibase, err := multibase.Encode(multibase.Base58BTC, publicKey)
+	if err != nil {
+		panic("Error while encoding multibase string")
+	}
+	return secp256k1KeyPair{
+		publicKey:  publicKeyMultibase,
+		privateKey: &privateKey,
 	}
 }
 

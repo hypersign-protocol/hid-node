@@ -20,3 +20,36 @@ type (
 		IsValid bool
 	}
 )
+
+// Struct catering to supported Client Spec's required inputs
+type ClientSpecOpts struct {
+	SSIDocBytes   []byte
+	SignerAddress string
+}
+
+// Cosmos ADR SignDoc Struct Definitions
+type (
+	Val struct {
+		Data   string `json:"data"`
+		Signer string `json:"signer"`
+	}
+
+	Msg struct {
+		Type  string `json:"type"`
+		Value Val    `json:"value"`
+	}
+
+	Fees struct {
+		Amount []string `json:"amount"`
+		Gas    string   `json:"gas"`
+	}
+
+	SignDoc struct {
+		AccountNumber string `json:"account_number"`
+		ChainId       string `json:"chain_id"`
+		Fee           Fees   `json:"fee"`
+		Memo          string `json:"memo"`
+		Msgs          []Msg  `json:"msgs"`
+		Sequence      string `json:"sequence"`
+	}
+)

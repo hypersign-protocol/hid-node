@@ -103,6 +103,18 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 			return nil, err
 		}
 
+		// ClientSpec check
+		clientSpecType := msg.ClientSpec
+		clientSpecOpts := types.ClientSpecOpts{
+			SSIDocBytes:   credMsg.GetSignBytes(),
+			SignerAddress: msg.Creator,
+		}
+
+		credDocBytes, err := getClientSpecDocBytes(clientSpecType, clientSpecOpts)
+		if err != nil {
+			return nil, err
+		}
+
 		// Proof Type Check
 		err = sigVerify.DocumentProofTypeCheck(credProof.Type, signersWithVM, credProof.VerificationMethod)
 		if err != nil {
@@ -110,7 +122,7 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 		}
 
 		// Verify Signature
-		err = sigVerify.VerifyDocumentSignature(&ctx, credMsg, signersWithVM, signatures)
+		err = sigVerify.VerifyDocumentSignature(&ctx, credDocBytes, signersWithVM, signatures)
 		if err != nil {
 			return nil, err
 		}
@@ -127,7 +139,7 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 		id = k.RegisterCred(ctx, cred)
 
 	} else {
-		cred, err := k.updateCredentialStatus(ctx, credMsg, credProof)
+		cred, err := k.updateCredentialStatus(ctx, msg)
 		if err != nil {
 			return nil, err
 		}
@@ -137,7 +149,10 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 	return &types.MsgRegisterCredentialStatusResponse{Id: id}, nil
 }
 
-func (k msgServer) updateCredentialStatus(ctx sdk.Context, newCredStatus *types.CredentialStatus, newCredProof *types.CredentialProof) (*types.Credential, error) {
+func (k msgServer) updateCredentialStatus(ctx sdk.Context, msg *types.MsgRegisterCredentialStatus) (*types.Credential, error) {
+	newCredStatus := msg.CredentialStatus
+	newCredProof := msg.Proof
+
 	credId := newCredStatus.GetClaim().GetId()
 
 	// Get Credential from store
@@ -286,6 +301,18 @@ func (k msgServer) updateCredentialStatus(ctx sdk.Context, newCredStatus *types.
 		return nil, err
 	}
 
+	// ClientSpec check
+	clientSpecType := msg.ClientSpec
+	clientSpecOpts := types.ClientSpecOpts{
+		SSIDocBytes:   newCredStatus.GetSignBytes(),
+		SignerAddress: msg.Creator,
+	}
+
+	credDocBytes, err := getClientSpecDocBytes(clientSpecType, clientSpecOpts)
+	if err != nil {
+		return nil, err
+	}
+
 	// Proof Type Check
 	err = sigVerify.DocumentProofTypeCheck(newCredProof.Type, signersWithVM, newCredProof.VerificationMethod)
 	if err != nil {
@@ -293,7 +320,7 @@ func (k msgServer) updateCredentialStatus(ctx sdk.Context, newCredStatus *types.
 	}
 
 	// Verify Signature
-	err = sigVerify.VerifyDocumentSignature(&ctx, newCredStatus, signersWithVM, signatures)
+	err = sigVerify.VerifyDocumentSignature(&ctx, credDocBytes, signersWithVM, signatures)
 	if err != nil {
 		return nil, err
 	}

@@ -33,4 +33,5 @@ var (
 	ErrInvalidCredentialHash      = sdkerrors.Register(ModuleName, 123, "Invalid Credential Hash")
 	ErrInvalidSchemaModelVersion  = sdkerrors.Register(ModuleName, 124, "Invalid Schema Model Version")
 	ErrNullSchemaField            = sdkerrors.Register(ModuleName, 125, "Null Schema Field")
+	ErrInvalidClientSpecType      = sdkerrors.Register(ModuleName, 126, "Invalid Client Spec Type")
 )

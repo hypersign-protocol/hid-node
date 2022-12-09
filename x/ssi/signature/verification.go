@@ -33,7 +33,7 @@ func VerifyIdentitySignature(signer types.Signer, signatures []*types.SignInfo, 
 	return result, nil
 }
 
-func VerifyDidSignature(ctx *sdk.Context, msg *types.Did, signers []types.Signer, signatures []*types.SignInfo) error {
+func VerifyDidSignature(ctx *sdk.Context, didDocBytes []byte, signers []types.Signer, signatures []*types.SignInfo) error {
 	var validArr []types.ValidDid
 
 	if len(signers) == 0 {
@@ -44,10 +44,8 @@ func VerifyDidSignature(ctx *sdk.Context, msg *types.Did, signers []types.Signer
 		return types.ErrInvalidSignature.Wrap("At least one signature should be present")
 	}
 
-	signingInput := msg.GetSignBytes()
-
 	for _, signer := range signers {
-		valid, err := VerifyIdentitySignature(signer, signatures, signingInput)
+		valid, err := VerifyIdentitySignature(signer, signatures, didDocBytes)
 		if err != nil {
 			return sdkerrors.Wrap(types.ErrInvalidSignature, err.Error())
 		}
@@ -77,7 +75,7 @@ func DocumentProofTypeCheck(inputProofType string, signers []types.Signer, vmId 
 		}
 	}
 
-	var expectedProofType string = verificationKeySignatureMap[vmType]
+	var expectedProofType string = VerificationKeySignatureMap[vmType]
 	if inputProofType != expectedProofType {
 		return fmt.Errorf(
 			"expected document proof type for verification method type %s to be '%s', recieved '%s'",
@@ -90,12 +88,11 @@ func DocumentProofTypeCheck(inputProofType string, signers []types.Signer, vmId 
 }
 
 // Verify Signature for Credential Schema and Credential Status Documents
-func VerifyDocumentSignature(ctx *sdk.Context, msg types.IdentityMsg, signers []types.Signer, signatures []*types.SignInfo) error {
+func VerifyDocumentSignature(ctx *sdk.Context, docBytes []byte, signers []types.Signer, signatures []*types.SignInfo) error {
 	var validArr []types.ValidDid
-	signingInput := msg.GetSignBytes()
 
 	for _, signer := range signers {
-		valid, err := VerifyIdentitySignature(signer, signatures, signingInput)
+		valid, err := VerifyIdentitySignature(signer, signatures, docBytes)
 		if err != nil {
 			return sdkerrors.Wrap(types.ErrInvalidSignature, err.Error())
 		}

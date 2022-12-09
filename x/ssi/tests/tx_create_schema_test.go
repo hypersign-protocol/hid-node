@@ -16,7 +16,7 @@ func TestCreateSchema(t *testing.T) {
 
 	k.SetChainNamespace(&ctx, "devnet")
 
-	keyPair1 := GenerateEd25519KeyPair()
+	keyPair1 := GenerateSecp256k1KeyPair()
 	rpcElements := GenerateDidDocumentRPCElements(keyPair1)
 	t.Logf("Registering DID with DID Id: %s", rpcElements.DidDocument.GetId())
 

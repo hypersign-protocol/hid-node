@@ -74,6 +74,18 @@ func (k msgServer) CreateSchema(goCtx context.Context, msg *types.MsgCreateSchem
 		return nil, err
 	}
 
+	// ClientSpec check
+	clientSpecType := msg.ClientSpec
+	clientSpecOpts := types.ClientSpecOpts{
+		SSIDocBytes:   schemaDoc.GetSignBytes(),
+		SignerAddress: msg.Creator,
+	}
+
+	schemaDocBytes, err := getClientSpecDocBytes(clientSpecType, clientSpecOpts)
+	if err != nil {
+		return nil, err
+	}
+
 	// Proof Type Check
 	err = sigVerify.DocumentProofTypeCheck(schemaProof.Type, signersWithVM, schemaProof.VerificationMethod)
 	if err != nil {
@@ -81,7 +93,7 @@ func (k msgServer) CreateSchema(goCtx context.Context, msg *types.MsgCreateSchem
 	}
 
 	// Signature check
-	if err := sigVerify.VerifyDocumentSignature(&ctx, schemaDoc, signersWithVM, signatures); err != nil {
+	if err := sigVerify.VerifyDocumentSignature(&ctx, schemaDocBytes, signersWithVM, signatures); err != nil {
 		return nil, err
 	}
 

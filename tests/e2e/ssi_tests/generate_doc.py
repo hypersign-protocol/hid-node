@@ -22,6 +22,8 @@ def generate_did_document(key_pair, algo="ed25519"):
     vm_type = ""
     if algo == "ed25519":
         vm_type = "Ed25519VerificationKey2020"
+    elif algo == "secp256k1":
+        vm_type = "EcdsaSecp256k1VerificationKey2019"
     else:
         raise Exception("unknown signing algorithm: " + key_pair)
 
@@ -40,7 +42,7 @@ def generate_did_document(key_pair, algo="ed25519"):
     base_document["assertionMethod"] = [authentication_verification_method_id]
     return base_document
     
-def generate_schema_document(key_pair, schema_author, vm, signature=None):
+def generate_schema_document(key_pair, schema_author, vm, signature=None, algo="ed25519"):
     base_schema_doc = {
         "type": "https://schema.org/Person",
         "modelVersion": "v1.0",
@@ -57,8 +59,16 @@ def generate_schema_document(key_pair, schema_author, vm, signature=None):
         }
     }
     
+    proof_type = ""
+    if algo == "ed25519":
+        proof_type = "Ed25519Signature2020"
+    elif algo == "secp256k1":
+        proof_type = "EcdsaSecp256k1Signature2019"
+    else:
+        raise Exception("Invalid signing algo: " + algo)
+
     base_schema_proof = {
-        "type": "Ed25519Signature2020",
+        "type": proof_type,
         "created": "2022-08-16T10:22:12Z",
         "verificationMethod": "",
         "proofValue": "",
@@ -72,13 +82,13 @@ def generate_schema_document(key_pair, schema_author, vm, signature=None):
 
     # Form Signature
     if not signature:
-        signature = get_document_signature(base_schema_doc, "schema", key_pair)
+        signature = get_document_signature(base_schema_doc, "schema", key_pair, algo)
         
     base_schema_proof["proofValue"] = signature
 
     return base_schema_doc, base_schema_proof
 
-def generate_cred_status_document(key_pair, cred_author, vm, signature=None):
+def generate_cred_status_document(key_pair, cred_author, vm, signature=None, algo="ed25519"):
     base_cred_status_doc = {
         "claim": {
                 "id": "",
@@ -91,8 +101,16 @@ def generate_cred_status_document(key_pair, cred_author, vm, signature=None):
         "credentialHash": "f35c3a4e3f1b8ba54ee3cf59d3de91b8b357f707fdb72a46473b65b46f92f80b"
     }
     
+    proof_type = ""
+    if algo == "ed25519":
+        proof_type = "Ed25519Signature2020"
+    elif algo == "secp256k1":
+        proof_type = "EcdsaSecp256k1Signature2019"
+    else:
+        raise Exception("Invalid signing algo: " + algo)
+    
     base_cred_status_proof = {
-        "type": "Ed25519Signature2020",
+        "type": proof_type,
         "created": "2022-08-16T09:37:12Z",
         "updated": "2022-08-16T09:37:12Z",
         "verificationMethod": "",
@@ -107,7 +125,7 @@ def generate_cred_status_document(key_pair, cred_author, vm, signature=None):
 
     # Form Signature
     if not signature:
-        signature = get_document_signature(base_cred_status_doc, "cred-status", key_pair)
+        signature = get_document_signature(base_cred_status_doc, "cred-status", key_pair, algo)
 
     base_cred_status_proof["proofValue"] = signature
 
