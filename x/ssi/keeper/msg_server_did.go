@@ -6,8 +6,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	docVerify "github.com/hypersign-protocol/hid-node/x/ssi/document_verification"
-	"github.com/hypersign-protocol/hid-node/x/ssi/signature"
+	"github.com/hypersign-protocol/hid-node/x/ssi/verification"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 )
 
@@ -26,7 +25,7 @@ func (k msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*t
 	signatures := msg.GetSignatures()
 
 	// Checks if the Did Document is valid
-	err = docVerify.ValidateDidDocument(msg.DidDocString, chainNamespace)
+	err = verification.ValidateDidDocument(msg.DidDocString, chainNamespace)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +56,7 @@ func (k msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*t
 		return nil, err
 	}
 
-	if err := signature.VerifyDidSignature(&ctx, didDocBytes, didSignersWithVM, signatures); err != nil {
+	if err := verification.VerifyDidSignature(&ctx, didDocBytes, didSignersWithVM, signatures); err != nil {
 		return nil, err
 	}
 
@@ -86,7 +85,7 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 	chainNamespace := k.GetChainNamespace(&ctx)
 
 	// Check if the input DID Document is valid
-	err := docVerify.ValidateDidDocument(didMsg, chainNamespace)
+	err := verification.ValidateDidDocument(didMsg, chainNamespace)
 	if err != nil {
 		return nil, err
 	}
@@ -105,7 +104,7 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 	oldMetaData := oldDIDDoc.GetDidDocumentMetadata()
 
 	// Check if the status of DID Document is deactivated
-	if err := docVerify.VerifyDidDeactivate(oldMetaData, didId); err != nil {
+	if err := verification.VerifyDidDeactivate(oldMetaData, didId); err != nil {
 		return nil, err
 	}
 
@@ -139,7 +138,7 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 		return nil, err
 	}
 
-	if err := signature.VerifyDidSignature(&ctx, didDocBytes, signersWithVm, msg.Signatures); err != nil {
+	if err := verification.VerifyDidSignature(&ctx, didDocBytes, signersWithVm, msg.Signatures); err != nil {
 		return nil, err
 	}
 
@@ -172,7 +171,7 @@ func (k msgServer) DeactivateDID(goCtx context.Context, msg *types.MsgDeactivate
 	chainNamespace := k.GetChainNamespace(&ctx)
 
 	// Check if the Did id format is valid
-	err := docVerify.IsValidID(didId, chainNamespace, "didDocument")
+	err := verification.IsValidID(didId, chainNamespace, "didDocument")
 	if err != nil {
 		return nil, err
 	}
@@ -192,7 +191,7 @@ func (k msgServer) DeactivateDID(goCtx context.Context, msg *types.MsgDeactivate
 	oldVersionId := metadata.GetVersionId()
 
 	// Check if the DID is already deactivated
-	if err := docVerify.VerifyDidDeactivate(metadata, didId); err != nil {
+	if err := verification.VerifyDidDeactivate(metadata, didId); err != nil {
 		return nil, err
 	}
 
@@ -228,7 +227,7 @@ func (k msgServer) DeactivateDID(goCtx context.Context, msg *types.MsgDeactivate
 		return nil, err
 	}
 
-	if err := signature.VerifyDidSignature(&ctx, didDocBytes, signersWithVM, signatures); err != nil {
+	if err := verification.VerifyDidSignature(&ctx, didDocBytes, signersWithVM, signatures); err != nil {
 		return nil, err
 	}
 

@@ -7,8 +7,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	docVerify "github.com/hypersign-protocol/hid-node/x/ssi/document_verification"
-	sigVerify "github.com/hypersign-protocol/hid-node/x/ssi/signature"
+	"github.com/hypersign-protocol/hid-node/x/ssi/verification"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 )
 
@@ -32,7 +31,7 @@ func (k msgServer) CreateSchema(goCtx context.Context, msg *types.MsgCreateSchem
 	}
 
 	// Check if Schema ID is valid
-	err = docVerify.IsValidID(schemaID, chainNamespace, "schemaDocument")
+	err = verification.IsValidID(schemaID, chainNamespace, "schemaDocument")
 	if err != nil {
 		return nil, sdkerrors.Wrap(types.ErrInvalidSchemaID, err.Error())
 	}
@@ -87,13 +86,13 @@ func (k msgServer) CreateSchema(goCtx context.Context, msg *types.MsgCreateSchem
 	}
 
 	// Proof Type Check
-	err = sigVerify.DocumentProofTypeCheck(schemaProof.Type, signersWithVM, schemaProof.VerificationMethod)
+	err = verification.DocumentProofTypeCheck(schemaProof.Type, signersWithVM, schemaProof.VerificationMethod)
 	if err != nil {
 		return nil, err
 	}
 
 	// Signature check
-	if err := sigVerify.VerifyDocumentSignature(&ctx, schemaDocBytes, signersWithVM, signatures); err != nil {
+	if err := verification.VerifyDocumentSignature(&ctx, schemaDocBytes, signersWithVM, signatures); err != nil {
 		return nil, err
 	}
 
