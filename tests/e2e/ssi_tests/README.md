@@ -10,6 +10,7 @@ Following scenarios are covered for E2E testing:
 6. Parent DID adds multiple DIDs in its controller group, and removes itself. One of the controllers attemps to change the DID Document (Valid Case)
 7. Parent DID adds multiple DIDs in its controller group, and removes itself. The Parent attempts to make changes in its DID Document (Invalid Case)
 8. Deactivated DID attempts to create Schema and Credential Status Documents.
+9. Every `x/ssi` module related transactions, using `secp256k1` keypair
 
 ### Run Tests
 
