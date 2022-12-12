@@ -79,9 +79,9 @@ def multiple_controllers_with_one_signer():
     run_blockchain_command(create_did_tx_cmd, f"Registering DID with Id: {controller_1_did_doc_id}")
 
     print("Registering 2nd Controller DID Document")
-    kp_controller_2_did = generate_key_pair()
-    controller_2_did_doc = generate_did_document(kp_controller_2_did)
-    create_did_tx_cmd = form_did_create_tx(controller_2_did_doc, kp_controller_2_did, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
+    kp_controller_2_did = generate_key_pair(algo="secp256k1")
+    controller_2_did_doc = generate_did_document(kp_controller_2_did, algo="secp256k1")
+    create_did_tx_cmd = form_did_create_tx(controller_2_did_doc, kp_controller_2_did, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME, signing_algo="secp256k1")
     controller_2_did_doc_id = controller_2_did_doc["id"]
     run_blockchain_command(create_did_tx_cmd, f"Registering DID with Id: {controller_2_did_doc_id}")
 
@@ -102,7 +102,8 @@ def multiple_controllers_with_one_signer():
         parent_did_doc, 
         kp_controller_2_did, 
         DEFAULT_BLOCKCHAIN_ACCOUNT_NAME,
-        controller_2_did_doc["authentication"][0]
+        controller_2_did_doc["authentication"][0],
+        "secp256k1"
     )
     run_blockchain_command(update_did_tx_cmd, f"2nd Controller trying to update Parent DID")
 
@@ -340,3 +341,66 @@ def invalid_case_controller_creates_schema_cred_status():
 
     print("\n-------Test Completed------\n")
 
+def did_operations_using_secp256k1():
+    print("\n--- Test: DID Operations using Secp256k1 Key Pair ---\n")
+
+    kp_algo = "secp256k1"
+    kp = generate_key_pair(algo=kp_algo)
+
+    print("Registering a DID Document")
+    did_doc_string = generate_did_document(kp, kp_algo)
+    did_doc_id = did_doc_string["id"]
+    create_tx_cmd = form_did_create_tx(did_doc_string, kp, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME, signing_algo=kp_algo)
+    run_blockchain_command(create_tx_cmd, f"Registering DID with Id: {did_doc_id}")
+
+    print("Registering a Schema Document")
+    schema_doc, schema_proof = generate_schema_document(
+        kp, 
+        did_doc_id, 
+        did_doc_string["authentication"][0],
+        algo = kp_algo
+    )
+    create_schema_cmd = form_create_schema_tx(
+        schema_doc, 
+        schema_proof, 
+        DEFAULT_BLOCKCHAIN_ACCOUNT_NAME
+    )
+    schema_doc_id = schema_doc["id"]
+    run_blockchain_command(create_schema_cmd, f"Registering Schema with Id: {schema_doc_id}")
+
+    print("Registering a Credential Status Document")
+    cred_doc, cred_proof = generate_cred_status_document(
+        kp,
+        did_doc_id,
+        did_doc_string["authentication"][0],
+        algo = kp_algo
+    )
+    register_cred_status_cmd = form_create_cred_status_tx(
+        cred_doc,
+        cred_proof,
+        DEFAULT_BLOCKCHAIN_ACCOUNT_NAME
+    )
+    cred_id = cred_doc["claim"]["id"]
+    run_blockchain_command(register_cred_status_cmd, f"Registering Credential status with Id: {cred_id}")
+
+    print("Updating the Registered DID Document")
+    registered_did_doc = query_did(did_doc_id)["didDocument"]
+    registered_did_doc["context"] = registered_did_doc["context"].append("newwebsite.com")
+    update_did_tx_cmd = form_did_update_tx(
+        registered_did_doc, 
+        kp, 
+        DEFAULT_BLOCKCHAIN_ACCOUNT_NAME,
+        signing_algo=kp_algo
+    )
+    run_blockchain_command(update_did_tx_cmd, f"Updating DID Document with Id: {did_doc_id}")
+
+    print("Deactivating the Registered DID Document")
+    deactivate_did_tx_cmd = form_did_deactivate_tx(
+        did_doc_id, 
+        kp, 
+        DEFAULT_BLOCKCHAIN_ACCOUNT_NAME,
+        signing_algo=kp_algo
+    )
+    run_blockchain_command(deactivate_did_tx_cmd, f"Deactivating DID Document with Id: {did_doc_id}")
+
+    print("\n-------Test Completed------\n")

@@ -10,7 +10,7 @@ The `did:hid` method are as follows:
 did                = "did:" method-name ":" [chain-namespace] ":" method-specific-id
 method-name        = "hid"
 chain-namespace    = ALPHA / DIGIT
-method-specific-id = 45 * id-char
+method-specific-id = Mulitbase encoded string
 id-char            = ALPHA / DIGIT
 ```
 
@@ -33,6 +33,11 @@ The `did:hid` method supports the following operations:
   - Query a DID Document
   - Query registered DID Documents
 
+## Supported Digital Signature Algorithms
+
+- **ed25519**
+- **secp256k1**
+
 ## Usage
 
 ### Register DID
@@ -41,14 +46,14 @@ The `did:hid` method supports the following operations:
 
 ```
 Usage:
-  hid-noded tx ssi create-did [did-doc-string] [verification-method-id] [flags]
+  hid-noded tx ssi create-did [did-doc-string] [vm-id-1] [sign-key-1] [sign-key-algo-1] ... [vm-id-N] [sign-key-N] [sign-key-algo-N] [flags]
 
 Params:
  - did-doc-string : Did Document String
- - verification-method-id : Id of verification Method Key
+ - vm-id-N : Verification Method Id
+ - sign-key-N : Base64-encoded signing key
+ - sign-key-algo-N: Supported Signing Key Algorithm
 
-Flags:
- - ver-key : Private Key of the Signer
 ```
 
 **Example**
@@ -88,7 +93,7 @@ hid-noded tx ssi create-did '{
 "assertionMethod": [
 "did:hid:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4#key-1"
 ]
-}' did:hid:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4#key-1 --ver-key <base64-encoded-private-key> --from <key-name-or-address> --chain-id <Chain ID> --yes
+}' did:hid:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4#key-1 <base64-encoded-private-key> ed25519 --from <key-name-or-address> --chain-id <Chain ID> --yes
 ```
 
 ### Query DID
@@ -295,10 +300,10 @@ Usage:
 Params:
  - did-doc-string : Did Document string
  - version-id : Version ID of the DID Document to be updated. It is expected that version Id should match latest DID Document's version Id
- - verification-method-id : Id of verification Method Key
+ - vm-id-N : Verification Method Id
+ - sign-key-N : Base64-encoded signing key
+ - sign-key-algo-N: Supported Signing Key Algorithm
 
-Flags:
- - --ver-key : Private Key of the Signer
 ```
 
 **Example**
@@ -324,7 +329,7 @@ hid-noded tx ssi update-did '{
 "authentication": [
 "did:hid:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4#key-1"
 ]
-}' <version-id> did:hid:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4#key-1 --ver-key <private-key> --from <key-name-or-address> --chain-id <Chain ID> --yes
+}' <version-id> did:hid:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4#key-1 <private-key> ed25519 --from <key-name-or-address> --chain-id <Chain ID> --yes
 ```
 
 ### Deactivate DID
@@ -338,14 +343,14 @@ Usage:
 Params:
  - did-id : DID Document ID
  - version-id : Version ID of the DID Document to be deactivated. It is expected that version Id should match latest DID Document's version Id
- - verification-method-id : Id of verification Method Key
+ - vm-id-N : Verification Method Id
+ - sign-key-N : Base64-encoded signing key
+ - sign-key-algo-N: Supported Signing Key Algorithm
 
-Flags:
- - --ver-key : Private Key of the Signer
 ```
 
 **Example**
 
 ```sh
-hid-noded tx ssi deactivate-did 'did:hid:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4' <version-id> did:hid:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4#key-1 --ver-key <private-key> --from <key-name-or-address> --chain-id <Chain Id> --yes
+hid-noded tx ssi deactivate-did 'did:hid:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4' <version-id> did:hid:devnet:z8BXg2zjwBRTrjPs7uCnkFBKrL9bPD14HxEJMENxm3CJ4#key-1 <base64-encoded-private-key> ed25519 --from <key-name-or-address> --chain-id <Chain Id> --yes
 ```

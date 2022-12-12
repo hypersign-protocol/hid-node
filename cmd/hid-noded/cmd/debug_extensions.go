@@ -10,13 +10,70 @@ import (
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
+	hidnodecli "github.com/hypersign-protocol/hid-node/x/ssi/client/cli"
 	"github.com/multiformats/go-multibase"
 	"github.com/spf13/cobra"
+	secp256k1 "github.com/tendermint/tendermint/crypto/secp256k1"
 )
 
 func extendDebug(debugCmd *cobra.Command) *cobra.Command {
-	debugCmd.AddCommand(ed25519Cmd())
+	debugCmd.AddCommand(
+		ed25519Cmd(),
+		secp256k1Cmd(),
+		signSSIDocCmd(),
+	)
 	return debugCmd
+}
+
+func secp256k1Cmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "secp256k1",
+		Short: "secp256k1 debug commands",
+	}
+
+	cmd.AddCommand(
+		secp256k1RandomCmd(),
+	)
+
+	return cmd
+}
+
+func secp256k1RandomCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "random",
+		Short: "Generate random secp256k1 keypair",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			privateKeyObj := secp256k1.GenPrivKey()
+
+			privateKey := privateKeyObj.Bytes()
+			publicKeyCompressed := privateKeyObj.PubKey().Bytes()
+
+			publicKeyMultibase, err := multibase.Encode(multibase.Base58BTC, publicKeyCompressed)
+			if err != nil {
+				panic(err)
+			}
+
+			keyInfo := struct {
+				PubKeyBase64    string `json:"pub_key_base_64"`
+				PubKeyMultibase string `json:"pub_key_multibase"`
+				PrivKeyBase64   string `json:"priv_key_base_64"`
+			}{
+				PubKeyBase64:    base64.StdEncoding.EncodeToString(publicKeyCompressed),
+				PubKeyMultibase: publicKeyMultibase,
+				PrivKeyBase64:   base64.StdEncoding.EncodeToString(privateKey),
+			}
+
+			keyInfoJson, err := json.Marshal(keyInfo)
+			if err != nil {
+				return err
+			}
+
+			_, err = fmt.Fprintln(cmd.OutOrStdout(), string(keyInfoJson))
+			return err
+		},
+	}
+
+	return cmd
 }
 
 // ed25519Cmd returns cobra Command.
@@ -30,7 +87,6 @@ func ed25519Cmd() *cobra.Command {
 		ed25519RandomCmd(),
 		base64toMultibase58Cmd(),
 		multibase58toBase64Cmd(),
-		signSSIDocCmd(),
 	)
 
 	return cmd
@@ -52,15 +108,13 @@ func signSSIDocCmd() *cobra.Command {
 
 func signSchemaDocCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "schema-doc [doc] [base64 encoded private-key]",
+		Use:   "schema-doc [doc] [base64 encoded private-key] [signing-algo]",
 		Short: "Schema Document signature",
-		Args:  cobra.ExactArgs(2),
+		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			argSchemaDoc := args[0]
-			privateKey, err := base64.StdEncoding.DecodeString(args[1])
-			if err != nil {
-				return err
-			}
+			argPrivateKey := args[1]
+			argSigningAlgo := args[2]
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -73,12 +127,24 @@ func signSchemaDocCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
+			schemaDocBytes := schemaDoc.GetSignBytes()
 
 			// Sign Schema Document
-			schemaDocBytes := schemaDoc.GetSignBytes()
-			signature := base64.StdEncoding.EncodeToString(
-				ed25519.Sign(privateKey, schemaDocBytes),
-			)
+			var signature string
+			switch argSigningAlgo {
+			case "ed25519":
+				signature, err = hidnodecli.GetEd25519Signature(argPrivateKey, schemaDocBytes)
+				if err != nil {
+					return err
+				}
+			case "secp256k1":
+				signature, err = hidnodecli.GetSecp256k1Signature(argPrivateKey, schemaDocBytes)
+				if err != nil {
+					return err
+				}
+			default:
+				panic("recieved unsupported signing-algo. Supported algorithms are: ['ed25519', 'secp256k1']")
+			}
 
 			_, err = fmt.Fprintln(cmd.OutOrStdout(), signature)
 			return err
@@ -89,15 +155,13 @@ func signSchemaDocCmd() *cobra.Command {
 
 func signCredStatusDocCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "cred-status-doc [doc] [base64 encoded private-key]",
+		Use:   "cred-status-doc [doc] [base64 encoded private-key] [signing-algo]",
 		Short: "Credential Status Document signature",
-		Args:  cobra.ExactArgs(2),
+		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			argCredStatusDoc := args[0]
-			privateKey, err := base64.StdEncoding.DecodeString(args[1])
-			if err != nil {
-				return err
-			}
+			argPrivateKey := args[1]
+			argSigningAlgo := args[2]
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -110,12 +174,24 @@ func signCredStatusDocCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
+			credStatusDocBytes := credStatusDoc.GetSignBytes()
 
 			// Sign Credential Status Document
-			credStatusDocBytes := credStatusDoc.GetSignBytes()
-			signature := base64.StdEncoding.EncodeToString(
-				ed25519.Sign(privateKey, credStatusDocBytes),
-			)
+			var signature string
+			switch argSigningAlgo {
+			case "ed25519":
+				signature, err = hidnodecli.GetEd25519Signature(argPrivateKey, credStatusDocBytes)
+				if err != nil {
+					return err
+				}
+			case "secp256k1":
+				signature, err = hidnodecli.GetSecp256k1Signature(argPrivateKey, credStatusDocBytes)
+				if err != nil {
+					return err
+				}
+			default:
+				panic("recieved unsupported signing-algo. Supported algorithms are: ['ed25519', 'secp256k1']")
+			}
 
 			_, err = fmt.Fprintln(cmd.OutOrStdout(), signature)
 			return err

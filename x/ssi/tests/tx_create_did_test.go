@@ -39,6 +39,35 @@ func TestCreateDIDUsingEd25519KeyPair(t *testing.T) {
 	t.Log("Create DID Tx Test Completed")
 }
 
+func TestCreateDIDUsingSecp256k1KeyPair(t *testing.T) {
+	t.Log("Create DID with Secp256k1")
+
+	k, ctx := TestKeeper(t)
+	msgServer := keeper.NewMsgServerImpl(*k)
+	goCtx := sdk.WrapSDKContext(ctx)
+
+	k.SetChainNamespace(&ctx, "devnet")
+
+	keyPair1 := GenerateSecp256k1KeyPair()
+	rpcElements := GenerateDidDocumentRPCElements(keyPair1)
+
+	msgCreateDID := &types.MsgCreateDID{
+		DidDocString: rpcElements.DidDocument,
+		Signatures:   rpcElements.Signatures,
+		Creator:      rpcElements.Creator,
+	}
+	t.Logf("Signature in base64: %v", msgCreateDID.Signatures[0].Signature)
+	_, err := msgServer.CreateDID(goCtx, msgCreateDID)
+	if err != nil {
+		t.Error("DID Registeration Failed")
+		t.Error(err)
+		t.FailNow()
+	}
+	t.Log("Did Registeration Successful")
+
+	t.Log("Create DID Tx Test Completed")
+}
+
 func TestInvalidServiceType(t *testing.T) {
 	t.Log("Running test for Invalid Service Type")
 	k, ctx := TestKeeper(t)
@@ -76,4 +105,84 @@ func TestInvalidServiceType(t *testing.T) {
 	assert.Contains(t, err.Error(), fmt.Sprintf("Service Type %s is Invalid: Invalid Service", invalidServiceType))
 
 	t.Log("Test Completed")
+}
+
+func TestCheckValidMethodSpecificId(t *testing.T) {
+	t.Log("Running test to check valid method-specific Id")
+	
+	didIdValidMethodSpecificId := "hid17kuuyfz5pq2raapxet3t06c2f0xxd4yesa5we2"
+	didIdInvalidMethodSpecificId1 := "abc2322222"
+	didIdInvalidMethodSpecificId2 := "abc_2322222"
+
+	k, ctx := TestKeeper(t)
+	msgServer := keeper.NewMsgServerImpl(*k)
+	goCtx := sdk.WrapSDKContext(ctx)
+	// Set Namespace
+	k.SetChainNamespace(&ctx, "devnet")
+
+	keyPair1 := GenerateEd25519KeyPair()
+	keyPair1.optionalID = didIdValidMethodSpecificId
+
+	keyPair2 := GenerateSecp256k1KeyPair()
+	keyPair2.optionalID = didIdInvalidMethodSpecificId1
+
+	keyPair3 := GenerateEd25519KeyPair()
+	keyPair3.optionalID = didIdInvalidMethodSpecificId2
+	
+	var rpcElements DidRpcElements
+	var msgCreateDID *types.MsgCreateDID
+
+	t.Log("Registering DID Document with Valid Method Specific ID")
+
+	rpcElements = GenerateDidDocumentRPCElements(keyPair1)
+	msgCreateDID = &types.MsgCreateDID{
+		DidDocString: rpcElements.DidDocument,
+		Signatures:   rpcElements.Signatures,
+		Creator:      rpcElements.Creator,
+	}
+
+	_, err := msgServer.CreateDID(goCtx, msgCreateDID)
+	if err != nil {
+		t.Error("DID Registeration Failed")
+		t.Error(err)
+		t.FailNow()
+	}
+	t.Log("DID Document Registeration with Valid Method Specific Id is successful")
+
+	t.Logf("Registering DID Document with Invalid Method Specific ID - %s", keyPair2.optionalID)
+
+	rpcElements = GenerateDidDocumentRPCElements(keyPair2)
+	msgCreateDID = &types.MsgCreateDID{
+		DidDocString: rpcElements.DidDocument,
+		Signatures:   rpcElements.Signatures,
+		Creator:      rpcElements.Creator,
+	}
+
+	_, err = msgServer.CreateDID(goCtx, msgCreateDID)
+	if err == nil {
+		t.Error("DID Registeration was intended to fail, but it did not")
+		t.Error(err)
+		t.FailNow()
+	}
+
+	t.Logf("DID Document Registeration with invalid method specific id - %s failed as expected", keyPair2.optionalID)
+
+	t.Logf("Registering DID Document with Invalid Method Specific ID - %s", keyPair3.optionalID)
+
+	rpcElements = GenerateDidDocumentRPCElements(keyPair3)
+	msgCreateDID = &types.MsgCreateDID{
+		DidDocString: rpcElements.DidDocument,
+		Signatures:   rpcElements.Signatures,
+		Creator:      rpcElements.Creator,
+	}
+
+	_, err = msgServer.CreateDID(goCtx, msgCreateDID)
+	if err == nil {
+		t.Error("DID Registeration was intended to fail, but it did not")
+		t.Error(err)
+		t.FailNow()
+	}
+
+	t.Logf("DID Document Registeration with invalid method specific id - %s failed as expected", keyPair3.optionalID)
+
 }

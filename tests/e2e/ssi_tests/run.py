@@ -11,6 +11,7 @@ def run_all_tests():
     controller_did_trying_to_update_diddoc()
     multiple_controllers_with_one_signer()
     deactivated_did_should_not_create_ssi_elements()
+    did_operations_using_secp256k1()
 
     print("============= 😃️ All Tests Completed Successfully ============== \n")
 

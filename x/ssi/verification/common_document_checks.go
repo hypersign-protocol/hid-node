@@ -7,7 +7,6 @@ import (
 
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
-	"github.com/multiformats/go-multibase"
 )
 
 func documentIdentifier(docType string) string {
@@ -87,10 +86,23 @@ func IsValidID(Id string, namespace string, docType string) error {
 		}
 	}
 
-	// Check if method-specific-id follows multibase format
-	_, _, err := multibase.Decode(docElements[docMethodSpecificId])
+	// Check if method-specific-id string is alphanumeric and 
+	// has the minimum required character length of 32
+	isProperMethodSpecificId, err := regexp.MatchString(
+		"^[a-zA-Z0-9]{32,}$", 
+		docElements[docMethodSpecificId],
+	)
 	if err != nil {
-		return sdkerrors.Wrap(types.ErrInvalidMethodSpecificId, docElements[docMethodSpecificId])
+		return fmt.Errorf("error in parsing regular expression for method-specific-id: %s", err.Error())
+	}
+	if !isProperMethodSpecificId {
+		return sdkerrors.Wrap(
+			types.ErrInvalidMethodSpecificId, 
+			fmt.Sprintf(
+				"method-specific-id should be an alphanumeric string with minimum 32 characters, recieved: %s",
+				docElements[docMethodSpecificId],
+			),
+		)
 	}
 
 	// Check for Schema Version Number

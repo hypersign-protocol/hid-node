@@ -23,6 +23,11 @@ sch:hid:<chain-namespace>:<method-specific-id>:<version-number>
   - Query a Schema Document
   - Query Registered Schema Documents
 
+## Supported Digital Signature Algorithms
+
+- **ed25519**
+- **secp256k1**
+
 ## Usage
 
 ### Register/Update Schema
