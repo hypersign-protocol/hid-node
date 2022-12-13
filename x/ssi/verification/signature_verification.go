@@ -62,19 +62,20 @@ func VerifyDidSignature(ctx *sdk.Context, didDocBytes []byte, signers []types.Si
 
 func DocumentProofTypeCheck(inputProofType string, signers []types.Signer, vmId string) error {
 	var vmType string
-
+	var expectedProofType string
+	
 	for i := 0; i < len(signers); i++ {
-		var err error
-		_, vmType, err = utils.FindPublicKeyAndVerificationMethodType(
-			signers[i],
-			vmId,
-		)
-		if err != nil {
-			return err
+		if signers[i].VerificationMethod[0].Id == vmId {
+			vmType = signers[i].VerificationMethod[0].Type
+			break
 		}
 	}
 
-	var expectedProofType string = VerificationKeySignatureMap[vmType]
+	if vmType == "" {
+		return types.ErrVerificationMethodNotFound.Wrap(vmId)
+	}
+
+	expectedProofType = VerificationKeySignatureMap[vmType]
 	if inputProofType != expectedProofType {
 		return fmt.Errorf(
 			"expected document proof type for verification method type %s to be '%s', recieved '%s'",

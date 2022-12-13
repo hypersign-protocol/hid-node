@@ -65,7 +65,7 @@ func GetModifiedDidDocumentSignature(modifiedDidDocument *types.Did, keyPair ed2
 	}
 }
 
-func GenerateDidDocumentRPCElements(keyPair GenericKeyPair) DidRpcElements {
+func GenerateDidDocumentRPCElements(keyPair GenericKeyPair, signingElements []DidSigningElements) DidRpcElements {
 	publicKey, optionalID := GetPublicKeyAndOptionalID(keyPair)
 	var didId string
 	if optionalID == "" {
@@ -97,12 +97,29 @@ func GenerateDidDocumentRPCElements(keyPair GenericKeyPair) DidRpcElements {
 		ServiceEndpoint: "http://www.example.com",
 	}
 
+	var controllers []string
+	if len(signingElements) > 0 {
+		for i := 0; i < len(signingElements); i++ {
+			controllers = append(
+				controllers, 
+				stripDidFromVerificationMethod(signingElements[i].vmId))
+		}
+	} else {
+		signingElements = []DidSigningElements{
+			DidSigningElements{
+				keyPair: keyPair,
+				vmId:    vm.Id,
+			},
+		}
+		controllers = []string{didId}
+	}
+
 	var didDocument *types.Did = &types.Did{
 		Context: []string{
 			"https://www.w3.org/ns/did/v1",
 		},
 		Id:         didId,
-		Controller: []string{didId},
+		Controller: controllers,
 		VerificationMethod: []*types.VerificationMethod{
 			vm,
 		},
@@ -113,12 +130,7 @@ func GenerateDidDocumentRPCElements(keyPair GenericKeyPair) DidRpcElements {
 		AssertionMethod: []string{verificationMethodId},
 	}
 
-	signingElements := []DidSigningElements{
-		DidSigningElements{
-			keyPair: keyPair,
-			vmId:    vm.Id,
-		},
-	}
+	
 
 	var signInfo []*types.SignInfo = getDidSigningInfo(didDocument, signingElements)
 
@@ -129,13 +141,13 @@ func GenerateDidDocumentRPCElements(keyPair GenericKeyPair) DidRpcElements {
 	}
 }
 
-func GenerateSchemaDocumentRPCElements(keyPair GenericKeyPair, Id string, verficationMethodId string) SchemaRpcElements {
-	var schemaId string = "sch:" + DidMethod + ":" + "devnet" + ":" + strings.Split(Id, ":")[3] + ":1.0"
+func GenerateSchemaDocumentRPCElements(keyPair GenericKeyPair, authorId string, verficationMethodId string) SchemaRpcElements {
+	var schemaId string = "sch:" + DidMethod + ":" + "devnet" + ":" + strings.Split(authorId, ":")[3] + ":1.0"
 	var schemaDocument *types.SchemaDocument = &types.SchemaDocument{
 		Type:         "https://w3c-ccg.github.io/vc-json-schemas/schema/1.0/schema.json",
 		ModelVersion: "v1.0",
 		Name:         "HS Credential",
-		Author:       Id,
+		Author:       authorId,
 		Id:           schemaId,
 		Authored:     "2022-04-10T04:07:12Z",
 		Schema: &types.SchemaProperty{
@@ -175,8 +187,8 @@ func GenerateSchemaDocumentRPCElements(keyPair GenericKeyPair, Id string, verfic
 	}
 }
 
-func GenerateCredStatusRPCElements(keyPair GenericKeyPair, Id string, verficationMethod *types.VerificationMethod) CredRpcElements {
-	var credentialId = "vc:" + DidMethod + ":" + "devnet:" + strings.Split(Id, ":")[3]
+func GenerateCredStatusRPCElements(keyPair GenericKeyPair, issuerId string, verficationMethod *types.VerificationMethod) CredRpcElements {
+	var credentialId = "vc:" + DidMethod + ":" + "devnet:" + strings.Split(issuerId, ":")[3]
 	var credHash = sha256.Sum256([]byte("Hash1234"))
 	var credentialStatus *types.CredentialStatus = &types.CredentialStatus{
 		Claim: &types.Claim{
@@ -184,7 +196,7 @@ func GenerateCredStatusRPCElements(keyPair GenericKeyPair, Id string, verficatio
 			CurrentStatus: "Live",
 			StatusReason:  "Valid",
 		},
-		Issuer:         Id,
+		Issuer:         issuerId,
 		IssuanceDate:   "2022-04-10T04:07:12Z",
 		ExpirationDate: "2023-02-22T13:45:55Z",
 		CredentialHash: hex.EncodeToString(credHash[:]),
@@ -251,7 +263,7 @@ func GenerateSecp256k1KeyPair() secp256k1KeyPair {
 }
 
 func CreateDidTx(msgServer types.MsgServer, ctx context.Context, keyPair ed25519KeyPair) (string, error) {
-	rpcElements := GenerateDidDocumentRPCElements(keyPair)
+	rpcElements := GenerateDidDocumentRPCElements(keyPair, []DidSigningElements{})
 
 	msgCreateDID := &types.MsgCreateDID{
 		DidDocString: rpcElements.DidDocument,

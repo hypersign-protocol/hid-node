@@ -17,7 +17,7 @@ func TestDeactivateDID(t *testing.T) {
 	k.SetChainNamespace(&ctx, "devnet")
 
 	keyPair1 := GenerateEd25519KeyPair()
-	rpcElements := GenerateDidDocumentRPCElements(keyPair1)
+	rpcElements := GenerateDidDocumentRPCElements(keyPair1, []DidSigningElements{})
 	t.Logf("Registering DID with DID Id: %s", rpcElements.DidDocument.GetId())
 
 	msgCreateDID := &types.MsgCreateDID{

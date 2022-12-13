@@ -19,7 +19,7 @@ func TestQueryCredential(t *testing.T) {
 	k.SetChainNamespace(&ctx, "devnet")
 
 	keyPair1 := GenerateEd25519KeyPair()
-	didRpcElements := GenerateDidDocumentRPCElements(keyPair1)
+	didRpcElements := GenerateDidDocumentRPCElements(keyPair1, []DidSigningElements{})
 	didId := didRpcElements.DidDocument.GetId()
 	t.Logf("Registering DID with DID Id: %s", didId)
 
@@ -92,7 +92,7 @@ func TestQueryCredentials(t *testing.T) {
 	k.SetChainNamespace(&ctx, "devnet")
 
 	keyPair1 := GenerateEd25519KeyPair()
-	didRpcElements := GenerateDidDocumentRPCElements(keyPair1)
+	didRpcElements := GenerateDidDocumentRPCElements(keyPair1, []DidSigningElements{})
 	didId := didRpcElements.DidDocument.GetId()
 	t.Logf("Registering DID with DID Id: %s", didId)
 

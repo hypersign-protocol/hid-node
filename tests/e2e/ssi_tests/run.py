@@ -6,6 +6,7 @@ def run_all_tests():
     
     simple_ssi_flow()
     controller_creates_schema_cred_status()
+    controllers_create_schema_cred_status()
     invalid_case_controller_creates_schema_cred_status()
     non_controller_did_trying_to_update_diddoc()
     controller_did_trying_to_update_diddoc()
