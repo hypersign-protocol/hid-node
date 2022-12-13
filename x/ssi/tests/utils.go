@@ -2,6 +2,7 @@ package tests
 
 import (
 	"crypto/ed25519"
+	"strings"
 )
 
 func SignGeneric(keyPair GenericKeyPair, data []byte) []byte {
@@ -29,4 +30,9 @@ func GetPublicKeyAndOptionalID(keyPair GenericKeyPair) (string, string) {
 	default:
 		panic("Unsupported Key Pair Type")
 	}
+}
+
+func stripDidFromVerificationMethod(vmId string) string {
+	segments := strings.Split(vmId, "#")
+	return segments[0]
 }
