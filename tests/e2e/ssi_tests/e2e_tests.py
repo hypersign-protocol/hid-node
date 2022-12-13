@@ -239,7 +239,7 @@ def simple_ssi_flow():
     print("\n------ Test Completed ---------\n")
 
 def controller_creates_schema_cred_status():
-    print("--- Test: Schema and Credential Status document registration by Controllers\n")
+    print("--- Test: Schema and Credential Status document registration by a single controller\n")
     print("In this workflow, a DID document registered with another DID Id in its controller group. The controller is expected to register schema and credential status")
     
     print("Registering DID for an Employee")
@@ -277,6 +277,63 @@ def controller_creates_schema_cred_status():
         employee_kp, 
         org_did_id, 
         employee_did["authentication"][0]
+    )
+    register_cred_status_cmd = form_create_cred_status_tx(
+        cred_doc,
+        cred_proof, 
+        DEFAULT_BLOCKCHAIN_ACCOUNT_NAME
+    )
+    cred_id = cred_doc["claim"]["id"]
+    cred_author = cred_doc["issuer"]
+    run_blockchain_command(register_cred_status_cmd, f"Registering credential status with Id: {cred_id} and {cred_author} being the author")
+    print("\n------ Test Completed ---------\n")
+
+def controllers_create_schema_cred_status():
+    print("--- Test: Schema and Credential Status document registration by multiple controllers\n")
+    print("In this workflow, a DID document registered with mutiple DIDs in its controller group. The controllers are expected to register schema and credential status")
+    
+    print("Registering DID for an Employee 1")
+    employee_kp_1 = generate_key_pair()
+    employee_did_1 = generate_did_document(employee_kp_1)
+    employee_did_1_id = employee_did_1["id"]
+    create_employee_did_tx_1 = form_did_create_tx(employee_did_1, employee_kp_1, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
+    run_blockchain_command(create_employee_did_tx_1, f"Registering Employee DID Document with ID {employee_did_1_id}")
+
+    print("Registering DID for an Employee 2")
+    employee_kp_2 = generate_key_pair()
+    employee_did_2 = generate_did_document(employee_kp_2)
+    employee_did_2_id = employee_did_2["id"]
+    create_employee_did_tx_2 = form_did_create_tx(employee_did_2, employee_kp_2, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
+    run_blockchain_command(create_employee_did_tx_2, f"Registering Employee DID Document with ID {employee_did_2_id}")
+
+    print("Registering DID for an Organization")
+    org_kp = generate_key_pair()
+    org_did = generate_did_document(org_kp)
+    org_did["controller"] = [employee_did_1_id, employee_did_2_id]
+    org_did_id = org_did["id"]
+    create_org_did_tx = form_did_create_tx(org_did, employee_kp_2, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME, employee_did_2["authentication"][0])
+    run_blockchain_command(create_org_did_tx, f"Registering Organisation DID Document with ID {org_did_id}")
+
+    print("Employee registering a Schema on behalf of Organization's DID")
+    schema_doc, schema_proof = generate_schema_document(
+        employee_kp_2, 
+        org_did_id, 
+        employee_did_2["authentication"][0]
+    )
+    create_schema_cmd = form_create_schema_tx(
+        schema_doc, 
+        schema_proof, 
+        DEFAULT_BLOCKCHAIN_ACCOUNT_NAME
+    )
+    schema_doc_id = schema_doc["id"]
+    schema_author = schema_doc["author"]
+    run_blockchain_command(create_schema_cmd, f"Registering Schema with Id: {schema_doc_id} with {schema_author} being the author")
+
+    print("Employee registering a Credential Status Document on behalf of Organization's DID")
+    cred_doc, cred_proof = generate_cred_status_document(
+        employee_kp_1, 
+        org_did_id, 
+        employee_did_1["authentication"][0]
     )
     register_cred_status_cmd = form_create_cred_status_tx(
         cred_doc,

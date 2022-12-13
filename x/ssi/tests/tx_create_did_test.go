@@ -19,7 +19,7 @@ func TestCreateDIDUsingEd25519KeyPair(t *testing.T) {
 	k.SetChainNamespace(&ctx, "devnet")
 
 	keyPair1 := GenerateEd25519KeyPair()
-	rpcElements := GenerateDidDocumentRPCElements(keyPair1)
+	rpcElements := GenerateDidDocumentRPCElements(keyPair1,[]DidSigningElements{})
 	t.Logf("Registering DID with DID Id: %s", rpcElements.DidDocument.GetId())
 
 	msgCreateDID := &types.MsgCreateDID{
@@ -49,7 +49,7 @@ func TestCreateDIDUsingSecp256k1KeyPair(t *testing.T) {
 	k.SetChainNamespace(&ctx, "devnet")
 
 	keyPair1 := GenerateSecp256k1KeyPair()
-	rpcElements := GenerateDidDocumentRPCElements(keyPair1)
+	rpcElements := GenerateDidDocumentRPCElements(keyPair1, []DidSigningElements{})
 
 	msgCreateDID := &types.MsgCreateDID{
 		DidDocString: rpcElements.DidDocument,
@@ -75,7 +75,7 @@ func TestInvalidServiceType(t *testing.T) {
 	goCtx := sdk.WrapSDKContext(ctx)
 
 	keyPair1 := GenerateEd25519KeyPair()
-	rpcElements := GenerateDidDocumentRPCElements(keyPair1)
+	rpcElements := GenerateDidDocumentRPCElements(keyPair1, []DidSigningElements{})
 	// Set Namespace
 	k.SetChainNamespace(&ctx, "devnet")
 
@@ -134,7 +134,7 @@ func TestCheckValidMethodSpecificId(t *testing.T) {
 
 	t.Log("Registering DID Document with Valid Method Specific ID")
 
-	rpcElements = GenerateDidDocumentRPCElements(keyPair1)
+	rpcElements = GenerateDidDocumentRPCElements(keyPair1, []DidSigningElements{})
 	msgCreateDID = &types.MsgCreateDID{
 		DidDocString: rpcElements.DidDocument,
 		Signatures:   rpcElements.Signatures,
@@ -151,7 +151,7 @@ func TestCheckValidMethodSpecificId(t *testing.T) {
 
 	t.Logf("Registering DID Document with Invalid Method Specific ID - %s", keyPair2.optionalID)
 
-	rpcElements = GenerateDidDocumentRPCElements(keyPair2)
+	rpcElements = GenerateDidDocumentRPCElements(keyPair2, []DidSigningElements{})
 	msgCreateDID = &types.MsgCreateDID{
 		DidDocString: rpcElements.DidDocument,
 		Signatures:   rpcElements.Signatures,
@@ -169,7 +169,7 @@ func TestCheckValidMethodSpecificId(t *testing.T) {
 
 	t.Logf("Registering DID Document with Invalid Method Specific ID - %s", keyPair3.optionalID)
 
-	rpcElements = GenerateDidDocumentRPCElements(keyPair3)
+	rpcElements = GenerateDidDocumentRPCElements(keyPair3, []DidSigningElements{})
 	msgCreateDID = &types.MsgCreateDID{
 		DidDocString: rpcElements.DidDocument,
 		Signatures:   rpcElements.Signatures,
