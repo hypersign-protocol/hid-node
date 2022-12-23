@@ -211,9 +211,9 @@ func TestUpdateCredentialStatus(t *testing.T) {
 	}
 	t.Log("Credential Status Registeration Successful")
 
-	t.Logf("Updating Credential Status (Id: %s) from Live to Revoked", credRpcElements.Status.GetClaim().GetId())
+	t.Logf("Updating Credential Status (Id: %s) from Live to Suspended", credRpcElements.Status.GetClaim().GetId())
 
-	updatedRpcCredElements := UpdateCredStatus("Revoked", credRpcElements, keyPair1)
+	updatedRpcCredElements := UpdateCredStatus("Suspended", credRpcElements, keyPair1)
 
 	msgUpdateCredentialStatus := &types.MsgRegisterCredentialStatus{
 		CredentialStatus: updatedRpcCredElements.Status,
@@ -228,4 +228,41 @@ func TestUpdateCredentialStatus(t *testing.T) {
 		t.FailNow()
 	}
 	t.Log("Credential Status Update Successful")
+
+	t.Logf("Updating Credential Status (Id: %s) from Suspended back to Live", credRpcElements.Status.GetClaim().GetId())
+
+	updatedRpcCredElements = UpdateCredStatus("Live", credRpcElements, keyPair1)
+
+	msgUpdateCredentialStatus = &types.MsgRegisterCredentialStatus{
+		CredentialStatus: updatedRpcCredElements.Status,
+		Proof:            updatedRpcCredElements.Proof,
+		Creator:          Creator,
+	}
+
+	_, errUpdatedCredStatus = msgServer.RegisterCredentialStatus(goCtx, msgUpdateCredentialStatus)
+	if errUpdatedCredStatus != nil {
+		t.Error("Credential Status Update Failed")
+		t.Error(errUpdatedCredStatus)
+		t.FailNow()
+	}
+	t.Log("Credential Status Update Successful")
+
+	t.Logf("Updating Credential Status (Id: %s) from Live to Expired", credRpcElements.Status.GetClaim().GetId())
+
+	updatedRpcCredElements = UpdateCredStatus("Expired", credRpcElements, keyPair1)
+
+	msgUpdateCredentialStatus = &types.MsgRegisterCredentialStatus{
+		CredentialStatus: updatedRpcCredElements.Status,
+		Proof:            updatedRpcCredElements.Proof,
+		Creator:          Creator,
+	}
+
+	_, errUpdatedCredStatus = msgServer.RegisterCredentialStatus(goCtx, msgUpdateCredentialStatus)
+	if errUpdatedCredStatus == nil {
+		t.Error("Credential Status Update was supposed to failed")
+		t.Error(errUpdatedCredStatus)
+		t.FailNow()
+	}
+	t.Log("Credential Status Update did not succeed as expected")
+	t.Log("Test Completed")
 }

@@ -36,7 +36,7 @@ func TestDeactivateDID(t *testing.T) {
 	}
 
 	// Querying registered did document to get the version ID
-	resolvedDidDocument, errResolve := k.GetDid(&ctx, rpcElements.DidDocument.GetId())
+	resolvedDidDocument, errResolve := k.GetDidDocumentState(&ctx, rpcElements.DidDocument.GetId())
 	if errResolve != nil {
 		t.Error("Error in retrieving registered did document")
 		t.Error(errResolve)

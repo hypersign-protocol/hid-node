@@ -58,6 +58,9 @@ func (k Keeper) SetCredentialCount(ctx sdk.Context, count uint64) {
 	store.Set(byteKey, bz)
 }
 
+// Invoked during BeginBlock, it checks the block time against credential
+// expiration date. If the expiration date is past current block time, the status
+// of the credential(s) are set to `Expired`.
 func (k Keeper) SetCredentialStatusToExpired(ctx sdk.Context) error {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.CredKey))
 	iterator := sdk.KVStorePrefixIterator(store, []byte{})

@@ -3,11 +3,16 @@ package keeper
 import (
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
+	"strings"
 
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 )
 
+var supportedClientSpecs []string = []string{
+	"cosmos-ADR036",
+}
 
 // Read more about Cosmos's ADR Spec from the following:
 // https://docs.cosmos.network/v0.45/architecture/adr-036-arbitrary-signature.html
@@ -47,18 +52,22 @@ func getCosmosADR036SignDocBytes(clientSpecOpts types.ClientSpecOpts) []byte {
 	return updatedSignDocBytes
 }
 
-// Get the updated marshaled SSI Document for the corresponding ClientSpec
+// Get the updated marshaled SSI document for the respective ClientSpec
 func getClientSpecDocBytes(clientSpecType string, clientSpecOpts types.ClientSpecOpts) ([]byte, error) {
 	switch clientSpecType {
 	case "cosmos-ADR036":
 		return getCosmosADR036SignDocBytes(clientSpecOpts), nil
 	// Non-ClientSpec RPC Request
+	// Return marshaled SSI document as-is 
 	case "":
 		return clientSpecOpts.SSIDocBytes, nil
 	default:
 		return nil, sdkerrors.Wrap(
 			types.ErrInvalidClientSpecType,
-			"supported client specs are : ['cosmos-ADR036']",
+			fmt.Sprintf(
+				"supported client specs are : [%s]", 
+				strings.Join(supportedClientSpecs, ", "),
+			),
 		)
 	}
 }

@@ -7,8 +7,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/hypersign-protocol/hid-node/x/ssi/verification"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
+	"github.com/hypersign-protocol/hid-node/x/ssi/verification"
 )
 
 func (k msgServer) CreateSchema(goCtx context.Context, msg *types.MsgCreateSchema) (*types.MsgCreateSchemaResponse, error) {
@@ -20,9 +20,9 @@ func (k msgServer) CreateSchema(goCtx context.Context, msg *types.MsgCreateSchem
 
 	chainNamespace := k.GetChainNamespace(&ctx)
 	// Get the Did Document of Schema's Author
-	authorDidDocument, err := k.GetDid(&ctx, schemaDoc.GetAuthor())
+	authorDidDocument, err := k.GetDidDocumentState(&ctx, schemaDoc.GetAuthor())
 	if err != nil {
-		return nil, sdkerrors.Wrap(err, fmt.Sprintf("The DID %s is not available", schemaDoc.GetAuthor()))
+		return nil, sdkerrors.Wrap(err, fmt.Sprintf("unable to get author`s DID %s from store", schemaDoc.GetAuthor()))
 	}
 
 	// Check if author's DID is deactivated
@@ -107,7 +107,7 @@ func (k msgServer) CreateSchema(goCtx context.Context, msg *types.MsgCreateSchem
 		Proof:        schemaProof,
 	}
 
-	id := k.AppendSchema(ctx, schema)
+	id := k.RegisterSchemaInStore(ctx, schema)
 
 	return &types.MsgCreateSchemaResponse{Id: id}, nil
 }

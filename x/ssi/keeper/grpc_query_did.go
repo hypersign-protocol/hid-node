@@ -58,7 +58,7 @@ func (k Keeper) QueryDidDocument(goCtx context.Context, req *types.QueryDidDocum
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// Check if DID Document exists
-	didDoc, err := k.GetDid(&ctx, req.DidId)
+	didDoc, err := k.GetDidDocumentState(&ctx, req.DidId)
 	if err != nil {
 		return nil, err
 	}
