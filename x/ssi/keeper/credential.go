@@ -10,14 +10,6 @@ import (
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 )
 
-// Support Credential Statuses
-const (
-	credClaimStatus_live      = "Live"
-	credClaimStatus_suspended = "Suspended"
-	credClaimStatus_revoked   = "Revoked"
-	credClaimStatus_expired   = "Expired"
-)
-
 func (k Keeper) RegisterCred(ctx sdk.Context, cred *types.Credential) uint64 {
 	count := k.GetCredentialCount(ctx)
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.CredKey))
