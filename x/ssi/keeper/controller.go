@@ -10,9 +10,12 @@ import (
 )
 
 func (k msgServer) ValidateDidControllers(ctx *sdk.Context, id string, controllers []string, verMethods []*types.VerificationMethod) error {
-
 	for _, verificationMethod := range verMethods {
-		if err := k.validateController(ctx, id, verificationMethod.Controller); err != nil {
+		if err := k.validateController(
+			ctx, 
+			id, 
+			verificationMethod.GetController(),
+		); err != nil {
 			return err
 		}
 	}
@@ -29,13 +32,17 @@ func (k *Keeper) validateController(ctx *sdk.Context, id string, controller stri
 	if id == controller {
 		return nil
 	}
-	didDoc, err := k.GetDid(ctx, controller)
+	didDoc, err := k.GetDidDocumentState(ctx, controller)
 	if err != nil {
 		return types.ErrDidDocNotFound.Wrap(controller)
 	}
 	if len(didDoc.DidDocument.Authentication) == 0 {
 		return types.ErrBadRequestInvalidVerMethod.Wrap(
-			fmt.Sprintf("Verificatition method controller %s doesn't have an authentication keys", controller))
+			fmt.Sprintf(
+				"verificatition method controller %s doesn't have an authentication keys", 
+				controller,
+			),
+		)
 	}
 	return nil
 }
@@ -44,17 +51,17 @@ func (k *Keeper) validateController(ctx *sdk.Context, id string, controller stri
 func (k *Keeper) GetVMForSigners(ctx *sdk.Context, signers []types.Signer) ([]types.Signer, error) {
 	for i := 0; i < len(signers); i++ {
 		if signers[i].VerificationMethod == nil {
-			fetchedDidDoc, err := k.GetDid(ctx, signers[i].Signer)
+			fetchedDidDoc, err := k.GetDidDocumentState(ctx, signers[i].Signer)
 			if err != nil {
 				return nil, types.ErrDidDocNotFound.Wrap(signers[i].Signer)
 			}
 
-			signers[i].Authentication = fetchedDidDoc.DidDocument.Authentication
-			signers[i].AssertionMethod = fetchedDidDoc.DidDocument.AssertionMethod
-			signers[i].KeyAgreement = fetchedDidDoc.DidDocument.KeyAgreement
-			signers[i].CapabilityInvocation = fetchedDidDoc.DidDocument.CapabilityInvocation
-			signers[i].CapabilityDelegation = fetchedDidDoc.DidDocument.CapabilityDelegation
-			signers[i].VerificationMethod = fetchedDidDoc.DidDocument.VerificationMethod
+			signers[i].Authentication = fetchedDidDoc.GetDidDocument().GetAuthentication()
+			signers[i].AssertionMethod = fetchedDidDoc.GetDidDocument().GetAssertionMethod()
+			signers[i].KeyAgreement = fetchedDidDoc.GetDidDocument().GetKeyAgreement()
+			signers[i].CapabilityInvocation = fetchedDidDoc.GetDidDocument().GetCapabilityInvocation()
+			signers[i].CapabilityDelegation = fetchedDidDoc.GetDidDocument().GetCapabilityDelegation()
+			signers[i].VerificationMethod = fetchedDidDoc.GetDidDocument().GetVerificationMethod()
 		}
 	}
 
@@ -62,34 +69,47 @@ func (k *Keeper) GetVMForSigners(ctx *sdk.Context, signers []types.Signer) ([]ty
 }
 
 // Get the updated signers from the new DID Document
-func GetUpdatedSigners(ctx *sdk.Context, oldDIDDoc *types.Did, newDIDDoc *types.Did, signatures []*types.SignInfo) []types.Signer {
+func GetUpdatedSigners(ctx *sdk.Context, oldDidDocument *types.Did, updatedDidDocument *types.Did, signatures []*types.SignInfo) []types.Signer {
 	var signers []types.Signer
 
-	oldController := oldDIDDoc.Controller
+	oldController := oldDidDocument.Controller
 	if len(oldController) == 0 {
-		oldController = []string{oldDIDDoc.Id}
+		oldController = []string{oldDidDocument.Id}
 	}
 
 	for _, controller := range oldController {
 		signers = append(signers, types.Signer{Signer: controller})
 	}
 
-	for _, oldVM := range oldDIDDoc.VerificationMethod {
-		newVM := utils.FindVerificationMethod(newDIDDoc.VerificationMethod, oldVM.Id)
+	oldVerificationMethods := oldDidDocument.GetVerificationMethod() 
+	for _, oldVM := range oldVerificationMethods {
+		newVM := utils.FindVerificationMethod(
+			updatedDidDocument.GetVerificationMethod(), 
+			oldVM.GetId(),
+		)
 
 		// Verification Method has been deleted
 		if newVM == nil {
-			signers = appendSignerIfNeed(signers, oldVM.Controller, newDIDDoc)
+			signers = appendSignerIfNeed(
+				signers, 
+				oldVM.GetController(), 
+				updatedDidDocument)
 		}
 
 		// Verification Method has been changed
 		if !reflect.DeepEqual(oldVM, newVM) {
-			signers = appendSignerIfNeed(signers, newVM.Controller, newDIDDoc)
+			signers = appendSignerIfNeed(
+				signers, 
+				newVM.GetController(), 
+				updatedDidDocument)
 		}
 
 		// Verification Method Controller has been changed, need to add old controller
 		if newVM.Controller != oldVM.Controller {
-			signers = appendSignerIfNeed(signers, oldVM.Controller, newDIDDoc)
+			signers = appendSignerIfNeed(
+				signers, 
+				oldVM.GetController(), 
+				updatedDidDocument)
 		}
 	}
 
@@ -107,9 +127,9 @@ func appendSignerIfNeed(signers []types.Signer, controller string, msg *types.Di
 		Signer: controller,
 	}
 
-	if controller == msg.Id {
-		signer.VerificationMethod = msg.VerificationMethod
-		signer.Authentication = msg.Authentication
+	if controller == msg.GetId() {
+		signer.VerificationMethod = msg.GetVerificationMethod()
+		signer.Authentication = msg.GetAuthentication()
 	}
 
 	return append(signers, signer)

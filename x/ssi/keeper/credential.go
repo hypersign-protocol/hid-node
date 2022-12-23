@@ -10,6 +10,14 @@ import (
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 )
 
+// Support Credential Statuses
+const (
+	credClaimStatus_live      = "Live"
+	credClaimStatus_suspended = "Suspended"
+	credClaimStatus_revoked   = "Revoked"
+	credClaimStatus_expired   = "Expired"
+)
+
 func (k Keeper) RegisterCred(ctx sdk.Context, cred *types.Credential) uint64 {
 	count := k.GetCredentialCount(ctx)
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.CredKey))
@@ -58,6 +66,9 @@ func (k Keeper) SetCredentialCount(ctx sdk.Context, count uint64) {
 	store.Set(byteKey, bz)
 }
 
+// Invoked during BeginBlock, it checks the block time against credential
+// expiration date. If the expiration date is past current block time, the status
+// of the credential(s) are set to `Expired`.
 func (k Keeper) SetCredentialStatusToExpired(ctx sdk.Context) error {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.CredKey))
 	iterator := sdk.KVStorePrefixIterator(store, []byte{})

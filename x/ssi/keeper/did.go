@@ -43,7 +43,7 @@ func (k Keeper) HasDid(ctx sdk.Context, id string) bool {
 }
 
 // Retrieves the DID from the store
-func (k Keeper) GetDid(ctx *sdk.Context, id string) (*types.DidDocumentState, error) {
+func (k Keeper) GetDidDocumentState(ctx *sdk.Context, id string) (*types.DidDocumentState, error) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidKey))
 
 	var didDocState types.DidDocumentState
@@ -73,14 +73,14 @@ func (k Keeper) UpdateDidDocumentInStore(ctx sdk.Context, didDoc types.DidDocume
 }
 
 // Creates record for a new DID Document
-func (k Keeper) CreateDidDocumentInStore(ctx sdk.Context, didDoc *types.DidDocumentState) uint64 {
-	count := k.GetDidCount(ctx)
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.DidKey))
+func (k Keeper) RegisterDidDocumentInStore(ctx sdk.Context, didDoc *types.DidDocumentState) uint64 {
+	didCount := k.GetDidCount(ctx)
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidKey))
 
-	id := didDoc.GetDidDocument().GetId()
+	idBytes := []byte(didDoc.GetDidDocument().GetId())
 	didDocBytes := k.cdc.MustMarshal(didDoc)
 
-	store.Set([]byte(id), didDocBytes)
-	k.SetDidCount(ctx, count+1)
-	return count
+	store.Set(idBytes, didDocBytes)
+	k.SetDidCount(ctx, didCount+1)
+	return didCount
 }
