@@ -11,8 +11,9 @@ from transactions import form_create_schema_tx, form_did_create_tx, \
     form_create_cred_status_tx, form_did_deactivate_tx, form_did_update_tx, query_did
 from constants import DEFAULT_BLOCKCHAIN_ACCOUNT_NAME
 
+# TC-8: Deactivated DID attempts to create Schema and Credential Status Documents.
 def deactivated_did_should_not_create_ssi_elements():
-    print("\n---- Test: Deactivated DID attempting to register Schema and Credential Status Docs ----\n")
+    print("\n---- Test Started: TC-8: Deactivated DID attempts to create Schema and Credential Status Documents. ----\n")
     print("In this workflow, a deactivated DID attempts to register Schema Doc and Credential Status Doc")
     print("It is expected to fail\n")
 
@@ -58,10 +59,11 @@ def deactivated_did_should_not_create_ssi_elements():
     )
     cred_id = cred_doc["claim"]["id"]
     run_blockchain_command(register_cred_status_cmd, f"Registering Credential status with Id: {cred_id} with {did_doc_id} being the issuer", True)
-    print("\n----Test Completed: Deactivated DID attempting to register Schema and Credential Status Docs------\n")
+    print("\n--- Test Completed: TC-8: Deactivated DID attempts to create Schema and Credential Status Documents. ---\n")
 
+# TC-7: Parent DID adds multiple DIDs in its controller group, and removes itself. One of the controllers and the Parent DID attemps to change the DID Document.
 def multiple_controllers_with_one_signer():
-    print("\n--- Test: Multiple Controllers with One Signer ---\n")
+    print("\n--- Test Started: TC-7: Parent DID adds multiple DIDs in its controller group, and removes itself. One of the controllers and the Parent DID attemps to change the DID Document. ---\n")
     print("In this worflow, two DIDs are added to another DID's Controller Group. One of them attempts to make change in the parent DID Document")
 
     print("Registering Parent DID Document")
@@ -116,10 +118,11 @@ def multiple_controllers_with_one_signer():
         DEFAULT_BLOCKCHAIN_ACCOUNT_NAME
     )
     run_blockchain_command(update_did_tx_cmd, f"Parent DID trying to update it's own DID Document", True)
-    print("\n----Test Completed: Multiple Controllers with One Signer-------\n")
+    print("\n--- Test Completed: TC-7: Parent DID adds multiple DIDs in its controller group, and removes itself. One of the controllers and the Parent DID attemps to change the DID Document. ---\n")
 
+# TC-6: Controller DID attempts to update the Parent DID Document
 def controller_did_trying_to_update_diddoc():
-    print("\n--- Test: Controller DID attempts to change Canon DID ---\n")
+    print("\n--- Test Started: TC-6: Controller DID attempts to update the Parent DID Document ---\n")
     print("In this workflow, Controller DID attempts to update its Parent DID Document")
 
     print("Registering the canon DID Document")
@@ -161,10 +164,11 @@ def controller_did_trying_to_update_diddoc():
         controller_did_doc["authentication"][0]
     )
     run_blockchain_command(update_did_tx_cmd, f"Attempt by controller to make changes in Canon DID")
-    print("\n------ Test Completed ---------\n")
+    print("\n--- Test Completed: TC-6: Controller DID attempts to update the Parent DID Document ---\n")
 
+# TC-5: Non-Controller DID attempts to update a DID Document (Invalid Case)
 def non_controller_did_trying_to_update_diddoc():
-    print("\n--- Test: Non Controller DID attempts to change Canon DID ---\n")
+    print("\n--- Test Started: TC-5: Non-Controller DID attempts to update a DID Document (Invalid Case) ---\n")
     print("In this workflow, Non-Controller DID attempts to update a DID Document")
     print("This is expected to fail\n")
 
@@ -195,10 +199,11 @@ def non_controller_did_trying_to_update_diddoc():
         non_controller_did_doc["authentication"][0]
     )
     run_blockchain_command(update_did_tx_cmd, f"Attempt by non-controller to make changes in Canon DID", True)
-    print("\n------ Test Completed ---------\n")
+    print("\n--- Test Completed: TC-5: Non-Controller DID attempts to update a DID Document (Invalid Case) ---\n")
 
+# TC-1: A simple SSI flow where three elements of SSI (DID Document, Schema Document and Credential Status Document)
 def simple_ssi_flow():
-    print("\n--- Test: Simple SSI Worflow ---\n")
+    print("\n--- Test Started: TC-1: A simple SSI flow where three elements of SSI (DID Document, Schema Document and Credential Status Document) ---\n")
     print("In this workflow, a DID document is registered, following which a credential schema and a credential status document is registered\n")
     
     kp = generate_key_pair()
@@ -236,10 +241,11 @@ def simple_ssi_flow():
     )
     cred_id = cred_doc["claim"]["id"]
     run_blockchain_command(register_cred_status_cmd, f"Registering Credential status with Id: {cred_id}")
-    print("\n------ Test Completed ---------\n")
+    print("\n--- Test Completed: TC-1: A simple SSI flow where three elements of SSI (DID Document, Schema Document and Credential Status Document) ---\n")
 
+# TC-2: Controller DID attempts to create Credential Schema and Credential Status Documents on behalf of Parent DID
 def controller_creates_schema_cred_status():
-    print("--- Test: Schema and Credential Status document registration by a single controller\n")
+    print("--- Test Started: TC-2: Controller DID attempts to create Credential Schema and Credential Status Documents on behalf of Parent DID ---\n")
     print("In this workflow, a DID document registered with another DID Id in its controller group. The controller is expected to register schema and credential status")
     
     print("Registering DID for an Employee")
@@ -286,10 +292,11 @@ def controller_creates_schema_cred_status():
     cred_id = cred_doc["claim"]["id"]
     cred_author = cred_doc["issuer"]
     run_blockchain_command(register_cred_status_cmd, f"Registering credential status with Id: {cred_id} and {cred_author} being the author")
-    print("\n------ Test Completed ---------\n")
+    print("\n--- Test Completed: TC-2: Controller DID attempts to create Credential Schema and Credential Status Documents on behalf of Parent DID ---\n")
 
+# TC-3: Multiple Controller DID attempt to create Credential Schema and Credential Status Documents on behalf of Parent DID
 def controllers_create_schema_cred_status():
-    print("--- Test: Schema and Credential Status document registration by multiple controllers\n")
+    print("\n--- Test Started: TC-3: Multiple Controller DID attempt to create Credential Schema and Credential Status Documents on behalf of Parent DID ---\n")
     print("In this workflow, a DID document registered with mutiple DIDs in its controller group. The controllers are expected to register schema and credential status")
     
     print("Registering DID for an Employee 1")
@@ -343,10 +350,11 @@ def controllers_create_schema_cred_status():
     cred_id = cred_doc["claim"]["id"]
     cred_author = cred_doc["issuer"]
     run_blockchain_command(register_cred_status_cmd, f"Registering credential status with Id: {cred_id} and {cred_author} being the author")
-    print("\n------ Test Completed ---------\n")
+    print("\n--- Test Completed: TC-3: Multiple Controller DID attempt to create Credential Schema and Credential Status Documents on behalf of Parent DID ---\n")
 
+# TC-4: Non-Controller DID attempts to create Credential Schema and Credential Status Documents on behalf of Parent DID (Invalid Case)
 def invalid_case_controller_creates_schema_cred_status():
-    print("--- Test: Invalid Schema and Credential Status document registration by Non Controllers\n")
+    print("\n--- Test Started: TC-4: Non-Controller DID attempts to create Credential Schema and Credential Status Documents on behalf of Parent DID (Invalid Case) ---\n")
     print("In this workflow, a DID document registered with another DID Id in its controller group. In this case, if the canon DID tries to create Schema or Credential Document, it should fail.\n")
     
     print("Registering DID for an Employee")
@@ -396,10 +404,11 @@ def invalid_case_controller_creates_schema_cred_status():
     cred_author = cred_doc["issuer"]
     run_blockchain_command(register_cred_status_cmd, f"Registering credential status with Id: {cred_id} with {cred_author} being the issuer\n", True)
 
-    print("\n-------Test Completed------\n")
+    print("\n--- Test Completed: TC-4: Non-Controller DID attempts to create Credential Schema and Credential Status Documents on behalf of Parent DID (Invalid Case) ---\n")
 
-def did_operations_using_secp256k1():
-    print("\n--- Test: DID Operations using Secp256k1 Key Pair ---\n")
+# TC-9: `x/ssi` module related transactions, using `secp256k1` keypair
+def ssi_operations_using_secp256k1():
+    print("\n--- Test Started: TC-9: `x/ssi` module related transactions, using `secp256k1` keypair ---\n")
 
     kp_algo = "secp256k1"
     kp = generate_key_pair(algo=kp_algo)
@@ -460,4 +469,115 @@ def did_operations_using_secp256k1():
     )
     run_blockchain_command(deactivate_did_tx_cmd, f"Deactivating DID Document with Id: {did_doc_id}")
 
-    print("\n-------Test Completed------\n")
+    print("\n--- Test Completed: TC-9: `x/ssi` module related transactions, using `secp256k1` keypair ---\n")
+
+# TC-10: Test scenarios for `blockchainAccountId`.
+def caip10_support_test():
+    print("\n--- Test Started: TC-10: Test scenarios for `blockchainAccountId` ---\n")
+    kp_algo = "recover-eth"
+
+    # Invalid blockchain Account Ids
+    invalid_blockchain_account_ids = [
+        "abc345566",
+        "eip:1:0x1234",
+        "eip155",
+        "eip155:1:",
+        "eip155::",
+        "eip155:1",
+        "eip155:::::23",
+        "eip155::0x1234567"
+    ]
+
+    for invalid_blockchain_id in invalid_blockchain_account_ids:
+        print("Registering a DID Document with an invalid blockchainAccountId:", invalid_blockchain_id)
+        kp = generate_key_pair(algo=kp_algo)
+        did_doc_string = generate_did_document(kp, kp_algo)
+        did_doc_string["verificationMethod"][0]["blockchainAccountId"] = invalid_blockchain_id
+        create_tx_cmd = form_did_create_tx(did_doc_string, kp, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME, signing_algo=kp_algo)
+        run_blockchain_command(create_tx_cmd, f"Registering a DID Document with an invalid blockchainAccountId: {invalid_blockchain_id}", True)
+    
+    print("Registering a DID with a VM of type EcdsaSecp256k1SignatureRecovery2020 having publicKeyMultibase attribute populated")
+    kp = generate_key_pair(algo=kp_algo)
+    did_doc_string = generate_did_document(kp, kp_algo)
+    did_doc_id = did_doc_string["id"]
+    did_doc_string["verificationMethod"][0]["publicKeyMultibase"] = "zrxxgf1f9xPYTraixqi9tipLta61hp4VJWQUUW5pmwcVz"
+    create_tx_cmd = form_did_create_tx(did_doc_string, kp, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME, signing_algo=kp_algo)
+    run_blockchain_command(create_tx_cmd, "Registering a DID with a VM of type EcdsaSecp256k1SignatureRecovery2020 having publicKeyMultibase attribute populated", True, True)
+
+    # Test for valid blockchainAccountId
+    kp = generate_key_pair(algo=kp_algo)
+    did_doc_string = generate_did_document(kp, kp_algo)
+    did_doc_id = did_doc_string["id"]
+    print(
+        "Registering a DID Document with a valid blockchainAccountId:", 
+        did_doc_string["verificationMethod"][0]["blockchainAccountId"]
+    )
+    create_tx_cmd = form_did_create_tx(did_doc_string, kp, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME, signing_algo=kp_algo)
+    run_blockchain_command(create_tx_cmd, f"Registering DID with Id: {did_doc_id}")
+
+    print("\n--- Test Completed: TC-10: Test scenarios for `blockchainAccountId` ---\n")
+
+# TC-11: `x/ssi` module related transactions, using ethereum based `secp256k1` keypair
+def ssi_operation_using_ethereum_keypair_test():
+    print("\n--- Test Started: TC-11: `x/ssi` module related transactions, using ethereum based `secp256k1` keypair ---\n")
+
+    kp_algo = "recover-eth"
+    kp = generate_key_pair(algo=kp_algo)
+
+    print("Registering a DID Document")
+    did_doc_string = generate_did_document(kp, kp_algo)
+    did_doc_id = did_doc_string["id"]
+    create_tx_cmd = form_did_create_tx(did_doc_string, kp, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME, signing_algo=kp_algo)
+    run_blockchain_command(create_tx_cmd, f"Registering DID with Id: {did_doc_id}")
+
+    print("Registering a Schema Document")
+    schema_doc, schema_proof = generate_schema_document(
+        kp, 
+        did_doc_id, 
+        did_doc_string["authentication"][0],
+        algo = kp_algo
+    )
+    create_schema_cmd = form_create_schema_tx(
+        schema_doc, 
+        schema_proof, 
+        DEFAULT_BLOCKCHAIN_ACCOUNT_NAME
+    )
+    schema_doc_id = schema_doc["id"]
+    run_blockchain_command(create_schema_cmd, f"Registering Schema with Id: {schema_doc_id}")
+
+    print("Registering a Credential Status Document")
+    cred_doc, cred_proof = generate_cred_status_document(
+        kp,
+        did_doc_id,
+        did_doc_string["authentication"][0],
+        algo = kp_algo
+    )
+    register_cred_status_cmd = form_create_cred_status_tx(
+        cred_doc,
+        cred_proof,
+        DEFAULT_BLOCKCHAIN_ACCOUNT_NAME
+    )
+    cred_id = cred_doc["claim"]["id"]
+    run_blockchain_command(register_cred_status_cmd, f"Registering Credential status with Id: {cred_id}")
+
+    print("Updating the Registered DID Document")
+    registered_did_doc = query_did(did_doc_id)["didDocument"]
+    registered_did_doc["context"] = registered_did_doc["context"].append("newwebsite.com")
+    update_did_tx_cmd = form_did_update_tx(
+        registered_did_doc, 
+        kp, 
+        DEFAULT_BLOCKCHAIN_ACCOUNT_NAME,
+        signing_algo=kp_algo
+    )
+    run_blockchain_command(update_did_tx_cmd, f"Updating DID Document with Id: {did_doc_id}")
+
+    print("Deactivating the Registered DID Document")
+    deactivate_did_tx_cmd = form_did_deactivate_tx(
+        did_doc_id, 
+        kp, 
+        DEFAULT_BLOCKCHAIN_ACCOUNT_NAME,
+        signing_algo=kp_algo
+    )
+    run_blockchain_command(deactivate_did_tx_cmd, f"Deactivating DID Document with Id: {did_doc_id}")
+
+    print("\n--- Test Completed: TC-11: `x/ssi` module related transactions, using ethereum based `secp256k1` keypair ---\n")

@@ -7,8 +7,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/hypersign-protocol/hid-node/x/ssi/verification"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
+	"github.com/hypersign-protocol/hid-node/x/ssi/verification"
 )
 
 func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.MsgRegisterCredentialStatus) (*types.MsgRegisterCredentialStatusResponse, error) {
@@ -245,7 +245,7 @@ func (k msgServer) updateCredentialStatus(ctx sdk.Context, msg *types.MsgRegiste
 	}
 	if statusFound == 0 {
 		return nil, sdkerrors.Wrap(
-			types.ErrInvalidCredentialStatus, 
+			types.ErrInvalidCredentialStatus,
 			fmt.Sprintf("unsupported credential claim status %s", newClaimStatus))
 	}
 

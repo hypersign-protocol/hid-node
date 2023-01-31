@@ -72,11 +72,9 @@ func (msg *MsgCreateDID) GetSignBytes() []byte {
 }
 
 func (msg *MsgCreateDID) ValidateBasic() error {
-	did := msg.GetDidDocString().GetId()
-	if did == "" {
-		return ErrBadRequestIsRequired.Wrap("DID")
-	}
-	return nil
+	msgDidDocument := msg.GetDidDocString()
+	err := didDocumentStatelessVerification(msgDidDocument)
+	return err
 }
 
 // MsgUpdateDID Type Methods
@@ -115,11 +113,9 @@ func (msg *MsgUpdateDID) GetSignBytes() []byte {
 }
 
 func (msg *MsgUpdateDID) ValidateBasic() error {
-	_, err := sdk.AccAddressFromBech32(msg.Creator)
-	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
-	}
-	return nil
+	msgDidDocument := msg.GetDidDocString()
+	err := didDocumentStatelessVerification(msgDidDocument)
+	return err
 }
 
 // MsgDeactivateDID Type Methods

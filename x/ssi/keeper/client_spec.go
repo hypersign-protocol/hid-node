@@ -7,12 +7,9 @@ import (
 	"strings"
 
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/hypersign-protocol/hid-node/x/ssi/common"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 )
-
-var supportedClientSpecs []string = []string{
-	"cosmos-ADR036",
-}
 
 // Read more about Cosmos's ADR Spec from the following:
 // https://docs.cosmos.network/v0.45/architecture/adr-036-arbitrary-signature.html
@@ -42,8 +39,7 @@ func getCosmosADR036SignDocBytes(clientSpecOpts types.ClientSpecOpts) []byte {
 	baseCosmosADR036SignDoc.Msgs[0].Value.Data = base64.StdEncoding.EncodeToString(
 		clientSpecOpts.SSIDocBytes)
 	baseCosmosADR036SignDoc.Msgs[0].Value.Signer = clientSpecOpts.SignerAddress
-	
-	
+
 	updatedSignDocBytes, err := json.Marshal(baseCosmosADR036SignDoc)
 	if err != nil {
 		panic(err)
@@ -58,15 +54,15 @@ func getClientSpecDocBytes(clientSpecType string, clientSpecOpts types.ClientSpe
 	case "cosmos-ADR036":
 		return getCosmosADR036SignDocBytes(clientSpecOpts), nil
 	// Non-ClientSpec RPC Request
-	// Return marshaled SSI document as-is 
+	// Return marshaled SSI document as-is
 	case "":
 		return clientSpecOpts.SSIDocBytes, nil
 	default:
 		return nil, sdkerrors.Wrap(
 			types.ErrInvalidClientSpecType,
 			fmt.Sprintf(
-				"supported client specs are : [%s]", 
-				strings.Join(supportedClientSpecs, ", "),
+				"supported client specs are : [%s]",
+				strings.Join(common.SupportedClientSpecs, ", "),
 			),
 		)
 	}

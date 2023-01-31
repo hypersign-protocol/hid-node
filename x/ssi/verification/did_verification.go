@@ -6,7 +6,6 @@ import (
 
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
-	utils "github.com/hypersign-protocol/hid-node/x/ssi/utils"
 )
 
 // Cheks whether the Service is valid
@@ -33,7 +32,7 @@ func IsValidDidFragment(didUrl string, method string, namespace string) bool {
 		return false
 	}
 
-	did, _ := utils.SplitDidUrlIntoDid(didUrl)
+	did, _ := splitDidUrlIntoDid(didUrl)
 	err := IsValidID(did, namespace, "didDocument")
 	return err == nil
 }
@@ -49,9 +48,9 @@ func IsValidDidServiceType(sType string) bool {
 }
 
 func DuplicateServiceExists(serviceId string, services []*types.Service) bool {
-	_, fragment := utils.SplitDidUrlIntoDid(serviceId)
+	_, fragment := splitDidUrlIntoDid(serviceId)
 	for _, s := range services {
-		_, sFragment := utils.SplitDidUrlIntoDid(s.Id)
+		_, sFragment := splitDidUrlIntoDid(s.Id)
 		if fragment == sFragment {
 			return true
 		}

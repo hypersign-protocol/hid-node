@@ -6,14 +6,14 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
-	"github.com/hypersign-protocol/hid-node/x/ssi/utils"
+	"github.com/hypersign-protocol/hid-node/x/ssi/verification"
 )
 
 func (k msgServer) ValidateDidControllers(ctx *sdk.Context, id string, controllers []string, verMethods []*types.VerificationMethod) error {
 	for _, verificationMethod := range verMethods {
 		if err := k.validateController(
-			ctx, 
-			id, 
+			ctx,
+			id,
 			verificationMethod.GetController(),
 		); err != nil {
 			return err
@@ -39,7 +39,7 @@ func (k *Keeper) validateController(ctx *sdk.Context, id string, controller stri
 	if len(didDoc.DidDocument.Authentication) == 0 {
 		return types.ErrBadRequestInvalidVerMethod.Wrap(
 			fmt.Sprintf(
-				"verificatition method controller %s doesn't have an authentication keys", 
+				"verificatition method controller %s doesn't have an authentication keys",
 				controller,
 			),
 		)
@@ -81,34 +81,34 @@ func GetUpdatedSigners(ctx *sdk.Context, oldDidDocument *types.Did, updatedDidDo
 		signers = append(signers, types.Signer{Signer: controller})
 	}
 
-	oldVerificationMethods := oldDidDocument.GetVerificationMethod() 
+	oldVerificationMethods := oldDidDocument.GetVerificationMethod()
 	for _, oldVM := range oldVerificationMethods {
-		newVM := utils.FindVerificationMethod(
-			updatedDidDocument.GetVerificationMethod(), 
+		newVM := verification.FindVerificationMethod(
+			updatedDidDocument.GetVerificationMethod(),
 			oldVM.GetId(),
 		)
 
 		// Verification Method has been deleted
 		if newVM == nil {
 			signers = appendSignerIfNeed(
-				signers, 
-				oldVM.GetController(), 
+				signers,
+				oldVM.GetController(),
 				updatedDidDocument)
 		}
 
 		// Verification Method has been changed
 		if !reflect.DeepEqual(oldVM, newVM) {
 			signers = appendSignerIfNeed(
-				signers, 
-				newVM.GetController(), 
+				signers,
+				newVM.GetController(),
 				updatedDidDocument)
 		}
 
 		// Verification Method Controller has been changed, need to add old controller
 		if newVM.Controller != oldVM.Controller {
 			signers = appendSignerIfNeed(
-				signers, 
-				oldVM.GetController(), 
+				signers,
+				oldVM.GetController(),
 				updatedDidDocument)
 		}
 	}

@@ -86,10 +86,10 @@ func IsValidID(Id string, namespace string, docType string) error {
 		}
 	}
 
-	// Check if method-specific-id string is alphanumeric and 
+	// Check if method-specific-id string is alphanumeric and
 	// has the minimum required character length of 32
 	isProperMethodSpecificId, err := regexp.MatchString(
-		"^[a-zA-Z0-9]{32,}$", 
+		"^[a-zA-Z0-9]{32,}$",
 		docElements[docMethodSpecificId],
 	)
 	if err != nil {
@@ -97,7 +97,7 @@ func IsValidID(Id string, namespace string, docType string) error {
 	}
 	if !isProperMethodSpecificId {
 		return sdkerrors.Wrap(
-			types.ErrInvalidMethodSpecificId, 
+			types.ErrInvalidMethodSpecificId,
 			fmt.Sprintf(
 				"method-specific-id should be an alphanumeric string with minimum 32 characters, recieved: %s",
 				docElements[docMethodSpecificId],
