@@ -84,6 +84,7 @@ func recoverEthPublicKey(blockchainAccountId string, signature string, documentB
 	blockchainAddress := getBlockchainAddress(blockchainAccountId)
 
 	// Convert message bytes to hash
+	// More info on the `personal_sign` here: https://docs.metamask.io/guide/signing-data.html#personal-sign
 	msgHash := etheraccounts.TextHash(documentBytes)
 
 	// Decode hex-encoded signature string to bytes
@@ -93,7 +94,9 @@ func recoverEthPublicKey(blockchainAccountId string, signature string, documentB
 	}
 
 	// Handle the signature recieved from web3-js client package by subtracting 27 from the recovery byte
-	signatureBytes[ethercrypto.RecoveryIDOffset] -= 27
+	if signatureBytes[ethercrypto.RecoveryIDOffset] == 27 || signatureBytes[ethercrypto.RecoveryIDOffset] == 28 {
+		signatureBytes[ethercrypto.RecoveryIDOffset] -= 27
+	} 
 
 	// Recover public key from signature
 	recoveredPublicKey, err := ethercrypto.SigToPub(msgHash, signatureBytes)

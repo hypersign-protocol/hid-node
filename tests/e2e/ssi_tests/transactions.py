@@ -7,7 +7,7 @@ from utils import run_command
 import json
 from utils import run_command
 
-COMMON_TX_COMMAND_FLAGS = "--chain-id hidnode --broadcast-mode block --keyring-backend test --yes"
+COMMON_TX_COMMAND_FLAGS = "--chain-id hidnode --output json --broadcast-mode block --keyring-backend test --yes"
 
 def form_did_create_tx(did_doc, kp, blockchain_account, verificationMethodId=None, signing_algo="ed25519"):
     if signing_algo == "recover-eth":
