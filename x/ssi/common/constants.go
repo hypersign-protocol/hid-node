@@ -16,6 +16,10 @@ var VerificationKeySignatureMap = map[string]string{
 const EIP155 string = "eip155"
 
 // Support Client Specs
+const ADR036Spec string = "cosmos-ADR036"
+const PersonalSignSpec string = "eth-personalSign"
+
 var SupportedClientSpecs []string = []string{
-	"cosmos-ADR036",
+	ADR036Spec,
+	PersonalSignSpec,
 }

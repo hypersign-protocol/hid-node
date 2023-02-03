@@ -107,11 +107,10 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 
 		// ClientSpec check
 		clientSpecType := msg.GetClientSpec()
-		msgCredStatusBytes := msgCredStatus.GetSignBytes()
 		singerAddress := msg.GetCreator()
 
 		clientSpecOpts := types.ClientSpecOpts{
-			SSIDocBytes:   msgCredStatusBytes,
+			SSIDoc:        msgCredStatus,
 			SignerAddress: singerAddress,
 		}
 
@@ -326,11 +325,10 @@ func (k msgServer) updateCredentialStatus(ctx sdk.Context, msg *types.MsgRegiste
 
 	// ClientSpec check
 	clientSpecType := msg.GetClientSpec()
-	msgNewCredStatusBytes := msgNewCredStatus.GetSignBytes()
 	signerAddress := msg.GetCreator()
 
 	clientSpecOpts := types.ClientSpecOpts{
-		SSIDocBytes:   msgNewCredStatusBytes,
+		SSIDoc:   msgNewCredStatus,
 		SignerAddress: signerAddress,
 	}
 

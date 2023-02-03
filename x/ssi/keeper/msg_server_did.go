@@ -50,11 +50,10 @@ func (k msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*t
 
 	// ClientSpec check
 	var didDocBytes []byte
-	didDocBytes = msgDidDocument.GetSignBytes()
 
 	msgClientSpecType := msg.GetClientSpec()
 	clientSpecOpts := types.ClientSpecOpts{
-		SSIDocBytes:   didDocBytes,
+		SSIDoc:   msgDidDocument,
 		SignerAddress: signerAddress,
 	}
 
@@ -139,12 +138,11 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 
 	// ClientSpec check
 	var didDocBytes []byte
-	didDocBytes = msgDidDocument.GetSignBytes()
 
-	clientSpecType := msg.ClientSpec
+	clientSpecType := msg.GetClientSpec()
 	signerAddress := msg.GetCreator()
 	clientSpecOpts := types.ClientSpecOpts{
-		SSIDocBytes:   didDocBytes,
+		SSIDoc:   msgDidDocument,
 		SignerAddress: signerAddress,
 	}
 
@@ -234,12 +232,11 @@ func (k msgServer) DeactivateDID(goCtx context.Context, msg *types.MsgDeactivate
 
 	// ClientSpec check
 	var didDocBytes []byte
-	didDocBytes = didDoc.GetSignBytes()
 	msgClientSpecType := msg.GetClientSpec()
 	msgSignerAddress := msg.GetCreator()
 
 	clientSpecOpts := types.ClientSpecOpts{
-		SSIDocBytes:   didDocBytes,
+		SSIDoc:   didDoc,
 		SignerAddress: msgSignerAddress,
 	}
 

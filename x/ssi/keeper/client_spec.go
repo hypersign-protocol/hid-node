@@ -13,7 +13,7 @@ import (
 
 // Read more about Cosmos's ADR Spec from the following:
 // https://docs.cosmos.network/v0.45/architecture/adr-036-arbitrary-signature.html
-func getCosmosADR036SignDocBytes(clientSpecOpts types.ClientSpecOpts) []byte {
+func getCosmosADR036SignDocBytes(clientSpecOpts types.ClientSpecOpts) ([]byte, error) {
 	var msgSignData types.Msg = types.Msg{
 		Type: "sign/MsgSignData",
 		Value: types.Val{
@@ -35,28 +35,35 @@ func getCosmosADR036SignDocBytes(clientSpecOpts types.ClientSpecOpts) []byte {
 		},
 		Sequence: "0",
 	}
-
+	ssiDocBytes := clientSpecOpts.SSIDoc.GetSignBytes()
 	baseCosmosADR036SignDoc.Msgs[0].Value.Data = base64.StdEncoding.EncodeToString(
-		clientSpecOpts.SSIDocBytes)
+		ssiDocBytes)
 	baseCosmosADR036SignDoc.Msgs[0].Value.Signer = clientSpecOpts.SignerAddress
 
 	updatedSignDocBytes, err := json.Marshal(baseCosmosADR036SignDoc)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
-	return updatedSignDocBytes
+	return updatedSignDocBytes, nil
+}
+
+// More info on the `personal_sign` here: https://docs.metamask.io/guide/signing-data.html#personal-sign
+func getPersonalSignSpecDocBytes(clientSpecOpts types.ClientSpecOpts) ([]byte, error) {
+	return json.Marshal(clientSpecOpts.SSIDoc)
 }
 
 // Get the updated marshaled SSI document for the respective ClientSpec
 func getClientSpecDocBytes(clientSpecType string, clientSpecOpts types.ClientSpecOpts) ([]byte, error) {
 	switch clientSpecType {
-	case "cosmos-ADR036":
-		return getCosmosADR036SignDocBytes(clientSpecOpts), nil
+	case common.ADR036Spec:
+		return getCosmosADR036SignDocBytes(clientSpecOpts)
+	case common.PersonalSignSpec:
+		return getPersonalSignSpecDocBytes(clientSpecOpts)
 	// Non-ClientSpec RPC Request
 	// Return marshaled SSI document as-is
 	case "":
-		return clientSpecOpts.SSIDocBytes, nil
+		return clientSpecOpts.SSIDoc.GetSignBytes(), nil
 	default:
 		return nil, sdkerrors.Wrap(
 			types.ErrInvalidClientSpecType,
