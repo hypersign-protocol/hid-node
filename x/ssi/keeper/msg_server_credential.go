@@ -7,8 +7,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/hypersign-protocol/hid-node/x/ssi/verification"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
+	"github.com/hypersign-protocol/hid-node/x/ssi/verification"
 )
 
 func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.MsgRegisterCredentialStatus) (*types.MsgRegisterCredentialStatusResponse, error) {
@@ -16,10 +16,10 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	credMsg := msg.GetCredentialStatus()
-	credProof := msg.GetProof()
+	msgCredStatus := msg.GetCredentialStatus()
+	msgCredProof := msg.GetProof()
 
-	credId := credMsg.GetClaim().GetId()
+	credId := msgCredStatus.GetClaim().GetId()
 
 	chainNamespace := k.GetChainNamespace(&ctx)
 
@@ -32,30 +32,34 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 	// Check if the credential already exist in the store
 	if !k.HasCredential(ctx, credId) {
 		// Check for the correct credential status
-		credStatus := credMsg.GetClaim().GetCurrentStatus()
+		credStatus := msgCredStatus.GetClaim().GetCurrentStatus()
 		if credStatus != "Live" {
 			return nil, sdkerrors.Wrap(types.ErrInvalidCredentialStatus, fmt.Sprintf("expected credential status to be `Live`, got %s", credStatus))
 		}
 
 		// Check if the DID of the issuer exists
-		issuerId := credMsg.GetIssuer()
+		issuerId := msgCredStatus.GetIssuer()
 		if !k.HasDid(ctx, issuerId) {
 			return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("Issuer`s DID %s doesnt exists", issuerId))
 		}
 
 		// Check if issuer's DID is deactivated
-		if issuerDidDocument, _ := k.GetDid(&ctx, issuerId); issuerDidDocument.DidDocumentMetadata.Deactivated {
+		issuerDidDocument, err := k.GetDidDocumentState(&ctx, issuerId)
+		if err != nil {
+			return nil, err
+		}
+		if issuerDidDocument.DidDocumentMetadata.Deactivated {
 			return nil, sdkerrors.Wrap(types.ErrDidDocDeactivated, fmt.Sprintf("%s is deactivated and cannot used be used to register credential status", issuerDidDocument.DidDocument.Id))
 		}
 
 		// Check if the expiration date is not before the issuance date.
-		expirationDate := credMsg.GetExpirationDate()
+		expirationDate := msgCredStatus.GetExpirationDate()
 		expirationDateParsed, err := time.Parse(time.RFC3339, expirationDate)
 		if err != nil {
 			return nil, sdkerrors.Wrapf(types.ErrInvalidDate, fmt.Sprintf("invalid expiration date format: %s", expirationDate))
 		}
 
-		issuanceDate := credMsg.GetIssuanceDate()
+		issuanceDate := msgCredStatus.GetIssuanceDate()
 		issuanceDateParsed, err := time.Parse(time.RFC3339, issuanceDate)
 		if err != nil {
 			return nil, sdkerrors.Wrapf(types.ErrInvalidDate, fmt.Sprintf("invalid issuance date format: %s", issuanceDate))
@@ -65,47 +69,49 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 			return nil, err
 		}
 
-		// Check if updated date iss imilar to created date
-		if err := verification.VerifyCredentialProofDates(credProof, true); err != nil {
+		// Check if updated date is similar to created date
+		if err := verification.VerifyCredentialProofDates(msgCredProof, true); err != nil {
 			return nil, err
 		}
 
 		// Check if the created date lies between issuance and expiration
-		currentDate, _ := time.Parse(time.RFC3339, credProof.Created)
+		currentDate, _ := time.Parse(time.RFC3339, msgCredProof.Created)
 		if currentDate.After(expirationDateParsed) || currentDate.Before(issuanceDateParsed) {
 			return nil, sdkerrors.Wrapf(types.ErrInvalidDate, "credential registeration is happening on a date which doesn`t lie between issuance date and expiration date")
 		}
 
 		// Check the hash type of credentialHash
-		isValidCredentialHash := verification.VerifyCredentialHash(credMsg.GetCredentialHash())
+		isValidCredentialHash := verification.VerifyCredentialHash(msgCredStatus.GetCredentialHash())
 		if !isValidCredentialHash {
 			return nil, sdkerrors.Wrapf(types.ErrInvalidCredentialHash, "supported hashing algorithms: sha256")
 		}
 
 		// Verify the Signature
-		didDocument, err := k.GetDid(&ctx, issuerId)
+		didDocumentState, err := k.GetDidDocumentState(&ctx, issuerId)
 		if err != nil {
 			return nil, err
 		}
 
-		did := didDocument.GetDidDocument()
+		didDocument := didDocumentState.GetDidDocument()
 
 		signature := &types.SignInfo{
-			VerificationMethodId: credProof.GetVerificationMethod(),
-			Signature:            credProof.GetProofValue(),
+			VerificationMethodId: msgCredProof.GetVerificationMethod(),
+			Signature:            msgCredProof.GetProofValue(),
 		}
 		signatures := []*types.SignInfo{signature}
-		signers := did.GetSigners()
+		signers := didDocument.GetSigners()
 		signersWithVM, err := k.GetVMForSigners(&ctx, signers)
 		if err != nil {
 			return nil, err
 		}
 
 		// ClientSpec check
-		clientSpecType := msg.ClientSpec
+		clientSpecType := msg.GetClientSpec()
+		singerAddress := msg.GetCreator()
+
 		clientSpecOpts := types.ClientSpecOpts{
-			SSIDocBytes:   credMsg.GetSignBytes(),
-			SignerAddress: msg.Creator,
+			SSIDoc:        msgCredStatus,
+			SignerAddress: singerAddress,
 		}
 
 		credDocBytes, err := getClientSpecDocBytes(clientSpecType, clientSpecOpts)
@@ -114,7 +120,7 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 		}
 
 		// Proof Type Check
-		err = verification.DocumentProofTypeCheck(credProof.Type, signersWithVM, credProof.VerificationMethod)
+		err = verification.DocumentProofTypeCheck(msgCredProof.Type, signersWithVM, msgCredProof.VerificationMethod)
 		if err != nil {
 			return nil, err
 		}
@@ -126,12 +132,12 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 		}
 
 		cred := &types.Credential{
-			Claim:          credMsg.GetClaim(),
-			Issuer:         credMsg.GetIssuer(),
-			IssuanceDate:   credMsg.GetIssuanceDate(),
-			ExpirationDate: credMsg.GetExpirationDate(),
-			CredentialHash: credMsg.GetCredentialHash(),
-			Proof:          credProof,
+			Claim:          msgCredStatus.GetClaim(),
+			Issuer:         msgCredStatus.GetIssuer(),
+			IssuanceDate:   msgCredStatus.GetIssuanceDate(),
+			ExpirationDate: msgCredStatus.GetExpirationDate(),
+			CredentialHash: msgCredStatus.GetCredentialHash(),
+			Proof:          msgCredProof,
 		}
 
 		id = k.RegisterCred(ctx, cred)
@@ -148,54 +154,46 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 }
 
 func (k msgServer) updateCredentialStatus(ctx sdk.Context, msg *types.MsgRegisterCredentialStatus) (*types.Credential, error) {
-	newCredStatus := msg.CredentialStatus
-	newCredProof := msg.Proof
+	msgNewCredStatus := msg.CredentialStatus
+	msgNewCredProof := msg.Proof
 
-	credId := newCredStatus.GetClaim().GetId()
+	credId := msgNewCredStatus.GetClaim().GetId()
 
 	// Get Credential from store
 	oldCredStatus, err := k.GetCredential(&ctx, credId)
 	if err != nil {
 		return nil, err
 	}
-	oldClaimStatus := oldCredStatus.GetClaim().GetCurrentStatus()
-	// Check for the correct credential status
-	newClaimStatus := newCredStatus.GetClaim().GetCurrentStatus()
-	statusFound := 0
-	for _, acceptablestatus := range verification.AcceptedCredStatuses {
-		if newClaimStatus == acceptablestatus {
-			statusFound = 1
-		}
-	}
-	if statusFound == 0 {
-		return nil, sdkerrors.Wrap(types.ErrInvalidCredentialStatus, fmt.Sprintf("expected credential status to be either of Revoke, Suspend or Expired, got %s", newClaimStatus))
-	}
 
 	// Check if the DID of the issuer exists
-	issuerId := newCredStatus.GetIssuer()
+	issuerId := msgNewCredStatus.GetIssuer()
 	if !k.HasDid(ctx, issuerId) {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("Issuer`s DID %s doesnt exists", issuerId))
 	}
 
 	// Check if issuer's DID is deactivated
-	if issuerDidDocument, _ := k.GetDid(&ctx, issuerId); issuerDidDocument.DidDocumentMetadata.Deactivated {
+	issuerDidDocument, err := k.GetDidDocumentState(&ctx, issuerId)
+	if err != nil {
+		return nil, err
+	}
+	if issuerDidDocument.DidDocumentMetadata.Deactivated {
 		return nil, sdkerrors.Wrap(types.ErrDidDocDeactivated, fmt.Sprintf("%s is deactivated and cannot used be used to register credential status", issuerDidDocument.DidDocument.Id))
 	}
 
 	// Check if the provided isser Id is the one who issued the VC
 	if issuerId != oldCredStatus.GetIssuer() {
 		return nil, sdkerrors.Wrapf(types.ErrInvalidCredentialField,
-			fmt.Sprintf("Isser ID %s is not issuer of verifiable credential id %s", issuerId, credId))
+			fmt.Sprintf("Issuer ID %s is not issuer of verifiable credential id %s", issuerId, credId))
 	}
 
 	// Check if the new expiration date and issuance date are same as old one.
-	newExpirationDate := newCredStatus.GetExpirationDate()
+	newExpirationDate := msgNewCredStatus.GetExpirationDate()
 	newExpirationDateParsed, err := time.Parse(time.RFC3339, newExpirationDate)
 	if err != nil {
 		return nil, sdkerrors.Wrapf(types.ErrInvalidDate, fmt.Sprintf("invalid expiration date format: %s", newExpirationDate))
 	}
 
-	newIssuanceDate := newCredStatus.GetIssuanceDate()
+	newIssuanceDate := msgNewCredStatus.GetIssuanceDate()
 	newIssuanceDateParsed, err := time.Parse(time.RFC3339, newIssuanceDate)
 	if err != nil {
 		return nil, sdkerrors.Wrapf(types.ErrInvalidDate, fmt.Sprintf("invalid issuance date format: %s", newIssuanceDate))
@@ -225,85 +223,113 @@ func (k msgServer) updateCredentialStatus(ctx sdk.Context, msg *types.MsgRegiste
 	}
 
 	// Check if updated date iss imilar to created date
-	if err := verification.VerifyCredentialProofDates(newCredProof, false); err != nil {
+	if err := verification.VerifyCredentialProofDates(msgNewCredProof, false); err != nil {
 		return nil, err
 	}
 
 	// Check if the created date lies between issuance and expiration
-	currentDate, _ := time.Parse(time.RFC3339, newCredProof.Created)
+	currentDate, _ := time.Parse(time.RFC3339, msgNewCredProof.Created)
 	if currentDate.After(newExpirationDateParsed) || currentDate.Before(newIssuanceDateParsed) {
 		return nil, sdkerrors.Wrapf(types.ErrInvalidDate, "credential update is happening on a date which doesn`t lie between issuance date and expiration date")
 	}
 
+	// Check for the correct credential status
+	oldClaimStatus := oldCredStatus.GetClaim().GetCurrentStatus()
+	newClaimStatus := msgNewCredStatus.GetClaim().GetCurrentStatus()
+	statusFound := 0
+	for _, acceptablestatus := range verification.GetAcceptedCredentialClaimStatuses() {
+		if newClaimStatus == acceptablestatus {
+			statusFound = 1
+		}
+	}
+	if statusFound == 0 {
+		return nil, sdkerrors.Wrap(
+			types.ErrInvalidCredentialStatus,
+			fmt.Sprintf("unsupported credential claim status %s", newClaimStatus))
+	}
+
 	// Old and New Credential Claim Check
-	newStatusReason := newCredStatus.GetClaim().GetStatusReason()
+
+	// Reject manual status change to Expired
+	if newClaimStatus == verification.ClaimStatus_expired {
+		return nil, sdkerrors.Wrapf(
+			types.ErrInvalidCredentialStatus,
+			"claim status cannot be manually changed to Expired")
+	}
 
 	switch oldClaimStatus {
-	case "Live":
-		if newClaimStatus == oldClaimStatus {
+	case verification.ClaimStatus_live:
+		switch newClaimStatus {
+		case verification.ClaimStatus_live:
 			return nil, sdkerrors.Wrapf(
 				types.ErrInvalidCredentialStatus,
-				fmt.Sprintf("credential is already %s", newClaimStatus))
-		}
-
-		if newClaimStatus == "Revoked" || newClaimStatus == "Suspended" || newClaimStatus == "Expired" {
+				fmt.Sprintf("credential claim status is already %s", newClaimStatus))
+		case verification.ClaimStatus_suspended, verification.ClaimStatus_revoked:
+			newStatusReason := msgNewCredStatus.GetClaim().GetStatusReason()
 			if len(newStatusReason) == 0 {
 				return nil, sdkerrors.Wrapf(
-					types.ErrInvalidCredentialField,
-					fmt.Sprintf("claim status reason cannot be empty for claim status %s", newClaimStatus))
+					types.ErrInvalidCredentialStatus,
+					"claim status reason cannot be empty",
+				)
 			}
 		}
 
-	case "Suspended":
-		if newClaimStatus == oldClaimStatus {
+	case verification.ClaimStatus_suspended:
+		switch newClaimStatus {
+		case verification.ClaimStatus_live, verification.ClaimStatus_revoked:
+			newStatusReason := msgNewCredStatus.GetClaim().GetStatusReason()
+			if len(newStatusReason) == 0 {
+				return nil, sdkerrors.Wrapf(
+					types.ErrInvalidCredentialStatus,
+					"claim status reason cannot be empty",
+				)
+			}
+		case verification.ClaimStatus_suspended:
 			return nil, sdkerrors.Wrapf(
 				types.ErrInvalidCredentialStatus,
-				fmt.Sprintf("credential is already %s", newClaimStatus))
+				fmt.Sprintf("credential claim status is already %s", newClaimStatus))
 		}
 
-	case "Revoked", "Expired":
+	case verification.ClaimStatus_revoked, verification.ClaimStatus_expired:
 		if newClaimStatus == oldClaimStatus {
 			return nil, sdkerrors.Wrapf(
 				types.ErrInvalidCredentialStatus,
-				fmt.Sprintf("credential is already %s", newClaimStatus))
+				fmt.Sprintf("credential claim status is already %s", newClaimStatus))
 		}
 
 		if newClaimStatus != oldClaimStatus {
 			return nil, sdkerrors.Wrapf(
 				types.ErrInvalidCredentialStatus,
-				fmt.Sprintf("credential cannot be updated from %s to %s", oldClaimStatus, newClaimStatus))
+				fmt.Sprintf("credential claim status cannot be updated from %s to %s", oldClaimStatus, newClaimStatus))
 		}
-
-	default:
-		return nil, sdkerrors.Wrapf(
-			types.ErrInvalidCredentialField,
-			fmt.Sprintf("invalid Credential Status present in existing credential %s", oldClaimStatus))
 	}
 
 	// Verify the Signature
-	didDocument, err := k.GetDid(&ctx, issuerId)
+	didDocumentState, err := k.GetDidDocumentState(&ctx, issuerId)
 	if err != nil {
 		return nil, err
 	}
 
-	did := didDocument.GetDidDocument()
+	didDocument := didDocumentState.GetDidDocument()
 
 	signature := &types.SignInfo{
-		VerificationMethodId: newCredProof.GetVerificationMethod(),
-		Signature:            newCredProof.GetProofValue(),
+		VerificationMethodId: msgNewCredProof.GetVerificationMethod(),
+		Signature:            msgNewCredProof.GetProofValue(),
 	}
 	signatures := []*types.SignInfo{signature}
-	signers := did.GetSigners()
+	signers := didDocument.GetSigners()
 	signersWithVM, err := k.GetVMForSigners(&ctx, signers)
 	if err != nil {
 		return nil, err
 	}
 
 	// ClientSpec check
-	clientSpecType := msg.ClientSpec
+	clientSpecType := msg.GetClientSpec()
+	signerAddress := msg.GetCreator()
+
 	clientSpecOpts := types.ClientSpecOpts{
-		SSIDocBytes:   newCredStatus.GetSignBytes(),
-		SignerAddress: msg.Creator,
+		SSIDoc:   msgNewCredStatus,
+		SignerAddress: signerAddress,
 	}
 
 	credDocBytes, err := getClientSpecDocBytes(clientSpecType, clientSpecOpts)
@@ -312,7 +338,7 @@ func (k msgServer) updateCredentialStatus(ctx sdk.Context, msg *types.MsgRegiste
 	}
 
 	// Proof Type Check
-	err = verification.DocumentProofTypeCheck(newCredProof.Type, signersWithVM, newCredProof.VerificationMethod)
+	err = verification.DocumentProofTypeCheck(msgNewCredProof.Type, signersWithVM, msgNewCredProof.VerificationMethod)
 	if err != nil {
 		return nil, err
 	}
@@ -324,12 +350,12 @@ func (k msgServer) updateCredentialStatus(ctx sdk.Context, msg *types.MsgRegiste
 	}
 
 	cred := types.Credential{
-		Claim:          newCredStatus.GetClaim(),
-		Issuer:         newCredStatus.GetIssuer(),
-		IssuanceDate:   newCredStatus.GetIssuanceDate(),
-		ExpirationDate: newCredStatus.GetExpirationDate(),
-		CredentialHash: newCredStatus.GetCredentialHash(),
-		Proof:          newCredProof,
+		Claim:          msgNewCredStatus.GetClaim(),
+		Issuer:         msgNewCredStatus.GetIssuer(),
+		IssuanceDate:   msgNewCredStatus.GetIssuanceDate(),
+		ExpirationDate: msgNewCredStatus.GetExpirationDate(),
+		CredentialHash: msgNewCredStatus.GetCredentialHash(),
+		Proof:          msgNewCredProof,
 	}
 
 	return &cred, nil

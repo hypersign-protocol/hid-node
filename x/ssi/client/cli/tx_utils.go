@@ -3,10 +3,15 @@ package cli
 import (
 	"crypto/ed25519"
 	"encoding/base64"
+	"encoding/hex"
 	"fmt"
 
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 	secp256k1 "github.com/tendermint/tendermint/crypto/secp256k1"
+
+	etheraccounts "github.com/ethereum/go-ethereum/accounts"
+	etherhexutil "github.com/ethereum/go-ethereum/common/hexutil"
+	ethercrypto "github.com/ethereum/go-ethereum/crypto"
 
 	"github.com/spf13/cobra"
 )
@@ -36,6 +41,29 @@ func extractDIDSigningElements(cmdArgs []string) ([]DIDSigningElements, error) {
 	}
 
 	return didSigningElementsList, nil
+}
+
+func GetEthRecoverySignature(privateKey string, message []byte) (string, error) {
+	// Decode key into bytes
+	privKeyBytes, err := hex.DecodeString(privateKey)
+	if err != nil {
+		panic(err)
+	}
+	privKeyObject, err := ethercrypto.ToECDSA(privKeyBytes)
+	if err != nil {
+		panic(err)
+	}
+
+	// Hash the message
+	msgHash := etheraccounts.TextHash(message)
+
+	// Sign Message
+	sigBytes, err := ethercrypto.Sign(msgHash, privKeyObject)
+	if err != nil {
+		panic(err)
+	}
+	
+	return etherhexutil.Encode(sigBytes), nil
 }
 
 func GetSecp256k1Signature(privateKey string, message []byte) (string, error) {
@@ -92,6 +120,11 @@ func getSignatures(cmd *cobra.Command, message []byte, cmdArgs []string) ([]*typ
 			}
 		case "secp256k1":
 			signInfoList[i].Signature, err = GetSecp256k1Signature(didSigningElementsList[i].SignKey, message)
+			if err != nil {
+				return nil, err
+			}
+		case "recover-eth":
+			signInfoList[i].Signature, err = GetEthRecoverySignature(didSigningElementsList[i].SignKey, message)
 			if err != nil {
 				return nil, err
 			}

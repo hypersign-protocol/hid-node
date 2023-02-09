@@ -16,7 +16,7 @@ def generate_did_document(key_pair, algo="ed25519"):
         "authentication": [],
     }
 
-    did_id = generate_document_id("did", key_pair)
+    did_id = generate_document_id("did", key_pair, algo)
 
     # Form the DID Document
     vm_type = ""
@@ -24,6 +24,8 @@ def generate_did_document(key_pair, algo="ed25519"):
         vm_type = "Ed25519VerificationKey2020"
     elif algo == "secp256k1":
         vm_type = "EcdsaSecp256k1VerificationKey2019"
+    elif algo == "recover-eth":
+        vm_type = "EcdsaSecp256k1RecoveryMethod2020"
     else:
         raise Exception("unknown signing algorithm: " + key_pair)
 
@@ -31,8 +33,14 @@ def generate_did_document(key_pair, algo="ed25519"):
         "id": did_id + "#key-1",
         "type": vm_type,
         "controller": did_id,
-        "publicKeyMultibase": key_pair["pub_key_multibase"]
+        "blockchainAccountId": "",
+        "publicKeyMultibase": ""
     }
+    if algo == "recover-eth":
+        verification_method["blockchainAccountId"] = "eip155:1:" + key_pair["ethereum_address"]
+    else:
+        verification_method["publicKeyMultibase"] = key_pair["pub_key_multibase"]
+   
     authentication_verification_method_id = verification_method["id"]
     
     base_document["id"] = did_id
@@ -64,6 +72,8 @@ def generate_schema_document(key_pair, schema_author, vm, signature=None, algo="
         proof_type = "Ed25519Signature2020"
     elif algo == "secp256k1":
         proof_type = "EcdsaSecp256k1Signature2019"
+    elif algo == "recover-eth":
+        proof_type = "EcdsaSecp256k1RecoverySignature2020"
     else:
         raise Exception("Invalid signing algo: " + algo)
 
@@ -75,7 +85,7 @@ def generate_schema_document(key_pair, schema_author, vm, signature=None, algo="
         "proofPurpose": "assertion"
     }
 
-    schema_id = generate_document_id("schema")
+    schema_id = generate_document_id("schema", algo=algo)
     base_schema_doc["id"] = schema_id
     base_schema_doc["author"] = schema_author
     base_schema_proof["verificationMethod"] = vm
@@ -106,6 +116,8 @@ def generate_cred_status_document(key_pair, cred_author, vm, signature=None, alg
         proof_type = "Ed25519Signature2020"
     elif algo == "secp256k1":
         proof_type = "EcdsaSecp256k1Signature2019"
+    elif algo == "recover-eth":
+        proof_type = "EcdsaSecp256k1RecoverySignature2020"
     else:
         raise Exception("Invalid signing algo: " + algo)
     
@@ -118,7 +130,7 @@ def generate_cred_status_document(key_pair, cred_author, vm, signature=None, alg
         "proofPurpose": "assertion"
     }
 
-    cred_id = generate_document_id("cred-status")
+    cred_id = generate_document_id("cred-status", algo=algo)
     base_cred_status_doc["claim"]["id"] = cred_id
     base_cred_status_doc["issuer"] = cred_author
     base_cred_status_proof["verificationMethod"] = vm

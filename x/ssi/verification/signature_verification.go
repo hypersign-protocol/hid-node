@@ -5,8 +5,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/hypersign-protocol/hid-node/x/ssi/common"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
-	"github.com/hypersign-protocol/hid-node/x/ssi/utils"
 )
 
 // Verify signatures against signer's public keys
@@ -15,14 +15,24 @@ func VerifyIdentitySignature(signer types.Signer, signatures []*types.SignInfo, 
 	result := false
 
 	for _, signature := range signatures {
-		did, _ := utils.SplitDidUrlIntoDid(signature.VerificationMethodId)
+		did, _ := splitDidUrlIntoDid(signature.VerificationMethodId)
 		if did == signer.Signer {
-			pubKey, vmType, err := utils.FindPublicKeyAndVerificationMethodType(signer, signature.VerificationMethodId)
+			vmElements, err := findVerificationMethodElements(signer, signature.VerificationMethodId)
 			if err != nil {
 				return false, err
 			}
 
-			result, err = verify(vmType, pubKey, signature.Signature, signingInput)
+			var verificationKey string
+			if vmElements.PublicKey != "" {
+				verificationKey = vmElements.PublicKey
+			}
+			if vmElements.BlockchainAccountId != "" {
+				verificationKey = vmElements.BlockchainAccountId
+			}
+
+			vmType := vmElements.VerificationMethodType
+			
+			result, err = verify(vmType, verificationKey, signature.Signature, signingInput)
 			if err != nil {
 				return false, err
 			}
@@ -63,7 +73,7 @@ func VerifyDidSignature(ctx *sdk.Context, didDocBytes []byte, signers []types.Si
 func DocumentProofTypeCheck(inputProofType string, signers []types.Signer, vmId string) error {
 	var vmType string
 	var expectedProofType string
-	
+
 	for i := 0; i < len(signers); i++ {
 		if signers[i].VerificationMethod[0].Id == vmId {
 			vmType = signers[i].VerificationMethod[0].Type
@@ -75,7 +85,7 @@ func DocumentProofTypeCheck(inputProofType string, signers []types.Signer, vmId 
 		return types.ErrVerificationMethodNotFound.Wrap(vmId)
 	}
 
-	expectedProofType = VerificationKeySignatureMap[vmType]
+	expectedProofType = common.VerificationKeySignatureMap[vmType]
 	if inputProofType != expectedProofType {
 		return fmt.Errorf(
 			"expected document proof type for verification method type %s to be '%s', recieved '%s'",

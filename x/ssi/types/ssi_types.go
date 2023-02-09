@@ -1,7 +1,12 @@
 package types
 
+import (
+	proto "github.com/gogo/protobuf/proto"
+)
+
 type (
-	IdentityMsg interface {
+	SsiMsg interface {
+		proto.Message
 		GetSignBytes() []byte
 	}
 
@@ -23,7 +28,7 @@ type (
 
 // Struct catering to supported Client Spec's required inputs
 type ClientSpecOpts struct {
-	SSIDocBytes   []byte
+	SSIDoc   SsiMsg
 	SignerAddress string
 }
 

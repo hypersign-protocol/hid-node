@@ -41,7 +41,7 @@ func (k Keeper) SetSchemaCount(ctx sdk.Context, count uint64) {
 	store.Set(byteKey, bz)
 }
 
-func (k Keeper) AppendSchema(ctx sdk.Context, schema types.Schema) uint64 {
+func (k Keeper) RegisterSchemaInStore(ctx sdk.Context, schema types.Schema) uint64 {
 	// Get the current number of Schemas in the store
 	count := k.GetSchemaCount(ctx)
 	// Get the store

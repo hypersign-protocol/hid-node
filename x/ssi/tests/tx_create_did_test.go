@@ -19,7 +19,7 @@ func TestCreateDIDUsingEd25519KeyPair(t *testing.T) {
 	k.SetChainNamespace(&ctx, "devnet")
 
 	keyPair1 := GenerateEd25519KeyPair()
-	rpcElements := GenerateDidDocumentRPCElements(keyPair1,[]DidSigningElements{})
+	rpcElements := GenerateDidDocumentRPCElements(keyPair1, []DidSigningElements{})
 	t.Logf("Registering DID with DID Id: %s", rpcElements.DidDocument.GetId())
 
 	msgCreateDID := &types.MsgCreateDID{
@@ -109,7 +109,7 @@ func TestInvalidServiceType(t *testing.T) {
 
 func TestCheckValidMethodSpecificId(t *testing.T) {
 	t.Log("Running test to check valid method-specific Id")
-	
+
 	didIdValidMethodSpecificId := "hid17kuuyfz5pq2raapxet3t06c2f0xxd4yesa5we2"
 	didIdInvalidMethodSpecificId1 := "abc2322222"
 	didIdInvalidMethodSpecificId2 := "abc_2322222"
@@ -128,7 +128,7 @@ func TestCheckValidMethodSpecificId(t *testing.T) {
 
 	keyPair3 := GenerateEd25519KeyPair()
 	keyPair3.optionalID = didIdInvalidMethodSpecificId2
-	
+
 	var rpcElements DidRpcElements
 	var msgCreateDID *types.MsgCreateDID
 

@@ -5,7 +5,7 @@ COMMIT := $(shell git rev-parse --short HEAD)
 
 BUILD_DIR ?= $(CURDIR)/build
 HIDNODE_CMD_DIR := $(CURDIR)/cmd/hid-noded
-E2E_SSI_TESTS_DIR := $(CURDIR)/tests/e2e/ssi_tests
+GO_MINOR_VERSION = $(shell go version | cut -c 14- | cut -d' ' -f1 | cut -d'.' -f2)
 
 GOBIN = $(shell go env GOPATH)/bin
 GOOS = $(shell go env GOOS)
@@ -31,14 +31,20 @@ export GO111MODULE=on
 
 all: proto-gen swagger-docs-gen build
 
+go-version-check:
+ifneq ($(GO_MINOR_VERSION),18)
+	@echo "ERROR: Go version 1.18 is required for this version of hid-node"
+	exit 1
+endif
+
 go.sum: go.mod
 		@echo "--> Ensure dependencies have not been modified"
 		@go mod verify
 
-install: go.sum
+install: go-version-check go.sum
 	go install -mod=readonly $(BUILD_FLAGS) $(HIDNODE_CMD_DIR)	
 
-build:
+build: go-version-check
 	go build -mod=readonly $(BUILD_FLAGS) -o $(BUILD_DIR)/hid-noded $(HIDNODE_CMD_DIR)
 
 ###############################################################################
