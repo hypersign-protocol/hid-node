@@ -28,7 +28,8 @@ message VerificationMethod {
   string id = 1;
   string type = 2;
   string controller = 3;
-  string publicKeyMultibase = 4;
+  string publicKeyMultibase = 4; // If value is provided, `blockchainAccountId` must be empty
+  string blockchainAccountId = 5; // If value is provided, `publicKeyMultibase` must be empty
 }
 
 message Service {

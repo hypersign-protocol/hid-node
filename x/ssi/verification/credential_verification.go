@@ -30,10 +30,10 @@ func VerifyCredentialStatusDates(issuanceDate time.Time, expirationDate time.Tim
 	// Check if the expiration date predates the issuance date.
 	if dateDiff < 0 {
 		return sdkerrors.Wrapf(
-			types.ErrInvalidDate, 
+			types.ErrInvalidDate,
 			fmt.Sprintf(
-				"expiration date %s cannot be less than issuance date %s", 
-				expirationDate, 
+				"expiration date %s cannot be less than issuance date %s",
+				expirationDate,
 				issuanceDate,
 			),
 		)
@@ -49,9 +49,9 @@ func VerifyCredentialProofDates(credProof *types.CredentialProof, credRegistrati
 	proofCreatedDateParsed, err := time.Parse(time.RFC3339, proofCreatedDate)
 	if err != nil {
 		return sdkerrors.Wrapf(
-			types.ErrInvalidDate, 
+			types.ErrInvalidDate,
 			fmt.Sprintf(
-				"invalid created date format: %s", 
+				"invalid created date format: %s",
 				proofCreatedDate,
 			),
 		)
@@ -61,9 +61,9 @@ func VerifyCredentialProofDates(credProof *types.CredentialProof, credRegistrati
 	proofUpdatedDateParsed, err := time.Parse(time.RFC3339, proofUpdatedDate)
 	if err != nil {
 		return sdkerrors.Wrapf(
-			types.ErrInvalidDate, 
+			types.ErrInvalidDate,
 			fmt.Sprintf(
-				"invalid created date format: %s", 
+				"invalid created date format: %s",
 				proofUpdatedDate,
 			),
 		)
@@ -74,10 +74,10 @@ func VerifyCredentialProofDates(credProof *types.CredentialProof, credRegistrati
 	if credRegistration {
 		if !proofUpdatedDateParsed.Equal(proofCreatedDateParsed) {
 			return sdkerrors.Wrapf(
-				types.ErrInvalidDate, 
+				types.ErrInvalidDate,
 				fmt.Sprintf(
-					"updated date %s should be similar to created date %s", 
-					proofUpdatedDate, 
+					"updated date %s should be similar to created date %s",
+					proofUpdatedDate,
 					proofCreatedDate,
 				),
 			)
@@ -86,10 +86,10 @@ func VerifyCredentialProofDates(credProof *types.CredentialProof, credRegistrati
 		dateDiff = int64(proofUpdatedDateParsed.Sub(proofCreatedDateParsed)) / 1e9 // converting nanoseconds to seconds
 		if dateDiff <= 0 {
 			return sdkerrors.Wrapf(
-				types.ErrInvalidDate, 
+				types.ErrInvalidDate,
 				fmt.Sprintf(
-					"update date %s cannot be less than or equal to created date %s in case of credential status update", 
-					proofUpdatedDate, 
+					"update date %s cannot be less than or equal to created date %s in case of credential status update",
+					proofUpdatedDate,
 					proofCreatedDate,
 				),
 			)

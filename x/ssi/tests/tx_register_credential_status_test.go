@@ -110,11 +110,11 @@ func TestCreateCredentialStatusWithMultiControllerDid(t *testing.T) {
 	singingElements := []DidSigningElements{
 		DidSigningElements{
 			keyPair: keyPair1,
-			vmId: rpcElements1.DidDocument.VerificationMethod[0].Id,
+			vmId:    rpcElements1.DidDocument.VerificationMethod[0].Id,
 		},
 		DidSigningElements{
 			keyPair: keyPair2,
-			vmId: rpcElements2.DidDocument.VerificationMethod[0].Id,
+			vmId:    rpcElements2.DidDocument.VerificationMethod[0].Id,
 		},
 	}
 	rpcElementsOrg := GenerateDidDocumentRPCElements(keyPairOrg, singingElements)

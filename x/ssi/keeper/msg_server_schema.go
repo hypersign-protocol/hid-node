@@ -76,7 +76,7 @@ func (k msgServer) CreateSchema(goCtx context.Context, msg *types.MsgCreateSchem
 	// ClientSpec check
 	clientSpecType := msg.ClientSpec
 	clientSpecOpts := types.ClientSpecOpts{
-		SSIDocBytes:   schemaDoc.GetSignBytes(),
+		SSIDoc:   schemaDoc,
 		SignerAddress: msg.Creator,
 	}
 

@@ -4,13 +4,15 @@ import (
 	"crypto/ed25519"
 	"crypto/rand"
 	"encoding/base64"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/hypersign-protocol/hid-node/x/ssi/types"
+	ethercrypto "github.com/ethereum/go-ethereum/crypto"
 	hidnodecli "github.com/hypersign-protocol/hid-node/x/ssi/client/cli"
+	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 	"github.com/multiformats/go-multibase"
 	"github.com/spf13/cobra"
 	secp256k1 "github.com/tendermint/tendermint/crypto/secp256k1"
@@ -33,6 +35,7 @@ func secp256k1Cmd() *cobra.Command {
 
 	cmd.AddCommand(
 		secp256k1RandomCmd(),
+		secp256k1EthRandomCmd(),
 	)
 
 	return cmd
@@ -61,6 +64,45 @@ func secp256k1RandomCmd() *cobra.Command {
 				PubKeyBase64:    base64.StdEncoding.EncodeToString(publicKeyCompressed),
 				PubKeyMultibase: publicKeyMultibase,
 				PrivKeyBase64:   base64.StdEncoding.EncodeToString(privateKey),
+			}
+
+			keyInfoJson, err := json.Marshal(keyInfo)
+			if err != nil {
+				return err
+			}
+
+			_, err = fmt.Fprintln(cmd.OutOrStdout(), string(keyInfoJson))
+			return err
+		},
+	}
+
+	return cmd
+}
+
+func secp256k1EthRandomCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "eth-hex-random",
+		Short: "Generate random Ethereum hex-encoded secp256k1 keypair",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			privateKeyObj := secp256k1.GenPrivKey()
+			privateKey := privateKeyObj.Bytes()
+
+			publicKeyCompressed := privateKeyObj.PubKey().Bytes()
+
+			publicKeyUncompressed, err := ethercrypto.DecompressPubkey(publicKeyCompressed)
+			if err != nil {
+				return err
+			}
+			ethereumAddress := ethercrypto.PubkeyToAddress(*publicKeyUncompressed).Hex()
+
+			keyInfo := struct {
+				PubKeyBase64    string `json:"pub_key_hex"`
+				PrivKeyBase64   string `json:"priv_key_hex"`
+				EthereumAddress string `json:"ethereum_address"`
+			}{
+				PubKeyBase64:    hex.EncodeToString(publicKeyCompressed),
+				PrivKeyBase64:   hex.EncodeToString(privateKey),
+				EthereumAddress: ethereumAddress,
 			}
 
 			keyInfoJson, err := json.Marshal(keyInfo)
@@ -108,7 +150,7 @@ func signSSIDocCmd() *cobra.Command {
 
 func signSchemaDocCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "schema-doc [doc] [base64 encoded private-key] [signing-algo]",
+		Use:   "schema-doc [doc] [private-key] [signing-algo]",
 		Short: "Schema Document signature",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -142,8 +184,13 @@ func signSchemaDocCmd() *cobra.Command {
 				if err != nil {
 					return err
 				}
+			case "recover-eth":
+				signature, err = hidnodecli.GetEthRecoverySignature(argPrivateKey, schemaDocBytes)
+				if err != nil {
+					return err
+				}
 			default:
-				panic("recieved unsupported signing-algo. Supported algorithms are: ['ed25519', 'secp256k1']")
+				panic("recieved unsupported signing-algo. Supported algorithms are: ['ed25519', 'secp256k1', 'recover-eth']")
 			}
 
 			_, err = fmt.Fprintln(cmd.OutOrStdout(), signature)
@@ -155,7 +202,7 @@ func signSchemaDocCmd() *cobra.Command {
 
 func signCredStatusDocCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "cred-status-doc [doc] [base64 encoded private-key] [signing-algo]",
+		Use:   "cred-status-doc [doc] [private-key] [signing-algo]",
 		Short: "Credential Status Document signature",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -189,8 +236,13 @@ func signCredStatusDocCmd() *cobra.Command {
 				if err != nil {
 					return err
 				}
+			case "recover-eth":
+				signature, err = hidnodecli.GetEthRecoverySignature(argPrivateKey, credStatusDocBytes)
+				if err != nil {
+					return err
+				}
 			default:
-				panic("recieved unsupported signing-algo. Supported algorithms are: ['ed25519', 'secp256k1']")
+				panic("recieved unsupported signing-algo. Supported algorithms are: ['ed25519', 'secp256k1', 'recover-eth']")
 			}
 
 			_, err = fmt.Fprintln(cmd.OutOrStdout(), signature)

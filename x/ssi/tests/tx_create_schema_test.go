@@ -106,11 +106,11 @@ func TestCreateSchemaWithMultiControllerDid(t *testing.T) {
 	singingElements := []DidSigningElements{
 		DidSigningElements{
 			keyPair: keyPair1,
-			vmId: rpcElements1.DidDocument.VerificationMethod[0].Id,
+			vmId:    rpcElements1.DidDocument.VerificationMethod[0].Id,
 		},
 		DidSigningElements{
 			keyPair: keyPair2,
-			vmId: rpcElements2.DidDocument.VerificationMethod[0].Id,
+			vmId:    rpcElements2.DidDocument.VerificationMethod[0].Id,
 		},
 	}
 	rpcElementsOrg := GenerateDidDocumentRPCElements(keyPairOrg, singingElements)
@@ -129,8 +129,6 @@ func TestCreateSchemaWithMultiControllerDid(t *testing.T) {
 		t.FailNow()
 	}
 	t.Log("Org DID Registered Successfully")
-
-
 
 	t.Log("Registering Schema")
 	schemaRpcElements := GenerateSchemaDocumentRPCElements(
