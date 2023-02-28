@@ -10,7 +10,6 @@ import (
 	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/hypersign-protocol/hid-node/x/ssi/common"
 	"github.com/hypersign-protocol/hid-node/x/ssi/keeper"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 	"github.com/multiformats/go-multibase"
@@ -79,9 +78,9 @@ func GenerateDidDocumentRPCElements(keyPair GenericKeyPair, signingElements []Di
 	var vmType string
 	switch keyPair.(type) {
 	case ed25519KeyPair:
-		vmType = common.Ed25519VerificationKey2020
+		vmType = types.Ed25519VerificationKey2020
 	case secp256k1KeyPair:
-		vmType = common.EcdsaSecp256k1VerificationKey2019
+		vmType = types.EcdsaSecp256k1VerificationKey2019
 	}
 
 	var vm = &types.VerificationMethod{
@@ -106,7 +105,7 @@ func GenerateDidDocumentRPCElements(keyPair GenericKeyPair, signingElements []Di
 		}
 	} else {
 		signingElements = []DidSigningElements{
-			DidSigningElements{
+			{
 				keyPair: keyPair,
 				vmId:    vm.Id,
 			},
@@ -165,9 +164,9 @@ func GenerateSchemaDocumentRPCElements(keyPair GenericKeyPair, authorId string, 
 	var proofType string
 	switch keyPair.(type) {
 	case ed25519KeyPair:
-		proofType = common.VerificationKeySignatureMap["Ed25519VerificationKey2020"]
+		proofType = types.VerificationKeySignatureMap["Ed25519VerificationKey2020"]
 	case secp256k1KeyPair:
-		proofType = common.VerificationKeySignatureMap["EcdsaSecp256k1VerificationKey2019"]
+		proofType = types.VerificationKeySignatureMap["EcdsaSecp256k1VerificationKey2019"]
 	}
 
 	var schemaProof *types.SchemaProof = &types.SchemaProof{
@@ -207,9 +206,9 @@ func GenerateCredStatusRPCElements(keyPair GenericKeyPair, issuerId string, verf
 	var proofType string
 	switch keyPair.(type) {
 	case ed25519KeyPair:
-		proofType = common.VerificationKeySignatureMap["Ed25519VerificationKey2020"]
+		proofType = types.VerificationKeySignatureMap["Ed25519VerificationKey2020"]
 	case secp256k1KeyPair:
-		proofType = common.VerificationKeySignatureMap["EcdsaSecp256k1VerificationKey2019"]
+		proofType = types.VerificationKeySignatureMap["EcdsaSecp256k1VerificationKey2019"]
 	}
 
 	var credentialProof *types.CredentialProof = &types.CredentialProof{

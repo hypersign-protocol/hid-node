@@ -40,14 +40,12 @@ def generate_did_document(key_pair, algo="ed25519"):
         verification_method["blockchainAccountId"] = "eip155:1:" + key_pair["ethereum_address"]
     else:
         verification_method["publicKeyMultibase"] = key_pair["pub_key_multibase"]
-   
-    authentication_verification_method_id = verification_method["id"]
     
     base_document["id"] = did_id
     base_document["controller"] = [did_id]
     base_document["verificationMethod"] = [verification_method]
-    base_document["authentication"] = [authentication_verification_method_id]
-    base_document["assertionMethod"] = [authentication_verification_method_id]
+    base_document["authentication"] = []
+    base_document["assertionMethod"] = []
     return base_document
     
 def generate_schema_document(key_pair, schema_author, vm, signature=None, algo="ed25519"):

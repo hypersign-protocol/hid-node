@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/hypersign-protocol/hid-node/x/ssi/common"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 )
 
@@ -54,11 +53,11 @@ func getPersonalSignSpecDocBytes(clientSpecOpts types.ClientSpecOpts) ([]byte, e
 }
 
 // Get the updated marshaled SSI document for the respective ClientSpec
-func getClientSpecDocBytes(clientSpecType string, clientSpecOpts types.ClientSpecOpts) ([]byte, error) {
-	switch clientSpecType {
-	case common.ADR036Spec:
+func getClientSpecDocBytes(clientSpecOpts types.ClientSpecOpts) ([]byte, error) {
+	switch clientSpecOpts.ClientSpecType {
+	case types.ADR036Spec:
 		return getCosmosADR036SignDocBytes(clientSpecOpts)
-	case common.PersonalSignSpec:
+	case types.PersonalSignSpec:
 		return getPersonalSignSpecDocBytes(clientSpecOpts)
 	// Non-ClientSpec RPC Request
 	// Return marshaled SSI document as-is
@@ -69,7 +68,7 @@ func getClientSpecDocBytes(clientSpecType string, clientSpecOpts types.ClientSpe
 			types.ErrInvalidClientSpecType,
 			fmt.Sprintf(
 				"supported client specs are : [%s]",
-				strings.Join(common.SupportedClientSpecs, ", "),
+				strings.Join(types.SupportedClientSpecs, ", "),
 			),
 		)
 	}

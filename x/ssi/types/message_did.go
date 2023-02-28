@@ -5,36 +5,6 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-// Returns a list of controllers present in the Did document along with
-// their verification methods.
-func (msg *Did) GetSigners() []Signer {
-	nControllers := len(msg.Controller)
-
-	if nControllers > 0 {
-		signers := make([]Signer, nControllers)
-		for i, controller := range msg.Controller {
-			if controller == msg.Id {
-				signers[i] = Signer{
-					Signer:               controller,
-					Authentication:       msg.Authentication,
-					AssertionMethod:      msg.AssertionMethod,
-					KeyAgreement:         msg.KeyAgreement,
-					CapabilityInvocation: msg.CapabilityInvocation,
-					CapabilityDelegation: msg.CapabilityDelegation,
-					VerificationMethod:   msg.VerificationMethod,
-				}
-			} else {
-				signers[i] = Signer{
-					Signer: controller,
-				}
-			}
-		}
-		return signers
-	}
-
-	return []Signer{}
-}
-
 func (msg *Did) GetSignBytes() []byte {
 	return ModuleCdc.MustMarshal(msg)
 }
@@ -72,9 +42,11 @@ func (msg *MsgCreateDID) GetSignBytes() []byte {
 }
 
 func (msg *MsgCreateDID) ValidateBasic() error {
-	msgDidDocument := msg.GetDidDocString()
-	err := didDocumentStatelessVerification(msgDidDocument)
-	return err
+	didDoc := msg.DidDocString
+	if err := didDoc.ValidateDidDocument(); err != nil {
+		return err
+	}
+	return nil
 }
 
 // MsgUpdateDID Type Methods
@@ -113,9 +85,11 @@ func (msg *MsgUpdateDID) GetSignBytes() []byte {
 }
 
 func (msg *MsgUpdateDID) ValidateBasic() error {
-	msgDidDocument := msg.GetDidDocString()
-	err := didDocumentStatelessVerification(msgDidDocument)
-	return err
+	didDoc := msg.DidDocString
+	if err := didDoc.ValidateDidDocument(); err != nil {
+		return err
+	}
+	return nil
 }
 
 // MsgDeactivateDID Type Methods

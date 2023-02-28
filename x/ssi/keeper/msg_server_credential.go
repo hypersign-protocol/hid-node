@@ -86,47 +86,20 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 			return nil, sdkerrors.Wrapf(types.ErrInvalidCredentialHash, "supported hashing algorithms: sha256")
 		}
 
-		// Verify the Signature
-		didDocumentState, err := k.GetDidDocumentState(&ctx, issuerId)
-		if err != nil {
-			return nil, err
-		}
-
-		didDocument := didDocumentState.GetDidDocument()
-
-		signature := &types.SignInfo{
-			VerificationMethodId: msgCredProof.GetVerificationMethod(),
-			Signature:            msgCredProof.GetProofValue(),
-		}
-		signatures := []*types.SignInfo{signature}
-		signers := didDocument.GetSigners()
-		signersWithVM, err := k.GetVMForSigners(&ctx, signers)
-		if err != nil {
-			return nil, err
-		}
-
 		// ClientSpec check
-		clientSpecType := msg.GetClientSpec()
-		singerAddress := msg.GetCreator()
-
 		clientSpecOpts := types.ClientSpecOpts{
-			SSIDoc:        msgCredStatus,
-			SignerAddress: singerAddress,
+			ClientSpecType: msg.ClientSpec,
+			SSIDoc:         msgCredStatus,
+			SignerAddress:  msg.Creator,
 		}
 
-		credDocBytes, err := getClientSpecDocBytes(clientSpecType, clientSpecOpts)
-		if err != nil {
-			return nil, err
-		}
-
-		// Proof Type Check
-		err = verification.DocumentProofTypeCheck(msgCredProof.Type, signersWithVM, msgCredProof.VerificationMethod)
+		credDocBytes, err := getClientSpecDocBytes(clientSpecOpts)
 		if err != nil {
 			return nil, err
 		}
 
 		// Verify Signature
-		err = verification.VerifyDocumentSignature(&ctx, credDocBytes, signersWithVM, signatures)
+		err = k.VerifyDocumentProof(ctx, credDocBytes, msgCredProof)
 		if err != nil {
 			return nil, err
 		}
@@ -304,47 +277,20 @@ func (k msgServer) updateCredentialStatus(ctx sdk.Context, msg *types.MsgRegiste
 		}
 	}
 
-	// Verify the Signature
-	didDocumentState, err := k.GetDidDocumentState(&ctx, issuerId)
-	if err != nil {
-		return nil, err
-	}
-
-	didDocument := didDocumentState.GetDidDocument()
-
-	signature := &types.SignInfo{
-		VerificationMethodId: msgNewCredProof.GetVerificationMethod(),
-		Signature:            msgNewCredProof.GetProofValue(),
-	}
-	signatures := []*types.SignInfo{signature}
-	signers := didDocument.GetSigners()
-	signersWithVM, err := k.GetVMForSigners(&ctx, signers)
-	if err != nil {
-		return nil, err
-	}
-
 	// ClientSpec check
-	clientSpecType := msg.GetClientSpec()
-	signerAddress := msg.GetCreator()
-
 	clientSpecOpts := types.ClientSpecOpts{
-		SSIDoc:   msgNewCredStatus,
-		SignerAddress: signerAddress,
+		ClientSpecType: msg.ClientSpec,
+		SSIDoc:         msgNewCredStatus,
+		SignerAddress:  msg.Creator,
 	}
 
-	credDocBytes, err := getClientSpecDocBytes(clientSpecType, clientSpecOpts)
-	if err != nil {
-		return nil, err
-	}
-
-	// Proof Type Check
-	err = verification.DocumentProofTypeCheck(msgNewCredProof.Type, signersWithVM, msgNewCredProof.VerificationMethod)
+	credDocBytes, err := getClientSpecDocBytes(clientSpecOpts)
 	if err != nil {
 		return nil, err
 	}
 
 	// Verify Signature
-	err = verification.VerifyDocumentSignature(&ctx, credDocBytes, signersWithVM, signatures)
+	err = k.VerifyDocumentProof(ctx, credDocBytes, msgNewCredProof)
 	if err != nil {
 		return nil, err
 	}

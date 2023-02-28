@@ -48,6 +48,11 @@ func (k Keeper) GetDidDocumentState(ctx *sdk.Context, id string) (*types.DidDocu
 
 	var didDocState types.DidDocumentState
 	var bytes = store.Get([]byte(id))
+
+	if len(bytes) == 0 {
+		return nil, sdkerrors.Wrap(types.ErrDidDocNotFound, id)
+	}
+
 	if err := k.cdc.Unmarshal(bytes, &didDocState); err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidType, err.Error())
 	}

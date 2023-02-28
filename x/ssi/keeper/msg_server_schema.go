@@ -62,37 +62,20 @@ func (k msgServer) CreateSchema(goCtx context.Context, msg *types.MsgCreateSchem
 		return nil, sdkerrors.Wrapf(types.ErrInvalidDate, "created date provided shouldn't be greater than the current block time")
 	}
 
-	signature := &types.SignInfo{
-		VerificationMethodId: schemaProof.VerificationMethod,
-		Signature:            schemaProof.ProofValue,
-	}
-	signatures := []*types.SignInfo{signature}
-	signers := authorDidDocument.DidDocument.GetSigners()
-	signersWithVM, err := k.GetVMForSigners(&ctx, signers)
-	if err != nil {
-		return nil, err
-	}
-
 	// ClientSpec check
-	clientSpecType := msg.ClientSpec
 	clientSpecOpts := types.ClientSpecOpts{
-		SSIDoc:   schemaDoc,
-		SignerAddress: msg.Creator,
+		ClientSpecType: msg.ClientSpec,
+		SSIDoc:         schemaDoc,
+		SignerAddress:  msg.Creator,
 	}
 
-	schemaDocBytes, err := getClientSpecDocBytes(clientSpecType, clientSpecOpts)
-	if err != nil {
-		return nil, err
-	}
-
-	// Proof Type Check
-	err = verification.DocumentProofTypeCheck(schemaProof.Type, signersWithVM, schemaProof.VerificationMethod)
+	schemaDocBytes, err := getClientSpecDocBytes(clientSpecOpts)
 	if err != nil {
 		return nil, err
 	}
 
 	// Signature check
-	if err := verification.VerifyDocumentSignature(&ctx, schemaDocBytes, signersWithVM, signatures); err != nil {
+	if err := k.VerifyDocumentProof(ctx, schemaDocBytes, schemaProof); err != nil {
 		return nil, err
 	}
 

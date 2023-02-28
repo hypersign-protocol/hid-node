@@ -3,7 +3,7 @@ package verification
 import (
 	"strings"
 
-	"github.com/hypersign-protocol/hid-node/x/ssi/common"
+	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 )
 
 // Extracts the blockchain address from blockchainAccountId
@@ -19,8 +19,8 @@ func getCAIP10Chain(blockchainAccountId string) string {
 	userPrefix := strings.Join(segments[0:len(segments)-1], ":")
 
 	// Ethereum based chain (EIP-155) check
-	if strings.HasPrefix(userPrefix, common.EIP155) {
-		return common.EIP155
+	if strings.HasPrefix(userPrefix, types.EIP155) {
+		return types.EIP155
 	} else {
 		return ""
 	}
