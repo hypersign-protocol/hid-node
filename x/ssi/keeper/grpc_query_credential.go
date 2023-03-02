@@ -17,7 +17,7 @@ func (k Keeper) QueryCredential(goCtx context.Context, req *types.QueryCredentia
 	}
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	cred, err := k.GetCredential(&ctx, req.CredId)
+	cred, err := k.GetCredentialStatusFromState(&ctx, req.CredId)
 	if err != nil {
 		return nil, err
 	}
@@ -51,5 +51,5 @@ func (k Keeper) QueryCredentials(goCtx context.Context, req *types.QueryCredenti
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
-	return &types.QueryCredentialsResponse{Credentials: credentials, TotalCount: k.GetCredentialCount(ctx)}, nil
+	return &types.QueryCredentialsResponse{Credentials: credentials, TotalCount: k.GetCredentialStatusCount(ctx)}, nil
 }

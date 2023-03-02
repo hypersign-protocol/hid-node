@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"strings"
 
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 )
 
@@ -64,12 +63,9 @@ func getClientSpecDocBytes(clientSpecOpts types.ClientSpecOpts) ([]byte, error) 
 	case "":
 		return clientSpecOpts.SSIDoc.GetSignBytes(), nil
 	default:
-		return nil, sdkerrors.Wrap(
-			types.ErrInvalidClientSpecType,
-			fmt.Sprintf(
-				"supported client specs are : [%s]",
-				strings.Join(types.SupportedClientSpecs, ", "),
-			),
+		return nil, fmt.Errorf(
+			"supported client specs are : [%s]",
+			strings.Join(types.SupportedClientSpecs, ", "),
 		)
 	}
 }

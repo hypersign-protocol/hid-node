@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 	"github.com/hypersign-protocol/hid-node/x/ssi/verification"
 )
@@ -39,7 +38,7 @@ func (k msgServer) checkControllerPresenceInState(
 
 		// Check if they are deactivated
 		if didDoc.DidDocumentMetadata.Deactivated {
-			return sdkerrors.Wrapf(types.ErrDidDocDeactivated, "%s", didDoc.DidDocument.Id)
+			return fmt.Errorf("DID document %s is deactivated", didDoc.DidDocument.Id)
 		}
 	}
 	return nil

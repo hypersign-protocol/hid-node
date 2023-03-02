@@ -76,8 +76,8 @@ func verifyEd25519(publicKey string, signature string, documentBytes []byte) err
 	// Decode Public Key
 	_, publicKeyBytes, err := multibase.Decode(publicKey)
 	if err != nil {
-		return types.ErrInvalidPublicKey.Wrapf(
-			"Cannot decode Ed25519 public key %s",
+		return fmt.Errorf(
+			"cannot decode Ed25519 public key %s",
 			publicKey,
 		)
 	}
@@ -89,7 +89,7 @@ func verifyEd25519(publicKey string, signature string, documentBytes []byte) err
 	}
 
 	if !ed25519.Verify(publicKeyBytes, documentBytes, signatureBytes) {
-		return fmt.Errorf("signature verification failed")
+		return fmt.Errorf("ed25519: signature could not be verified")
 	} else {
 		return nil
 	}
@@ -110,7 +110,7 @@ func verifySecp256k1(publicKey string, signature string, documentBytes []byte) e
 	}
 
 	if !pubKeyObj.VerifySignature(documentBytes, signatureBytes) {
-		return fmt.Errorf("signature verification failed")
+		return fmt.Errorf("secp256k1: signature could not be verified")
 	} else {
 		return nil
 	}
@@ -147,7 +147,7 @@ func recoverEthPublicKey(blockchainAccountId string, signature string, documentB
 
 	// Match the recovered address against user provided address
 	if recoveredBlockchainAddress != blockchainAddress {
-		return fmt.Errorf("signature verification failed")
+		return fmt.Errorf("eth-recovery-method-secp256k1: signature could not be verified")
 	} else {
 		return nil
 	}

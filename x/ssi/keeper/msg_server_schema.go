@@ -71,12 +71,12 @@ func (k msgServer) CreateSchema(goCtx context.Context, msg *types.MsgCreateSchem
 
 	schemaDocBytes, err := getClientSpecDocBytes(clientSpecOpts)
 	if err != nil {
-		return nil, err
+		return nil, sdkerrors.Wrap(types.ErrInvalidClientSpecType, err.Error())
 	}
 
 	// Signature check
 	if err := k.VerifyDocumentProof(ctx, schemaDocBytes, schemaProof); err != nil {
-		return nil, err
+		return nil, sdkerrors.Wrap(types.ErrInvalidClientSpecType, err.Error())
 	}
 
 	var schema = types.Schema{

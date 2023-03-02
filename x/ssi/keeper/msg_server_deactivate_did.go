@@ -28,7 +28,7 @@ func (k msgServer) DeactivateDID(goCtx context.Context, msg *types.MsgDeactivate
 	// Get the DID Document from state
 	didDocumentState, err := k.GetDidDocumentState(&ctx, msgDidId)
 	if err != nil {
-		return nil, err
+		return nil, sdkerrors.Wrap(types.ErrDidDocNotFound, err.Error())
 	}
 	didDocument := didDocumentState.DidDocument
 	didDocumentMetadata := didDocumentState.DidDocumentMetadata
@@ -51,7 +51,7 @@ func (k msgServer) DeactivateDID(goCtx context.Context, msg *types.MsgDeactivate
 	// Gather controllers
 	controllers := getControllersForDeactivateDID(didDocument)
 	if err := k.checkControllerPresenceInState(ctx, controllers, didDocument.Id); err != nil {
-		return nil, err
+		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, err.Error())
 	}
 
 	signMap := makeSignatureMap(msgSignatures)
@@ -60,7 +60,7 @@ func (k msgServer) DeactivateDID(goCtx context.Context, msg *types.MsgDeactivate
 	controllerMap, err := k.formAnyControllerVmListMap(ctx, controllers,
 		didDocument.VerificationMethod, signMap)
 	if err != nil {
-		return nil, err
+		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, err.Error())
 	}
 
 	// Get Client Spec
@@ -72,13 +72,13 @@ func (k msgServer) DeactivateDID(goCtx context.Context, msg *types.MsgDeactivate
 	var didDocBytes []byte
 	didDocBytes, err = getClientSpecDocBytes(clientSpecOpts)
 	if err != nil {
-		return nil, err
+		return nil, sdkerrors.Wrapf(types.ErrInvalidClientSpecType, err.Error())
 	}
 
 	// Signature Verification
 	err = verification.VerifySignatureOfAnyController(didDocBytes, controllerMap)
 	if err != nil {
-		return nil, err
+		return nil, sdkerrors.Wrapf(types.ErrInvalidSignature, err.Error())
 	}
 
 	// Create updated metadata

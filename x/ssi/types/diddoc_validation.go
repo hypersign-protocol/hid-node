@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
-
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 // isValidDidDoc checks if the DID Id is valid
@@ -13,8 +11,7 @@ func isValidDidDocId(id string) error {
 	// check the number of elements in DID Document
 	idElements := strings.Split(id, ":")
 	if !(len(idElements) == 3 || len(idElements) == 4) {
-		return sdkerrors.Wrapf(
-			ErrInvalidDidDoc,
+		return fmt.Errorf(
 			"number of elements in DID Id %s should be either 3 or 4",
 			id,
 		)
@@ -22,8 +19,7 @@ func isValidDidDocId(id string) error {
 
 	// check if the first element is valid document identifier
 	if idElements[0] != DocumentIdentifierDid {
-		return sdkerrors.Wrapf(
-			ErrInvalidDidDoc,
+		return fmt.Errorf(
 			"document identifier should be %s",
 			DocumentIdentifierDid,
 		)
@@ -31,8 +27,7 @@ func isValidDidDocId(id string) error {
 
 	// check if the second element is the correct DID method
 	if idElements[1] != DidMethod {
-		return sdkerrors.Wrapf(
-			ErrInvalidDidDoc,
+		return fmt.Errorf(
 			"DID method should be %s",
 			DidMethod,
 		)
@@ -49,12 +44,9 @@ func isValidDidDocId(id string) error {
 		return fmt.Errorf("error in parsing regular expression for method-specific-id: %s", err.Error())
 	}
 	if !isProperMethodSpecificId {
-		return sdkerrors.Wrap(
-			ErrInvalidMethodSpecificId,
-			fmt.Sprintf(
-				"method-specific-id should be an alphanumeric string with minimum of 32 characters, received: %s",
-				methodSpecificId,
-			),
+		return fmt.Errorf(
+			"method-specific-id should be an alphanumeric string with minimum of 32 characters, received: %s",
+			methodSpecificId,
 		)
 	}
 
@@ -69,8 +61,7 @@ func isDidUrl(id string) error {
 
 	// check for fragment
 	if didId == "" || fragment == "" {
-		return sdkerrors.Wrapf(
-			ErrInvalidDidDoc,
+		return fmt.Errorf(
 			"invalid didUrl %s",
 			id,
 		)
@@ -94,8 +85,7 @@ func isSupportedVmType(typ string) error {
 	}
 
 	if _, supported := VerificationKeySignatureMap[typ]; !supported {
-		return sdkerrors.Wrapf(
-			ErrInvalidDidDoc,
+		return fmt.Errorf(
 			"%s verification method type not supported, supported verification method types: %s ",
 			typ,
 			supportedList(),
@@ -113,16 +103,14 @@ func verificationKeyCheck(vm *VerificationMethod) error {
 	switch vm.Type {
 	case EcdsaSecp256k1RecoveryMethod2020:
 		if vm.GetBlockchainAccountId() == "" {
-			return sdkerrors.Wrapf(
-				ErrBadRequestInvalidVerMethod,
+			return fmt.Errorf(
 				"blockchainAccountId cannot be empty for verification method %s as it is of type %s",
 				vm.Id,
 				vm.Type,
 			)
 		}
 		if vm.GetPublicKeyMultibase() != "" {
-			return sdkerrors.Wrapf(
-				ErrBadRequestInvalidVerMethod,
+			return fmt.Errorf(
 				"publicKeyMultibase should be empty for verification method %s as it is type %s",
 				vm.Id,
 				vm.Type,
@@ -131,16 +119,14 @@ func verificationKeyCheck(vm *VerificationMethod) error {
 
 	default:
 		if vm.GetBlockchainAccountId() != "" {
-			return sdkerrors.Wrapf(
-				ErrBadRequestInvalidVerMethod,
+			return fmt.Errorf(
 				"blockchainAccountId should be empty for verification method %s as it is of type %s",
 				vm.Id,
 				vm.Type,
 			)
 		}
 		if vm.GetPublicKeyMultibase() == "" {
-			return sdkerrors.Wrapf(
-				ErrBadRequestInvalidVerMethod,
+			return fmt.Errorf(
 				"publicKeyMultibase cannot be empty for verification method %s as it is type %s",
 				vm.Id,
 				vm.Type,
@@ -171,7 +157,7 @@ func validateServices(services []*Service) error {
 
 		// validate service Id
 		if err = isDidUrl(service.Id); err != nil {
-			return ErrInvalidService.Wrapf("service ID %s is Invalid", service.Id)
+			return fmt.Errorf("service ID %s is Invalid", service.Id)
 		}
 
 		// validate service Type
@@ -182,7 +168,7 @@ func validateServices(services []*Service) error {
 			}
 		}
 		if !foundType {
-			return ErrInvalidService.Wrapf("service Type %s is Invalid", service.Type)
+			return fmt.Errorf("service Type %s is Invalid", service.Type)
 		}
 	}
 
@@ -192,7 +178,7 @@ func validateServices(services []*Service) error {
 		serviceIdList = append(serviceIdList, service.Id)
 	}
 	if duplicateId := checkDuplicateId(serviceIdList); duplicateId != "" {
-		return ErrInvalidService.Wrapf("duplicate service found with Id: %s ", duplicateId)
+		return fmt.Errorf("duplicate service found with Id: %s ", duplicateId)
 	}
 
 	return nil
@@ -239,13 +225,13 @@ func validateVerificationMethods(vms []*VerificationMethod) error {
 		blockchainAccountIdList = append(blockchainAccountIdList, vm.BlockchainAccountId)
 	}
 	if duplicateId := checkDuplicateId(vmIdList); duplicateId != "" {
-		return ErrInvalidDidDoc.Wrapf("duplicate verification method Id found: %s ", duplicateId)
+		return fmt.Errorf("duplicate verification method Id found: %s ", duplicateId)
 	}
 	if duplicateKey := checkDuplicateId(publicKeyMultibaseList); duplicateKey != "" {
-		return ErrInvalidDidDoc.Wrapf("duplicate publicKeyMultibase found: %s ", duplicateKey)
+		return fmt.Errorf("duplicate publicKeyMultibase found: %s ", duplicateKey)
 	}
 	if duplicateKey := checkDuplicateId(blockchainAccountIdList); duplicateKey != "" {
-		return ErrInvalidDidDoc.Wrapf("duplicate blockchainAccountId found: %s ", duplicateKey)
+		return fmt.Errorf("duplicate blockchainAccountId found: %s ", duplicateKey)
 	}
 
 	return nil

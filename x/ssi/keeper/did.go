@@ -2,10 +2,10 @@ package keeper
 
 import (
 	"encoding/binary"
+	"fmt"
 
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/hypersign-protocol/hid-node/utils"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 )
@@ -50,11 +50,11 @@ func (k Keeper) GetDidDocumentState(ctx *sdk.Context, id string) (*types.DidDocu
 	var bytes = store.Get([]byte(id))
 
 	if len(bytes) == 0 {
-		return nil, sdkerrors.Wrap(types.ErrDidDocNotFound, id)
+		return nil, fmt.Errorf("DID Document %s not found", id)
 	}
 
 	if err := k.cdc.Unmarshal(bytes, &didDocState); err != nil {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidType, err.Error())
+		return nil, fmt.Errorf("internal: unable to unmarshal didDocBytes of id %s", id)
 	}
 
 	return &didDocState, nil

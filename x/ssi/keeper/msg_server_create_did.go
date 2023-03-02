@@ -21,12 +21,12 @@ func (k msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*t
 
 	// Validate DID Document
 	if err := msgDidDocument.ValidateDidDocument(); err != nil {
-		return nil, err
+		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, err.Error())
 	}
 
 	// Validate namespace in DID Document
-	if err := didNamespaceValidation(k, ctx, msgDidDocument); err != nil {
-		return nil, err
+	if err := didDocNamespaceValidation(k, ctx, msgDidDocument); err != nil {
+		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, err.Error())
 	}
 
 	// Checks if the Did Document is already registered
@@ -38,13 +38,13 @@ func (k msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*t
 	controllerList := getControllersForCreateDID(msgDidDocument)
 
 	if err := k.checkControllerPresenceInState(ctx, controllerList, msgDidDocument.Id); err != nil {
-		return nil, err
+		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, err.Error())
 	}
 
 	// Collect necessary Verification Methods which are needed to be valid
 	requiredVMs, err := getVerificationMethodsForCreateDID(msgDidDocument)
 	if err != nil {
-		return nil, err
+		return nil, sdkerrors.Wrap(types.ErrVerificationMethodNotFound, err.Error())
 	}
 
 	// Associate Signatures
@@ -52,7 +52,7 @@ func (k msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*t
 
 	requiredVmMap, err := k.formMustControllerVmListMap(ctx, controllerList, requiredVMs, signMap)
 	if err != nil {
-		return nil, err
+		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, err.Error())
 	}
 
 	// ClientSpec check
@@ -64,13 +64,13 @@ func (k msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*t
 	var didDocBytes []byte
 	didDocBytes, err = getClientSpecDocBytes(clientSpecOpts)
 	if err != nil {
-		return nil, err
+		return nil, sdkerrors.Wrapf(types.ErrInvalidClientSpecType, err.Error())
 	}
 
 	// Verify Signatures
 	err = verification.VerifySignatureOfEveryController(didDocBytes, requiredVmMap)
 	if err != nil {
-		return nil, err
+		return nil, sdkerrors.Wrapf(types.ErrInvalidSignature, err.Error())
 	}
 
 	// Formt DID Document Metadata
@@ -122,7 +122,7 @@ func getVerificationMethodsForCreateDID(didDocument *types.Did) ([]*types.Verifi
 
 	if !foundAtleastOneSubjectVM && types.FindInSlice(didDocument.Controller, didDocument.Id) {
 		return nil, fmt.Errorf(
-			"there should be atleast one verification method from subject DID controller %v", didDocument.Id)
+			"there should be atleast one verification method of DID Subject %v", didDocument.Id)
 	}
 
 	return mustHaveVerificaitonMethods, nil

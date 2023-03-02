@@ -8,8 +8,8 @@ import (
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 )
 
-// namespaceValidation validates the namespace in document id
-func namespaceValidation(k msgServer, ctx sdk.Context, docId string) error {
+// didNamespaceValidation validates the namespace in DID Document Id
+func didNamespaceValidation(k msgServer, ctx sdk.Context, docId string) error {
 	genesisNamespace := k.GetChainNamespace(&ctx)
 
 	docIdElements := strings.Split(docId, ":")
@@ -35,16 +35,16 @@ func namespaceValidation(k msgServer, ctx sdk.Context, docId string) error {
 	return nil
 }
 
-// didNamespaceValidation validates the namespace in Did Document Id
-func didNamespaceValidation(k msgServer, ctx sdk.Context, didDoc *types.Did) error {
+// didDocNamespaceValidation validates the namespace in Did Document
+func didDocNamespaceValidation(k msgServer, ctx sdk.Context, didDoc *types.Did) error {
 	// Subject ID check
-	if err := namespaceValidation(k, ctx, didDoc.Id); err != nil {
+	if err := didNamespaceValidation(k, ctx, didDoc.Id); err != nil {
 		return err
 	}
 
 	// Controllers check
 	for _, controller := range didDoc.Controller {
-		if err := namespaceValidation(k, ctx, controller); err != nil {
+		if err := didNamespaceValidation(k, ctx, controller); err != nil {
 			return err
 		}
 	}
@@ -52,7 +52,7 @@ func didNamespaceValidation(k msgServer, ctx sdk.Context, didDoc *types.Did) err
 	// Verification Method ID checks
 	for _, vm := range didDoc.VerificationMethod {
 		didId, _ := types.GetElementsFromDidUrl(vm.Id)
-		if err := namespaceValidation(k, ctx, didId); err != nil {
+		if err := didNamespaceValidation(k, ctx, didId); err != nil {
 			return err
 		}
 	}
@@ -69,7 +69,7 @@ func didNamespaceValidation(k msgServer, ctx sdk.Context, didDoc *types.Did) err
 	for _, vmRelationship := range vmRelationshipList {
 		// didUrl check and presence in verification methods
 		for _, id := range vmRelationship {
-			if err := namespaceValidation(k, ctx, id); err != nil {
+			if err := didNamespaceValidation(k, ctx, id); err != nil {
 				return err
 			}
 		}

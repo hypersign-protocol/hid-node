@@ -22,12 +22,12 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 
 	// Validate DID Document
 	if err := msgDidDocument.ValidateDidDocument(); err != nil {
-		return nil, err
+		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, err.Error())
 	}
 
 	// Validate namespace in DID Document
-	if err := didNamespaceValidation(k, ctx, msgDidDocument); err != nil {
-		return nil, err
+	if err := didDocNamespaceValidation(k, ctx, msgDidDocument); err != nil {
+		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, err.Error())
 	}
 
 	// Checks if the Did Document is already registered
@@ -38,7 +38,7 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 	// Fetch registered Did Document from state
 	existingDidDocumentState, err := k.GetDidDocumentState(&ctx, msgDidDocument.Id)
 	if err != nil {
-		return nil, err
+		return nil, sdkerrors.Wrap(types.ErrDidDocNotFound, err.Error())
 	}
 	existingDidDocument := existingDidDocumentState.DidDocument
 
@@ -60,10 +60,10 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 	// Look for any change in Controller array
 	mandatoryControllers, anyControllers := getControllersForUpdateDID(existingDidDocument, msgDidDocument)
 	if err := k.checkControllerPresenceInState(ctx, mandatoryControllers, msgDidDocument.Id); err != nil {
-		return nil, err
+		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, err.Error())
 	}
 	if err := k.checkControllerPresenceInState(ctx, anyControllers, msgDidDocument.Id); err != nil {
-		return nil, err
+		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, err.Error())
 	}
 
 	// Gather Verification Methods
@@ -73,13 +73,13 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 
 	requiredVmMap, err := k.formMustControllerVmListMap(ctx, mandatoryControllers, updatedVms, signMap)
 	if err != nil {
-		return nil, err
+		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, err.Error())
 	}
 
 	optionalVmMap, err := k.formAnyControllerVmListMap(ctx,
 		anyControllers, existingDidDocument.VerificationMethod, signMap)
 	if err != nil {
-		return nil, err
+		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, err.Error())
 	}
 
 	// ClientSpec Opts
@@ -91,16 +91,16 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 	var didDocBytes []byte
 	didDocBytes, err = getClientSpecDocBytes(clientSpecOpts)
 	if err != nil {
-		return nil, err
+		return nil, sdkerrors.Wrapf(types.ErrInvalidClientSpecType, err.Error())
 	}
 
 	// Signature Verification
 	if err := verification.VerifySignatureOfEveryController(didDocBytes, requiredVmMap); err != nil {
-		return nil, err
+		return nil, sdkerrors.Wrapf(types.ErrInvalidSignature, err.Error())
 	}
 
 	if err := verification.VerifySignatureOfAnyController(didDocBytes, optionalVmMap); err != nil {
-		return nil, err
+		return nil, sdkerrors.Wrapf(types.ErrInvalidSignature, err.Error())
 	}
 
 	// Create the Metadata and assign `created` and `deactivated` to previous DIDDoc's metadata values
