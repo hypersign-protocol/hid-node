@@ -135,7 +135,7 @@ func (k msgServer) updateCredentialStatus(ctx sdk.Context, msg *types.MsgRegiste
 	// Get Credential from store
 	oldCredStatus, err := k.GetCredentialStatusFromState(&ctx, credId)
 	if err != nil {
-		return nil, err
+		return nil, sdkerrors.Wrap(types.ErrCredentialStatusNotFound, err.Error())
 	}
 
 	// Check if the DID of the issuer exists

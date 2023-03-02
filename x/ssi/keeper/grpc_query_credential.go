@@ -5,6 +5,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/query"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 	"google.golang.org/grpc/codes"
@@ -19,7 +20,7 @@ func (k Keeper) QueryCredential(goCtx context.Context, req *types.QueryCredentia
 
 	cred, err := k.GetCredentialStatusFromState(&ctx, req.CredId)
 	if err != nil {
-		return nil, err
+		return nil, sdkerrors.Wrap(types.ErrCredentialStatusNotFound, err.Error())
 	}
 
 	return &types.QueryCredentialResponse{CredStatus: cred}, nil

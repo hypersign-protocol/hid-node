@@ -22,4 +22,5 @@ var (
 	ErrInvalidCredentialField     = sdkerrors.Register(ModuleName, 112, "invalid Credential Field")
 	ErrInvalidCredentialHash      = sdkerrors.Register(ModuleName, 113, "invalid Credential Hash")
 	ErrInvalidClientSpecType      = sdkerrors.Register(ModuleName, 114, "invalid Client Spec Type")
+	ErrCredentialStatusNotFound   = sdkerrors.Register(ModuleName, 115, "credentialStatus document not found")
 )
