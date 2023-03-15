@@ -1,4 +1,4 @@
-package common
+package types
 
 // Supported Verification Method Types
 const Ed25519VerificationKey2020 = "Ed25519VerificationKey2020"
@@ -11,6 +11,15 @@ var VerificationKeySignatureMap = map[string]string{
 	EcdsaSecp256k1VerificationKey2019: "EcdsaSecp256k1Signature2019",
 	EcdsaSecp256k1RecoveryMethod2020:  "EcdsaSecp256k1RecoverySignature2020",
 }
+
+// Supported Service Types
+var SupportedServiceTypes = []string{
+	"LinkedDomains",
+}
+
+// Did Document ID
+const DocumentIdentifierDid = "did"
+const DidMethod = "hid"
 
 // Supported CAIP-10 prefixes
 const EIP155 string = "eip155"

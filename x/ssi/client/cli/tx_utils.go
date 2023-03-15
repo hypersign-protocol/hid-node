@@ -62,7 +62,7 @@ func GetEthRecoverySignature(privateKey string, message []byte) (string, error) 
 	if err != nil {
 		panic(err)
 	}
-	
+
 	return etherhexutil.Encode(sigBytes), nil
 }
 

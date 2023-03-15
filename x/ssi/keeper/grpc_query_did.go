@@ -5,6 +5,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/query"
 
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
@@ -60,7 +61,7 @@ func (k Keeper) QueryDidDocument(goCtx context.Context, req *types.QueryDidDocum
 	// Check if DID Document exists
 	didDoc, err := k.GetDidDocumentState(&ctx, req.DidId)
 	if err != nil {
-		return nil, err
+		return nil, sdkerrors.Wrap(types.ErrDidDocNotFound, err.Error())
 	}
 
 	return &types.QueryDidDocumentResponse{

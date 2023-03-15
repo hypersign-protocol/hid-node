@@ -24,12 +24,33 @@ type (
 		DidId   string
 		IsValid bool
 	}
+
+	ExtendedVerificationMethod struct {
+		Id                  string
+		Type                string
+		Controller          string
+		PublicKeyMultibase  string
+		BlockchainAccountId string
+		Signature           string
+	}
 )
+
+func CreateExtendedVerificationMethod(vm *VerificationMethod, signature string) *ExtendedVerificationMethod {
+	return &ExtendedVerificationMethod{
+		Id:                  vm.Id,
+		Type:                vm.Type,
+		Controller:          vm.Controller,
+		PublicKeyMultibase:  vm.PublicKeyMultibase,
+		BlockchainAccountId: vm.BlockchainAccountId,
+		Signature:           signature,
+	}
+}
 
 // Struct catering to supported Client Spec's required inputs
 type ClientSpecOpts struct {
-	SSIDoc   SsiMsg
-	SignerAddress string
+	ClientSpecType string
+	SSIDoc         SsiMsg
+	SignerAddress  string
 }
 
 // Cosmos ADR SignDoc Struct Definitions
@@ -58,3 +79,10 @@ type (
 		Sequence      string `json:"sequence"`
 	}
 )
+
+// Handle Proof Struct of SSI Docs
+type SSIProofInterface interface {
+	GetProofValue() string
+	GetType() string
+	GetVerificationMethod() string
+}
