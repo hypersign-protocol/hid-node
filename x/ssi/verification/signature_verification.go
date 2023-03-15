@@ -16,7 +16,7 @@ func VerifySignatureOfEveryController(
 		}
 		err := verifyAll(vmList, didDoc)
 		if err != nil {
-			return fmt.Errorf("need every signature for controller %s to be valid", controller)
+			return fmt.Errorf("%s: need every signature for controller %s to be valid", err.Error(), controller)
 		}
 	}
 	return nil

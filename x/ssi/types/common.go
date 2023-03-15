@@ -12,6 +12,16 @@ var VerificationKeySignatureMap = map[string]string{
 	EcdsaSecp256k1RecoveryMethod2020:  "EcdsaSecp256k1RecoverySignature2020",
 }
 
+var supportedVerificationMethodTypes []string = func() []string {
+	result := []string{}
+
+	for vmType := range VerificationKeySignatureMap {
+		result = append(result, vmType)
+	}
+
+	return result
+}()
+
 // Supported Service Types
 var SupportedServiceTypes = []string{
 	"LinkedDomains",
@@ -21,14 +31,42 @@ var SupportedServiceTypes = []string{
 const DocumentIdentifierDid = "did"
 const DidMethod = "hid"
 
-// Supported CAIP-10 prefixes
-const EIP155 string = "eip155"
+// CAIP-10 prefixes
+const EthereumCAIP10Prefix string = "eip155" // Ethereum Based Chains
+const CosmosCAIP10Prefix string = "cosmos"   // Cosmos Based Chains
 
-// Support Client Specs
+// Supported CAIP-10 prefixes
+var CAIP10PrefixForEcdsaSecp256k1RecoveryMethod2020 []string = []string{
+	EthereumCAIP10Prefix,
+}
+
+var CAIP10PrefixForEcdsaSecp256k1VerificationKey2019 []string = []string{
+	CosmosCAIP10Prefix,
+}
+
 const ADR036Spec string = "cosmos-ADR036"
 const PersonalSignSpec string = "eth-personalSign"
 
+// Supported Client Specs
 var SupportedClientSpecs []string = []string{
 	ADR036Spec,
 	PersonalSignSpec,
+}
+
+// Map between supported cosmos chain-id and their respective blockhchain address prefix
+var CosmosCAIP10ChainIdBech32PrefixMap = map[string]string{
+	// Mainnet Chains
+	"cosmoshub-4":                "cosmos",
+	"osmosis-1":                  "osmo",
+	"akashnet-2":                 "akash",
+	"stargaze-1":                 "stars",
+	"core-1":                     "persistence",
+	"crypto-org-chain-mainnet-1": "cro",
+
+	// Testnet Chains
+	"theta-testnet-001": "cosmos",
+	"osmo-test-4":       "osmo",
+	"elgafar-1":         "stars",
+	"test-core-1":       "persistence",
+	"jagrat":            "hid",
 }

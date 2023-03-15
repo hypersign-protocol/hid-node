@@ -76,31 +76,27 @@ func isDidUrl(id string) error {
 }
 
 func isSupportedVmType(typ string) error {
-	supportedList := func() string {
-		var resultStr string = ""
-		for vKeyType := range VerificationKeySignatureMap {
-			resultStr += fmt.Sprintf("%s, ", vKeyType)
-		}
-		return resultStr
-	}
-
 	if _, supported := VerificationKeySignatureMap[typ]; !supported {
 		return fmt.Errorf(
-			"%s verification method type not supported, supported verification method types: %s ",
+			"%v verification method type not supported, supported verification method types: %v ",
 			typ,
-			supportedList(),
+			supportedVerificationMethodTypes,
 		)
 	}
 	return nil
 }
 
 // verificationKeyCheck validates of publicKeyMultibase and blockchainAccountId.
-// If the verfication method type is EcdsaSecp256k1RecoveryMethod2020, only blockchainAccountId
-// field must be populated, else only publicKeyMultibase must be populated.
 func verificationKeyCheck(vm *VerificationMethod) error {
-	// Verification Method of Type EcdsaSecp256k1RecoveryMethod2020 should only have
-	// `blockchainAccountId` field populated
 	switch vm.Type {
+	case EcdsaSecp256k1VerificationKey2019:
+		if vm.GetPublicKeyMultibase() == "" {
+			return fmt.Errorf(
+				"publicKeyMultibase cannot be empty for verification method %s as it is type %s",
+				vm.Id,
+				vm.Type,
+			)
+		}
 	case EcdsaSecp256k1RecoveryMethod2020:
 		if vm.GetBlockchainAccountId() == "" {
 			return fmt.Errorf(
@@ -109,29 +105,31 @@ func verificationKeyCheck(vm *VerificationMethod) error {
 				vm.Type,
 			)
 		}
+
 		if vm.GetPublicKeyMultibase() != "" {
 			return fmt.Errorf(
-				"publicKeyMultibase should be empty for verification method %s as it is type %s",
+				"publicKeyMultibase should not be provided for verification method %s as it is of type %s",
 				vm.Id,
 				vm.Type,
 			)
 		}
-
-	default:
+	case Ed25519VerificationKey2020:
 		if vm.GetBlockchainAccountId() != "" {
 			return fmt.Errorf(
-				"blockchainAccountId should be empty for verification method %s as it is of type %s",
+				"blockchainAccountId is currently not supported for verification method %s as it is of type %s",
 				vm.Id,
 				vm.Type,
 			)
 		}
 		if vm.GetPublicKeyMultibase() == "" {
 			return fmt.Errorf(
-				"publicKeyMultibase cannot be empty for verification method %s as it is type %s",
+				"publicKeyMultibase cannot be empty for verification method %s as it is of type %s",
 				vm.Id,
 				vm.Type,
 			)
 		}
+	default:
+		return fmt.Errorf("unsupported verification method type: %v", supportedVerificationMethodTypes)
 	}
 
 	return nil

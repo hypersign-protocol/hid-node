@@ -41,92 +41,173 @@ func verifyAny(extendedVmList []*types.ExtendedVerificationMethod, data []byte) 
 }
 
 func verify(extendedVm *types.ExtendedVerificationMethod, data []byte) error {
-	var verificationKey string
-	var signature string = extendedVm.Signature
-
-	if extendedVm.PublicKeyMultibase != "" {
-		verificationKey = extendedVm.PublicKeyMultibase
-	} else if extendedVm.BlockchainAccountId != "" {
-		verificationKey = extendedVm.BlockchainAccountId
-	} else {
-		return fmt.Errorf("either publicKeyMultibase or BlockchainAccountId must be present")
-	}
-
 	switch extendedVm.Type {
 	case types.Ed25519VerificationKey2020:
-		return verifyEd25519(verificationKey, signature, data)
+		return verifyEd25519VerificationKey2020Key(extendedVm, data)
 	case types.EcdsaSecp256k1VerificationKey2019:
-		return verifySecp256k1(verificationKey, signature, data)
+		return verifyEcdsaSecp256k1VerificationKey2019Key(extendedVm, data)
 	case types.EcdsaSecp256k1RecoveryMethod2020:
-		chain := getCAIP10Chain(verificationKey)
-		// Check for supported chains
-		switch chain {
-		// Ethereum based chains
-		case types.EIP155:
-			return recoverEthPublicKey(verificationKey, signature, data)
-		default:
-			return fmt.Errorf("unsupported blockchain address: %s", verificationKey)
-		}
+		return verifyEcdsaSecp256k1RecoveryMethod2020Key(extendedVm, data)
 	default:
 		return fmt.Errorf("unsupported verification method: %s", extendedVm.Type)
 	}
 }
 
-func verifyEd25519(publicKey string, signature string, documentBytes []byte) error {
+// verifyEcdsaSecp256k1RecoveryMethod2020Key verifies the verification key for verification method type EcdsaSecp256k1RecoveryMethod2020
+func verifyEcdsaSecp256k1RecoveryMethod2020Key(extendedVm *types.ExtendedVerificationMethod, documentBytes []byte) error {
+	extractedCAIP10Prefix, err := getCAIP10Prefix(extendedVm.BlockchainAccountId)
+	if err != nil {
+		return err
+	}
+
+	switch extractedCAIP10Prefix {
+	case types.EthereumCAIP10Prefix:
+		return verifyEthereumBlockchainAccountId(
+			extendedVm,
+			documentBytes,
+		)
+	default:
+		return fmt.Errorf(
+			"unsupported CAIP-10 prefix: '%v', supported CAIP-10 prefixes for verification method type %v: %v",
+			extractedCAIP10Prefix,
+			extendedVm.Type,
+			types.CAIP10PrefixForEcdsaSecp256k1RecoveryMethod2020,
+		)
+	}
+}
+
+// verifyEd25519VerificationKey2020Key verifies the verification key for verification method type Ed25519VerificationKey2020
+func verifyEd25519VerificationKey2020Key(extendedVm *types.ExtendedVerificationMethod, documentBytes []byte) error {
 	// Decode Public Key
-	_, publicKeyBytes, err := multibase.Decode(publicKey)
+	_, publicKeyBytes, err := multibase.Decode(extendedVm.PublicKeyMultibase)
 	if err != nil {
 		return fmt.Errorf(
 			"cannot decode Ed25519 public key %s",
-			publicKey,
+			extendedVm.PublicKeyMultibase,
 		)
 	}
 
 	// Decode Signatures
-	signatureBytes, err := base64.StdEncoding.DecodeString(signature)
+	signatureBytes, err := base64.StdEncoding.DecodeString(extendedVm.Signature)
 	if err != nil {
 		return err
 	}
 
 	if !ed25519.Verify(publicKeyBytes, documentBytes, signatureBytes) {
-		return fmt.Errorf("ed25519: signature could not be verified")
+		return fmt.Errorf("signature could not be verified for verificationMethodId: %v", extendedVm.Id)
 	} else {
 		return nil
 	}
 }
 
-func verifySecp256k1(publicKey string, signature string, documentBytes []byte) error {
+// verifyEcdsaSecp256k1VerificationKey2019Key verifies the verification key for verification method type EcdsaSecp256k1VerificationKey2019
+func verifyEcdsaSecp256k1VerificationKey2019Key(extendedVm *types.ExtendedVerificationMethod, documentBytes []byte) error {
+	// Decode and Parse Signature
+	signatureBytes, err := base64.StdEncoding.DecodeString(extendedVm.Signature)
+	if err != nil {
+		return err
+	}
+
 	// Decode Public Key
-	_, publicKeyBytes, err := multibase.Decode(publicKey)
+	_, publicKeyBytes, err := multibase.Decode(extendedVm.PublicKeyMultibase)
 	if err != nil {
 		return err
 	}
 	var pubKeyObj secp256k1.PubKey = publicKeyBytes
 
-	// Decode and Parse Signature
-	signatureBytes, err := base64.StdEncoding.DecodeString(signature)
+	// Check if the signature is valid for given publicKeyMultibase
+	if !pubKeyObj.VerifySignature(documentBytes, signatureBytes) {
+		return fmt.Errorf("signature could not be verified for verificationMethodId: %v", extendedVm.Id)
+	}
+
+	// Check if blockchainAccountId is passed
+	if extendedVm.BlockchainAccountId != "" {
+		extractedCAIP10Prefix, err := getCAIP10Prefix(extendedVm.BlockchainAccountId)
+		if err != nil {
+			return err
+		}
+
+		switch extractedCAIP10Prefix {
+		case types.CosmosCAIP10Prefix:
+			return verifyCosmosBlockchainAccountId(
+				extendedVm.BlockchainAccountId,
+				extendedVm.PublicKeyMultibase,
+			)
+		default:
+			return fmt.Errorf(
+				"unsupported CAIP-10 prefix: '%v', supported CAIP-10 prefixes for verification method type %v: %v",
+				extractedCAIP10Prefix,
+				extendedVm.Type,
+				types.CAIP10PrefixForEcdsaSecp256k1VerificationKey2019,
+			)
+		}
+	}
+
+	return nil
+}
+
+// verifyCosmosBlockchainAccountId verifies Cosmos Ecosystem based blockchain address. The verified
+// publicKeyMultibase is converted to a bech32 encoded blockchain address which is then compared with the
+// user provided blockchain address. If they do not match, error is returned.
+func verifyCosmosBlockchainAccountId(blockchainAccountId, publicKeyMultibase string) error {
+	// Check if the blockchainAccountId prefix is valid
+	extractedCAIP10Prefix, err := getCAIP10Prefix(blockchainAccountId)
+	if err != nil {
+		return err
+	}
+	if extractedCAIP10Prefix != types.CosmosCAIP10Prefix {
+		return fmt.Errorf(
+			"expected CAIP-10 prefix to be '%v', got '%v'",
+			types.CosmosCAIP10Prefix,
+			extractedCAIP10Prefix,
+		)
+	}
+
+	// Decode public key
+	_, publicKeyBytes, err := multibase.Decode(publicKeyMultibase)
 	if err != nil {
 		return err
 	}
 
-	if !pubKeyObj.VerifySignature(documentBytes, signatureBytes) {
-		return fmt.Errorf("secp256k1: signature could not be verified")
+	// Convert publicKeyMultibase to bech32 encoded blockchain address
+	chainId := getChainIdFromBlockchainAccountId(blockchainAccountId)
+	addressPrefix, isChainSupported := types.CosmosCAIP10ChainIdBech32PrefixMap[chainId]
+	if !isChainSupported {
+		return fmt.Errorf(
+			"cosmos chain with chain-id '%v' in blockchainAccountId '%v' is not supported",
+			chainId,
+			blockchainAccountId,
+		)
+	}
+	convertedAddress := publicKeyToCosmosBech32Address(
+		addressPrefix,
+		publicKeyBytes,
+	)
+
+	// Compare converted blockchain address
+	if convertedAddress != getBlockchainAddress(blockchainAccountId) {
+		return fmt.Errorf(
+			"blockchain address provided in blockchainAccountId '%v' is unexpected",
+			blockchainAccountId,
+		)
 	} else {
 		return nil
 	}
 }
 
-// Support for EIP155 based blockchain address
-func recoverEthPublicKey(blockchainAccountId string, signature string, documentBytes []byte) error {
+// verifyEthereumBlockchainAccountId verifies Ethereum Ecosystem based blockchain address. A secp256k1 based
+// publicKey is extracted from the recoverable Secp256k1 signature. It is converted into a hex encoded based
+// blockchain address, and matched with user provided blockchain address. If they do not match, error is returned.
+func verifyEthereumBlockchainAccountId(extendedVm *types.ExtendedVerificationMethod, documentBytes []byte) error {
 	// Extract blockchain address from blockchain account id
-	blockchainAddress := getBlockchainAddress(blockchainAccountId)
+	blockchainAddress := getBlockchainAddress(extendedVm.BlockchainAccountId)
 
 	// Convert message bytes to hash
 	// More info on the `personal_sign` here: https://docs.metamask.io/guide/signing-data.html#personal-sign
 	msgHash := etheraccounts.TextHash(documentBytes)
 
 	// Decode hex-encoded signature string to bytes
-	signatureBytes, err := etherhexutil.Decode(signature)
+	signatureBytes, err := etherhexutil.Decode(extendedVm.Signature)
 	if err != nil {
 		return err
 	}
@@ -142,7 +223,7 @@ func recoverEthPublicKey(blockchainAccountId string, signature string, documentB
 		return err
 	}
 
-	// Convert public key to hex-encoded address
+	// Convert public key to b-encoded address
 	recoveredBlockchainAddress := ethercrypto.PubkeyToAddress(*recoveredPublicKey).Hex()
 
 	// Match the recovered address against user provided address
