@@ -29,6 +29,9 @@ def run_all_tests():
     schema_test()
     deactivate_did()
     credential_status_test()
+    caip10_ethereum_support_test()
+    caip10_cosmos_support_test()
+    vm_type_test()
 
     print("============= 😃️ All test cases completed successfully ============== \n")
 

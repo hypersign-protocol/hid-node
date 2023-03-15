@@ -3,7 +3,7 @@ import sys
 sys.path.insert(1, os.getcwd())
 import time
 
-from utils import run_blockchain_command, generate_key_pair
+from utils import run_blockchain_command, generate_key_pair, secp256k1_pubkey_to_address
 from generate_doc import generate_did_document, generate_schema_document, generate_cred_status_document
 from transactions import form_did_create_tx_multisig, form_did_update_tx_multisig, \
       query_did, form_create_schema_tx, form_did_deactivate_tx_multisig, form_create_cred_status_tx
@@ -141,7 +141,7 @@ def create_did_test():
     create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
     run_blockchain_command(create_tx_cmd, f"Registering DID by passing both Alice's and Eve's Signature")
 
-    print("\n--- Test Completed ---\n")
+    print("--- Test Completed ---\n")
 
 # TC - II : Update DID scenarios
 def update_did_test():
@@ -353,7 +353,7 @@ def update_did_test():
     update_tx_cmd = form_did_update_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
     run_blockchain_command(update_tx_cmd, f"Jenny (controller) attempts to update Tx")
 
-    print("\n--- Test Completed ---\n")
+    print("--- Test Completed ---\n")
 
 def deactivate_did():
     print("\n--- Deactivate DID Test ---\n")
@@ -431,7 +431,9 @@ def deactivate_did():
     signers = []
     signers.append(signPair_mike)
     deactivate_tx_cmd = form_did_deactivate_tx_multisig(did_doc_mike, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
-    run_blockchain_command(deactivate_tx_cmd, f"Deactivation of Mike's DID with Id: {did_doc_mike}")    
+    run_blockchain_command(deactivate_tx_cmd, f"Deactivation of Mike's DID with Id: {did_doc_mike}")
+
+    print("--- Test Completed ---\n") 
 
 def schema_test():
     print("\n--- Schema Test ---\n")
@@ -505,7 +507,7 @@ def schema_test():
     schema_doc_id = schema_doc["id"]
     run_blockchain_command(create_schema_cmd, f"Registering Schema with Id: {schema_doc_id}")
 
-    print("\n--- Test Completed ---\n")
+    print("--- Test Completed ---\n")
 
 def credential_status_test():
     print("\n--- Credential Status Test ---\n")
@@ -579,4 +581,291 @@ def credential_status_test():
     cred_id = cred_doc["claim"]["id"]
     run_blockchain_command(register_cred_status_cmd, f"Registering Credential status with Id: {cred_id}")
 
-    print("\n--- Test Completed ---\n")
+    print("--- Test Completed ---\n")
+
+def caip10_ethereum_support_test():
+    print("\n--- CAIP-10 Test: Ethereum Chains ---\n")
+    kp_algo = "recover-eth"
+
+    # Invalid blockchain Account Ids
+    invalid_blockchain_account_ids = [
+        "abc345566",
+        "eip:1:0x1234",
+        "eip155",
+        "eip155:1:",
+        "eip155::",
+        "eip155:1",
+        "eip155:::::23",
+        "eip155::0x1234567"
+    ]
+
+    for invalid_blockchain_id in invalid_blockchain_account_ids:
+        print("Registering a DID Document with an invalid blockchainAccountId:", invalid_blockchain_id)
+        kp = generate_key_pair(algo=kp_algo)
+        
+        did_doc_string = generate_did_document(kp, kp_algo)
+        did_doc_string["verificationMethod"][0]["blockchainAccountId"] = invalid_blockchain_id
+        signers = []
+        signPair = {
+            "kp": kp,
+            "verificationMethodId": did_doc_string["verificationMethod"][0]["id"],
+            "signing_algo": kp_algo
+        }
+        signers.append(signPair)
+        create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
+        run_blockchain_command(create_tx_cmd, f"Registering a DID Document with an invalid blockchainAccountId: {invalid_blockchain_id}", True)
+    
+    print("Registering a DID with a VM of type EcdsaSecp256k1SignatureRecovery2020 having publicKeyMultibase attribute populated")
+    kp = generate_key_pair(algo=kp_algo)
+    did_doc_string = generate_did_document(kp, kp_algo)
+    did_doc_id = did_doc_string["id"]
+    did_doc_string["verificationMethod"][0]["publicKeyMultibase"] = "zrxxgf1f9xPYTraixqi9tipLta61hp4VJWQUUW5pmwcVz"
+    signers = []
+    signPair = {
+        "kp": kp,
+        "verificationMethodId": did_doc_string["verificationMethod"][0]["id"],
+        "signing_algo": kp_algo
+    }
+    signers.append(signPair)
+    create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
+    run_blockchain_command(create_tx_cmd, "Registering a DID with a VM of type EcdsaSecp256k1SignatureRecovery2020 having publicKeyMultibase attribute populated", True, True)
+
+    # Test for valid blockchainAccountId
+    kp = generate_key_pair(algo=kp_algo)
+    did_doc_string = generate_did_document(kp, kp_algo)
+    did_doc_id = did_doc_string["id"]
+    print(
+        "Registering a DID Document with a valid blockchainAccountId:", 
+        did_doc_string["verificationMethod"][0]["blockchainAccountId"]
+    )
+    signers = []
+    signPair = {
+        "kp": kp,
+        "verificationMethodId": did_doc_string["verificationMethod"][0]["id"],
+        "signing_algo": kp_algo
+    }
+    signers.append(signPair)
+    create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
+    run_blockchain_command(create_tx_cmd, f"Registering DID with Id: {did_doc_id}")
+
+    print("--- Test Completed ---\n")
+
+def caip10_cosmos_support_test():
+    print("\n--- CAIP-10 Test: Cosmos Chains ---\n")
+
+    kp_algo = "secp256k1"
+
+    # Invalid blockchain Account Ids
+    invalid_blockchain_account_ids = [
+        "abc345566",
+        "cos:1:0x1234",
+        "cosmos",
+        "cosmos:1",
+        "cosmos:jagrat",
+        "cosmos:1:",
+        "cosmos::",
+        "cosmos:1",
+        "cosmos:::::23",
+        "cosmos::0x1234567"
+    ]
+
+    for invalid_blockchain_id in invalid_blockchain_account_ids:
+        print("Registering a DID Document with an invalid blockchainAccountId:", invalid_blockchain_id)
+        kp = generate_key_pair(algo=kp_algo)
+        
+        did_doc_string = generate_did_document(kp, kp_algo)
+        did_doc_string["verificationMethod"][0]["blockchainAccountId"] = invalid_blockchain_id
+        
+        signers = []
+        signPair = {
+            "kp": kp,
+            "verificationMethodId": did_doc_string["verificationMethod"][0]["id"],
+            "signing_algo": kp_algo
+        }
+        signers.append(signPair)
+
+        create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
+        run_blockchain_command(create_tx_cmd, f"Registering a DID Document with an invalid blockchainAccountId: {invalid_blockchain_id}", True)
+    
+    print("Registering a DID with a VM of type EcdsaSecp256k1VerificationKey2019 having both publicKeyMultibase and blockchainAccountId attributes populated")
+    kp = generate_key_pair(algo=kp_algo)
+    did_doc_string = generate_did_document(kp, kp_algo)
+    did_doc_id = did_doc_string["id"]
+    signers = []
+    signPair = {
+        "kp": kp,
+        "verificationMethodId": did_doc_string["verificationMethod"][0]["id"],
+        "signing_algo": kp_algo
+    }
+    signers.append(signPair)
+    create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
+    run_blockchain_command(create_tx_cmd, f"Registering the DID with DID Id {did_doc_id}")
+
+    print("Registering a DID with invalid chain-id in blockchainAccountId")
+    kp = generate_key_pair(algo=kp_algo)
+    did_doc_string = generate_did_document(kp, kp_algo)
+    did_doc_id = did_doc_string["id"]
+    blockchainAccountId = secp256k1_pubkey_to_address(kp["pub_key_base_64"], "hid")
+    did_doc_string["verificationMethod"][0]["blockchainAccountId"] = "cosmos:hidnode02:" + blockchainAccountId
+
+    signers = []
+    signPair = {
+        "kp": kp,
+        "verificationMethodId": did_doc_string["verificationMethod"][0]["id"],
+        "signing_algo": kp_algo
+    }
+    signers.append(signPair)
+    
+    create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
+    run_blockchain_command(create_tx_cmd, f"Registering DID with Id: {did_doc_id}", True)
+
+    print("--- Test Completed ---\n")
+
+def vm_type_test():
+    print("\n--- Verification Method Types Test ---\n")
+
+    # Ed25519VerificationKey2020
+    print("1. FAIL: Registering DID Document with a verification method of type Ed25519VerificationKey2020. Both publicKeyMultibase and blockchainAccountId are passed.")
+    kp_alice = generate_key_pair()
+    signers = []
+    did_doc_string = generate_did_document(kp_alice)
+    did_doc_alice = did_doc_string["id"]
+    did_doc_string["verificationMethod"][0]["blockchainAccountId"] = "solana:4sGjMW1sUnHzSxGspuhpqLDx6wiyjNtZ:7S3P4HxJpyyigGzodYwHtCxZyUQe9JiBMHyRWXArAaKv"
+    signPair_alice = {
+        "kp": kp_alice,
+        "verificationMethodId": did_doc_string["verificationMethod"][0]["id"],
+        "signing_algo": "ed25519"
+    }
+    signers.append(signPair_alice)
+    create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
+    run_blockchain_command(create_tx_cmd, f"Registering DID with Id: {did_doc_alice}", True, True)
+
+    print("2. FAIL: Registering DID Document with a verification method of type Ed25519VerificationKey2020. Only blockchainAccountId is passed.")
+    kp_alice = generate_key_pair()
+    signers = []
+    did_doc_string = generate_did_document(kp_alice)
+    did_doc_alice = did_doc_string["id"]
+    did_doc_string["verificationMethod"][0]["publicKeyMultibase"] = ""
+    did_doc_string["verificationMethod"][0]["blockchainAccountId"] = "solana:4sGjMW1sUnHzSxGspuhpqLDx6wiyjNtZ:7S3P4HxJpyyigGzodYwHtCxZyUQe9JiBMHyRWXArAaKv"
+    signPair_alice = {
+        "kp": kp_alice,
+        "verificationMethodId": did_doc_string["verificationMethod"][0]["id"],
+        "signing_algo": "ed25519"
+    }
+    signers.append(signPair_alice)
+    create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
+    run_blockchain_command(create_tx_cmd, f"Registering DID with Id: {did_doc_alice}", True, True)
+
+    print("3. PASS: Registering DID Document with a verification method of type Ed25519VerificationKey2020. Only publicKeyMultibase is passed.")
+    kp_alice = generate_key_pair()
+    signers = []
+    did_doc_string = generate_did_document(kp_alice)
+    did_doc_alice = did_doc_string["id"]
+    signPair_alice = {
+        "kp": kp_alice,
+        "verificationMethodId": did_doc_string["verificationMethod"][0]["id"],
+        "signing_algo": "ed25519"
+    }
+    signers.append(signPair_alice)
+    create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
+    run_blockchain_command(create_tx_cmd, f"Registering DID with Id: {did_doc_alice}")
+
+    # EcdsaSecp256k1VerificationKey2019
+    print("4. PASS: Registering DID Document with a verification method of type EcdsaSecp256k1VerificationKey2019. Only publicKeyMultibase is passed.")
+    kp_algo = "secp256k1"
+    kp = generate_key_pair(algo=kp_algo)
+    did_doc_string = generate_did_document(kp, kp_algo)
+    did_doc_id = did_doc_string["id"]
+    did_doc_string["verificationMethod"][0]["blockchainAccountId"] = ""
+    signers = []
+    signPair = {
+        "kp": kp,
+        "verificationMethodId": did_doc_string["verificationMethod"][0]["id"],
+        "signing_algo": kp_algo
+    }
+    signers.append(signPair)
+    create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
+    run_blockchain_command(create_tx_cmd, f"Registering DID with Id: {did_doc_id}")
+
+    print("5. PASS: Registering DID Document with a verification method of type EcdsaSecp256k1VerificationKey2019. Both publicKeyMultibase and blockchainAccountId are passed.")
+    kp_algo = "secp256k1"
+    kp = generate_key_pair(algo=kp_algo)
+    did_doc_string = generate_did_document(kp, kp_algo)
+    did_doc_id = did_doc_string["id"]
+    signers = []
+    signPair = {
+        "kp": kp,
+        "verificationMethodId": did_doc_string["verificationMethod"][0]["id"],
+        "signing_algo": kp_algo
+    }
+    signers.append(signPair)
+    create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
+    run_blockchain_command(create_tx_cmd, f"Registering DID with Id: {did_doc_id}")
+
+    print("6. FAIL: Registering DID Document with a verification method of type EcdsaSecp256k1VerificationKey2019. Only blockchainAccountId is passed.")
+    kp_algo = "secp256k1"
+    kp = generate_key_pair(algo=kp_algo)
+    did_doc_string = generate_did_document(kp, kp_algo)
+    did_doc_id = did_doc_string["id"]
+    did_doc_string["verificationMethod"][0]["publicKeyMultibase"] = ""
+    signers = []
+    signPair = {
+        "kp": kp,
+        "verificationMethodId": did_doc_string["verificationMethod"][0]["id"],
+        "signing_algo": kp_algo
+    }
+    signers.append(signPair)
+    create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
+    run_blockchain_command(create_tx_cmd, f"Registering DID with Id: {did_doc_id}", True, True)
+
+    # EcdsaSecp256k1RecoveryMethod2020
+    print("7. FAIL: Registering DID Document with a verification method of type EcdsaSecp256k1RecoveryMethod2020. Only publicKeyMultibase is passed.")
+    kp_algo = "recover-eth"
+    kp = generate_key_pair(algo=kp_algo)
+    did_doc_string = generate_did_document(kp, kp_algo)
+    did_doc_id = did_doc_string["id"]
+    did_doc_string["verificationMethod"][0]["publicKeyMultibase"] = "z22XxPVrzTr24zUBGfZiZCm9bwj3RkHKLmx9ENYBxmY57o"
+    did_doc_string["verificationMethod"][0]["blockchainAccountId"] = ""
+    signers = []
+    signPair = {
+        "kp": kp,
+        "verificationMethodId": did_doc_string["verificationMethod"][0]["id"],
+        "signing_algo": kp_algo
+    }
+    signers.append(signPair)
+    create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
+    run_blockchain_command(create_tx_cmd, f"Registering DID with Id: {did_doc_id}", True, True)
+
+    print("8. FAIL: Registering DID Document with a verification method of type EcdsaSecp256k1RecoveryMethod2020. Both publicKeyMultibase and blockchainAccountId is passed.")
+    kp_algo = "recover-eth"
+    kp = generate_key_pair(algo=kp_algo)
+    did_doc_string = generate_did_document(kp, kp_algo)
+    did_doc_id = did_doc_string["id"]
+    did_doc_string["verificationMethod"][0]["publicKeyMultibase"] = "z22XxPVrzTr24zUBGfZiZCm9bwj3RkHKLmx9ENYBxmY57o"
+    signers = []
+    signPair = {
+        "kp": kp,
+        "verificationMethodId": did_doc_string["verificationMethod"][0]["id"],
+        "signing_algo": kp_algo
+    }
+    signers.append(signPair)
+    create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
+    run_blockchain_command(create_tx_cmd, f"Registering DID with Id: {did_doc_id}", True, True)
+
+    print("9. PASS: Registering DID Document with a verification method of type EcdsaSecp256k1RecoveryMethod2020. Only blockchainAccountId is passed.")
+    kp_algo = "recover-eth"
+    kp = generate_key_pair(algo=kp_algo)
+    did_doc_string = generate_did_document(kp, kp_algo)
+    did_doc_id = did_doc_string["id"]
+    signers = []
+    signPair = {
+        "kp": kp,
+        "verificationMethodId": did_doc_string["verificationMethod"][0]["id"],
+        "signing_algo": kp_algo
+    }
+    signers.append(signPair)
+    create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
+    run_blockchain_command(create_tx_cmd, f"Registering DID with Id: {did_doc_id}")
+
+    print("--- Test Completed ---\n")
+    
