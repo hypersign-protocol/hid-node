@@ -101,5 +101,3 @@ message QueryDidDocumentsResponse {
   uint64 totalDidCount = 1;
   repeated QueryDidDocumentResponse didDocList = 2;
 }
-
-// this line is used by starport scaffolding # 3

@@ -55,20 +55,8 @@ func (k msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*t
 		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, err.Error())
 	}
 
-	// ClientSpec check
-	clientSpecOpts := types.ClientSpecOpts{
-		ClientSpecType: msg.ClientSpec,
-		SSIDoc:         msgDidDocument,
-		SignerAddress:  msg.Creator,
-	}
-	var didDocBytes []byte
-	didDocBytes, err = getClientSpecDocBytes(clientSpecOpts)
-	if err != nil {
-		return nil, sdkerrors.Wrapf(types.ErrInvalidClientSpecType, err.Error())
-	}
-
 	// Verify Signatures
-	err = verification.VerifySignatureOfEveryController(didDocBytes, requiredVmMap)
+	err = verification.VerifySignatureOfEveryController(msgDidDocument, requiredVmMap)
 	if err != nil {
 		return nil, sdkerrors.Wrapf(types.ErrInvalidSignature, err.Error())
 	}

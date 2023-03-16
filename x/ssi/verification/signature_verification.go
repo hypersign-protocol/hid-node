@@ -8,13 +8,13 @@ import (
 
 // VerifySignatureOfEveryController verifies every required verification method of every controller
 func VerifySignatureOfEveryController(
-	didDoc []byte, VmMap map[string][]*types.ExtendedVerificationMethod,
+	didDocMsg types.SsiMsg, VmMap map[string][]*types.ExtendedVerificationMethod,
 ) error {
 	for controller, vmList := range VmMap {
 		if len(vmList) == 0 {
 			return fmt.Errorf("require atleast one valid signature for controller %s", controller)
 		}
-		err := verifyAll(vmList, didDoc)
+		err := verifyAll(vmList, didDocMsg)
 		if err != nil {
 			return fmt.Errorf("%s: need every signature for controller %s to be valid", err.Error(), controller)
 		}
@@ -24,11 +24,11 @@ func VerifySignatureOfEveryController(
 
 // VerifySignatureOfEveryController verifies any required0 verification8
 func VerifySignatureOfAnyController(
-	didDoc []byte, VmMap map[string][]*types.ExtendedVerificationMethod,
+	didDocMsg types.SsiMsg, VmMap map[string][]*types.ExtendedVerificationMethod,
 ) error {
 	found := false
 	for _, vmList := range VmMap {
-		found = verifyAny(vmList, didDoc)
+		found = verifyAny(vmList, didDocMsg)
 		if found {
 			break
 		}
@@ -43,9 +43,9 @@ func VerifySignatureOfAnyController(
 }
 
 // VerifyDocumentProofSignature verfies the proof of the SSI Document such as Credential Schema and Credential Status
-func VerifyDocumentProofSignature(singedData []byte, vm *types.VerificationMethod, singature string) error {
-	vmExtended := types.CreateExtendedVerificationMethod(vm, singature)
-	if err := verify(vmExtended, singedData); err != nil {
+func VerifyDocumentProofSignature(ssiMsg types.SsiMsg, vm *types.VerificationMethod, signInfo *types.SignInfo) error {
+	vmExtended := types.CreateExtendedVerificationMethod(vm, signInfo)
+	if err := verify(vmExtended, ssiMsg); err != nil {
 		return err
 	}
 	return nil

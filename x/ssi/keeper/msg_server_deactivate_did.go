@@ -63,20 +63,8 @@ func (k msgServer) DeactivateDID(goCtx context.Context, msg *types.MsgDeactivate
 		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, err.Error())
 	}
 
-	// Get Client Spec
-	clientSpecOpts := types.ClientSpecOpts{
-		ClientSpecType: msg.ClientSpec,
-		SSIDoc:         didDocument,
-		SignerAddress:  msg.Creator,
-	}
-	var didDocBytes []byte
-	didDocBytes, err = getClientSpecDocBytes(clientSpecOpts)
-	if err != nil {
-		return nil, sdkerrors.Wrapf(types.ErrInvalidClientSpecType, err.Error())
-	}
-
 	// Signature Verification
-	err = verification.VerifySignatureOfAnyController(didDocBytes, controllerMap)
+	err = verification.VerifySignatureOfAnyController(didDocument, controllerMap)
 	if err != nil {
 		return nil, sdkerrors.Wrapf(types.ErrInvalidSignature, err.Error())
 	}

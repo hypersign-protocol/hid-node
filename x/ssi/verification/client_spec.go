@@ -1,17 +1,16 @@
-package keeper
+package verification
 
 import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"strings"
 
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 )
 
 // Read more about Cosmos's ADR Spec from the following:
 // https://docs.cosmos.network/v0.45/architecture/adr-036-arbitrary-signature.html
-func getCosmosADR036SignDocBytes(clientSpecOpts types.ClientSpecOpts) ([]byte, error) {
+func getCosmosADR036SignDocBytes(ssiMsg types.SsiMsg, clientSpec *types.ClientSpec) ([]byte, error) {
 	var msgSignData types.Msg = types.Msg{
 		Type: "sign/MsgSignData",
 		Value: types.Val{
@@ -33,10 +32,10 @@ func getCosmosADR036SignDocBytes(clientSpecOpts types.ClientSpecOpts) ([]byte, e
 		},
 		Sequence: "0",
 	}
-	ssiDocBytes := clientSpecOpts.SSIDoc.GetSignBytes()
+	ssiDocBytes := ssiMsg.GetSignBytes()
 	baseCosmosADR036SignDoc.Msgs[0].Value.Data = base64.StdEncoding.EncodeToString(
 		ssiDocBytes)
-	baseCosmosADR036SignDoc.Msgs[0].Value.Signer = clientSpecOpts.SignerAddress
+	baseCosmosADR036SignDoc.Msgs[0].Value.Signer = clientSpec.Adr036SignerAddress
 
 	updatedSignDocBytes, err := json.Marshal(baseCosmosADR036SignDoc)
 	if err != nil {
@@ -47,25 +46,28 @@ func getCosmosADR036SignDocBytes(clientSpecOpts types.ClientSpecOpts) ([]byte, e
 }
 
 // More info on the `personal_sign` here: https://docs.metamask.io/guide/signing-data.html#personal-sign
-func getPersonalSignSpecDocBytes(clientSpecOpts types.ClientSpecOpts) ([]byte, error) {
-	return json.Marshal(clientSpecOpts.SSIDoc)
+func getPersonalSignSpecDocBytes(ssiMsg types.SsiMsg) ([]byte, error) {
+	return json.Marshal(ssiMsg)
 }
 
 // Get the updated marshaled SSI document for the respective ClientSpec
-func getClientSpecDocBytes(clientSpecOpts types.ClientSpecOpts) ([]byte, error) {
-	switch clientSpecOpts.ClientSpecType {
-	case types.ADR036Spec:
-		return getCosmosADR036SignDocBytes(clientSpecOpts)
-	case types.PersonalSignSpec:
-		return getPersonalSignSpecDocBytes(clientSpecOpts)
-	// Non-ClientSpec RPC Request
-	// Return marshaled SSI document as-is
+func getDocBytesByClientSpec(ssiMsg types.SsiMsg, extendedVm *types.ExtendedVerificationMethod) ([]byte, error) {
+	if extendedVm.ClientSpec == nil {
+		return nil, fmt.Errorf("clientSpec cannot be nil for verificationMethod %v", extendedVm.Id)
+	}
+
+	switch extendedVm.ClientSpec.Type {
+	case types.ADR036ClientSpec:
+		return getCosmosADR036SignDocBytes(ssiMsg, extendedVm.ClientSpec)
+	case types.PersonalSignClientSpec:
+		return getPersonalSignSpecDocBytes(ssiMsg)
+	// Non-ClientSpec RPC Request. Return marshaled SSI document as-is
 	case "":
-		return clientSpecOpts.SSIDoc.GetSignBytes(), nil
+		return ssiMsg.GetSignBytes(), nil
 	default:
 		return nil, fmt.Errorf(
-			"supported client specs are : [%s]",
-			strings.Join(types.SupportedClientSpecs, ", "),
+			"supported clientSpecs: %v",
+			types.SupportedClientSpecs,
 		)
 	}
 }

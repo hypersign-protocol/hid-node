@@ -16,9 +16,9 @@ import (
 	ethercrypto "github.com/ethereum/go-ethereum/crypto"
 )
 
-func verifyAll(extendedVmList []*types.ExtendedVerificationMethod, data []byte) error {
+func verifyAll(extendedVmList []*types.ExtendedVerificationMethod, ssiMsg types.SsiMsg) error {
 	for _, extendedVm := range extendedVmList {
-		err := verify(extendedVm, data)
+		err := verify(extendedVm, ssiMsg)
 		if err != nil {
 			return err
 		}
@@ -26,11 +26,11 @@ func verifyAll(extendedVmList []*types.ExtendedVerificationMethod, data []byte) 
 	return nil
 }
 
-func verifyAny(extendedVmList []*types.ExtendedVerificationMethod, data []byte) bool {
+func verifyAny(extendedVmList []*types.ExtendedVerificationMethod, ssiMsg types.SsiMsg) bool {
 	found := false
 
 	for _, extendedVm := range extendedVmList {
-		err := verify(extendedVm, data)
+		err := verify(extendedVm, ssiMsg)
 		if err == nil {
 			found = true
 			break
@@ -40,14 +40,19 @@ func verifyAny(extendedVmList []*types.ExtendedVerificationMethod, data []byte) 
 	return found
 }
 
-func verify(extendedVm *types.ExtendedVerificationMethod, data []byte) error {
+func verify(extendedVm *types.ExtendedVerificationMethod, ssiMsg types.SsiMsg) error {
+	docBytes, err := getDocBytesByClientSpec(ssiMsg, extendedVm)
+	if err != nil {
+		return err
+	}
+
 	switch extendedVm.Type {
 	case types.Ed25519VerificationKey2020:
-		return verifyEd25519VerificationKey2020Key(extendedVm, data)
+		return verifyEd25519VerificationKey2020Key(extendedVm, docBytes)
 	case types.EcdsaSecp256k1VerificationKey2019:
-		return verifyEcdsaSecp256k1VerificationKey2019Key(extendedVm, data)
+		return verifyEcdsaSecp256k1VerificationKey2019Key(extendedVm, docBytes)
 	case types.EcdsaSecp256k1RecoveryMethod2020:
-		return verifyEcdsaSecp256k1RecoveryMethod2020Key(extendedVm, data)
+		return verifyEcdsaSecp256k1RecoveryMethod2020Key(extendedVm, docBytes)
 	default:
 		return fmt.Errorf("unsupported verification method: %s", extendedVm.Type)
 	}

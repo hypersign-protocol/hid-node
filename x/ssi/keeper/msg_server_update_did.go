@@ -82,24 +82,12 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, err.Error())
 	}
 
-	// ClientSpec Opts
-	clientSpecOpts := types.ClientSpecOpts{
-		ClientSpecType: msg.ClientSpec,
-		SSIDoc:         msgDidDocument,
-		SignerAddress:  msg.Creator,
-	}
-	var didDocBytes []byte
-	didDocBytes, err = getClientSpecDocBytes(clientSpecOpts)
-	if err != nil {
-		return nil, sdkerrors.Wrapf(types.ErrInvalidClientSpecType, err.Error())
-	}
-
 	// Signature Verification
-	if err := verification.VerifySignatureOfEveryController(didDocBytes, requiredVmMap); err != nil {
+	if err := verification.VerifySignatureOfEveryController(msgDidDocument, requiredVmMap); err != nil {
 		return nil, sdkerrors.Wrapf(types.ErrInvalidSignature, err.Error())
 	}
 
-	if err := verification.VerifySignatureOfAnyController(didDocBytes, optionalVmMap); err != nil {
+	if err := verification.VerifySignatureOfAnyController(msgDidDocument, optionalVmMap); err != nil {
 		return nil, sdkerrors.Wrapf(types.ErrInvalidSignature, err.Error())
 	}
 
