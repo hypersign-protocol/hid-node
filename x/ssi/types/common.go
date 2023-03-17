@@ -44,13 +44,13 @@ var CAIP10PrefixForEcdsaSecp256k1VerificationKey2019 []string = []string{
 	CosmosCAIP10Prefix,
 }
 
-const ADR036Spec string = "cosmos-ADR036"
-const PersonalSignSpec string = "eth-personalSign"
+const ADR036ClientSpec string = "cosmos-ADR036"
+const PersonalSignClientSpec string = "eth-personalSign"
 
 // Supported Client Specs
 var SupportedClientSpecs []string = []string{
-	ADR036Spec,
-	PersonalSignSpec,
+	ADR036ClientSpec,
+	PersonalSignClientSpec,
 }
 
 // Map between supported cosmos chain-id and their respective blockhchain address prefix

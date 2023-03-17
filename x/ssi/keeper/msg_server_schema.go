@@ -17,6 +17,7 @@ func (k msgServer) CreateSchema(goCtx context.Context, msg *types.MsgCreateSchem
 	schemaDoc := msg.GetSchemaDoc()
 	schemaProof := msg.GetSchemaProof()
 	schemaID := schemaDoc.GetId()
+	schemaClientSpec := msg.GetClientSpec()
 
 	chainNamespace := k.GetChainNamespace(&ctx)
 	// Get the Did Document of Schema's Author
@@ -62,20 +63,8 @@ func (k msgServer) CreateSchema(goCtx context.Context, msg *types.MsgCreateSchem
 		return nil, sdkerrors.Wrapf(types.ErrInvalidDate, "created date provided shouldn't be greater than the current block time")
 	}
 
-	// ClientSpec check
-	clientSpecOpts := types.ClientSpecOpts{
-		ClientSpecType: msg.ClientSpec,
-		SSIDoc:         schemaDoc,
-		SignerAddress:  msg.Creator,
-	}
-
-	schemaDocBytes, err := getClientSpecDocBytes(clientSpecOpts)
-	if err != nil {
-		return nil, sdkerrors.Wrap(types.ErrInvalidClientSpecType, err.Error())
-	}
-
 	// Signature check
-	if err := k.VerifyDocumentProof(ctx, schemaDocBytes, schemaProof); err != nil {
+	if err := k.VerifyDocumentProof(ctx, schemaDoc, schemaProof, schemaClientSpec); err != nil {
 		return nil, sdkerrors.Wrap(types.ErrInvalidClientSpecType, err.Error())
 	}
 

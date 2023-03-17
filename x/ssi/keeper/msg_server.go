@@ -48,7 +48,7 @@ func (k msgServer) checkControllerPresenceInState(
 // every verification method of every controller needs to be valid
 func (k msgServer) formMustControllerVmListMap(ctx sdk.Context,
 	controllers []string, verificationMethods []*types.VerificationMethod,
-	inputSignMap map[string]string,
+	inputSignMap map[string]*types.SignInfo,
 ) (map[string][]*types.ExtendedVerificationMethod, error) {
 	var controllerMap map[string][]*types.ExtendedVerificationMethod = map[string][]*types.ExtendedVerificationMethod{}
 	var vmMap map[string]*types.VerificationMethod = map[string]*types.VerificationMethod{}
@@ -110,7 +110,7 @@ func (k msgServer) formMustControllerVmListMap(ctx sdk.Context,
 // atleast one verification method of any controller needs to be valid
 func (k msgServer) formAnyControllerVmListMap(ctx sdk.Context,
 	controllers []string, verificationMethods []*types.VerificationMethod,
-	inputSignMap map[string]string,
+	inputSignMap map[string]*types.SignInfo,
 ) (map[string][]*types.ExtendedVerificationMethod, error) {
 	var controllerMap map[string][]*types.ExtendedVerificationMethod = map[string][]*types.ExtendedVerificationMethod{}
 	var vmMap map[string]*types.VerificationMethod = map[string]*types.VerificationMethod{}
@@ -174,7 +174,7 @@ func (k msgServer) getControllerVmFromState(ctx sdk.Context, verificationMethodI
 }
 
 // VerifyDocumentProof verifies the proof of a SSI Document
-func (k msgServer) VerifyDocumentProof(ctx sdk.Context, docBytes []byte, inputDocProof types.SSIProofInterface) error {
+func (k msgServer) VerifyDocumentProof(ctx sdk.Context, ssiMsg types.SsiMsg, inputDocProof types.SSIProofInterface, clientSpec *types.ClientSpec) error {
 	// Get DID Document from State
 	schemaProofVmId := inputDocProof.GetVerificationMethod()
 	didId, _ := types.SplitDidUrl(schemaProofVmId)
@@ -208,7 +208,12 @@ func (k msgServer) VerifyDocumentProof(ctx sdk.Context, docBytes []byte, inputDo
 	}
 
 	// Verify signature
-	err = verification.VerifyDocumentProofSignature(docBytes, schemaVm, inputDocProof.GetProofValue())
+	signInfo := &types.SignInfo{
+		VerificationMethodId: inputDocProof.GetVerificationMethod(),
+		Signature:            inputDocProof.GetProofValue(),
+		ClientSpec:           clientSpec,
+	}
+	err = verification.VerifyDocumentProofSignature(ssiMsg, schemaVm, signInfo)
 	if err != nil {
 		return err
 	}
@@ -217,11 +222,11 @@ func (k msgServer) VerifyDocumentProof(ctx sdk.Context, docBytes []byte, inputDo
 }
 
 // makeSignatureMap converts []SignInfo to map
-func makeSignatureMap(inputSignatures []*types.SignInfo) map[string]string {
-	var signMap map[string]string = map[string]string{}
+func makeSignatureMap(inputSignatures []*types.SignInfo) map[string]*types.SignInfo {
+	var signMap map[string]*types.SignInfo = map[string]*types.SignInfo{}
 
 	for _, sign := range inputSignatures {
-		signMap[sign.VerificationMethodId] = sign.Signature
+		signMap[sign.VerificationMethodId] = sign
 	}
 
 	return signMap

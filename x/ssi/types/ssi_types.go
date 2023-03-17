@@ -32,18 +32,25 @@ type (
 		PublicKeyMultibase  string
 		BlockchainAccountId string
 		Signature           string
+		ClientSpec          *ClientSpec
 	}
 )
 
-func CreateExtendedVerificationMethod(vm *VerificationMethod, signature string) *ExtendedVerificationMethod {
-	return &ExtendedVerificationMethod{
+func CreateExtendedVerificationMethod(vm *VerificationMethod, signInfo *SignInfo) *ExtendedVerificationMethod {
+	extendedVm := &ExtendedVerificationMethod{
 		Id:                  vm.Id,
 		Type:                vm.Type,
 		Controller:          vm.Controller,
 		PublicKeyMultibase:  vm.PublicKeyMultibase,
 		BlockchainAccountId: vm.BlockchainAccountId,
-		Signature:           signature,
+		Signature:           signInfo.Signature,
 	}
+
+	if signInfo.ClientSpec != nil {
+		extendedVm.ClientSpec = signInfo.ClientSpec
+	}
+
+	return extendedVm
 }
 
 // Struct catering to supported Client Spec's required inputs

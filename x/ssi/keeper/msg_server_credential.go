@@ -18,6 +18,7 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 
 	msgCredStatus := msg.GetCredentialStatus()
 	msgCredProof := msg.GetProof()
+	msgCredClientSpec := msg.GetClientSpec()
 
 	credId := msgCredStatus.GetClaim().GetId()
 
@@ -86,20 +87,8 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 			return nil, sdkerrors.Wrapf(types.ErrInvalidCredentialHash, "supported hashing algorithms: sha256")
 		}
 
-		// ClientSpec check
-		clientSpecOpts := types.ClientSpecOpts{
-			ClientSpecType: msg.ClientSpec,
-			SSIDoc:         msgCredStatus,
-			SignerAddress:  msg.Creator,
-		}
-
-		credDocBytes, err := getClientSpecDocBytes(clientSpecOpts)
-		if err != nil {
-			return nil, sdkerrors.Wrapf(types.ErrInvalidClientSpecType, err.Error())
-		}
-
 		// Verify Signature
-		err = k.VerifyDocumentProof(ctx, credDocBytes, msgCredProof)
+		err = k.VerifyDocumentProof(ctx, msgCredStatus, msgCredProof, msgCredClientSpec)
 		if err != nil {
 			return nil, sdkerrors.Wrapf(types.ErrInvalidSignature, err.Error())
 		}
@@ -129,6 +118,7 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 func (k msgServer) updateCredentialStatus(ctx sdk.Context, msg *types.MsgRegisterCredentialStatus) (*types.Credential, error) {
 	msgNewCredStatus := msg.CredentialStatus
 	msgNewCredProof := msg.Proof
+	msgNewCredClientSpec := msg.ClientSpec
 
 	credId := msgNewCredStatus.GetClaim().GetId()
 
@@ -277,20 +267,8 @@ func (k msgServer) updateCredentialStatus(ctx sdk.Context, msg *types.MsgRegiste
 		}
 	}
 
-	// ClientSpec check
-	clientSpecOpts := types.ClientSpecOpts{
-		ClientSpecType: msg.ClientSpec,
-		SSIDoc:         msgNewCredStatus,
-		SignerAddress:  msg.Creator,
-	}
-
-	credDocBytes, err := getClientSpecDocBytes(clientSpecOpts)
-	if err != nil {
-		return nil, sdkerrors.Wrap(types.ErrInvalidClientSpecType, err.Error())
-	}
-
 	// Verify Signature
-	err = k.VerifyDocumentProof(ctx, credDocBytes, msgNewCredProof)
+	err = k.VerifyDocumentProof(ctx, msgNewCredStatus, msgNewCredProof, msgNewCredClientSpec)
 	if err != nil {
 		return nil, sdkerrors.Wrap(types.ErrInvalidSignature, err.Error())
 	}
