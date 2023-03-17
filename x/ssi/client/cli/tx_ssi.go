@@ -128,9 +128,6 @@ func CmdCreateSchema() *cobra.Command {
 				SchemaDoc:   &schemaDoc,
 				SchemaProof: &schemaProof,
 				Creator:     clientCtx.GetFromAddress().String(),
-				ClientSpec: &types.ClientSpec{
-					Type: "",
-				},
 			}
 
 			if err := msg.ValidateBasic(); err != nil {
@@ -227,9 +224,6 @@ func CmdRegisterCredentialStatus() *cobra.Command {
 				CredentialStatus: &credentialStatus,
 				Proof:            &proof,
 				Creator:          clientCtx.GetFromAddress().String(),
-				ClientSpec: &types.ClientSpec{
-					Type: "",
-				},
 			}
 
 			if err := msg.ValidateBasic(); err != nil {
