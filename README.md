@@ -26,33 +26,27 @@ Following are the prerequisites that needs to be installed:
 
 ## Get started
 
-### Local
+### Local Binary
 
-Clone the repository and install the binary:
+1. Clone this repository and install the binary:
+   ```sh
+   git clone https://github.com/hypersign-protocol/hid-node.git
+   cd hid-node
+   make install
+   ```
 
-```sh
-git clone https://github.com/hypersign-protocol/hid-node.git
-cd hid-node
-make install
-```
+> The binary `hid-noded` is usually generated in `$HOME/go/bin` directory. Run `hid-noded --help` to explore its functionalities
 
-The binary `hid-noded` will be generated in `$GO_PATH/bin` directory. To explore its functionalities, type `hid-noded --help` in a seperate terminal window.
+2. Run the following script to setup a single-node blockchain. Please note that the following script requires `jq` to be installed.
+   ```sh
+   sudo chmod +x ./scripts/localnet-single-node/setup.sh
+   sh ./scripts/localnet-single-node/setup.sh
+   ```
 
-#### Running the Blockchain
-
-To start a single-node blockchain, run the following command to initialize the node:
-
-```sh
-sh ./scripts/localnet-single-node/setup.sh
-```
-
-> Note: The above script requires `jq` to be installed.
-
-Run the hid-node:
-
-```sh
-hid-noded start --home ~/.hid-node
-```
+3. Start `hid-noded`:
+   ```sh
+   hid-noded start --home ~/.hid-node
+   ```
 
 ### Docker
 
@@ -79,3 +73,5 @@ To run a single node `hid-node` docker container, follow the below steps:
 | Credential Schema | https://docs.hypersign.id/self-sovereign-identity-ssi/schema |
 | Verifiable Credential Status | https://docs.hypersign.id/self-sovereign-identity-ssi/verifiable-credential-vc/credential-revocation-registry |
 
+
+Please contact [support@hypermine.in](mailto:support@hypermine.in) for consulting and integration
