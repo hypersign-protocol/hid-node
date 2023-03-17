@@ -52,22 +52,19 @@ func getPersonalSignSpecDocBytes(ssiMsg types.SsiMsg) ([]byte, error) {
 
 // Get the updated marshaled SSI document for the respective ClientSpec
 func getDocBytesByClientSpec(ssiMsg types.SsiMsg, extendedVm *types.ExtendedVerificationMethod) ([]byte, error) {
-	if extendedVm.ClientSpec == nil {
-		return nil, fmt.Errorf("clientSpec cannot be nil for verificationMethod %v", extendedVm.Id)
-	}
-
-	switch extendedVm.ClientSpec.Type {
-	case types.ADR036ClientSpec:
-		return getCosmosADR036SignDocBytes(ssiMsg, extendedVm.ClientSpec)
-	case types.PersonalSignClientSpec:
-		return getPersonalSignSpecDocBytes(ssiMsg)
-	// Non-ClientSpec RPC Request. Return marshaled SSI document as-is
-	case "":
+	if extendedVm.ClientSpec != nil {
+		switch extendedVm.ClientSpec.Type {
+		case types.ADR036ClientSpec:
+			return getCosmosADR036SignDocBytes(ssiMsg, extendedVm.ClientSpec)
+		case types.PersonalSignClientSpec:
+			return getPersonalSignSpecDocBytes(ssiMsg)
+		default:
+			return nil, fmt.Errorf(
+				"supported clientSpecs: %v",
+				types.SupportedClientSpecs,
+			)
+		}
+	} else {
 		return ssiMsg.GetSignBytes(), nil
-	default:
-		return nil, fmt.Errorf(
-			"supported clientSpecs: %v",
-			types.SupportedClientSpecs,
-		)
 	}
 }

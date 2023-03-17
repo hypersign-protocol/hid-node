@@ -109,9 +109,6 @@ func getSignatures(cmd *cobra.Command, message []byte, cmdArgs []string) ([]*typ
 		// Get the VM Ids
 		signInfoList = append(signInfoList, &types.SignInfo{
 			VerificationMethodId: didSigningElementsList[i].VerificationMethodId,
-			ClientSpec: &types.ClientSpec{
-				Type: "",
-			},
 		})
 
 		// Sign based on the Signing Algorithm
