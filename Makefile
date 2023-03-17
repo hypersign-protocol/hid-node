@@ -32,8 +32,8 @@ export GO111MODULE=on
 all: proto-gen swagger-docs-gen build
 
 go-version-check:
-ifneq ($(GO_MINOR_VERSION),18)
-	@echo "ERROR: Go version 1.18 is required for this version of hid-node"
+ifneq ($(GO_MINOR_VERSION),19)
+	@echo "ERROR: Go version 1.19 is required to build hid-noded binary"
 	exit 1
 endif
 
