@@ -88,6 +88,7 @@ func (k msgServer) formMustControllerVmListMap(ctx sdk.Context,
 				if presentInControllerMap {
 					vmExtended := types.CreateExtendedVerificationMethod(vmMap[vmId], sign)
 					controllerMap[controller] = append(controllerMap[controller], vmExtended)
+					delete(inputSignMap, vmId)
 				}
 				// Check for VM from the respective controller's DID Doc
 			} else {
@@ -99,6 +100,7 @@ func (k msgServer) formMustControllerVmListMap(ctx sdk.Context,
 				if presentInControllerMap {
 					vmExtended := types.CreateExtendedVerificationMethod(vmState, sign)
 					controllerMap[controller] = append(controllerMap[controller], vmExtended)
+					delete(inputSignMap, vmId)
 				}
 			}
 		}
