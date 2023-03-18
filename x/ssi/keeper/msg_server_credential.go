@@ -18,6 +18,7 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 
 	msgCredStatus := msg.GetCredentialStatus()
 	msgCredProof := msg.GetProof()
+	msgCredClientSpec := msg.GetClientSpec()
 
 	credId := msgCredStatus.GetClaim().GetId()
 
@@ -26,7 +27,7 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 	// Check the format of Credential ID
 	err := verification.IsValidID(credId, chainNamespace, "credDocument")
 	if err != nil {
-		return nil, err
+		return nil, sdkerrors.Wrap(types.ErrInvalidSchemaID, err.Error())
 	}
 
 	// Check if the credential already exist in the store
@@ -46,7 +47,7 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 		// Check if issuer's DID is deactivated
 		issuerDidDocument, err := k.GetDidDocumentState(&ctx, issuerId)
 		if err != nil {
-			return nil, err
+			return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, err.Error())
 		}
 		if issuerDidDocument.DidDocumentMetadata.Deactivated {
 			return nil, sdkerrors.Wrap(types.ErrDidDocDeactivated, fmt.Sprintf("%s is deactivated and cannot used be used to register credential status", issuerDidDocument.DidDocument.Id))
@@ -66,12 +67,12 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 		}
 
 		if err := verification.VerifyCredentialStatusDates(issuanceDateParsed, expirationDateParsed); err != nil {
-			return nil, err
+			return nil, sdkerrors.Wrapf(types.ErrInvalidCredentialField, err.Error())
 		}
 
 		// Check if updated date is similar to created date
 		if err := verification.VerifyCredentialProofDates(msgCredProof, true); err != nil {
-			return nil, err
+			return nil, sdkerrors.Wrapf(types.ErrInvalidCredentialField, err.Error())
 		}
 
 		// Check if the created date lies between issuance and expiration
@@ -86,49 +87,10 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 			return nil, sdkerrors.Wrapf(types.ErrInvalidCredentialHash, "supported hashing algorithms: sha256")
 		}
 
-		// Verify the Signature
-		didDocumentState, err := k.GetDidDocumentState(&ctx, issuerId)
-		if err != nil {
-			return nil, err
-		}
-
-		didDocument := didDocumentState.GetDidDocument()
-
-		signature := &types.SignInfo{
-			VerificationMethodId: msgCredProof.GetVerificationMethod(),
-			Signature:            msgCredProof.GetProofValue(),
-		}
-		signatures := []*types.SignInfo{signature}
-		signers := didDocument.GetSigners()
-		signersWithVM, err := k.GetVMForSigners(&ctx, signers)
-		if err != nil {
-			return nil, err
-		}
-
-		// ClientSpec check
-		clientSpecType := msg.GetClientSpec()
-		singerAddress := msg.GetCreator()
-
-		clientSpecOpts := types.ClientSpecOpts{
-			SSIDoc:        msgCredStatus,
-			SignerAddress: singerAddress,
-		}
-
-		credDocBytes, err := getClientSpecDocBytes(clientSpecType, clientSpecOpts)
-		if err != nil {
-			return nil, err
-		}
-
-		// Proof Type Check
-		err = verification.DocumentProofTypeCheck(msgCredProof.Type, signersWithVM, msgCredProof.VerificationMethod)
-		if err != nil {
-			return nil, err
-		}
-
 		// Verify Signature
-		err = verification.VerifyDocumentSignature(&ctx, credDocBytes, signersWithVM, signatures)
+		err = k.VerifyDocumentProof(ctx, msgCredStatus, msgCredProof, msgCredClientSpec)
 		if err != nil {
-			return nil, err
+			return nil, sdkerrors.Wrapf(types.ErrInvalidSignature, err.Error())
 		}
 
 		cred := &types.Credential{
@@ -140,14 +102,14 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 			Proof:          msgCredProof,
 		}
 
-		id = k.RegisterCred(ctx, cred)
+		id = k.RegisterCredentialStatusInState(ctx, cred)
 
 	} else {
 		cred, err := k.updateCredentialStatus(ctx, msg)
 		if err != nil {
 			return nil, err
 		}
-		id = k.RegisterCred(ctx, cred)
+		id = k.RegisterCredentialStatusInState(ctx, cred)
 	}
 
 	return &types.MsgRegisterCredentialStatusResponse{Id: id}, nil
@@ -156,13 +118,14 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 func (k msgServer) updateCredentialStatus(ctx sdk.Context, msg *types.MsgRegisterCredentialStatus) (*types.Credential, error) {
 	msgNewCredStatus := msg.CredentialStatus
 	msgNewCredProof := msg.Proof
+	msgNewCredClientSpec := msg.ClientSpec
 
 	credId := msgNewCredStatus.GetClaim().GetId()
 
 	// Get Credential from store
-	oldCredStatus, err := k.GetCredential(&ctx, credId)
+	oldCredStatus, err := k.GetCredentialStatusFromState(&ctx, credId)
 	if err != nil {
-		return nil, err
+		return nil, sdkerrors.Wrap(types.ErrCredentialStatusNotFound, err.Error())
 	}
 
 	// Check if the DID of the issuer exists
@@ -174,7 +137,7 @@ func (k msgServer) updateCredentialStatus(ctx sdk.Context, msg *types.MsgRegiste
 	// Check if issuer's DID is deactivated
 	issuerDidDocument, err := k.GetDidDocumentState(&ctx, issuerId)
 	if err != nil {
-		return nil, err
+		return nil, sdkerrors.Wrap(types.ErrDidDocNotFound, err.Error())
 	}
 	if issuerDidDocument.DidDocumentMetadata.Deactivated {
 		return nil, sdkerrors.Wrap(types.ErrDidDocDeactivated, fmt.Sprintf("%s is deactivated and cannot used be used to register credential status", issuerDidDocument.DidDocument.Id))
@@ -183,7 +146,7 @@ func (k msgServer) updateCredentialStatus(ctx sdk.Context, msg *types.MsgRegiste
 	// Check if the provided isser Id is the one who issued the VC
 	if issuerId != oldCredStatus.GetIssuer() {
 		return nil, sdkerrors.Wrapf(types.ErrInvalidCredentialField,
-			fmt.Sprintf("Issuer ID %s is not issuer of verifiable credential id %s", issuerId, credId))
+			fmt.Sprintf("issuer id %s is not issuer of verifiable credential id %s", issuerId, credId))
 	}
 
 	// Check if the new expiration date and issuance date are same as old one.
@@ -219,12 +182,12 @@ func (k msgServer) updateCredentialStatus(ctx sdk.Context, msg *types.MsgRegiste
 
 	// Check if new expiration date isn't less than new issuance date
 	if err := verification.VerifyCredentialStatusDates(newIssuanceDateParsed, newExpirationDateParsed); err != nil {
-		return nil, err
+		return nil, sdkerrors.Wrap(types.ErrInvalidCredentialField, err.Error())
 	}
 
 	// Check if updated date iss imilar to created date
 	if err := verification.VerifyCredentialProofDates(msgNewCredProof, false); err != nil {
-		return nil, err
+		return nil, sdkerrors.Wrap(types.ErrInvalidCredentialField, err.Error())
 	}
 
 	// Check if the created date lies between issuance and expiration
@@ -304,49 +267,10 @@ func (k msgServer) updateCredentialStatus(ctx sdk.Context, msg *types.MsgRegiste
 		}
 	}
 
-	// Verify the Signature
-	didDocumentState, err := k.GetDidDocumentState(&ctx, issuerId)
-	if err != nil {
-		return nil, err
-	}
-
-	didDocument := didDocumentState.GetDidDocument()
-
-	signature := &types.SignInfo{
-		VerificationMethodId: msgNewCredProof.GetVerificationMethod(),
-		Signature:            msgNewCredProof.GetProofValue(),
-	}
-	signatures := []*types.SignInfo{signature}
-	signers := didDocument.GetSigners()
-	signersWithVM, err := k.GetVMForSigners(&ctx, signers)
-	if err != nil {
-		return nil, err
-	}
-
-	// ClientSpec check
-	clientSpecType := msg.GetClientSpec()
-	signerAddress := msg.GetCreator()
-
-	clientSpecOpts := types.ClientSpecOpts{
-		SSIDoc:   msgNewCredStatus,
-		SignerAddress: signerAddress,
-	}
-
-	credDocBytes, err := getClientSpecDocBytes(clientSpecType, clientSpecOpts)
-	if err != nil {
-		return nil, err
-	}
-
-	// Proof Type Check
-	err = verification.DocumentProofTypeCheck(msgNewCredProof.Type, signersWithVM, msgNewCredProof.VerificationMethod)
-	if err != nil {
-		return nil, err
-	}
-
 	// Verify Signature
-	err = verification.VerifyDocumentSignature(&ctx, credDocBytes, signersWithVM, signatures)
+	err = k.VerifyDocumentProof(ctx, msgNewCredStatus, msgNewCredProof, msgNewCredClientSpec)
 	if err != nil {
-		return nil, err
+		return nil, sdkerrors.Wrap(types.ErrInvalidSignature, err.Error())
 	}
 
 	cred := types.Credential{

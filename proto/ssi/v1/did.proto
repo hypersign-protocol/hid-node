@@ -3,10 +3,12 @@ package hypersignprotocol.hidnode.ssi;
 
 option go_package = "github.com/hypersign-protocol/hid-node/x/ssi/types";
 
+import "ssi/v1/clientSpec.proto";
+
 message Did {
   repeated string context = 1;
   string id = 2;
-  repeated string controller = 3; // DID Controller Spec: https://www.w3.org/TR/did-core/#did-controller
+  repeated string controller = 3;
   repeated string alsoKnownAs = 4;
   repeated VerificationMethod verificationMethod = 5;
   repeated string authentication = 6;
@@ -41,6 +43,7 @@ message Service {
 message SignInfo {
   string verification_method_id = 1;
   string signature = 2;
+  ClientSpec clientSpec = 3;
 }
 
 message DidDocumentState {

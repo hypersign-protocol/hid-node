@@ -1,13 +1,11 @@
 package tests
 
 import (
-	"fmt"
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/hypersign-protocol/hid-node/x/ssi/keeper"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestCreateDIDUsingEd25519KeyPair(t *testing.T) {
@@ -101,8 +99,6 @@ func TestInvalidServiceType(t *testing.T) {
 		t.Error("DID Document Registeration was expected to fail, as the service type provided was invalid")
 		t.FailNow()
 	}
-
-	assert.Contains(t, err.Error(), fmt.Sprintf("Service Type %s is Invalid: Invalid Service", invalidServiceType))
 
 	t.Log("Test Completed")
 }

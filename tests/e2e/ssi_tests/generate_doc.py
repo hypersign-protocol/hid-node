@@ -3,7 +3,8 @@ import sys
 sys.path.insert(1, os.getcwd())
 
 import json
-from utils import run_command, generate_document_id, get_document_signature
+from utils import run_command, generate_document_id, get_document_signature, \
+    secp256k1_pubkey_to_address
 
 def generate_did_document(key_pair, algo="ed25519"):
     base_document = {
@@ -38,16 +39,19 @@ def generate_did_document(key_pair, algo="ed25519"):
     }
     if algo == "recover-eth":
         verification_method["blockchainAccountId"] = "eip155:1:" + key_pair["ethereum_address"]
+    elif algo == "secp256k1":
+
+        verification_method["blockchainAccountId"] = "cosmos:jagrat:" + \
+            secp256k1_pubkey_to_address(key_pair["pub_key_base_64"], "hid")
+        verification_method["publicKeyMultibase"] = key_pair["pub_key_multibase"]
     else:
         verification_method["publicKeyMultibase"] = key_pair["pub_key_multibase"]
-   
-    authentication_verification_method_id = verification_method["id"]
     
     base_document["id"] = did_id
     base_document["controller"] = [did_id]
     base_document["verificationMethod"] = [verification_method]
-    base_document["authentication"] = [authentication_verification_method_id]
-    base_document["assertionMethod"] = [authentication_verification_method_id]
+    base_document["authentication"] = []
+    base_document["assertionMethod"] = []
     return base_document
     
 def generate_schema_document(key_pair, schema_author, vm, signature=None, algo="ed25519"):

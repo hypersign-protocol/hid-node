@@ -35,6 +35,7 @@ func secp256k1Cmd() *cobra.Command {
 
 	cmd.AddCommand(
 		secp256k1RandomCmd(),
+		secp256k1Bech32AddressCmd(),
 		secp256k1EthRandomCmd(),
 	)
 
@@ -72,6 +73,30 @@ func secp256k1RandomCmd() *cobra.Command {
 			}
 
 			_, err = fmt.Fprintln(cmd.OutOrStdout(), string(keyInfoJson))
+			return err
+		},
+	}
+
+	return cmd
+}
+
+func secp256k1Bech32AddressCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "bech32-addr [base64-encoded-public-key] [prefix]",
+		Short: "Converts a compressed base64 encoded secp256k1 public key to bech32 address",
+		Args:  cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			base64PubKey := args[0]
+			addrPrefix := args[1]
+
+			publicKeyBytes, err := base64.StdEncoding.DecodeString(base64PubKey)
+			if err != nil {
+				panic(err)
+			}
+
+			bech32address := publicKeyToBech32Address(addrPrefix, publicKeyBytes)
+
+			_, err = fmt.Fprintln(cmd.OutOrStdout(), bech32address)
 			return err
 		},
 	}

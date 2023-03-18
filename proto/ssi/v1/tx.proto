@@ -1,13 +1,12 @@
 syntax = "proto3";
 package hypersignprotocol.hidnode.ssi;
 
-// this line is used by starport scaffolding # proto/tx/import
-
 option go_package = "github.com/hypersign-protocol/hid-node/x/ssi/types";
 
 import "ssi/v1/schema.proto";
 import "ssi/v1/did.proto";
 import "ssi/v1/credential.proto";
+import "ssi/v1/clientSpec.proto";
 
 // Msg defines the Msg service.
 service Msg {
@@ -16,14 +15,12 @@ service Msg {
   rpc CreateSchema(MsgCreateSchema) returns (MsgCreateSchemaResponse);
   rpc DeactivateDID(MsgDeactivateDID) returns (MsgDeactivateDIDResponse);
   rpc RegisterCredentialStatus(MsgRegisterCredentialStatus) returns (MsgRegisterCredentialStatusResponse);
-// this line is used by starport scaffolding # proto/tx/rpc
 }
 
 message MsgCreateDID {
   Did didDocString = 1;
   repeated SignInfo signatures = 2;
   string creator = 3;
-  string clientSpec = 4;
 }
 
 message MsgCreateDIDResponse {
@@ -35,7 +32,6 @@ message MsgUpdateDID {
   string version_id = 2;
   repeated SignInfo signatures = 3;
   string creator = 4;
-  string clientSpec = 5;
 }
 
 message MsgUpdateDIDResponse {
@@ -46,7 +42,7 @@ message MsgCreateSchema {
   string creator = 1;
   SchemaDocument schemaDoc = 2;
   SchemaProof schemaProof = 3;
-  string clientSpec = 4;
+  ClientSpec clientSpec = 4;
 }
 
 message MsgCreateSchemaResponse {
@@ -58,7 +54,6 @@ message MsgDeactivateDID {
   string didId = 2;
   string version_id = 3;
   repeated SignInfo signatures = 4;
-  string clientSpec = 5;
 }
 
 message MsgDeactivateDIDResponse {
@@ -69,11 +64,9 @@ message MsgRegisterCredentialStatus {
   string creator = 1;
   CredentialStatus credentialStatus = 2;
   CredentialProof proof = 3;
-  string clientSpec = 4;
+  ClientSpec clientSpec = 4;
 }
 
 message MsgRegisterCredentialStatusResponse {
   uint64 id = 1;
 }
-
-// this line is used by starport scaffolding # proto/tx/message

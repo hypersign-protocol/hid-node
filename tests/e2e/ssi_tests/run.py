@@ -24,17 +24,14 @@ def generate_report(func):
 def run_all_tests():
     print("============= 🔧️ Running all x/ssi e2e tests ============== \n")
     
-    simple_ssi_flow()
-    controller_creates_schema_cred_status()
-    controllers_create_schema_cred_status()
-    invalid_case_controller_creates_schema_cred_status()
-    non_controller_did_trying_to_update_diddoc()
-    controller_did_trying_to_update_diddoc()
-    multiple_controllers_with_one_signer()
-    deactivated_did_should_not_create_ssi_elements()
-    ssi_operations_using_secp256k1()
-    caip10_support_test()
-    ssi_operation_using_ethereum_keypair_test()
+    create_did_test()
+    update_did_test()
+    schema_test()
+    deactivate_did()
+    credential_status_test()
+    caip10_ethereum_support_test()
+    caip10_cosmos_support_test()
+    vm_type_test()
 
     print("============= 😃️ All test cases completed successfully ============== \n")
 
@@ -47,6 +44,6 @@ if __name__=='__main__':
             generate_report(run_all_tests)
         else:
             run_all_tests()
-        
+
     except Exception as e:
         raise(e)

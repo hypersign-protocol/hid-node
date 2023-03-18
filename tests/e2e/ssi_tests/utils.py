@@ -103,3 +103,8 @@ def get_document_signature(doc: dict, doc_type: str, key_pair: dict, algo: str =
     cmd_string = f"hid-noded debug sign-ssi-doc {doc_cmd} '{json.dumps(doc)}' {private_key} {algo}"
     signature, _ = run_command(cmd_string)
     return signature
+
+def secp256k1_pubkey_to_address(pub_key, prefix):
+    cmd_string = f"hid-noded debug secp256k1 bech32-addr {pub_key} {prefix}"
+    addr, _ = run_command(cmd_string)
+    return addr
