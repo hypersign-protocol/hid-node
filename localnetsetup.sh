@@ -8,19 +8,8 @@ ${BINARY} &> /dev/null
 
 RET_VAL=$?
 if [ ${RET_VAL} -ne 0 ]; then
-    # Check the current version of hid-noded running on testnet
-    echo "hid-noded binary is not installed in your system. Installing now......"
-    HIDNODE_TESTNET_VERSION=$(curl -s https://rpc.jagrat.hypersign.id/abci_info | jq -r .result.response.version)
-    echo -e "\nCurrent hid-noded version running on Testnet is $HIDNODE_TESTNET_VERSION. Installing binary of version $HIDNODE_TESTNET_VERSION"
-    VERSION=$(echo "$HIDNODE_TESTNET_VERSION" | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
-    SANITISED_VERSION=$(echo "$HIDNODE_TESTNET_VERSION" | sed "s/.*$VERSION/$VERSION/")
-    
-    # Download binary
-    mkdir tmp_hid_node && cd tmp_hid_node
-    FILENAME=hid-noded-$SANITISED_VERSION-linux-amd64.tar.gz
-    wget "https://github.com/hypersign-protocol/hid-node/releases/download/v$SANITISED_VERSION/$FILENAME"
-    tar -C $HOME/.local/bin/ -xzf $FILENAME
-    cd .. && rm -rf ./tmp_hid_node
+    echo "hid-noded binary is not installed in your system."
+    exit 1
 fi
 
 # Setting up config files
