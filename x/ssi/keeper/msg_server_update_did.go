@@ -57,29 +57,74 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 		return nil, sdkerrors.Wrap(types.ErrUnexpectedDidVersion, errMsg)
 	}
 
-	// Look for any change in Controller array
-	mandatoryControllers, anyControllers := getControllersForUpdateDID(existingDidDocument, msgDidDocument)
-	if err := k.checkControllerPresenceInState(ctx, mandatoryControllers, msgDidDocument.Id); err != nil {
-		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, err.Error())
-	}
-	if err := k.checkControllerPresenceInState(ctx, anyControllers, msgDidDocument.Id); err != nil {
-		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, err.Error())
-	}
-
-	// Gather Verification Methods
-	updatedVms := getVerificationMethodsForUpdateDID(existingDidDocument.VerificationMethod, msgDidDocument.VerificationMethod)
-
 	signMap := makeSignatureMap(msgSignatures)
 
-	requiredVmMap, err := k.formMustControllerVmListMap(ctx, mandatoryControllers, updatedVms, signMap)
-	if err != nil {
-		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, err.Error())
+	// Check if there is any change in controllers
+	var optionalVmMap map[string][]*types.ExtendedVerificationMethod = map[string][]*types.ExtendedVerificationMethod{}
+	var requiredVmMap map[string][]*types.ExtendedVerificationMethod = map[string][]*types.ExtendedVerificationMethod{}
+	var vmMapErr error
+
+	existingDidDocumentControllers := existingDidDocument.Controller
+	incomingDidDocumentControllers := msgDidDocument.Controller
+
+	if len(existingDidDocumentControllers) == 0 {
+		existingDidDocumentControllers = append(existingDidDocumentControllers, existingDidDocument.Id)
+	}
+	if len(incomingDidDocumentControllers) == 0 {
+		incomingDidDocumentControllers = append(incomingDidDocumentControllers, msgDidDocument.Id)
 	}
 
-	optionalVmMap, err := k.formAnyControllerVmListMap(ctx,
-		anyControllers, existingDidDocument.VerificationMethod, signMap)
-	if err != nil {
-		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, err.Error())
+	// check if both controller arrays are equal
+	if reflect.DeepEqual(existingDidDocumentControllers, incomingDidDocumentControllers) {
+		commonController := existingDidDocumentControllers
+		if err := k.checkControllerPresenceInState(ctx, commonController, msgDidDocument.Id); err != nil {
+			return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, err.Error())
+		}
+
+		// Check if verification Methods are similar
+		if reflect.DeepEqual(existingDidDocument.VerificationMethod, msgDidDocument.VerificationMethod) {
+			optionalVmMap, vmMapErr = k.formAnyControllerVmListMap(ctx, commonController, existingDidDocument.VerificationMethod, signMap)
+			if vmMapErr != nil {
+				return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, vmMapErr.Error())
+			}
+		} else {
+			// if Vms are not similar
+			// Get the distinct VMs (new)
+			updatedVms := getVerificationMethodsForUpdateDID(existingDidDocument.VerificationMethod, msgDidDocument.VerificationMethod)
+
+			for _, vm := range updatedVms {
+				vmExtended := types.CreateExtendedVerificationMethod(vm, signMap[vm.Id])
+				requiredVmMap[vm.Controller] = append(requiredVmMap[vm.Controller], vmExtended)
+				delete(signMap, vm.Id)
+			}
+
+			optionalVmMap, vmMapErr = k.formAnyControllerVmListMap(ctx, commonController, existingDidDocument.VerificationMethod, signMap)
+			if err != vmMapErr {
+				return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, vmMapErr.Error())
+			}
+		}
+	} else {
+		// Look for any change in Controller array
+		mandatoryControllers, anyControllers := getControllersForUpdateDID(existingDidDocument, msgDidDocument)
+		if err := k.checkControllerPresenceInState(ctx, mandatoryControllers, msgDidDocument.Id); err != nil {
+			return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, err.Error())
+		}
+		if err := k.checkControllerPresenceInState(ctx, anyControllers, msgDidDocument.Id); err != nil {
+			return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, err.Error())
+		}
+
+		// Gather Verification Methods
+		updatedVms := getVerificationMethodsForUpdateDID(existingDidDocument.VerificationMethod, msgDidDocument.VerificationMethod)
+
+		requiredVmMap, vmMapErr = k.formMustControllerVmListMap(ctx, mandatoryControllers, updatedVms, signMap)
+		if vmMapErr != nil {
+			return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, vmMapErr.Error())
+		}
+
+		optionalVmMap, vmMapErr = k.formAnyControllerVmListMap(ctx, anyControllers, existingDidDocument.VerificationMethod, signMap)
+		if err != vmMapErr {
+			return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, vmMapErr.Error())
+		}
 	}
 
 	// Signature Verification

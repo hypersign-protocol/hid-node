@@ -143,6 +143,52 @@ def create_did_test():
 
     print("--- Test Completed ---\n")
 
+
+def run_something():
+    print("11. PASS: Jenny creates herself a DID with empty Controller list. She then attempts to update the DIDDoc by changing the context field and passes her signature only.\n")
+    kp_jenny = generate_key_pair()
+    kp_alice = generate_key_pair()
+
+    signers = []
+    did_doc_string = generate_did_document(kp_jenny)
+    did_doc_string["controller"] = []
+    did_doc_jenny = did_doc_string["id"]
+    did_doc_jenny_vm = did_doc_string["verificationMethod"][0]
+    signPair_jenny = {
+        "kp": kp_jenny,
+        "verificationMethodId": did_doc_jenny_vm["id"],
+        "signing_algo": "ed25519"
+    }
+    signers.append(signPair_jenny)
+    create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
+    run_blockchain_command(create_tx_cmd, f"Registering of Jenny's DID with Id: {did_doc_jenny}")
+
+    signers = []
+    did_doc_string_alice = generate_did_document(kp_alice)
+    new_vm = did_doc_string_alice["verificationMethod"][0]
+    new_vm_id = did_doc_string["verificationMethod"][0]["id"] + "news"
+    new_vm["id"] = new_vm_id
+    new_vm["controller"] = did_doc_string["id"]   
+
+    did_doc_string["verificationMethod"] = [
+        did_doc_string["verificationMethod"][0],
+        new_vm,
+    ]
+    signPair_jenny_1 = {
+        "kp": kp_jenny,
+        "verificationMethodId": did_doc_jenny_vm["id"],
+        "signing_algo": "ed25519"
+    }
+    signPair_jenny_2 = {
+        "kp": kp_alice,
+        "verificationMethodId": new_vm_id,
+        "signing_algo": "ed25519"
+    }
+    signers.append(signPair_jenny_1)
+    signers.append(signPair_jenny_2)
+    update_tx_cmd = form_did_update_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
+    run_blockchain_command(update_tx_cmd, f"Jenny (controller) attempts to update Tx")
+
 # TC - II : Update DID scenarios
 def update_did_test():
     print("\n--- Update DID Test ---\n") 
@@ -350,6 +396,50 @@ def update_did_test():
     signers = []
     did_doc_string["context"] = ["yo"]
     signers.append(signPair_jenny)
+    update_tx_cmd = form_did_update_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
+    run_blockchain_command(update_tx_cmd, f"Jenny (controller) attempts to update Tx")
+
+    print("12. PASS: Jenny creates herself a DID with empty Controller list. She then attempts to update the DIDDoc by adding a new Verification method. She passes signatures for both new and old VMs\n")
+    kp_jenny = generate_key_pair()
+    kp_jenny_2 = generate_key_pair()
+
+    signers = []
+    did_doc_string = generate_did_document(kp_jenny)
+    did_doc_string["controller"] = []
+    did_doc_jenny = did_doc_string["id"]
+    did_doc_jenny_vm = did_doc_string["verificationMethod"][0]
+    signPair_jenny = {
+        "kp": kp_jenny,
+        "verificationMethodId": did_doc_jenny_vm["id"],
+        "signing_algo": "ed25519"
+    }
+    signers.append(signPair_jenny)
+    create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
+    run_blockchain_command(create_tx_cmd, f"Registering of Jenny's DID with Id: {did_doc_jenny}")
+
+    signers = []
+    did_doc_string_alice = generate_did_document(kp_jenny_2)
+    new_vm = did_doc_string_alice["verificationMethod"][0]
+    new_vm_id = did_doc_string["verificationMethod"][0]["id"] + "news"
+    new_vm["id"] = new_vm_id
+    new_vm["controller"] = did_doc_string["id"]
+
+    did_doc_string["verificationMethod"] = [
+        did_doc_string["verificationMethod"][0],
+        new_vm,
+    ]
+    signPair_jenny_1 = {
+        "kp": kp_jenny,
+        "verificationMethodId": did_doc_jenny_vm["id"],
+        "signing_algo": "ed25519"
+    }
+    signPair_jenny_2 = {
+        "kp": kp_jenny_2,
+        "verificationMethodId": new_vm_id,
+        "signing_algo": "ed25519"
+    }
+    signers.append(signPair_jenny_1)
+    signers.append(signPair_jenny_2)
     update_tx_cmd = form_did_update_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
     run_blockchain_command(update_tx_cmd, f"Jenny (controller) attempts to update Tx")
 

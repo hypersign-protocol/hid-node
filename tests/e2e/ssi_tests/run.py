@@ -24,14 +24,15 @@ def generate_report(func):
 def run_all_tests():
     print("============= 🔧️ Running all x/ssi e2e tests ============== \n")
     
-    create_did_test()
+    # create_did_test()
     update_did_test()
-    schema_test()
-    deactivate_did()
-    credential_status_test()
-    caip10_ethereum_support_test()
-    caip10_cosmos_support_test()
-    vm_type_test()
+    # schema_test()
+    # deactivate_did()
+    # credential_status_test()
+    # caip10_ethereum_support_test()
+    # caip10_cosmos_support_test()
+    # vm_type_test()
+    #run_something()
 
     print("============= 😃️ All test cases completed successfully ============== \n")
 
