@@ -331,6 +331,11 @@ func New(
 		return fromVM, nil
 	})
 
+	app.UpgradeKeeper.SetUpgradeHandler("v017", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+		ctx.Logger().Info("v0.1.7 upgrade")
+		return fromVM, nil
+	})
+
 	// register the staking hooks
 	// NOTE: stakingKeeper above is passed by reference, so that it will contain these hooks
 	app.StakingKeeper = *stakingKeeper.SetHooks(
