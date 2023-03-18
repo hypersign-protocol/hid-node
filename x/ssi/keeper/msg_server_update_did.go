@@ -60,13 +60,14 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 	signMap := makeSignatureMap(msgSignatures)
 
 	// Check if there is any change in controllers
-	var optionalVmMap map[string][]*types.ExtendedVerificationMethod = map[string][]*types.ExtendedVerificationMethod{}
-	var requiredVmMap map[string][]*types.ExtendedVerificationMethod = map[string][]*types.ExtendedVerificationMethod{}
+	var optionalVmMap map[string][]*types.ExtendedVerificationMethod
+	var requiredVmMap map[string][]*types.ExtendedVerificationMethod
 	var vmMapErr error
 
 	existingDidDocumentControllers := existingDidDocument.Controller
 	incomingDidDocumentControllers := msgDidDocument.Controller
 
+	// Assume DID Subject as controller if the controller array is empty
 	if len(existingDidDocumentControllers) == 0 {
 		existingDidDocumentControllers = append(existingDidDocumentControllers, existingDidDocument.Id)
 	}
@@ -93,7 +94,17 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 			updatedVms := getVerificationMethodsForUpdateDID(existingDidDocument.VerificationMethod, msgDidDocument.VerificationMethod)
 
 			for _, vm := range updatedVms {
+				if _, signInfoProvided := signMap[vm.Id]; !signInfoProvided {
+					return nil, sdkerrors.Wrapf(
+						types.ErrInvalidSignature,
+						"signature must be provided for verification method id %v",
+						vm.Id,
+					)
+				}
 				vmExtended := types.CreateExtendedVerificationMethod(vm, signMap[vm.Id])
+				if requiredVmMap == nil {
+					requiredVmMap = map[string][]*types.ExtendedVerificationMethod{}
+				}
 				requiredVmMap[vm.Controller] = append(requiredVmMap[vm.Controller], vmExtended)
 				delete(signMap, vm.Id)
 			}
