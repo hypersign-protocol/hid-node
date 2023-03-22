@@ -53,6 +53,41 @@ var SupportedClientSpecs []string = []string{
 	PersonalSignClientSpec,
 }
 
+// Supported CAIP-10 Prefixes
+var SupportedCAIP10Prefixes = []string{
+	EthereumCAIP10Prefix,
+	CosmosCAIP10Prefix,
+}
+
+var SupportedCAIP10EthereumChainIds = []string{
+	// Ethereum-Based Mainnet Chains
+	"1",   // Ethereum Mainnet
+	"137", // Polygon Mainnet
+	"56",  // Binance Smart Chain
+
+	// Ethereum-Based Testnet Chains
+	"3",     // Ropsten (Ethereum Testnet)
+	"4",     // Rinkeby (Ethereum Testnet)
+	"5",     // Goerli (Ethereum Testnet)
+	"80001", // Polygon Mumbai Testnet
+	"97",    // Binance Smart Chain Testnet
+}
+
+var SupportedCAIP10CosmosChainIds = []string{
+	"cosmoshub-4",                // Cosmos Hub
+	"osmosis-1",                  // Osmosis
+	"akashnet-2",                 // Akash
+	"stargaze-1",                 // Stargaze
+	"core-1",                     // Persistence
+	"crypto-org-chain-mainnet-1", // Crypto.Org Chain
+
+	"theta-testnet-001", // Cosmos Hub Theta Testnet
+	"osmo-test-4",       // Osmosis Testnet
+	"elgafar-1",         // Stargaze Testnet
+	"test-core-1",       // Persistence Testnet
+	"jagrat",            // Hypersign Identity Network - Jagrat Testnet
+}
+
 // Map between supported cosmos chain-id and their respective blockhchain address prefix
 var CosmosCAIP10ChainIdBech32PrefixMap = map[string]string{
 	// Mainnet Chains
@@ -69,4 +104,10 @@ var CosmosCAIP10ChainIdBech32PrefixMap = map[string]string{
 	"elgafar-1":         "stars",
 	"test-core-1":       "persistence",
 	"jagrat":            "hid",
+}
+
+// Map between support CAIP-10 prefix and list of chain-ids
+var SupportedCAIP10PrefixChainIdsMap = map[string][]string{
+	EthereumCAIP10Prefix: SupportedCAIP10EthereumChainIds,
+	CosmosCAIP10Prefix:   SupportedCAIP10CosmosChainIds,
 }

@@ -10,10 +10,15 @@ import (
 )
 
 // publicKeyToCosmosBech32Address converts publicKey byteArray to Bech32 encoded blockchain address
-func publicKeyToCosmosBech32Address(addressPrefix string, pubKeyBytes []byte) string {
+func publicKeyToCosmosBech32Address(addressPrefix string, pubKeyBytes []byte) (string, error) {
 	// Throw error if the length of secp256k1 publicKey is not 33
 	if len(pubKeyBytes) != 33 {
-		panic(fmt.Sprintf("invalid secp256k1 public key length %v", len(pubKeyBytes)))
+		return "", fmt.Errorf("invalid secp256k1 public key length %v", len(pubKeyBytes))
+	}
+
+	// Throw an error if addressPrefix is empty
+	if addressPrefix == "" {
+		return "", fmt.Errorf("address prefix cannot be empty")
 	}
 
 	// Hash pubKeyBytes as: RIPEMD160(SHA256(public_key_bytes))
@@ -27,5 +32,5 @@ func publicKeyToCosmosBech32Address(addressPrefix string, pubKeyBytes []byte) st
 	if err != nil {
 		panic(err)
 	}
-	return address
+	return address, nil
 }

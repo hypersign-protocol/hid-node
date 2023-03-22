@@ -175,22 +175,22 @@ func verifyCosmosBlockchainAccountId(blockchainAccountId, publicKeyMultibase str
 	}
 
 	// Convert publicKeyMultibase to bech32 encoded blockchain address
-	chainId := getChainIdFromBlockchainAccountId(blockchainAccountId)
-	addressPrefix, isChainSupported := types.CosmosCAIP10ChainIdBech32PrefixMap[chainId]
-	if !isChainSupported {
-		return fmt.Errorf(
-			"cosmos chain with chain-id '%v' in blockchainAccountId '%v' is not supported",
-			chainId,
-			blockchainAccountId,
-		)
+	chainId, err := getChainIdFromBlockchainAccountId(blockchainAccountId)
+	if err != nil {
+		return err
 	}
-	convertedAddress := publicKeyToCosmosBech32Address(
-		addressPrefix,
-		publicKeyBytes,
-	)
+	validAddressPrefix := types.CosmosCAIP10ChainIdBech32PrefixMap[chainId]	
+	convertedAddress, err := publicKeyToCosmosBech32Address(validAddressPrefix, publicKeyBytes)
+	if err != nil {
+		return err
+	}
 
-	// Compare converted blockchain address
-	if convertedAddress != getBlockchainAddress(blockchainAccountId) {
+	// Compare converted blockchain address with user provided blockchain address
+	inputAddress, err := getBlockchainAddress(blockchainAccountId)
+	if err != nil {
+		return err
+	}
+	if convertedAddress != inputAddress {
 		return fmt.Errorf(
 			"blockchain address provided in blockchainAccountId '%v' is unexpected",
 			blockchainAccountId,
@@ -205,7 +205,10 @@ func verifyCosmosBlockchainAccountId(blockchainAccountId, publicKeyMultibase str
 // blockchain address, and matched with user provided blockchain address. If they do not match, error is returned.
 func verifyEthereumBlockchainAccountId(extendedVm *types.ExtendedVerificationMethod, documentBytes []byte) error {
 	// Extract blockchain address from blockchain account id
-	blockchainAddress := getBlockchainAddress(extendedVm.BlockchainAccountId)
+	blockchainAddress, err := getBlockchainAddress(extendedVm.BlockchainAccountId)
+	if err != nil {
+		return err
+	}
 
 	// Convert message bytes to hash
 	// More info on the `personal_sign` here: https://docs.metamask.io/guide/signing-data.html#personal-sign
