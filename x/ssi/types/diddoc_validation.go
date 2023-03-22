@@ -143,8 +143,8 @@ func verificationKeyCheck(vm *VerificationMethod) error {
 	return nil
 }
 
-// checkDuplicateId return a duplicate Id from the list, if found
-func checkDuplicateId(list []string) string {
+// checkDuplicateItems return a duplicate Id from the list, if found
+func checkDuplicateItems(list []string) string {
 	presentMap := map[string]bool{}
 	for idx := range list {
 		if _, present := presentMap[list[idx]]; !present {
@@ -183,7 +183,7 @@ func validateServices(services []*Service) error {
 	for _, service := range services {
 		serviceIdList = append(serviceIdList, service.Id)
 	}
-	if duplicateId := checkDuplicateId(serviceIdList); duplicateId != "" {
+	if duplicateId := checkDuplicateItems(serviceIdList); duplicateId != "" {
 		return fmt.Errorf("duplicate service found with Id: %s ", duplicateId)
 	}
 
@@ -224,19 +224,42 @@ func validateVerificationMethods(vms []*VerificationMethod) error {
 	vmIdList := []string{}
 	publicKeyMultibaseList := []string{}
 	blockchainAccountIdList := []string{}
+	
+	var pubKeyMultibaseBlockchainAccIdMap map[string]bool = map[string]bool{}
 
 	for _, vm := range vms {
 		vmIdList = append(vmIdList, vm.Id)
-		publicKeyMultibaseList = append(publicKeyMultibaseList, vm.PublicKeyMultibase)
+		
+		if vm.Type == EcdsaSecp256k1VerificationKey2019 {
+			if _, present := pubKeyMultibaseBlockchainAccIdMap[vm.PublicKeyMultibase]; present {
+				// TODO: Following is a temporary measure, where we will be allowing duplicate publicKeyMultibase values
+				// for type EcdsaSecp256k1VerificationKey2019, provided if blockchainAccountId field is populated. This is done since
+				// one secp256k1 key pair from Keplr wallet can have multiple blockchain addresses depending upon the bech32
+				// prefix. This will eventually be removed once the successful recovery of public key from the `signEthereum()`
+				// generated signature is figured out.
+				if vm.BlockchainAccountId == "" {
+					return fmt.Errorf(
+						"duplicate publicKeyMultibase of type EcdsaSecp256k1VerificationKey2019 without blockchainAccountId is not allowed: %s ", 
+						vm.PublicKeyMultibase,
+					)
+				}
+			} else {
+				pubKeyMultibaseBlockchainAccIdMap[vm.PublicKeyMultibase] = true
+			}
+		} else {
+			publicKeyMultibaseList = append(publicKeyMultibaseList, vm.PublicKeyMultibase)
+		}
+		
 		blockchainAccountIdList = append(blockchainAccountIdList, vm.BlockchainAccountId)
 	}
-	if duplicateId := checkDuplicateId(vmIdList); duplicateId != "" {
+
+	if duplicateId := checkDuplicateItems(vmIdList); duplicateId != "" {
 		return fmt.Errorf("duplicate verification method Id found: %s ", duplicateId)
 	}
-	if duplicateKey := checkDuplicateId(publicKeyMultibaseList); duplicateKey != "" {
+	if duplicateKey := checkDuplicateItems(publicKeyMultibaseList); duplicateKey != "" {
 		return fmt.Errorf("duplicate publicKeyMultibase found: %s ", duplicateKey)
 	}
-	if duplicateKey := checkDuplicateId(blockchainAccountIdList); duplicateKey != "" {
+	if duplicateKey := checkDuplicateItems(blockchainAccountIdList); duplicateKey != "" {
 		return fmt.Errorf("duplicate blockchainAccountId found: %s ", duplicateKey)
 	}
 
