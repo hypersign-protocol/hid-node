@@ -132,6 +132,14 @@ func verificationKeyCheck(vm *VerificationMethod) error {
 		return fmt.Errorf("unsupported verification method type: %v", supportedVerificationMethodTypes)
 	}
 
+	// validate blockchainAccountId
+	if vm.BlockchainAccountId != "" {
+		err := validateBlockchainAccountId(vm.BlockchainAccountId)
+		if err != nil {
+			return fmt.Errorf("invalid blockchainAccount Id %v: "+err.Error(), vm.BlockchainAccountId)
+		}
+	}
+
 	return nil
 }
 
@@ -264,6 +272,38 @@ func validateVmRelationships(didDoc *Did) error {
 					element,
 				)
 			}
+		}
+	}
+
+	return nil
+}
+
+func validateBlockchainAccountId(blockchainAccountId string) error {
+	blockchainId, err := NewBlockchainId(blockchainAccountId)
+	if err != nil {
+		return err
+	}
+
+	var validationErr error
+
+	// Check for supported CAIP-10 prefix
+	validationErr = blockchainId.ValidateSupportedCAIP10Prefix()
+	if validationErr != nil {
+		return validationErr
+	}
+
+	// Check for supported CAIP-10 chain-ids
+	validationErr = blockchainId.ValidateSupportChainId()
+	if validationErr != nil {
+		return validationErr
+	}
+
+	// Check for supported CAIP-10 bech32 prefix. Perform this validation
+	// only when the CAIP-10 prefix is "cosmos"
+	if blockchainId.CAIP10Prefix == CosmosCAIP10Prefix {
+		validationErr = blockchainId.ValidateSupportedBech32Prefix()
+		if validationErr != nil {
+			return validationErr
 		}
 	}
 

@@ -657,6 +657,8 @@ def caip10_ethereum_support_test():
         "eip155:1",
         "eip155:::::23",
         "eip155::0x1234567"
+        "eip155:1000231432:0x23",
+        "eip155:jagrat:0x23"
     ]
 
     for invalid_blockchain_id in invalid_blockchain_account_ids:
@@ -673,7 +675,7 @@ def caip10_ethereum_support_test():
         }
         signers.append(signPair)
         create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
-        run_blockchain_command(create_tx_cmd, f"Registering a DID Document with an invalid blockchainAccountId: {invalid_blockchain_id}", True)
+        run_blockchain_command(create_tx_cmd, f"Registering a DID Document with an invalid blockchainAccountId: {invalid_blockchain_id}", True, True)
     
     print("Registering a DID with a VM of type EcdsaSecp256k1SignatureRecovery2020 having publicKeyMultibase attribute populated")
     kp = generate_key_pair(algo=kp_algo)
@@ -745,7 +747,7 @@ def caip10_cosmos_support_test():
         signers.append(signPair)
 
         create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
-        run_blockchain_command(create_tx_cmd, f"Registering a DID Document with an invalid blockchainAccountId: {invalid_blockchain_id}", True)
+        run_blockchain_command(create_tx_cmd, f"Registering a DID Document with an invalid blockchainAccountId: {invalid_blockchain_id}", True, True)
     
     print("Registering a DID with a VM of type EcdsaSecp256k1VerificationKey2019 having both publicKeyMultibase and blockchainAccountId attributes populated")
     kp = generate_key_pair(algo=kp_algo)
@@ -777,7 +779,7 @@ def caip10_cosmos_support_test():
     signers.append(signPair)
     
     create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
-    run_blockchain_command(create_tx_cmd, f"Registering DID with Id: {did_doc_id}", True)
+    run_blockchain_command(create_tx_cmd, f"Registering DID with Id: {did_doc_id}", True, True)
 
     print("--- Test Completed ---\n")
 

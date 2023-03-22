@@ -1,6 +1,9 @@
 package types
 
 import (
+	fmt "fmt"
+	"strings"
+
 	proto "github.com/gogo/protobuf/proto"
 )
 
@@ -92,4 +95,69 @@ type SSIProofInterface interface {
 	GetProofValue() string
 	GetType() string
 	GetVerificationMethod() string
+}
+
+// CAIP-10 Blockchain Account Id
+type BlockchainId struct {
+	CAIP10Prefix      string
+	ChainId           string
+	BlockchainAddress string
+}
+
+func NewBlockchainId(blockchainAccountId string) (*BlockchainId, error) {
+	segments := strings.Split(blockchainAccountId, ":")
+
+	// Validate blockchainAccountId segments
+	if len(segments) != 3 {
+		return nil, fmt.Errorf(
+			"invalid CAIP-10 format for blockchainAccountId '%v'. Please refer: https://github.com/ChainAgnostic/CAIPs/blob/master/CAIPs/caip-10.md",
+			blockchainAccountId,
+		)
+	}
+
+	return &BlockchainId{
+		CAIP10Prefix:      segments[0],
+		ChainId:           segments[1],
+		BlockchainAddress: segments[2],
+	}, nil
+}
+
+func (bid *BlockchainId) ValidateSupportedCAIP10Prefix() error {
+	if !FindInSlice(SupportedCAIP10Prefixes, bid.CAIP10Prefix) {
+		return fmt.Errorf(
+			"unsupported CAIP-10 prefix: '%v', supported CAIP-10 prefixes are %v",
+			bid.CAIP10Prefix,
+			SupportedCAIP10Prefixes,
+		)
+	}
+	return nil
+}
+
+func (bid *BlockchainId) ValidateSupportChainId() error {
+	supportedChainIds := SupportedCAIP10PrefixChainIdsMap[bid.CAIP10Prefix]
+
+	if !FindInSlice(supportedChainIds, bid.ChainId) {
+		return fmt.Errorf(
+			"unsupported CAIP-10 chain-id: '%v', supported CAIP-10 chain-ids are %v",
+			bid.ChainId,
+			supportedChainIds,
+		)
+	}
+
+	return nil
+}
+
+func (bid *BlockchainId) ValidateSupportedBech32Prefix() error {
+	extractedBech32Prefix := strings.Split(bid.BlockchainAddress, "1")[0]
+
+	supportedBech32Prefix, supported := CosmosCAIP10ChainIdBech32PrefixMap[bid.ChainId]
+	if !supported {
+		return fmt.Errorf("chain-id %v is not supported", bid.ChainId)
+	}
+
+	if supportedBech32Prefix != extractedBech32Prefix {
+		return fmt.Errorf("invalid bech32 prefix for blockchain address: %v", bid.BlockchainAddress)
+	}
+
+	return nil
 }
