@@ -141,6 +141,31 @@ def create_did_test():
     create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
     run_blockchain_command(create_tx_cmd, f"Registering DID by passing both Alice's and Eve's Signature")
 
+    print("8. FAIL: Alice tries to register a DID Document with duplicate publicKeyMultibase of type Ed25519VerificationKey2020 \n")
+    kp_alice = generate_key_pair()
+    signers = []
+    did_doc_string = generate_did_document(kp_alice)
+    did_doc_string_2 = generate_did_document(kp_alice)
+    
+    did_doc_string_vm_1 = did_doc_string["verificationMethod"][0]
+    did_doc_string_vm_2 = did_doc_string_2["verificationMethod"][0] 
+    did_doc_string_vm_2["id"] = did_doc_string_vm_2["id"] + "new"
+    
+    did_doc_string["verificationMethod"] = [
+        did_doc_string_vm_1,
+        did_doc_string_vm_2
+    ]
+
+    did_doc_alice = did_doc_string["id"]
+    signPair_alice = {
+        "kp": kp_alice,
+        "verificationMethodId": did_doc_string["verificationMethod"][0]["id"],
+        "signing_algo": "ed25519"
+    }
+    signers.append(signPair_alice)
+    create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
+    run_blockchain_command(create_tx_cmd, f"Registering Alice's DID with Id: {did_doc_alice}", True, True)
+
     print("--- Test Completed ---\n")
 
 # TC - II : Update DID scenarios
@@ -728,7 +753,7 @@ def caip10_cosmos_support_test():
         "cosmos:::::23",
         "cosmos::0x1234567"
     ]
-
+    print("1. FAIL: Registering a DID Document with an invalid blockchainAccountIds.\n")
     for invalid_blockchain_id in invalid_blockchain_account_ids:
         print("Registering a DID Document with an invalid blockchainAccountId:", invalid_blockchain_id)
         kp = generate_key_pair(algo=kp_algo)
@@ -747,7 +772,7 @@ def caip10_cosmos_support_test():
         create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
         run_blockchain_command(create_tx_cmd, f"Registering a DID Document with an invalid blockchainAccountId: {invalid_blockchain_id}", True)
     
-    print("Registering a DID with a VM of type EcdsaSecp256k1VerificationKey2019 having both publicKeyMultibase and blockchainAccountId attributes populated")
+    print("2. PASS: Registering a DID with a VM of type EcdsaSecp256k1VerificationKey2019 having both publicKeyMultibase and blockchainAccountId attributes populated")
     kp = generate_key_pair(algo=kp_algo)
     did_doc_string = generate_did_document(kp, kp_algo)
     did_doc_id = did_doc_string["id"]
@@ -761,7 +786,7 @@ def caip10_cosmos_support_test():
     create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
     run_blockchain_command(create_tx_cmd, f"Registering the DID with DID Id {did_doc_id}")
 
-    print("Registering a DID with invalid chain-id in blockchainAccountId")
+    print("3. FAIL: Registering a DID with invalid chain-id in blockchainAccountId")
     kp = generate_key_pair(algo=kp_algo)
     did_doc_string = generate_did_document(kp, kp_algo)
     did_doc_id = did_doc_string["id"]
@@ -775,9 +800,146 @@ def caip10_cosmos_support_test():
         "signing_algo": kp_algo
     }
     signers.append(signPair)
-    
     create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
     run_blockchain_command(create_tx_cmd, f"Registering DID with Id: {did_doc_id}", True)
+
+    print("4. PASS: Registering a DID with two VM of type EcdsaSecp256k1VerificationKey2019 with duplicate publicKeyMultibase and different blockchain account Id")
+    kp = generate_key_pair(algo=kp_algo)
+
+    did_doc_string_1 = generate_did_document(kp, kp_algo)
+    did_doc_string_2 = generate_did_document(kp, kp_algo, "osmo")
+    did_doc_string_2_vm = did_doc_string_2["verificationMethod"][0]
+    did_doc_string_2_vm["id"] = did_doc_string_2_vm["id"] + "new"
+
+    did_doc_string_1["verificationMethod"] = [
+        did_doc_string_1["verificationMethod"][0],
+        did_doc_string_2_vm,
+    ]
+    did_doc_id = did_doc_string_1["id"]
+    
+    signers = []
+    signPair1 = {
+        "kp": kp,
+        "verificationMethodId": did_doc_string_1["verificationMethod"][0]["id"],
+        "signing_algo": kp_algo
+    }
+    signPair2 = {
+        "kp": kp,
+        "verificationMethodId": did_doc_string_2["verificationMethod"][0]["id"],
+        "signing_algo": kp_algo
+    }
+    signers.append(signPair1)
+    signers.append(signPair2)
+    create_tx_cmd = form_did_create_tx_multisig(did_doc_string_1, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
+    run_blockchain_command(create_tx_cmd, f"Registering the DID with DID Id {did_doc_id}")
+
+    print("5. PASS: Registering a DID with two VM of type EcdsaSecp256k1VerificationKey2019 with duplicate publicKeyMultibase but one of them is without a blockchain account id")
+    kp = generate_key_pair(algo=kp_algo)
+
+    did_doc_string_1 = generate_did_document(kp, kp_algo)
+    did_doc_string_2 = generate_did_document(kp, kp_algo)
+    did_doc_string_2_vm = did_doc_string_2["verificationMethod"][0]
+    did_doc_string_2_vm["id"] = did_doc_string_2_vm["id"] + "new"
+
+    #Remove blockchainAccountIds
+    did_doc_string_1["verificationMethod"][0]["blockchainAccountId"] = ""
+
+    did_doc_string_1["verificationMethod"] = [
+        did_doc_string_1["verificationMethod"][0],
+        did_doc_string_2_vm,
+    ]
+    did_doc_id = did_doc_string_1["id"]
+    
+    signers = []
+    signPair1 = {
+        "kp": kp,
+        "verificationMethodId": did_doc_string_1["verificationMethod"][0]["id"],
+        "signing_algo": kp_algo
+    }
+    signPair2 = {
+        "kp": kp,
+        "verificationMethodId": did_doc_string_2["verificationMethod"][0]["id"],
+        "signing_algo": kp_algo
+    }
+    signers.append(signPair1)
+    signers.append(signPair2)
+    create_tx_cmd = form_did_create_tx_multisig(did_doc_string_1, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
+    run_blockchain_command(create_tx_cmd, f"Registering the DID with DID Id {did_doc_id}")
+
+    print("6. FAIL: Registering a DID with two VM of type EcdsaSecp256k1VerificationKey2019 with duplicate publicKeyMultibase and duplicate blockchainAccountId")
+    kp = generate_key_pair(algo=kp_algo)
+
+    did_doc_string_1 = generate_did_document(kp, kp_algo)
+    did_doc_string_2 = generate_did_document(kp, kp_algo)
+
+    did_doc_vm1 = did_doc_string_1["verificationMethod"][0]
+    did_doc_vm2 = did_doc_string_2["verificationMethod"][0]
+
+    # Change vm id
+    did_doc_vm1["id"] = did_doc_vm1["id"] + "news"
+    did_doc_vm2["id"] = did_doc_vm1["id"] + "2" 
+
+    
+    did_doc_string_1["verificationMethod"] = [
+        did_doc_vm1,
+        did_doc_vm2
+    ]
+    did_doc_id = did_doc_string_1["id"]
+    
+    signers = []
+    signPair1 = {
+        "kp": kp,
+        "verificationMethodId": did_doc_string_1["verificationMethod"][0]["id"],
+        "signing_algo": kp_algo
+    }
+    signPair2 = {
+        "kp": kp,
+        "verificationMethodId": did_doc_string_1["verificationMethod"][1]["id"],
+        "signing_algo": kp_algo
+    }
+    signers.append(signPair1)
+    signers.append(signPair2)
+    create_tx_cmd = form_did_create_tx_multisig(did_doc_string_1, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
+    run_blockchain_command(create_tx_cmd, f"Registering the DID with DID Id {did_doc_id}", True, True)
+
+    print("7. FAIL: Registering a DID with two VM of type EcdsaSecp256k1VerificationKey2019 with duplicate publicKeyMultibase and no blockchainAccountId in either of them")
+    kp = generate_key_pair(algo=kp_algo)
+
+    did_doc_string_1 = generate_did_document(kp, kp_algo)
+    did_doc_string_2 = generate_did_document(kp, kp_algo)
+
+    did_doc_vm1 = did_doc_string_1["verificationMethod"][0]
+    did_doc_vm2 = did_doc_string_2["verificationMethod"][0]
+
+    # Change vm id
+    did_doc_vm1["id"] = did_doc_vm1["id"] + "news"
+    did_doc_vm2["id"] = did_doc_vm1["id"] + "2" 
+
+    # Remove blockchainAccountId
+    did_doc_vm1["blockchainAccountId"] = ""
+    did_doc_vm2["blockchainAccountId"] = ""
+    
+    did_doc_string_1["verificationMethod"] = [
+        did_doc_vm1,
+        did_doc_vm2
+    ]
+    did_doc_id = did_doc_string_1["id"]
+    
+    signers = []
+    signPair1 = {
+        "kp": kp,
+        "verificationMethodId": did_doc_string_1["verificationMethod"][0]["id"],
+        "signing_algo": kp_algo
+    }
+    signPair2 = {
+        "kp": kp,
+        "verificationMethodId": did_doc_vm2["id"],
+        "signing_algo": kp_algo
+    }
+    signers.append(signPair1)
+    signers.append(signPair2)
+    create_tx_cmd = form_did_create_tx_multisig(did_doc_string_1, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
+    run_blockchain_command(create_tx_cmd, f"Registering the DID with DID Id {did_doc_id}", True, True)
 
     print("--- Test Completed ---\n")
 

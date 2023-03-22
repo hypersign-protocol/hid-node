@@ -6,7 +6,7 @@ import json
 from utils import run_command, generate_document_id, get_document_signature, \
     secp256k1_pubkey_to_address
 
-def generate_did_document(key_pair, algo="ed25519"):
+def generate_did_document(key_pair, algo="ed25519", bech32prefix="hid"):
     base_document = {
         "context" : [
             "https://www.w3.org/ns/did/v1"
@@ -41,8 +41,15 @@ def generate_did_document(key_pair, algo="ed25519"):
         verification_method["blockchainAccountId"] = "eip155:1:" + key_pair["ethereum_address"]
     elif algo == "secp256k1":
 
-        verification_method["blockchainAccountId"] = "cosmos:jagrat:" + \
-            secp256k1_pubkey_to_address(key_pair["pub_key_base_64"], "hid")
+        if bech32prefix == "hid":
+            verification_method["blockchainAccountId"] = "cosmos:jagrat:" + \
+                secp256k1_pubkey_to_address(key_pair["pub_key_base_64"], bech32prefix)
+        elif bech32prefix == "osmo":
+            verification_method["blockchainAccountId"] = "cosmos:osmosis-1:" + \
+                secp256k1_pubkey_to_address(key_pair["pub_key_base_64"], bech32prefix)
+        else:
+            raise Exception("unsupported bech32 prefix " + bech32prefix)
+    
         verification_method["publicKeyMultibase"] = key_pair["pub_key_multibase"]
     else:
         verification_method["publicKeyMultibase"] = key_pair["pub_key_multibase"]
