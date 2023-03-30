@@ -38,7 +38,7 @@ cat $HOME/.hid-node/config/genesis.json | jq '.app_state["gov"]["deposit_params"
 cat $HOME/.hid-node/config/genesis.json | jq '.app_state["gov"]["voting_params"]["voting_period"]="50s"' > $HOME/.hid-node/config/tmp_genesis.json && mv $HOME/.hid-node/config/tmp_genesis.json $HOME/.hid-node/config/genesis.json
 
 # update ssi genesis
-cat $HOME/.hid-node/config/genesis.json | jq '.app_state["ssi"]["chain_namespace"]="testnet"' > $HOME/.hid-node/config/tmp_genesis.json && mv $HOME/.hid-node/config/tmp_genesis.json $HOME/.hid-node/config/genesis.json
+cat $HOME/.hid-node/config/genesis.json | jq '.app_state["ssi"]["chain_namespace"]="devnet"' > $HOME/.hid-node/config/tmp_genesis.json && mv $HOME/.hid-node/config/tmp_genesis.json $HOME/.hid-node/config/genesis.json
 
 # update mint genesis
 cat $HOME/.hid-node/config/genesis.json | jq '.app_state["mint"]["params"]["mint_denom"]="uhid"' > $HOME/.hid-node/config/tmp_genesis.json && mv $HOME/.hid-node/config/tmp_genesis.json $HOME/.hid-node/config/genesis.json
@@ -59,6 +59,12 @@ sed -i -E 's|allow_duplicate_ip = false|allow_duplicate_ip = true|g' $HOME/.hid-
 sed -i -E 's|addr_book_strict = true|addr_book_strict = false|g' $HOME/.hid-node/config/config.toml
 sed -i -E 's|cors_allowed_origins = \[\]|cors_allowed_origins = \[\"\*\"\]|g' $HOME/.hid-node/config/config.toml
 
-echo -e "\nConfiguarations set, you are ready to run hid-noded now!"
+echo -e "\nConfiguration set up is done, you are ready to run hid-noded now!"
+
+echo -e "\nPlease note the important chain configurations below:"
+
+echo -e "\nRPC server address: http://localhost:26657"
+echo -e "API server address: http://localhost:1317"
+echo -e "DID Namespace: devnet"
 
 echo -e "\nEnter the command 'hid-noded start' to start a single node blockchain."
