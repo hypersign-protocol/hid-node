@@ -25,7 +25,8 @@ func (k msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*t
 	}
 
 	// Validate namespace in DID Document
-	if err := didDocNamespaceValidation(k, ctx, msgDidDocument); err != nil {
+	chainNamespace := k.GetChainNamespace(&ctx)
+	if err := types.DidChainNamespaceValidation(msgDidDocument, chainNamespace); err != nil {
 		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, err.Error())
 	}
 

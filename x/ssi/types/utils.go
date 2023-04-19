@@ -61,42 +61,53 @@ func checkDuplicateItems(list []string) string {
 	return ""
 }
 
-func getDidDocumentIdentifier(didId string) (string, error) {
-	didIdElements := strings.Split(didId, ":")
+func getDocumentChainNamespace(docId string) string {
+	docIdElements := strings.Split(docId, ":")
 
-	if len(didIdElements) < 1 {
-		return "", fmt.Errorf("invalid DID Id: %v", didId)
+	// Non Blockchain Account ID MSI
+	if len(docIdElements) == 4 || len(docIdElements) == 6 {
+		return docIdElements[2]
+	} else {
+		return ""
 	}
-
-	return didIdElements[0], nil
 }
 
-func getDidDocumentMethod(didId string) (string, error) {
-	didIdElements := strings.Split(didId, ":")
+func getDocumentIdentifier(docId string) (string, error) {
+	docIdElements := strings.Split(docId, ":")
 
-	if len(didIdElements) < 2 {
-		return "", fmt.Errorf("invalid DID Id: %v", didId)
+	if len(docIdElements) < 1 {
+		return "", fmt.Errorf("invalid document Id: %v", docId)
 	}
 
-	return didIdElements[1], nil
+	return docIdElements[0], nil
 }
 
-// GetMethodSpecificIdAndType extracts the method-specific-id from DID Id and which of following
+func getDocumentMethod(docId string) (string, error) {
+	docIdElements := strings.Split(docId, ":")
+
+	if len(docIdElements) < 2 {
+		return "", fmt.Errorf("invalid document Id: %v", docId)
+	}
+
+	return docIdElements[1], nil
+}
+
+// GetMethodSpecificIdAndType extracts the method-specific-id from Document Id and which of following
 // types it belongs to:
 //
 // 1. CAIP-10 Blockchain Account ID
 //
 // 2. String consisting of Alphanumeric, dot (.) and hyphen (-) characters only
 func GetMethodSpecificIdAndType(didId string) (string, string, error) {
-	didIdElements := strings.Split(didId, ":")
+	docIdElements := strings.Split(didId, ":")
 	var methodSpecificId string
 	var methodSpecificIdCondition string
 
 	if getMSIBlockchainAccountIdCondition(didId) {
-		methodSpecificId = strings.Join(didIdElements[(len(didIdElements)-3):], ":")
+		methodSpecificId = strings.Join(docIdElements[(len(docIdElements)-3):], ":")
 		methodSpecificIdCondition = MSIBlockchainAccountId
 	} else if getMSINonBlockchainAccountIdCondition(didId) {
-		methodSpecificId = didIdElements[len(didIdElements)-1]
+		methodSpecificId = docIdElements[len(docIdElements)-1]
 		methodSpecificIdCondition = MSINonBlockchainAccountId
 	} else {
 		return "", "", fmt.Errorf(

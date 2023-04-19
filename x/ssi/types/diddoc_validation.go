@@ -7,12 +7,12 @@ import (
 
 // isValidDidDoc checks if the DID Id is valid
 func isValidDidDocId(id string) error {
-	inputDocumentIdentifier, err := getDidDocumentIdentifier(id)
+	inputDocumentIdentifier, err := getDocumentIdentifier(id)
 	if err != nil {
 		return err
 	}
 
-	inputDidMethod, err := getDidDocumentMethod(id)
+	inputDidMethod, err := getDocumentMethod(id)
 	if err != nil {
 		return err
 	}
