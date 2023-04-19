@@ -1,5 +1,6 @@
 import subprocess
 import json
+import uuid
 
 def run_command(cmd_string):
     if type(cmd_string) != str:
@@ -58,16 +59,19 @@ def generate_key_pair(algo="ed25519"):
     kp = json.loads(result_str)
     return kp
 
-def generate_document_id(doc_type: str, kp: dict = None, algo: str = "ed25519"):
+def generate_document_id(doc_type: str, kp: dict = None, algo: str = "ed25519", is_uuid: bool =False):
     id = ""
     if not kp:
         kp = generate_key_pair(algo)
     
-    if algo in ["recover-eth"]:
-        method_specific_id = kp["ethereum_address"]
+    if is_uuid:
+        method_specific_id = str(uuid.uuid4())
     else:
-        method_specific_id = kp["pub_key_multibase"]
-    
+        if algo in ["recover-eth"]:
+            method_specific_id = kp["ethereum_address"]
+        else:
+            method_specific_id = kp["pub_key_multibase"]
+        
     if method_specific_id == None:
         raise Exception("Public key is empty")
     

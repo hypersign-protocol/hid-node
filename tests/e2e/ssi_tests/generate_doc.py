@@ -6,7 +6,7 @@ import json
 from utils import run_command, generate_document_id, get_document_signature, \
     secp256k1_pubkey_to_address
 
-def generate_did_document(key_pair, algo="ed25519", bech32prefix="hid"):
+def generate_did_document(key_pair, algo="ed25519", bech32prefix="hid", is_uuid=False):
     base_document = {
         "context" : [
             "https://www.w3.org/ns/did/v1"
@@ -17,7 +17,7 @@ def generate_did_document(key_pair, algo="ed25519", bech32prefix="hid"):
         "authentication": [],
     }
 
-    did_id = generate_document_id("did", key_pair, algo)
+    did_id = generate_document_id("did", key_pair, algo, is_uuid)
 
     # Form the DID Document
     vm_type = ""
@@ -31,12 +31,13 @@ def generate_did_document(key_pair, algo="ed25519", bech32prefix="hid"):
         raise Exception("unknown signing algorithm: " + key_pair)
 
     verification_method = {
-        "id": did_id + "#key-1",
-        "type": vm_type,
-        "controller": did_id,
+        "id": "",
+        "type": "",
+        "controller": "",
         "blockchainAccountId": "",
         "publicKeyMultibase": ""
     }
+
     if algo == "recover-eth":
         verification_method["blockchainAccountId"] = "eip155:1:" + key_pair["ethereum_address"]
     elif algo == "secp256k1":
@@ -44,16 +45,22 @@ def generate_did_document(key_pair, algo="ed25519", bech32prefix="hid"):
         if bech32prefix == "hid":
             verification_method["blockchainAccountId"] = "cosmos:jagrat:" + \
                 secp256k1_pubkey_to_address(key_pair["pub_key_base_64"], bech32prefix)
+            did_id = "did:hid:devnet:" + verification_method["blockchainAccountId"]
         elif bech32prefix == "osmo":
             verification_method["blockchainAccountId"] = "cosmos:osmosis-1:" + \
                 secp256k1_pubkey_to_address(key_pair["pub_key_base_64"], bech32prefix)
+            did_id = "did:hid:devnet:" + verification_method["blockchainAccountId"]
         else:
-            raise Exception("unsupported bech32 prefix " + bech32prefix)
+            verification_method["blockchainAccountId"] = ""
     
         verification_method["publicKeyMultibase"] = key_pair["pub_key_multibase"]
     else:
         verification_method["publicKeyMultibase"] = key_pair["pub_key_multibase"]
     
+    verification_method["controller"] = did_id
+    verification_method["type"] = vm_type
+    verification_method["id"] = did_id + "#k1"
+
     base_document["id"] = did_id
     base_document["controller"] = [did_id]
     base_document["verificationMethod"] = [verification_method]

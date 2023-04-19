@@ -3,51 +3,65 @@ package types
 import (
 	"fmt"
 	"regexp"
-	"strings"
 )
 
 // isValidDidDoc checks if the DID Id is valid
 func isValidDidDocId(id string) error {
-	// check the number of elements in DID Document
-	idElements := strings.Split(id, ":")
-	if !(len(idElements) == 3 || len(idElements) == 4) {
-		return fmt.Errorf(
-			"number of elements in DID Id %s should be either 3 or 4",
-			id,
-		)
+	inputDocumentIdentifier, err := getDidDocumentIdentifier(id)
+	if err != nil {
+		return err
 	}
 
-	// check if the first element is valid document identifier
-	if idElements[0] != DocumentIdentifierDid {
+	inputDidMethod, err := getDidDocumentMethod(id)
+	if err != nil {
+		return err
+	}
+
+	inputMSI, inputMSIType, err := GetMethodSpecificIdAndType(id)
+	if err != nil {
+		return err
+	}
+
+	// Validate Document Identifier
+	if inputDocumentIdentifier != DocumentIdentifierDid {
 		return fmt.Errorf(
 			"document identifier should be %s",
 			DocumentIdentifierDid,
 		)
 	}
 
-	// check if the second element is the correct DID method
-	if idElements[1] != DidMethod {
+	// Validate DID Method
+	if inputDidMethod != DidMethod {
 		return fmt.Errorf(
 			"DID method should be %s",
 			DidMethod,
 		)
 	}
 
-	// check proper method specific id
-	// TODO: need to define a specification for method-specific-id
-	methodSpecificId := idElements[len(idElements)-1]
-	isProperMethodSpecificId, err := regexp.MatchString(
-		"^[a-zA-Z0-9]{32,}$",
-		methodSpecificId,
-	)
-	if err != nil {
-		return fmt.Errorf("error in parsing regular expression for method-specific-id: %s", err.Error())
-	}
-	if !isProperMethodSpecificId {
-		return fmt.Errorf(
-			"method-specific-id should be an alphanumeric string with minimum of 32 characters, received: %s",
-			methodSpecificId,
+	// Validate Method Specific ID
+	switch inputMSIType {
+	case MSIBlockchainAccountId:
+		if err := validateBlockchainAccountId(inputMSI); err != nil {
+			return err
+		}
+	case MSINonBlockchainAccountId:
+		// Non Blockchain Account ID should be a string that supports alphanumeric characters,
+		// and dot (.) and hypen (-). The first character MUST NOT be dot (.) or hyphen (-).
+		isValidMSI, err := regexp.MatchString(
+			"^[a-zA-Z0-9][a-zA-Z0-9.-]*$",
+			inputMSI,
 		)
+		if err != nil {
+			return err
+		}
+		if !isValidMSI {
+			return fmt.Errorf(
+				"method-specific-id of non BlockchainAccountId type %v should only contain alphanumeric, dot (.) and hyphen (-)",
+				inputMSI,
+			)
+		}
+	default:
+		return fmt.Errorf("invalid method specific id type: %v", inputMSIType)
 	}
 
 	return nil
@@ -143,19 +157,6 @@ func verificationKeyCheck(vm *VerificationMethod) error {
 	return nil
 }
 
-// checkDuplicateItems return a duplicate Id from the list, if found
-func checkDuplicateItems(list []string) string {
-	presentMap := map[string]bool{}
-	for idx := range list {
-		if _, present := presentMap[list[idx]]; !present {
-			presentMap[list[idx]] = true
-		} else {
-			return list[idx]
-		}
-	}
-	return ""
-}
-
 // validateServices validates the Service attribute of DID Document
 func validateServices(services []*Service) error {
 	for _, service := range services {
@@ -224,12 +225,12 @@ func validateVerificationMethods(vms []*VerificationMethod) error {
 	vmIdList := []string{}
 	publicKeyMultibaseList := []string{}
 	blockchainAccountIdList := []string{}
-	
+
 	var pubKeyMultibaseBlockchainAccIdMap map[string]bool = map[string]bool{}
 
 	for _, vm := range vms {
 		vmIdList = append(vmIdList, vm.Id)
-		
+
 		if vm.Type == EcdsaSecp256k1VerificationKey2019 {
 			if _, present := pubKeyMultibaseBlockchainAccIdMap[vm.PublicKeyMultibase]; present {
 				// TODO: Following is a temporary measure, where we will be allowing duplicate publicKeyMultibase values
@@ -239,7 +240,7 @@ func validateVerificationMethods(vms []*VerificationMethod) error {
 				// generated signature is figured out.
 				if vm.BlockchainAccountId == "" {
 					return fmt.Errorf(
-						"duplicate publicKeyMultibase of type EcdsaSecp256k1VerificationKey2019 without blockchainAccountId is not allowed: %s ", 
+						"duplicate publicKeyMultibase of type EcdsaSecp256k1VerificationKey2019 without blockchainAccountId is not allowed: %s ",
 						vm.PublicKeyMultibase,
 					)
 				}
@@ -249,7 +250,7 @@ func validateVerificationMethods(vms []*VerificationMethod) error {
 		} else {
 			publicKeyMultibaseList = append(publicKeyMultibaseList, vm.PublicKeyMultibase)
 		}
-		
+
 		blockchainAccountIdList = append(blockchainAccountIdList, vm.BlockchainAccountId)
 	}
 
