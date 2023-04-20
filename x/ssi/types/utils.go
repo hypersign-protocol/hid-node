@@ -103,10 +103,10 @@ func GetMethodSpecificIdAndType(didId string) (string, string, error) {
 	var methodSpecificId string
 	var methodSpecificIdCondition string
 
-	if getMSIBlockchainAccountIdCondition(didId) {
+	if isMSIBlockchainAccountId(didId) {
 		methodSpecificId = strings.Join(docIdElements[(len(docIdElements)-3):], ":")
 		methodSpecificIdCondition = MSIBlockchainAccountId
-	} else if getMSINonBlockchainAccountIdCondition(didId) {
+	} else if isMSINonBlockchainAccountId(didId) {
 		methodSpecificId = docIdElements[len(docIdElements)-1]
 		methodSpecificIdCondition = MSINonBlockchainAccountId
 	} else {
@@ -117,14 +117,14 @@ func GetMethodSpecificIdAndType(didId string) (string, string, error) {
 	return methodSpecificId, methodSpecificIdCondition, nil
 }
 
-// getMSINonBlockchainAccountIdCondition asserts if the Method Specific Id is a CAIP-10 Blockchain Account Id
-func getMSINonBlockchainAccountIdCondition(didId string) bool {
+// isMSINonBlockchainAccountId asserts if the Method Specific Id is a CAIP-10 Blockchain Account Id
+func isMSINonBlockchainAccountId(didId string) bool {
 	didIdElements := strings.Split(didId, ":")
 	return (len(didIdElements) == 3 || len(didIdElements) == 4)
 }
 
-// getMSIMultibaseCondition asserts if the Method Specific Id is a Multibase encoded string
-func getMSIBlockchainAccountIdCondition(didId string) bool {
+// isMSIBlockchainAccountId asserts if the Method Specific Id is a string containing alphanumeric, dot (.) and hyphen (-) characters
+func isMSIBlockchainAccountId(didId string) bool {
 	didIdElements := strings.Split(didId, ":")
 	return (len(didIdElements) == 5 || len(didIdElements) == 6)
 }
