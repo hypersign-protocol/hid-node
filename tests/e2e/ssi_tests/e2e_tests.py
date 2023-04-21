@@ -495,7 +495,7 @@ def deactivate_did():
 
     print("2. PASS: Mike creates a DID for himself, but the controller list is empty. Mike attempts to deactivate it \n")
     
-    # Register Alice's DID
+    # Register Mike's DID
     kp_mike = generate_key_pair()
     signers = []
     did_doc_string = generate_did_document(kp_mike)
@@ -517,6 +517,36 @@ def deactivate_did():
     signers.append(signPair_mike)
     deactivate_tx_cmd = form_did_deactivate_tx_multisig(did_doc_mike, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
     run_blockchain_command(deactivate_tx_cmd, f"Deactivation of Mike's DID with Id: {did_doc_mike}")
+
+    print("3. FAIL: Mike creates a DID for himself, but the controller list is empty. Mike deactivates it and then attempts to updates it. \n")
+
+    kp_mike = generate_key_pair()
+    signers = []
+    did_doc_string = generate_did_document(kp_mike)
+    did_doc_string["controller"] = []
+    did_doc_mike = did_doc_string["id"]
+    did_doc_mike_vm = did_doc_string["verificationMethod"][0]
+    signPair_mike = {
+        "kp": kp_mike,
+        "verificationMethodId": did_doc_mike_vm["id"],
+        "signing_algo": "ed25519"
+    }
+    signers.append(signPair_mike)
+    create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
+    run_blockchain_command(create_tx_cmd, f"Registering of Mike's DID with Id: {did_doc_mike}")
+
+    # Deactivate DID
+    signers = []
+    signers.append(signPair_mike)
+    deactivate_tx_cmd = form_did_deactivate_tx_multisig(did_doc_mike, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
+    run_blockchain_command(deactivate_tx_cmd, f"Deactivation of Mike's DID with Id: {did_doc_mike}")
+
+    # Attempt to update deactivated DID
+    signers = []
+    signers.append(signPair_mike)
+    did_doc_string["context"] = ["hii"]
+    update_tx_cmd = form_did_update_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
+    run_blockchain_command(update_tx_cmd, f"Bob (non-controller) attempts to update Org DID with Id: {did_doc_org}", True)
 
     print("--- Test Completed ---\n") 
 
