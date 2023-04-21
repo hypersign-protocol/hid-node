@@ -2,12 +2,16 @@ package cli
 
 import (
 	"crypto/ed25519"
+	"crypto/sha256"
 	"encoding/base64"
 	"encoding/hex"
 	"fmt"
 
+	"github.com/cosmos/cosmos-sdk/types/bech32"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
+	"github.com/multiformats/go-multibase"
 	secp256k1 "github.com/tendermint/tendermint/crypto/secp256k1"
+	"golang.org/x/crypto/ripemd160" // nolint: staticcheck
 
 	etheraccounts "github.com/ethereum/go-ethereum/accounts"
 	etherhexutil "github.com/ethereum/go-ethereum/common/hexutil"
@@ -134,4 +138,37 @@ func getSignatures(cmd *cobra.Command, message []byte, cmdArgs []string) ([]*typ
 	}
 
 	return signInfoList, nil
+}
+
+// validateDidAliasSignerAddress checks if the signer address provided in the --from flag matches
+// the address extracted from the publicKeyMultibase
+func validateDidAliasSignerAddress(fromSignerAddress, publicKeyMultibase string) error {
+	// Decode public key
+	_, publicKeyBytes, err := multibase.Decode(publicKeyMultibase)
+	if err != nil {
+		return err
+	}
+
+	// Throw error if the length of secp256k1 publicKey is not 33
+	if len(publicKeyBytes) != 33 {
+		return fmt.Errorf("invalid secp256k1 public key length %v", len(publicKeyBytes))
+	}
+
+	// Hash pubKeyBytes as: RIPEMD160(SHA256(public_key_bytes))
+	pubKeySha256Hash := sha256.Sum256(publicKeyBytes)
+	ripemd160hash := ripemd160.New()
+	ripemd160hash.Write(pubKeySha256Hash[:])
+	addressBytes := ripemd160hash.Sum(nil)
+
+	// Convert addressBytes to bech32 encoded address
+	convertedAddress, err := bech32.ConvertAndEncode("hid", addressBytes)
+	if err != nil {
+		return err
+	}
+
+	if fromSignerAddress != convertedAddress {
+		return fmt.Errorf("transaction signer address is not the author of DID Document alias")
+	}
+
+	return nil
 }

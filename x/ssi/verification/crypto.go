@@ -179,7 +179,7 @@ func verifyCosmosBlockchainAccountId(blockchainAccountId, publicKeyMultibase str
 	if err != nil {
 		return err
 	}
-	validAddressPrefix := types.CosmosCAIP10ChainIdBech32PrefixMap[chainId]	
+	validAddressPrefix := types.CosmosCAIP10ChainIdBech32PrefixMap[chainId]
 	convertedAddress, err := publicKeyToCosmosBech32Address(validAddressPrefix, publicKeyBytes)
 	if err != nil {
 		return err

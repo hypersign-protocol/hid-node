@@ -25,7 +25,13 @@ func (k msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*t
 	}
 
 	// Validate namespace in DID Document
-	if err := didDocNamespaceValidation(k, ctx, msgDidDocument); err != nil {
+	chainNamespace := k.GetChainNamespace(&ctx)
+	if err := types.DidChainNamespaceValidation(msgDidDocument, chainNamespace); err != nil {
+		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, err.Error())
+	}
+
+	// Validate ownership of method specific id
+	if err := checkMethodSpecificIdOwnership(msgDidDocument.VerificationMethod, msgDidDocument.Id); err != nil {
 		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, err.Error())
 	}
 
@@ -74,6 +80,37 @@ func (k msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*t
 	id := k.RegisterDidDocumentInStore(ctx, &didDocumentState)
 
 	return &types.MsgCreateDIDResponse{Id: id}, nil
+}
+
+// checkMethodSpecificIdOwnership validates the ownership of blockchain account id passed in the method specific
+// identifier of DID Document. This ensures that a DID ID (containing a blockchain address) is being created by someone
+// who owns the blockchain address.
+func checkMethodSpecificIdOwnership(verificationMethods []*types.VerificationMethod, didId string) error {
+	inputMSI, inputMSIType, err := types.GetMethodSpecificIdAndType(didId)
+	if err != nil {
+		return err
+	}
+
+	if inputMSIType == types.MSIBlockchainAccountId {
+		foundMSIinAnyVM := false
+		for _, vm := range verificationMethods {
+			if vm.BlockchainAccountId == inputMSI {
+				foundMSIinAnyVM = true
+				break
+			}
+		}
+
+		if !foundMSIinAnyVM {
+			return fmt.Errorf(
+				"proof of ownership for method-specific-id in %v must be provided",
+				didId,
+			)
+		} else {
+			return nil
+		}
+	} else {
+		return nil
+	}
 }
 
 // getControllersForCreateDID returns a list of controller DIDs

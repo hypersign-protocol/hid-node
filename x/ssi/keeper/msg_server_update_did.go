@@ -26,7 +26,8 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 	}
 
 	// Validate namespace in DID Document
-	if err := didDocNamespaceValidation(k, ctx, msgDidDocument); err != nil {
+	chainNamespace := k.GetChainNamespace(&ctx)
+	if err := types.DidChainNamespaceValidation(msgDidDocument, chainNamespace); err != nil {
 		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, err.Error())
 	}
 
@@ -41,6 +42,11 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 		return nil, sdkerrors.Wrap(types.ErrDidDocNotFound, err.Error())
 	}
 	existingDidDocument := existingDidDocumentState.DidDocument
+
+	// Check if the DID Document is already deactivated
+	if existingDidDocumentState.DidDocumentMetadata.Deactivated {
+		return nil, sdkerrors.Wrapf(types.ErrDidDocDeactivated, "cannot update didDocument %v as it is deactivated", existingDidDocument.Id)
+	}
 
 	// Check if the incoming DID Document has any changes. If not, throw an error.
 	if reflect.DeepEqual(existingDidDocument, msgDidDocument) {

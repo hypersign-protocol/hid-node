@@ -1,5 +1,9 @@
 package types
 
+// Supported method-specific-id Formats
+const MSIBlockchainAccountId = "MSIBlockchainAccountId"
+const MSINonBlockchainAccountId = "MSINonBlockchainAccountId"
+
 // Supported Verification Method Types
 const Ed25519VerificationKey2020 = "Ed25519VerificationKey2020"
 const EcdsaSecp256k1VerificationKey2019 = "EcdsaSecp256k1VerificationKey2019"

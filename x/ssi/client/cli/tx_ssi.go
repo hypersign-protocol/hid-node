@@ -1,43 +1,123 @@
 package cli
 
 import (
+	"encoding/base64"
+	"fmt"
+	"os"
+	"path/filepath"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
+	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 	"github.com/spf13/cobra"
 )
 
+const didAliasFlag = "did-alias"
+
 func CmdCreateDID() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "create-did [did-doc-string] [vm-id-1] [sign-key-1] [sign-key-algo-1] ... [vm-id-N] [sign-key-N] [sign-key-algo-N]",
+		Use:   "create-did [did-doc-string] ([vm-id-1] [sign-key-1] [sign-key-algo-1] ... [vm-id-N] [sign-key-N] [sign-key-algo-N]) [flags]\n  hid-noded tx ssi create-did --did-alias <name of the DID Alias> [flags]",
 		Short: "Registers a DID Document",
-		Args:  cobra.MinimumNArgs(4),
+		Args:  cobra.ArbitraryArgs,
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			argDidDocString := args[0]
+			didAlias, err := cmd.Flags().GetString(didAliasFlag)
+			if err != nil {
+				return err
+			}
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			// Unmarshal DidDocString
 			var didDoc types.Did
-			err = clientCtx.Codec.UnmarshalJSON([]byte(argDidDocString), &didDoc)
-			if err != nil {
-				return err
+			var signInfos []*types.SignInfo
+			txAuthorAddr := clientCtx.GetFromAddress()
+			txAuthorAddrString := clientCtx.GetFromAddress().String()
+
+			if didAlias == "" {
+				// Minimum 4 CLI arguments are expected
+				if len(args) < 4 {
+					return fmt.Errorf("requires at least 4 arg(s), only received %v", len(args))
+				}
+
+				argDidDocString := args[0]
+
+				// Unmarshal DidDocString
+				err = clientCtx.Codec.UnmarshalJSON([]byte(argDidDocString), &didDoc)
+				if err != nil {
+					return err
+				}
+
+				// Prepare Signatures
+				signInfos, err = getSignatures(cmd, didDoc.GetSignBytes(), args[1:])
+				if err != nil {
+					return err
+				}
+			} else {
+				// Get the DID Document from local
+				didAliasConfig, err := types.GetDidAliasConfig(cmd)
+				if err != nil {
+					return fmt.Errorf("failed to read DID Alias config: %v", err.Error())
+				}
+
+				aliasFile := didAlias + ".json"
+				didDocBytes, err := os.ReadFile(filepath.Join(didAliasConfig.DidAliasDir, aliasFile))
+				if err != nil {
+					fmt.Fprintf(cmd.ErrOrStderr(), "DID Document alias '%v' does not exist\n", didAlias)
+					return nil
+				}
+
+				err = clientCtx.Codec.UnmarshalJSON(didDocBytes, &didDoc)
+				if err != nil {
+					return err
+				}
+
+				// Ensure the --from flag value matches with publicKey multibase
+
+				// Since DID Alias will always have one verification method object, it is safe to
+				// choose the 0th index
+				publicKeyMultibase := didDoc.VerificationMethod[0].PublicKeyMultibase
+
+				if err := validateDidAliasSignerAddress(txAuthorAddrString, publicKeyMultibase); err != nil {
+					return fmt.Errorf("%v: %v", err.Error(), didAlias)
+				}
+
+				// Sign the DID Document using Keyring to get theSignInfo. Currently, "test" keyring-backend is only supported
+				keyringBackend, err := cmd.Flags().GetString(flags.FlagKeyringBackend)
+				if err != nil {
+					return err
+				}
+				if keyringBackend != "test" {
+					return fmt.Errorf("unsupporeted keyring backend for DID Document Alias Signing: %v", keyringBackend)
+				}
+
+				kr, err := keyring.New("hid-node-app", keyringBackend, didAliasConfig.HidNodeConfigDir, nil)
+				if err != nil {
+					return err
+				}
+
+				signatureBytes, _, err := kr.SignByAddress(txAuthorAddr, didDoc.GetSignBytes())
+				if err != nil {
+					return err
+				}
+				signatureStr := base64.StdEncoding.EncodeToString(signatureBytes)
+
+				signInfos = []*types.SignInfo{
+					{
+						VerificationMethodId: didDoc.VerificationMethod[0].Id,
+						Signature:            signatureStr,
+					},
+				}
 			}
 
-			// Prepare Signatures
-			signInfos, err := getSignatures(cmd, didDoc.GetSignBytes(), args[1:])
-			if err != nil {
-				return err
-			}
-
+			// Submit CreateDID Tx
 			msg := types.MsgCreateDID{
 				DidDocString: &didDoc,
 				Signatures:   signInfos,
-				Creator:      clientCtx.GetFromAddress().String(),
+				Creator:      txAuthorAddrString,
 			}
 
 			if err := msg.ValidateBasic(); err != nil {
@@ -47,6 +127,7 @@ func CmdCreateDID() *cobra.Command {
 		},
 	}
 
+	cmd.Flags().String(didAliasFlag, "", "alias of the generated DID Document which can be referred to while registering on-chain")
 	flags.AddTxFlagsToCmd(cmd)
 	return cmd
 }

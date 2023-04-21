@@ -495,7 +495,7 @@ def deactivate_did():
 
     print("2. PASS: Mike creates a DID for himself, but the controller list is empty. Mike attempts to deactivate it \n")
     
-    # Register Alice's DID
+    # Register Mike's DID
     kp_mike = generate_key_pair()
     signers = []
     did_doc_string = generate_did_document(kp_mike)
@@ -517,6 +517,36 @@ def deactivate_did():
     signers.append(signPair_mike)
     deactivate_tx_cmd = form_did_deactivate_tx_multisig(did_doc_mike, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
     run_blockchain_command(deactivate_tx_cmd, f"Deactivation of Mike's DID with Id: {did_doc_mike}")
+
+    print("3. FAIL: Mike creates a DID for himself, but the controller list is empty. Mike deactivates it and then attempts to updates it. \n")
+
+    kp_mike = generate_key_pair()
+    signers = []
+    did_doc_string = generate_did_document(kp_mike)
+    did_doc_string["controller"] = []
+    did_doc_mike = did_doc_string["id"]
+    did_doc_mike_vm = did_doc_string["verificationMethod"][0]
+    signPair_mike = {
+        "kp": kp_mike,
+        "verificationMethodId": did_doc_mike_vm["id"],
+        "signing_algo": "ed25519"
+    }
+    signers.append(signPair_mike)
+    create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
+    run_blockchain_command(create_tx_cmd, f"Registering of Mike's DID with Id: {did_doc_mike}")
+
+    # Deactivate DID
+    signers = []
+    signers.append(signPair_mike)
+    deactivate_tx_cmd = form_did_deactivate_tx_multisig(did_doc_mike, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
+    run_blockchain_command(deactivate_tx_cmd, f"Deactivation of Mike's DID with Id: {did_doc_mike}")
+
+    # Attempt to update deactivated DID
+    signers = []
+    signers.append(signPair_mike)
+    did_doc_string["context"] = ["hii"]
+    update_tx_cmd = form_did_update_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
+    run_blockchain_command(update_tx_cmd, f"Bob (non-controller) attempts to update Org DID with Id: {did_doc_org}", True)
 
     print("--- Test Completed ---\n") 
 
@@ -812,6 +842,7 @@ def caip10_cosmos_support_test():
     did_doc_string_2 = generate_did_document(kp, kp_algo, "osmo")
     did_doc_string_2_vm = did_doc_string_2["verificationMethod"][0]
     did_doc_string_2_vm["id"] = did_doc_string_2_vm["id"] + "new"
+    did_doc_string_2_vm["controller"] = did_doc_string_1["verificationMethod"][0]["controller"]
 
     did_doc_string_1["verificationMethod"] = [
         did_doc_string_1["verificationMethod"][0],
@@ -998,7 +1029,7 @@ def vm_type_test():
     print("4. PASS: Registering DID Document with a verification method of type EcdsaSecp256k1VerificationKey2019. Only publicKeyMultibase is passed.")
     kp_algo = "secp256k1"
     kp = generate_key_pair(algo=kp_algo)
-    did_doc_string = generate_did_document(kp, kp_algo)
+    did_doc_string = generate_did_document(kp, kp_algo, is_uuid=True, bech32prefix="")
     did_doc_id = did_doc_string["id"]
     did_doc_string["verificationMethod"][0]["blockchainAccountId"] = ""
     signers = []
@@ -1093,3 +1124,130 @@ def vm_type_test():
 
     print("--- Test Completed ---\n")
     
+def method_specific_id_test():
+    print("\n--- Method Specific ID Tests ---\n")
+
+    print("1. PASS: Registering a DID Document where the user provides a blockchain address in MSI that they own")
+
+    kp_algo = "secp256k1"
+    kp_alice = generate_key_pair(algo=kp_algo)
+    signers = []
+    did_doc_string = generate_did_document(kp_alice, algo=kp_algo)
+    did_doc_alice = did_doc_string["id"]
+    did_doc_alice_vm = did_doc_string["verificationMethod"]
+    signPair_alice = {
+        "kp": kp_alice,
+        "verificationMethodId": did_doc_string["verificationMethod"][0]["id"],
+        "signing_algo": kp_algo
+    }
+    signers.append(signPair_alice)
+    create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
+    run_blockchain_command(create_tx_cmd, f"Registering Alice's DID with Id: {did_doc_alice}")
+
+    print("2. FAIL: Registering a DID Document where the user provides a blockchain address in MSI that they don't own")
+    
+    kp_algo = "secp256k1"
+    kp_bob = generate_key_pair(algo=kp_algo)
+    signers = []
+    did_doc_string = generate_did_document(kp_bob, algo=kp_algo)
+    did_doc_string["controller"] = [did_doc_alice]
+    did_doc_string["verificationMethod"] = did_doc_alice_vm
+    
+    did_doc_bob = did_doc_string["id"]
+    signers.append(signPair_alice)
+    create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
+    run_blockchain_command(create_tx_cmd, f"Registering Bob's DID with Id: {did_doc_bob}", True)
+
+    print("3. PASS: Registering a DID Document where the user provides a multibase encoded public key in MSI that they own")
+
+    kp_algo = "ed25519"
+    kp_alice = generate_key_pair(algo=kp_algo)
+    signers = []
+    did_doc_string = generate_did_document(kp_alice, algo=kp_algo)
+    did_doc_alice = did_doc_string["id"]
+    did_doc_alice_vm = did_doc_string["verificationMethod"]
+    signPair_alice = {
+        "kp": kp_alice,
+        "verificationMethodId": did_doc_string["verificationMethod"][0]["id"],
+        "signing_algo": kp_algo
+    }
+    signers.append(signPair_alice)
+    create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
+    run_blockchain_command(create_tx_cmd, f"Registering Alice's DID with Id: {did_doc_alice}")
+
+    print("4. PASS: Registering a DID Document where the user provides a multibase encoded public key in MSI that they don't own")
+    
+    kp_algo = "ed25519"
+    kp_bob = generate_key_pair(algo=kp_algo)
+    signers = []
+    did_doc_string = generate_did_document(kp_bob, algo=kp_algo)
+    did_doc_string["controller"] = [did_doc_alice]
+    did_doc_string["verificationMethod"] = did_doc_alice_vm
+    
+    did_doc_bob = did_doc_string["id"]
+    signers.append(signPair_alice)
+    create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
+    run_blockchain_command(create_tx_cmd, f"Registering Bob's DID with Id: {did_doc_bob}")
+
+    print("5. FAIL: Attempt to Register Invalid DID Documents with invalid DID Id")
+
+    did_id_list = [
+        "did:hid:1:",
+        "did:hid:1",
+        "did:hid:devnet",
+        "did:hid:devnet:",
+        "did:hid:devnet:zHiii",
+        "did:hid:devnet:asa54qf",
+        "did:hid:devnet:asa54qf|sds",
+        "did:hid:devnet:-asa54-qfsds",
+        "did:hid:devnet:.com",
+    ]
+
+    for did_id in did_id_list:
+        did_doc_string["id"] = did_id
+        create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
+        run_blockchain_command(create_tx_cmd, f"Registering Invalid DID with Id: {did_id}", True, True)        
+
+    print("6. PASS: Alice tries to update their DID Document by removing the Verification Method associated with the method specific id (CAIP-10 Blockchain Address)")
+
+    kp_algo = "secp256k1"
+    kp_alice = generate_key_pair(algo=kp_algo)
+    signers = []
+    did_doc_string = generate_did_document(kp_alice, algo=kp_algo)
+    did_doc_alice = did_doc_string["id"]
+    did_doc_alice_vm = did_doc_string["verificationMethod"]
+    signPair_alice = {
+        "kp": kp_alice,
+        "verificationMethodId": did_doc_string["verificationMethod"][0]["id"],
+        "signing_algo": kp_algo
+    }
+    signers.append(signPair_alice)
+    create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
+    run_blockchain_command(create_tx_cmd, f"Registering Alice's DID with Id: {did_doc_alice}")
+    
+    did_doc_string["verificationMethod"] = []
+    update_tx_cmd = form_did_update_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
+    run_blockchain_command(update_tx_cmd, f"Removal of Verification Method associated with method specific id")
+
+    print("7. PASS: Alice tries to update their DID Document by removing the Verification Method associated with the method specific id (Multibase Encoded PublicKey)")
+
+    kp_algo = "ed25519"
+    kp_alice = generate_key_pair(algo=kp_algo)
+    signers = []
+    did_doc_string = generate_did_document(kp_alice, algo=kp_algo)
+    did_doc_alice = did_doc_string["id"]
+    did_doc_alice_vm = did_doc_string["verificationMethod"]
+    signPair_alice = {
+        "kp": kp_alice,
+        "verificationMethodId": did_doc_string["verificationMethod"][0]["id"],
+        "signing_algo": kp_algo
+    }
+    signers.append(signPair_alice)
+    create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
+    run_blockchain_command(create_tx_cmd, f"Registering Alice's DID with Id: {did_doc_alice}")
+
+    did_doc_string["verificationMethod"] = []
+    update_tx_cmd = form_did_update_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
+    run_blockchain_command(update_tx_cmd, f"Removal of Verification Method associated with method specific id")
+
+    print("--- Test Completed ---\n")
