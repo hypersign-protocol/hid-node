@@ -42,6 +42,11 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 	}
 	existingDidDocument := existingDidDocumentState.DidDocument
 
+	// Check if the DID Document is already deactivated
+	if existingDidDocumentState.DidDocumentMetadata.Deactivated {
+		return nil, sdkerrors.Wrapf(types.ErrDidDocDeactivated, "cannot update didDocument %v as it is deactivated", existingDidDocument.Id)
+	}
+
 	// Check if the incoming DID Document has any changes. If not, throw an error.
 	if reflect.DeepEqual(existingDidDocument, msgDidDocument) {
 		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, "incoming DID Document does not have any changes")
