@@ -6,17 +6,16 @@ option go_package = "github.com/hypersign-protocol/hid-node/x/ssi/types";
 import "ssi/v1/clientSpec.proto";
 
 message Did {
-  repeated string context = 1;
-  string id = 2;
-  repeated string controller = 3;
-  repeated string alsoKnownAs = 4;
-  repeated VerificationMethod verificationMethod = 5;
-  repeated string authentication = 6;
-  repeated string assertionMethod = 7;
-  repeated string keyAgreement = 8;
-  repeated string capabilityInvocation = 9;
-  repeated string capabilityDelegation = 10;
-  repeated Service service = 11;
+  string id = 1;
+  repeated string controller = 2;
+  repeated string alsoKnownAs = 3;
+  repeated VerificationMethod verificationMethod = 4;
+  repeated string authentication = 5;
+  repeated string assertionMethod = 6;
+  repeated string keyAgreement = 7;
+  repeated string capabilityInvocation = 8;
+  repeated string capabilityDelegation = 9;
+  repeated Service service = 10;
 }
 
 message Metadata {

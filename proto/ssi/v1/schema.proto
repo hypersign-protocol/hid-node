@@ -13,12 +13,11 @@ message SchemaDocument {
 }
 
 message SchemaProperty {
-    string schema = 1;
-    string description = 2;
-    string type = 3;
-    string properties = 4;
-    repeated string required = 5;
-    bool additionalProperties = 6;
+    string description = 1;
+    string type = 2;
+    string properties = 3;
+    repeated string required = 4;
+    bool additionalProperties = 5;
 }
 
 message SchemaProof {

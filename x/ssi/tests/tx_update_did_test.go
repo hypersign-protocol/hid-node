@@ -46,7 +46,7 @@ func TestUpdateDID(t *testing.T) {
 	versionId := resolvedDidDocument.GetDidDocumentMetadata().GetVersionId()
 
 	// Updated the existing DID by appending a link
-	resolvedDidDocument.DidDocument.Context = append(resolvedDidDocument.DidDocument.Context, "http://www.example.com")
+	resolvedDidDocument.DidDocument.AlsoKnownAs = append(resolvedDidDocument.DidDocument.AlsoKnownAs, "http://www.example.com")
 
 	updateRpcElements := GetModifiedDidDocumentSignature(
 		resolvedDidDocument.DidDocument,

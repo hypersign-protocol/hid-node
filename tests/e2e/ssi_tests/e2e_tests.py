@@ -218,7 +218,7 @@ def update_did_test():
 
     # Bob (who is not the controller) attempts to make changes in Org DID
     signers = []
-    did_doc_string["context"] = ["gmm", "gmm2"]
+    did_doc_string["alsoKnownAs"] = ["gmm", "gmm2"]
     signers.append(signPair_bob)
     update_tx_cmd = form_did_update_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
     run_blockchain_command(update_tx_cmd, f"Bob (non-controller) attempts to update Org DID with Id: {did_doc_org}", True)
@@ -226,7 +226,7 @@ def update_did_test():
     # Alice (who is the controller) attempts to make changes in Org DID
     print("2. PASS: Alice creates an Org DID where alice is the controller, and Bob's VM is added to its VM List only. Alice attempts to update Org DID by sending her signature.\n")
     signers = []
-    did_doc_string["context"] = ["gmm", "gmm2"]
+    did_doc_string["alsoKnownAs"] = ["gmm", "gmm2"]
     signers.append(signPair_alice)
     update_tx_cmd = form_did_update_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
     run_blockchain_command(update_tx_cmd, f"Alice (controller) attempts to update Org DID with Id: {did_doc_org}")
@@ -336,7 +336,7 @@ def update_did_test():
     run_blockchain_command(create_tx_cmd, f"Registering of Org DID with Id: {did_doc_org}")
 
     print("Hot-Wallet 1 attemps to update Org DID. It is expected to fail")
-    did_doc_string["context"] = ["exempler.org"]
+    did_doc_string["alsoKnownAs"] = ["exempler.org"]
     signers = []
     signers.append(signPair_hw1)
     update_tx_cmd = form_did_update_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
@@ -373,7 +373,7 @@ def update_did_test():
     run_blockchain_command(create_tx_cmd, f"Registering of Jenny's DID with Id: {did_doc_jenny}")
 
     signers = []
-    did_doc_string["context"] = ["yo"]
+    did_doc_string["alsoKnownAs"] = ["yo"]
     signers.append(signPair_jenny)
     update_tx_cmd = form_did_update_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
     run_blockchain_command(update_tx_cmd, f"Jenny (controller) attempts to update Tx")
@@ -544,7 +544,7 @@ def deactivate_did():
     # Attempt to update deactivated DID
     signers = []
     signers.append(signPair_mike)
-    did_doc_string["context"] = ["hii"]
+    did_doc_string["alsoKnownAs"] = ["hii"]
     update_tx_cmd = form_did_update_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
     run_blockchain_command(update_tx_cmd, f"Bob (non-controller) attempts to update Org DID with Id: {did_doc_org}", True)
 

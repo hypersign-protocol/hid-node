@@ -8,9 +8,6 @@ from utils import run_command, generate_document_id, get_document_signature, \
 
 def generate_did_document(key_pair, algo="ed25519", bech32prefix="hid", is_uuid=False):
     base_document = {
-        "context" : [
-            "https://www.w3.org/ns/did/v1"
-        ],
         "id": "",
         "controller": [],
         "verificationMethod": [],
@@ -77,7 +74,6 @@ def generate_schema_document(key_pair, schema_author, vm, signature=None, algo="
         "author": "",
         "authored": "2022-08-16T10:22:12Z",
         "schema": {
-            "schema":"https://json-schema.org/draft-07/schema#",
             "description":"Person Schema",
             "type":"object",
             "properties":"{givenName:{type:string},gender:{type:string},email:{type:text},address:{type:text}}",

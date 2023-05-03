@@ -114,9 +114,6 @@ func GenerateDidDocumentRPCElements(keyPair GenericKeyPair, signingElements []Di
 	}
 
 	var didDocument *types.Did = &types.Did{
-		Context: []string{
-			"https://www.w3.org/ns/did/v1",
-		},
 		Id:         didId,
 		Controller: controllers,
 		VerificationMethod: []*types.VerificationMethod{
@@ -148,7 +145,6 @@ func GenerateSchemaDocumentRPCElements(keyPair GenericKeyPair, authorId string, 
 		Id:           schemaId,
 		Authored:     "2022-04-10T04:07:12Z",
 		Schema: &types.SchemaProperty{
-			Schema:               "https://json-schema.org/draft-07/schema#",
 			Description:          "test",
 			Type:                 "Object",
 			Properties:           "{myString:{type:string}}",
