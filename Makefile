@@ -18,7 +18,8 @@ ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=hid-node \
 	-X github.com/cosmos/cosmos-sdk/version.AppName=hid-node \
 	-X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
 	-X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
-	-X github.com/tendermint/tendermint/version.TMCoreSemVer=$(TM_VERSION)
+	-X github.com/tendermint/tendermint/version.TMCoreSemVer=$(TM_VERSION) \
+	-X github.com/hypersign-protocol/hid-node/app.ProposalsEnabled=true # enable x/wasm based proposals
 
 BUILD_FLAGS := -ldflags '$(ldflags)'
 
