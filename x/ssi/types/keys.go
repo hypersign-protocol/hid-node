@@ -28,6 +28,8 @@ const (
 
 	CredKey      = "Cred-value-"
 	CredCountKey = "Cred-count-"
+
+	BlockchainAccountIdStoreKey = "blockchainaddrstorekey"
 )
 
 func KeyPrefix(p string) []byte {
