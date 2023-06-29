@@ -81,6 +81,9 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 		incomingDidDocumentControllers = append(incomingDidDocumentControllers, msgDidDocument.Id)
 	}
 
+	vmsToBeRemoved := []*types.VerificationMethod{}
+	vmsToBeAdded := []*types.VerificationMethod{}
+
 	// check if both controller arrays are equal
 	if reflect.DeepEqual(existingDidDocumentControllers, incomingDidDocumentControllers) {
 		commonController := existingDidDocumentControllers
@@ -95,6 +98,13 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 				return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, vmMapErr.Error())
 			}
 		} else {
+			// Get a list of Verification Methods having a populated `blockchainAccountId` field, which are being newly added
+			// and/or removed from the DID Document
+			vmsToBeAdded, vmsToBeRemoved, err = processBlockchainAccountIdForUpdateDID(k, ctx, existingDidDocument.VerificationMethod, msgDidDocument.VerificationMethod)
+			if err != nil {
+				return nil, err
+			}
+
 			// if Vms are not similar
 			// Get the distinct VMs (new)
 			updatedVms := getVerificationMethodsForUpdateDID(existingDidDocument.VerificationMethod, msgDidDocument.VerificationMethod)
@@ -167,6 +177,18 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 	// Update the DID Document in store
 	if err := k.UpdateDidDocumentInStore(ctx, didDocumentState); err != nil {
 		return nil, err
+	}
+
+	// Iterate through the removed Verification Methods having `blockchainAccountId` populated
+	// and remove them from store
+	for _, vm := range vmsToBeRemoved {
+		k.RemoveBlockchainAddressInStore(&ctx, vm.BlockchainAccountId)
+	}
+
+	// Iterate through the added Verification Methods having `blockchainAccountId` populated
+	// and add them to store
+	for _, vm := range vmsToBeAdded {
+		k.SetBlockchainAddressInStore(&ctx, vm.BlockchainAccountId, vm.Controller)
 	}
 
 	return &types.MsgUpdateDIDResponse{UpdateId: msgDidDocument.Id}, nil
@@ -267,4 +289,49 @@ func getVerificationMethodsForUpdateDID(existingVMs []*types.VerificationMethod,
 	}
 
 	return updatedVms
+}
+
+func processBlockchainAccountIdForUpdateDID(k msgServer, ctx sdk.Context, existingVMs []*types.VerificationMethod, incomingVMs []*types.VerificationMethod) ([]*types.VerificationMethod, []*types.VerificationMethod, error) {
+	newVms := []*types.VerificationMethod{}
+	deletedVms := []*types.VerificationMethod{}
+
+	// Make map of existing VMs
+	existingVmMap := map[string]*types.VerificationMethod{}
+	for _, vm := range existingVMs {
+		existingVmMap[vm.Id] = vm
+	}
+
+	// Make map of incoming VMs
+	incomingVmMap := map[string]*types.VerificationMethod{}
+	for _, vm := range incomingVMs {
+		incomingVmMap[vm.Id] = vm
+		// Check if VM is present in existing VM map.
+		// If it's not present, the VM is being added to existing Did Document.
+		// Add the VM to "required" group
+		if _, present := existingVmMap[vm.Id]; !present {
+			if vm.BlockchainAccountId != "" {
+				if didIdBytes := k.GetBlockchainAddressFromStore(&ctx, vm.BlockchainAccountId); len(didIdBytes) != 0 {
+					return nil, nil, fmt.Errorf(
+						"blockchainAccountId %v of verification method %v is already part of DID Document %v",
+						vm.BlockchainAccountId,
+						vm.Id,
+						string(didIdBytes),
+					)
+				} else {
+					newVms = append(newVms, vm)
+				}
+			}
+		}
+	}
+
+	// Get the list of VMs that are being removed
+	for _, vm := range existingVMs {
+		if _, present := incomingVmMap[vm.Id]; !present {
+			if vm.BlockchainAccountId != "" {
+				deletedVms = append(deletedVms, vm)
+			}
+		}
+	}
+
+	return newVms, deletedVms, nil
 }
