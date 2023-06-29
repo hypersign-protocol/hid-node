@@ -85,6 +85,13 @@ func (k msgServer) DeactivateDID(goCtx context.Context, msg *types.MsgDeactivate
 		return nil, err
 	}
 
+	// Remove the BlockchainAccountId from BlockchainAddressStore
+	for _, vm := range didDocumentState.DidDocument.VerificationMethod {
+		if vm.BlockchainAccountId != "" {
+			k.RemoveBlockchainAddressInStore(&ctx, vm.BlockchainAccountId)
+		}
+	}
+
 	return &types.MsgDeactivateDIDResponse{Id: 1}, nil
 }
 
