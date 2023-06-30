@@ -306,33 +306,8 @@ func New(
 	app.FeeGrantKeeper = feegrantkeeper.NewKeeper(appCodec, keys[feegrant.StoreKey], app.AccountKeeper)
 	app.UpgradeKeeper = upgradekeeper.NewKeeper(skipUpgradeHeights, keys[upgradetypes.StoreKey], appCodec, homePath, app.BaseApp)
 
-	app.UpgradeKeeper.SetUpgradeHandler("v011", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-		ctx.Logger().Info("IBC upgrade to v3")
-		return fromVM, nil
-	})
-
-	app.UpgradeKeeper.SetUpgradeHandler("v013", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-		ctx.Logger().Info("v0.1.3 upgrade")
-		return fromVM, nil
-	})
-
-	app.UpgradeKeeper.SetUpgradeHandler("v014", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-		ctx.Logger().Info("v0.1.4 upgrade")
-		return fromVM, nil
-	})
-
-	app.UpgradeKeeper.SetUpgradeHandler("v015", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-		ctx.Logger().Info("v0.1.5 upgrade")
-		return fromVM, nil
-	})
-
-	app.UpgradeKeeper.SetUpgradeHandler("v016", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-		ctx.Logger().Info("v0.1.6 upgrade")
-		return fromVM, nil
-	})
-
-	app.UpgradeKeeper.SetUpgradeHandler("v017", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-		ctx.Logger().Info("v0.1.7 upgrade")
+	app.UpgradeKeeper.SetUpgradeHandler("v018", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+		ctx.Logger().Info("v0.1.8 upgrade")
 		return fromVM, nil
 	})
 
