@@ -102,6 +102,11 @@ func (k msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*t
 		}
 	}
 
+	// Emit a successful DID Document Registration event
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent("create_did", sdk.NewAttribute("tx_author", msg.GetCreator())),
+	)
+
 	return &types.MsgCreateDIDResponse{Id: id}, nil
 }
 
