@@ -56,7 +56,7 @@ def key_agrement_test():
     create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
     run_blockchain_command(create_tx_cmd, f"Registering Alice's DID with Id: {did_doc_string['id']}")
 
-    print("\n--4. FAIL: An attempt is made to update the DID Document by passing the signature of X25519KeyVerificationKey2020 based verification method")
+    print("\n--4. FAIL: An attempt is made to update the DID Document by passing the signature of X25519KeyAgreementKey2020 based verification method")
     signers = []
     did_doc_string["context"] = ["some_context"]
     did_doc_string["authentication"] = []
@@ -67,7 +67,7 @@ def key_agrement_test():
     }
     signers.append(signPair_x25519)
     update_tx_cmd = form_did_update_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
-    run_blockchain_command(update_tx_cmd, f"DID Document update using X25519KeyVerificationKey2020 based verification method", True)
+    run_blockchain_command(update_tx_cmd, f"DID Document update using X25519KeyAgreementKey2020 based verification method", True)
 
     print("\n--5. PASS: An attempt is made to update the DID Document by passing the signature of Ed25519VerificationKey2020 based verification method")
     signers = []
@@ -77,11 +77,11 @@ def key_agrement_test():
     update_tx_cmd = form_did_update_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
     run_blockchain_command(update_tx_cmd, f"DID Document {did_doc_string['id']} update using Ed25519VerificationKey2020 based verification method")
 
-    print("\n--6. FAIL: An attempt is made to deactivate the DID Document by passing the signature of X25519KeyVerificationKey2020 based verification method--\n")
+    print("\n--6. FAIL: An attempt is made to deactivate the DID Document by passing the signature of X25519KeyAgreementKey2020 based verification method--\n")
     signers = []
     signers.append(signPair_x25519)
     deactivate_tx_cmd = form_did_deactivate_tx_multisig(did_doc_string["id"], signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
-    run_blockchain_command(deactivate_tx_cmd, f"DID Document deactivate using X25519KeyVerificationKey2020 based verification method", True)
+    run_blockchain_command(deactivate_tx_cmd, f"DID Document deactivate using X25519KeyAgreementKey2020 based verification method", True)
 
     print("\n--7. PASS: An attempt is made to deactivate the DID Document by passing the signature of Ed25519VerificationKey2020 based verification method--\n")
     signers = []
