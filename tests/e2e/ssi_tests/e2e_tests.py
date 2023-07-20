@@ -3,11 +3,91 @@ import sys
 sys.path.insert(1, os.getcwd())
 import time
 
-from utils import run_blockchain_command, generate_key_pair, secp256k1_pubkey_to_address
+from utils import run_blockchain_command, generate_key_pair, secp256k1_pubkey_to_address, add_keyAgreeemnt_pubKeyMultibase
 from generate_doc import generate_did_document, generate_schema_document, generate_cred_status_document
 from transactions import form_did_create_tx_multisig, form_did_update_tx_multisig, \
       query_did, form_create_schema_tx, form_did_deactivate_tx_multisig, form_create_cred_status_tx
 from constants import DEFAULT_BLOCKCHAIN_ACCOUNT_NAME
+
+def key_agrement_test():
+    print("\n--1. FAIL: Ed25519VerificationKey2020 based Verification Method ID being added to keyAgreement attribute--\n")
+
+    kp_alice = generate_key_pair("ed25519")
+    signers = []
+    did_doc_string = generate_did_document(kp_alice, "ed25519")
+    did_doc_alice = did_doc_string["id"]
+    ed25519Vm = did_doc_string["verificationMethod"][0]
+    did_doc_string["keyAgreement"] = [ed25519Vm["id"]]
+    signPair_alice = {
+        "kp": kp_alice,
+        "verificationMethodId": did_doc_string["verificationMethod"][0]["id"],
+        "signing_algo": "ed25519"
+    }
+    signers.append(signPair_alice)
+    create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
+    run_blockchain_command(create_tx_cmd, f"Registering Alice's DID with Id: {did_doc_alice}", True, True)
+
+    print("\n--2. FAIL: X25519KeyAgreementKey2020 based Verification Method ID being added to authentication attribute--\n")
+
+    kp_bob = generate_key_pair("ed25519")
+    signers = []
+    did_doc_string = generate_did_document(kp_bob, "ed25519")
+    did_doc_alice = did_doc_string["id"]
+    x25519Vm =  add_keyAgreeemnt_pubKeyMultibase(did_doc_string["verificationMethod"][0], "X25519KeyAgreementKey2020")
+    did_doc_string["verificationMethod"] = [x25519Vm]
+    did_doc_string["authentication"] = [x25519Vm["id"]]
+    signPair_bob = {
+        "kp": kp_bob,
+        "verificationMethodId": did_doc_string["verificationMethod"][0]["id"],
+        "signing_algo": "ed25519"
+    }
+    signers.append(signPair_bob)
+    create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
+    run_blockchain_command(create_tx_cmd, f"Registering Alice's DID with Id: {did_doc_alice}", True, True)
+
+    print("\n--3. PASS: A DID Document is created with Ed25519VerificationKey2020 and X25519KeyAgreementKey2020 based VMs--\n")
+    did_doc_string = generate_did_document(kp_alice, "ed25519")
+    signers = []
+    x25519Vm["controller"] = ed25519Vm["controller"]
+    did_doc_string["verificationMethod"] = [ed25519Vm, x25519Vm]
+    did_doc_string["authentication"] = [ed25519Vm["id"]]
+    did_doc_string["keyAgreement"] = [x25519Vm["id"]]
+    signers.append(signPair_alice)
+    create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
+    run_blockchain_command(create_tx_cmd, f"Registering Alice's DID with Id: {did_doc_string['id']}")
+
+    print("\n--4. FAIL: An attempt is made to update the DID Document by passing the signature of X25519KeyVerificationKey2020 based verification method")
+    signers = []
+    did_doc_string["context"] = ["some_context"]
+    did_doc_string["authentication"] = []
+    signPair_x25519 = {
+        "kp": kp_bob,
+        "verificationMethodId": x25519Vm["id"],
+        "signing_algo": "ed25519"
+    }
+    signers.append(signPair_x25519)
+    update_tx_cmd = form_did_update_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
+    run_blockchain_command(update_tx_cmd, f"DID Document update using X25519KeyVerificationKey2020 based verification method", True)
+
+    print("\n--5. PASS: An attempt is made to update the DID Document by passing the signature of Ed25519VerificationKey2020 based verification method")
+    signers = []
+    did_doc_string["context"] = ["some_context"]
+    signers.append(signPair_alice)
+    signers.append(signPair_x25519)
+    update_tx_cmd = form_did_update_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
+    run_blockchain_command(update_tx_cmd, f"DID Document {did_doc_string['id']} update using Ed25519VerificationKey2020 based verification method")
+
+    print("\n--6. FAIL: An attempt is made to deactivate the DID Document by passing the signature of X25519KeyVerificationKey2020 based verification method--\n")
+    signers = []
+    signers.append(signPair_x25519)
+    deactivate_tx_cmd = form_did_deactivate_tx_multisig(did_doc_string["id"], signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
+    run_blockchain_command(deactivate_tx_cmd, f"DID Document deactivate using X25519KeyVerificationKey2020 based verification method", True)
+
+    print("\n--7. PASS: An attempt is made to deactivate the DID Document by passing the signature of Ed25519VerificationKey2020 based verification method--\n")
+    signers = []
+    signers.append(signPair_alice)
+    deactivate_tx_cmd = form_did_deactivate_tx_multisig(did_doc_string["id"], signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
+    run_blockchain_command(deactivate_tx_cmd, f"DID Document deactivate using Ed25519VerificationKey2020 based verification method")
 
 def unique_wallet_address_test():
     print("\n---1. FAIL: Alice Creates a DID Doc. Bob attempts to create a DID Document by adding one of Alice's VM.---\n")

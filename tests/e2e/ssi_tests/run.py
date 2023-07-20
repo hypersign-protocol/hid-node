@@ -34,6 +34,7 @@ def run_all_tests():
     vm_type_test()
     method_specific_id_test()
     unique_wallet_address_test()
+    key_agrement_test()
     
     print("============= 😃️ All test cases completed successfully ============== \n")
 

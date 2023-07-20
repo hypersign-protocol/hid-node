@@ -53,6 +53,10 @@ func verify(extendedVm *types.ExtendedVerificationMethod, ssiMsg types.SsiMsg) e
 		return verifyEcdsaSecp256k1VerificationKey2019Key(extendedVm, docBytes)
 	case types.EcdsaSecp256k1RecoveryMethod2020:
 		return verifyEcdsaSecp256k1RecoveryMethod2020Key(extendedVm, docBytes)
+	case types.X25519KeyAgreementKey2020:
+		return verifyX25519KeyAgreementKey2020Key(extendedVm)
+	case types.X25519KeyAgreementKeyEIP5630:
+		return verifyX25519KeyAgreementKeyEIP5630Key(extendedVm)
 	default:
 		return fmt.Errorf("unsupported verification method: %s", extendedVm.Type)
 	}
@@ -240,4 +244,30 @@ func verifyEthereumBlockchainAccountId(extendedVm *types.ExtendedVerificationMet
 	} else {
 		return nil
 	}
+}
+
+// verifyX25519KeyAgreementKey2020Key verifies the verification key for verification method type X25519KeyAgreementKey2020
+func verifyX25519KeyAgreementKey2020Key(extendedVm *types.ExtendedVerificationMethod) error {
+	_, _, err := multibase.Decode(extendedVm.PublicKeyMultibase)
+	if err != nil {
+		return fmt.Errorf(
+			"cannot decode X25519KeyAgreementKey2020 public key %s",
+			extendedVm.PublicKeyMultibase,
+		)
+	}
+
+	return nil
+}
+
+// verifyX25519KeyAgreementKeyEIP5630Key verifies the verification key for verification method type X25519KeyAgreementKeyEIP5630
+func verifyX25519KeyAgreementKeyEIP5630Key(extendedVm *types.ExtendedVerificationMethod) error {
+	_, _, err := multibase.Decode(extendedVm.PublicKeyMultibase)
+	if err != nil {
+		return fmt.Errorf(
+			"cannot decode X25519KeyAgreementKeyEIP5630 public key %s",
+			extendedVm.PublicKeyMultibase,
+		)
+	}
+
+	return nil
 }
