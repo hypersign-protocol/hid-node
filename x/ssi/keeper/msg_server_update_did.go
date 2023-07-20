@@ -270,6 +270,11 @@ func getVerificationMethodsForUpdateDID(existingVMs []*types.VerificationMethod,
 	// Make map of existing VMs
 	existingVmMap := map[string]*types.VerificationMethod{}
 	for _, vm := range existingVMs {
+		// Skip X25519KeyAgreementKey2020 or X25519KeyAgreementKey2020 because these
+		// are not allowed for Authentication and Assertion purposes
+		if ((vm.Type == types.X25519KeyAgreementKey2020) || (vm.Type == types.X25519KeyAgreementKeyEIP5630)) {
+			continue
+		}
 		existingVmMap[vm.Id] = vm
 	}
 
@@ -280,7 +285,7 @@ func getVerificationMethodsForUpdateDID(existingVMs []*types.VerificationMethod,
 		// Check if VM is present in existing VM map.
 		// If it's not present, the VM is being added to existing Did Document.
 		// Add the VM to "required" group
-		if _, present := existingVmMap[vm.Id]; !present {
+		if _, present := existingVmMap[vm.Id]; !present && ((vm.Type != types.X25519KeyAgreementKey2020) && (vm.Type != types.X25519KeyAgreementKeyEIP5630))  {
 			updatedVms = append(
 				updatedVms,
 				vm,

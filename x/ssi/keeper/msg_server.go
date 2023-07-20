@@ -98,8 +98,12 @@ func (k msgServer) formMustControllerVmListMap(ctx sdk.Context,
 				}
 				_, presentInControllerMap := controllerMap[vmState.Controller]
 				if presentInControllerMap {
-					vmExtended := types.CreateExtendedVerificationMethod(vmState, sign)
-					controllerMap[controller] = append(controllerMap[controller], vmExtended)
+					// Skip X25519KeyAgreementKey2020 or X25519KeyAgreementKey2020 because these
+					// are not allowed for Authentication and Assertion purposes
+					if (vmState.Type != types.X25519KeyAgreementKey2020) && (vmState.Type != types.X25519KeyAgreementKeyEIP5630) {
+						vmExtended := types.CreateExtendedVerificationMethod(vmState, sign)
+						controllerMap[controller] = append(controllerMap[controller], vmExtended)
+					}
 					delete(inputSignMap, vmId)
 				}
 			}
@@ -149,8 +153,12 @@ func (k msgServer) formAnyControllerVmListMap(ctx sdk.Context,
 				}
 				_, presentInControllerMap := controllerMap[vmState.Controller]
 				if presentInControllerMap {
-					vmExtended := types.CreateExtendedVerificationMethod(vmState, sign)
-					controllerMap[controller] = append(controllerMap[controller], vmExtended)
+					// Skip X25519KeyAgreementKey2020 or X25519KeyAgreementKey2020 because these
+		            // are not allowed for Authentication and Assertion purposes
+					if (vmState.Type != types.X25519KeyAgreementKey2020) && (vmState.Type != types.X25519KeyAgreementKeyEIP5630) { 
+						vmExtended := types.CreateExtendedVerificationMethod(vmState, sign)
+						controllerMap[controller] = append(controllerMap[controller], vmExtended)
+					}
 				}
 			}
 		}
@@ -178,8 +186,8 @@ func (k msgServer) getControllerVmFromState(ctx sdk.Context, verificationMethodI
 // VerifyDocumentProof verifies the proof of a SSI Document
 func (k msgServer) VerifyDocumentProof(ctx sdk.Context, ssiMsg types.SsiMsg, inputDocProof types.SSIProofInterface, clientSpec *types.ClientSpec) error {
 	// Get DID Document from State
-	schemaProofVmId := inputDocProof.GetVerificationMethod()
-	didId, _ := types.SplitDidUrl(schemaProofVmId)
+	docProofVmId := inputDocProof.GetVerificationMethod()
+	didId, _ := types.SplitDidUrl(docProofVmId)
 	didDocumentState, err := k.GetDidDocumentState(&ctx, didId)
 	if err != nil {
 		return err
@@ -187,24 +195,31 @@ func (k msgServer) VerifyDocumentProof(ctx sdk.Context, ssiMsg types.SsiMsg, inp
 	didDoc := didDocumentState.DidDocument
 
 	// Search for Verification Method in DID Document
-	var schemaVm *types.VerificationMethod = nil
+	var docVm *types.VerificationMethod = nil
 	for _, vm := range didDoc.VerificationMethod {
-		if vm.Id == schemaProofVmId {
-			schemaVm = vm
+		if vm.Id == docProofVmId {
+			docVm = vm
 			break
 		}
 	}
-	if schemaVm == nil {
-		return fmt.Errorf("verificationMethod %s is not present in DID document %s", schemaProofVmId, didId)
+	if docVm == nil {
+		return fmt.Errorf("verificationMethod %s is not present in DID document %s", docProofVmId, didId)
+	}
+
+	// VerificationKeySignatureMap has X25519KeyAgreementKey2020 and X25519KeyAgreementKeyEIP5630 as supported Verification Type.
+	// However, they are not allowed to be used for Authentication or Assertion purposes. Since, their corresponding values in the map
+	// are empty string, the following check is in place.
+	if types.VerificationKeySignatureMap[docVm.Type] == "" {
+		return fmt.Errorf("proof type must be specified")
 	}
 
 	// Check if the Proof Type is correct
-	if types.VerificationKeySignatureMap[schemaVm.Type] != inputDocProof.GetType() {
+	if types.VerificationKeySignatureMap[docVm.Type] != inputDocProof.GetType() {
 		return fmt.Errorf(
 			"expected proof type to be %v as the verificationMethod type of %v is %v, recieved %v",
-			types.VerificationKeySignatureMap[schemaVm.Type],
-			schemaVm.Id,
-			schemaVm.Type,
+			types.VerificationKeySignatureMap[docVm.Type],
+			docVm.Id,
+			docVm.Type,
 			inputDocProof.GetType(),
 		)
 	}
@@ -215,7 +230,7 @@ func (k msgServer) VerifyDocumentProof(ctx sdk.Context, ssiMsg types.SsiMsg, inp
 		Signature:            inputDocProof.GetProofValue(),
 		ClientSpec:           clientSpec,
 	}
-	err = verification.VerifyDocumentProofSignature(ssiMsg, schemaVm, signInfo)
+	err = verification.VerifyDocumentProofSignature(ssiMsg, docVm, signInfo)
 	if err != nil {
 		return err
 	}
