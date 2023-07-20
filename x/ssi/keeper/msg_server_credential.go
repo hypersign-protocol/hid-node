@@ -104,6 +104,11 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 
 		id = k.RegisterCredentialStatusInState(ctx, cred)
 
+		// Emit a successful Credential Status Registration event
+		ctx.EventManager().EmitEvent(
+			sdk.NewEvent("create_credential_status", sdk.NewAttribute("tx_author", msg.GetCreator())),
+		)
+
 	} else {
 		cred, err := k.updateCredentialStatus(ctx, msg)
 		if err != nil {

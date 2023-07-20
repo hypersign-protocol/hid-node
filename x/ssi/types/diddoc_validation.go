@@ -142,6 +142,36 @@ func verificationKeyCheck(vm *VerificationMethod) error {
 				vm.Type,
 			)
 		}
+	case X25519KeyAgreementKey2020:
+		if vm.GetPublicKeyMultibase() == "" {
+			return fmt.Errorf(
+				"publicKeyMultibase cannot be empty for verification method %s as it is of type %s",
+				vm.Id,
+				vm.Type,
+			)
+		}
+		if vm.GetBlockchainAccountId() != "" {
+			return fmt.Errorf(
+				"blockchainAccountId must be empty for verification method %s as it is of type %s",
+				vm.Id,
+				vm.Type,
+			)
+		}
+	case X25519KeyAgreementKeyEIP5630:
+		if vm.GetPublicKeyMultibase() == "" {
+			return fmt.Errorf(
+				"publicKeyMultibase cannot be empty for verification method %s as it is of type %s",
+				vm.Id,
+				vm.Type,
+			)
+		}
+		if vm.GetBlockchainAccountId() != "" {
+			return fmt.Errorf(
+				"blockchainAccountId must be empty for verification method %s as it is of type %s",
+				vm.Id,
+				vm.Type,
+			)
+		}
 	default:
 		return fmt.Errorf("unsupported verification method type: %v", supportedVerificationMethodTypes)
 	}
@@ -268,10 +298,10 @@ func validateVerificationMethods(vms []*VerificationMethod) error {
 }
 
 func validateVmRelationships(didDoc *Did) error {
-	// make verificationMethods map
-	vmMap := map[string]bool{}
+	// make verificationMethodType map between VM Id and VM type
+	vmTypeMap := map[string]string{}
 	for _, vm := range didDoc.VerificationMethod {
-		vmMap[vm.Id] = true
+		vmTypeMap[vm.Id] = vm.Type
 	}
 
 	vmRelationshipList := map[string][]string{
@@ -284,17 +314,39 @@ func validateVmRelationships(didDoc *Did) error {
 
 	for field, vmRelationship := range vmRelationshipList {
 		// didUrl check and presence in verification methods
-		for _, element := range vmRelationship {
-			err := isDidUrl(element)
+		for _, vmId := range vmRelationship {
+			err := isDidUrl(vmId)
 			if err != nil {
 				return fmt.Errorf("%s: %s", field, err)
 			}
-			if _, found := vmMap[element]; !found {
+			
+			if _, found := vmTypeMap[vmId]; !found {
 				return fmt.Errorf(
 					"%s: verification method id %s not found in verificationMethod list",
 					field,
-					element,
+					vmId,
 				)
+			}
+			
+			// keyAgreement field should harbour only those Verification Methods whose type is either X25519KeyAgreementKey2020
+			// or X25519KeyAgreementKeyEIP5630
+			if (vmTypeMap[vmId] == X25519KeyAgreementKey2020) || (vmTypeMap[vmId] == X25519KeyAgreementKeyEIP5630) {
+				if (field != "keyAgreement") {
+					return fmt.Errorf(
+						"verification method id %v is of type %v which is not allowed in '%v' attribute",
+						vmId,
+						vmTypeMap[vmId],
+						field,
+					)
+				}
+			} else {
+				if (field == "keyAgreement") { 
+					return fmt.Errorf(
+						"verification method id %v provided in '%v' attribute must be of type X25519KeyAgreementKey2020 or X25519KeyAgreementKeyEIP5630",
+						vmId,
+						field,
+					)
+				}
 			}
 		}
 	}

@@ -102,6 +102,11 @@ func (k msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*t
 		}
 	}
 
+	// Emit a successful DID Document Registration event
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent("create_did", sdk.NewAttribute("tx_author", msg.GetCreator())),
+	)
+
 	return &types.MsgCreateDIDResponse{Id: id}, nil
 }
 
@@ -165,6 +170,13 @@ func getVerificationMethodsForCreateDID(didDocument *types.Did) ([]*types.Verifi
 		if vm.Controller == didDocument.Id {
 			foundAtleastOneSubjectVM = true
 		}
+
+		// Skip X25519KeyAgreementKey2020 or X25519KeyAgreementKey2020 because these
+		// are not allowed for Authentication and Assertion purposes
+		if (vm.Type == types.X25519KeyAgreementKey2020) || (vm.Type == types.X25519KeyAgreementKeyEIP5630) {
+			continue
+		}
+
 		mustHaveVerificaitonMethods = append(mustHaveVerificaitonMethods, vm)
 	}
 

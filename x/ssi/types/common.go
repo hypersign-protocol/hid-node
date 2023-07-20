@@ -8,12 +8,16 @@ const MSINonBlockchainAccountId = "MSINonBlockchainAccountId"
 const Ed25519VerificationKey2020 = "Ed25519VerificationKey2020"
 const EcdsaSecp256k1VerificationKey2019 = "EcdsaSecp256k1VerificationKey2019"
 const EcdsaSecp256k1RecoveryMethod2020 = "EcdsaSecp256k1RecoveryMethod2020"
+const X25519KeyAgreementKey2020 = "X25519KeyAgreementKey2020"
+const X25519KeyAgreementKeyEIP5630 = "X25519KeyAgreementKeyEIP5630" // TODO: Temporary spec name for KeyAgreement type from Metamask
 
 // Mapping between Verification Key and its corresponding Signature
 var VerificationKeySignatureMap = map[string]string{
 	Ed25519VerificationKey2020:        "Ed25519Signature2020",
 	EcdsaSecp256k1VerificationKey2019: "EcdsaSecp256k1Signature2019",
 	EcdsaSecp256k1RecoveryMethod2020:  "EcdsaSecp256k1RecoverySignature2020",
+	X25519KeyAgreementKey2020: "", // Authentication and Assertion are not allowed
+	X25519KeyAgreementKeyEIP5630: "", // Authentication and Assertion are not allowed
 }
 
 var supportedVerificationMethodTypes []string = func() []string {
