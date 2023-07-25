@@ -1,0 +1,26 @@
+syntax = "proto3";
+package hypersignprotocol.hidnode.identityfee;
+
+import "google/api/annotations.proto";
+import "cosmos/base/v1beta1/coin.proto";
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/hypersign-protocol/hid-node/x/identityfee/types";
+option (gogoproto.equal_all) = true;
+
+service Query { 
+    // Get the list of fixed fees for every x/ssi module transactions
+    rpc QuerySSIFee(QuerySSIFeeRequest) returns (QuerySSIFeeResponse) {
+        option (google.api.http).get = "/hypersign-protocol/hidnode/identityfee";
+    }
+}
+
+message QuerySSIFeeRequest {}
+
+message QuerySSIFeeResponse {
+    cosmos.base.v1beta1.Coin create_did_fee = 1;
+    cosmos.base.v1beta1.Coin update_did_fee = 2;
+    cosmos.base.v1beta1.Coin deactivate_did_fee = 3;
+    cosmos.base.v1beta1.Coin create_schema_fee = 4;
+    cosmos.base.v1beta1.Coin register_credential_status_fee = 5;
+}

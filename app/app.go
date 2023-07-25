@@ -99,6 +99,10 @@ import (
 	ssimodule "github.com/hypersign-protocol/hid-node/x/ssi"
 	ssimodulekeeper "github.com/hypersign-protocol/hid-node/x/ssi/keeper"
 	ssimoduletypes "github.com/hypersign-protocol/hid-node/x/ssi/types"
+
+	identifyfeemodule "github.com/hypersign-protocol/hid-node/x/identityfee"
+	identifyfeekeeper "github.com/hypersign-protocol/hid-node/x/identityfee/keeper"
+	identifyfeetypes "github.com/hypersign-protocol/hid-node/x/identityfee/types"
 )
 
 const (
@@ -146,6 +150,7 @@ var (
 		transfer.AppModuleBasic{},
 		authzmodule.AppModuleBasic{},
 		ssimodule.AppModuleBasic{},
+		identifyfeemodule.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -209,6 +214,7 @@ type App struct {
 	TransferKeeper   ibctransferkeeper.Keeper
 	FeeGrantKeeper   feegrantkeeper.Keeper
 	AuthzKeeper      authzkeeper.Keeper
+	IdentityFeeKeeper     identifyfeekeeper.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
@@ -372,6 +378,12 @@ func New(
 	)
 	ssiModule := ssimodule.NewAppModule(appCodec, app.SsiKeeper, app.AccountKeeper, app.BankKeeper)
 
+	app.IdentityFeeKeeper = *identifyfeekeeper.NewKeeper(
+		appCodec,
+		app.GetSubspace(identifyfeetypes.ModuleName),
+	)
+	identityFeeModule := identifyfeemodule.NewAppModule(appCodec, app.IdentityFeeKeeper)
+
 	// Create static IBC router, add transfer route, then set and seal it
 	ibcRouter := ibcporttypes.NewRouter()
 	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferIBCModule)
@@ -408,6 +420,7 @@ func New(
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
 		ssiModule,
+		identityFeeModule,
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -430,6 +443,7 @@ func New(
 		feegrant.ModuleName,
 		authz.ModuleName,
 		ssimoduletypes.ModuleName,
+		identifyfeetypes.ModuleName,
 		genutiltypes.ModuleName,
 		crisistypes.ModuleName,
 		paramstypes.ModuleName,
@@ -445,6 +459,7 @@ func New(
 		distrtypes.ModuleName,
 		upgradetypes.ModuleName,
 		ssimoduletypes.ModuleName,
+		identifyfeetypes.ModuleName,
 		genutiltypes.ModuleName,
 		feegrant.ModuleName,
 		authz.ModuleName,
@@ -476,6 +491,7 @@ func New(
 		evidencetypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		ssimoduletypes.ModuleName,
+		identifyfeetypes.ModuleName,
 		feegrant.ModuleName,
 		authz.ModuleName,
 		paramstypes.ModuleName,
@@ -495,13 +511,16 @@ func New(
 	app.SetInitChainer(app.InitChainer)
 	app.SetBeginBlocker(app.BeginBlocker)
 
-	anteHandler, err := ante.NewAnteHandler(
-		ante.HandlerOptions{
-			AccountKeeper:   app.AccountKeeper,
-			BankKeeper:      app.BankKeeper,
-			SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
-			FeegrantKeeper:  app.FeeGrantKeeper,
-			SigGasConsumer:  ante.DefaultSigVerificationGasConsumer,
+	anteHandler, err := NewAnteHandler(
+		HandlerOptions{
+			HandlerOptions: ante.HandlerOptions{
+				AccountKeeper:   app.AccountKeeper,
+				BankKeeper:      app.BankKeeper,
+				SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
+				FeegrantKeeper:  app.FeeGrantKeeper,
+				SigGasConsumer:  ante.DefaultSigVerificationGasConsumer,
+			},
+			IdentityFeeKeeper: app.IdentityFeeKeeper,
 		},
 	)
 	if err != nil {
@@ -669,7 +688,8 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
 	paramsKeeper.Subspace(ssimoduletypes.ModuleName)
-
+	paramsKeeper.Subspace(identifyfeetypes.ModuleName).WithKeyTable(identifyfeetypes.ParamKeyTable())
+	
 	return paramsKeeper
 }
 
