@@ -35,6 +35,8 @@ def run_all_tests():
     method_specific_id_test()
     unique_wallet_address_test()
     key_agrement_test()
+    ssi_fee_test()
+    big_did_tx_test()
     
     print("============= 😃️ All test cases completed successfully ============== \n")
 
