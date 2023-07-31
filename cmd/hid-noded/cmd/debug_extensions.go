@@ -3,6 +3,7 @@ package cmd
 import (
 	"crypto/ed25519"
 	"crypto/rand"
+	"crypto/sha256"
 	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
@@ -11,6 +12,7 @@ import (
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/cosmos/cosmos-sdk/client"
 	ethercrypto "github.com/ethereum/go-ethereum/crypto"
+	bbs "github.com/hyperledger/aries-framework-go/component/kmscrypto/crypto/primitive/bbs12381g2pub"
 	hidnodecli "github.com/hypersign-protocol/hid-node/x/ssi/client/cli"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 	"github.com/multiformats/go-multibase"
@@ -22,9 +24,23 @@ func extendDebug(debugCmd *cobra.Command) *cobra.Command {
 	debugCmd.AddCommand(
 		ed25519Cmd(),
 		secp256k1Cmd(),
+		bbsCmd(),
 		signSSIDocCmd(),
 	)
 	return debugCmd
+}
+
+func bbsCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "bbs",
+		Short: "bbs debug commands",
+	}
+
+	cmd.AddCommand(
+		blsRandomCmd(),
+	)
+
+	return cmd
 }
 
 func secp256k1Cmd() *cobra.Command {
@@ -38,6 +54,56 @@ func secp256k1Cmd() *cobra.Command {
 		secp256k1Bech32AddressCmd(),
 		secp256k1EthRandomCmd(),
 	)
+
+	return cmd
+}
+
+func blsRandomCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "random",
+		Short: "Generate random blsBbs keypair",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			pubKey, privKey, err := bbs.GenerateKeyPair(sha256.New, nil)
+			if err != nil {
+				return err
+			}
+
+			// Convert Public Key Object to Multibase
+			pubKeyBytes, err := pubKey.Marshal()
+			if err != nil {
+				return err
+			}
+
+			publicKeyMultibase, err := multibase.Encode(multibase.Base58BTC, pubKeyBytes)
+			if err != nil {
+				return err
+			}
+
+			// Convert Private Object to Bytes
+			privKeyBytes, err := privKey.Marshal()
+			if err != nil {
+				return err
+			}
+
+			keyInfo := struct {
+				PubKeyBase64    string `json:"pub_key_base_64"`
+				PubKeyMultibase string `json:"pub_key_multibase"`
+				PrivKeyBase64   string `json:"priv_key_base_64"`
+			}{
+				PubKeyBase64:    base64.StdEncoding.EncodeToString(pubKeyBytes),
+				PubKeyMultibase: publicKeyMultibase,
+				PrivKeyBase64:   base64.StdEncoding.EncodeToString(privKeyBytes),
+			}
+
+			keyInfoJson, err := json.Marshal(keyInfo)
+			if err != nil {
+				return err
+			}
+
+			_, err = fmt.Fprintln(cmd.OutOrStdout(), string(keyInfoJson))
+			return err
+		},
+	}
 
 	return cmd
 }
@@ -214,8 +280,13 @@ func signSchemaDocCmd() *cobra.Command {
 				if err != nil {
 					return err
 				}
+			case "bbs":
+				signature, err = hidnodecli.GetBBSSignature(argPrivateKey, schemaDocBytes)
+				if err != nil {
+					return err
+				}
 			default:
-				panic("recieved unsupported signing-algo. Supported algorithms are: ['ed25519', 'secp256k1', 'recover-eth']")
+				panic("recieved unsupported signing-algo. Supported algorithms are: ['ed25519', 'secp256k1', 'recover-eth', 'bbs']")
 			}
 
 			_, err = fmt.Fprintln(cmd.OutOrStdout(), signature)
@@ -266,8 +337,13 @@ func signCredStatusDocCmd() *cobra.Command {
 				if err != nil {
 					return err
 				}
+			case "bbs":
+				signature, err = hidnodecli.GetBBSSignature(argPrivateKey, credStatusDocBytes)
+				if err != nil {
+					return err
+				}
 			default:
-				panic("recieved unsupported signing-algo. Supported algorithms are: ['ed25519', 'secp256k1', 'recover-eth']")
+				panic("recieved unsupported signing-algo. Supported algorithms are: ['ed25519', 'secp256k1', 'recover-eth', 'bbs']")
 			}
 
 			_, err = fmt.Fprintln(cmd.OutOrStdout(), signature)
