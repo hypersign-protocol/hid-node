@@ -172,8 +172,23 @@ func verificationKeyCheck(vm *VerificationMethod) error {
 				vm.Type,
 			)
 		}
+	case Bls12381G2Key2020:
+		if vm.GetBlockchainAccountId() != "" {
+			return fmt.Errorf(
+				"blockchainAccountId is currently not supported for verification method %s as it is of type %s",
+				vm.Id,
+				vm.Type,
+			)
+		}
+		if vm.GetPublicKeyMultibase() == "" {
+			return fmt.Errorf(
+				"publicKeyMultibase cannot be empty for verification method %s as it is of type %s",
+				vm.Id,
+				vm.Type,
+			)
+		}
 	default:
-		return fmt.Errorf("unsupported verification method type: %v", supportedVerificationMethodTypes)
+		return fmt.Errorf("unsupported verification method type: %v. Supported verification method types are: %v", vm.Type, supportedVerificationMethodTypes)
 	}
 
 	// validate blockchainAccountId
@@ -319,7 +334,7 @@ func validateVmRelationships(didDoc *Did) error {
 			if err != nil {
 				return fmt.Errorf("%s: %s", field, err)
 			}
-			
+
 			if _, found := vmTypeMap[vmId]; !found {
 				return fmt.Errorf(
 					"%s: verification method id %s not found in verificationMethod list",
@@ -327,11 +342,11 @@ func validateVmRelationships(didDoc *Did) error {
 					vmId,
 				)
 			}
-			
+
 			// keyAgreement field should harbour only those Verification Methods whose type is either X25519KeyAgreementKey2020
 			// or X25519KeyAgreementKeyEIP5630
 			if (vmTypeMap[vmId] == X25519KeyAgreementKey2020) || (vmTypeMap[vmId] == X25519KeyAgreementKeyEIP5630) {
-				if (field != "keyAgreement") {
+				if field != "keyAgreement" {
 					return fmt.Errorf(
 						"verification method id %v is of type %v which is not allowed in '%v' attribute",
 						vmId,
@@ -340,7 +355,7 @@ func validateVmRelationships(didDoc *Did) error {
 					)
 				}
 			} else {
-				if (field == "keyAgreement") { 
+				if field == "keyAgreement" {
 					return fmt.Errorf(
 						"verification method id %v provided in '%v' attribute must be of type X25519KeyAgreementKey2020 or X25519KeyAgreementKeyEIP5630",
 						vmId,

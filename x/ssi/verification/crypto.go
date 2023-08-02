@@ -14,6 +14,9 @@ import (
 	etheraccounts "github.com/ethereum/go-ethereum/accounts"
 	etherhexutil "github.com/ethereum/go-ethereum/common/hexutil"
 	ethercrypto "github.com/ethereum/go-ethereum/crypto"
+
+	// BBS+ Signatures
+	bbs "github.com/hyperledger/aries-framework-go/component/kmscrypto/crypto/primitive/bbs12381g2pub"
 )
 
 func verifyAll(extendedVmList []*types.ExtendedVerificationMethod, ssiMsg types.SsiMsg) error {
@@ -57,9 +60,42 @@ func verify(extendedVm *types.ExtendedVerificationMethod, ssiMsg types.SsiMsg) e
 		return verifyX25519KeyAgreementKey2020Key(extendedVm)
 	case types.X25519KeyAgreementKeyEIP5630:
 		return verifyX25519KeyAgreementKeyEIP5630Key(extendedVm)
+	case types.Bls12381G2Key2020:
+		return verifyBls12381G2Key2020Key(extendedVm, docBytes)
 	default:
 		return fmt.Errorf("unsupported verification method: %s", extendedVm.Type)
 	}
+}
+
+// verifyBls12381G2Key2020Key verifies the verification key for verification method type Bls12381G2Key2020
+func verifyBls12381G2Key2020Key(extendedVm *types.ExtendedVerificationMethod, documentBytes []byte) error {
+	bbsObj := bbs.New()
+
+	// Unlike in tranditional cryptographic algorithms where a message is signed as-is, the message in BBS+ Signature
+	// scheme is put in an array of byteArray, which is then signed.
+	// Refer here: https://github.com/hyperledger/aries-framework-go/blob/020b60b288ed8280c8b9ccfe40e31172733aae12/component/kmscrypto/crypto/primitive/bbs12381g2pub/bbs_test.go#L97
+	msgFrame := [][]byte{
+		documentBytes,
+	}
+
+	// Decode Signature to Bytes
+	sigBytes, err := base64.StdEncoding.DecodeString(extendedVm.Signature)
+	if err != nil {
+		return err
+	}
+
+	// Decode Public Key
+	_, pubKeyBytes, err := multibase.Decode(extendedVm.PublicKeyMultibase)
+	if err != nil {
+		return err
+	}
+
+	// Verify the signature
+	if err := bbsObj.Verify(msgFrame, sigBytes, pubKeyBytes); err != nil {
+		return fmt.Errorf("signature could not be verified for verificationMethodId: %v", extendedVm.Id)
+	}
+
+	return nil
 }
 
 // verifyEcdsaSecp256k1RecoveryMethod2020Key verifies the verification key for verification method type EcdsaSecp256k1RecoveryMethod2020
