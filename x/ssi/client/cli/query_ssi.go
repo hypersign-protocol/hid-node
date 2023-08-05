@@ -11,6 +11,31 @@ import (
 
 var _ = strconv.Itoa(0)
 
+func cmdListFees() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "list-fees",
+		Short: "List fee for all SSI based transactions",
+		Args:  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			queryClient := types.NewQueryClient(clientCtx)
+
+			res, err := queryClient.QuerySSIFee(cmd.Context(), &types.QuerySSIFeeRequest{})
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintProto(res)
+		},
+	}
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
+}
+
 func CmdGetSchema() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "schema [schema-id]",

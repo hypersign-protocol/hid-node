@@ -4,7 +4,7 @@ import (
 	"context"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/hypersign-protocol/hid-node/x/identityfee/types"
+	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 )
 
 // QuerySSIFee fetches fees for all SSI based transactions

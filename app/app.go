@@ -99,10 +99,6 @@ import (
 	ssimodule "github.com/hypersign-protocol/hid-node/x/ssi"
 	ssimodulekeeper "github.com/hypersign-protocol/hid-node/x/ssi/keeper"
 	ssimoduletypes "github.com/hypersign-protocol/hid-node/x/ssi/types"
-
-	identifyfeemodule "github.com/hypersign-protocol/hid-node/x/identityfee"
-	identifyfeekeeper "github.com/hypersign-protocol/hid-node/x/identityfee/keeper"
-	identifyfeetypes "github.com/hypersign-protocol/hid-node/x/identityfee/types"
 )
 
 const (
@@ -150,7 +146,6 @@ var (
 		transfer.AppModuleBasic{},
 		authzmodule.AppModuleBasic{},
 		ssimodule.AppModuleBasic{},
-		identifyfeemodule.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -198,23 +193,22 @@ type App struct {
 	memKeys map[string]*sdk.MemoryStoreKey
 
 	// keepers
-	AccountKeeper    authkeeper.AccountKeeper
-	BankKeeper       bankkeeper.Keeper
-	CapabilityKeeper *capabilitykeeper.Keeper
-	StakingKeeper    stakingkeeper.Keeper
-	SlashingKeeper   slashingkeeper.Keeper
-	MintKeeper       mintkeeper.Keeper
-	DistrKeeper      distrkeeper.Keeper
-	GovKeeper        govkeeper.Keeper
-	CrisisKeeper     crisiskeeper.Keeper
-	UpgradeKeeper    upgradekeeper.Keeper
-	ParamsKeeper     paramskeeper.Keeper
-	IBCKeeper        *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
-	EvidenceKeeper   evidencekeeper.Keeper
-	TransferKeeper   ibctransferkeeper.Keeper
-	FeeGrantKeeper   feegrantkeeper.Keeper
-	AuthzKeeper      authzkeeper.Keeper
-	IdentityFeeKeeper     identifyfeekeeper.Keeper
+	AccountKeeper     authkeeper.AccountKeeper
+	BankKeeper        bankkeeper.Keeper
+	CapabilityKeeper  *capabilitykeeper.Keeper
+	StakingKeeper     stakingkeeper.Keeper
+	SlashingKeeper    slashingkeeper.Keeper
+	MintKeeper        mintkeeper.Keeper
+	DistrKeeper       distrkeeper.Keeper
+	GovKeeper         govkeeper.Keeper
+	CrisisKeeper      crisiskeeper.Keeper
+	UpgradeKeeper     upgradekeeper.Keeper
+	ParamsKeeper      paramskeeper.Keeper
+	IBCKeeper         *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
+	EvidenceKeeper    evidencekeeper.Keeper
+	TransferKeeper    ibctransferkeeper.Keeper
+	FeeGrantKeeper    feegrantkeeper.Keeper
+	AuthzKeeper       authzkeeper.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
@@ -378,12 +372,6 @@ func New(
 	)
 	ssiModule := ssimodule.NewAppModule(appCodec, app.SsiKeeper, app.AccountKeeper, app.BankKeeper)
 
-	app.IdentityFeeKeeper = *identifyfeekeeper.NewKeeper(
-		appCodec,
-		app.GetSubspace(identifyfeetypes.ModuleName),
-	)
-	identityFeeModule := identifyfeemodule.NewAppModule(appCodec, app.IdentityFeeKeeper)
-
 	// Create static IBC router, add transfer route, then set and seal it
 	ibcRouter := ibcporttypes.NewRouter()
 	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferIBCModule)
@@ -420,7 +408,6 @@ func New(
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
 		ssiModule,
-		identityFeeModule,
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -443,7 +430,6 @@ func New(
 		feegrant.ModuleName,
 		authz.ModuleName,
 		ssimoduletypes.ModuleName,
-		identifyfeetypes.ModuleName,
 		genutiltypes.ModuleName,
 		crisistypes.ModuleName,
 		paramstypes.ModuleName,
@@ -459,7 +445,6 @@ func New(
 		distrtypes.ModuleName,
 		upgradetypes.ModuleName,
 		ssimoduletypes.ModuleName,
-		identifyfeetypes.ModuleName,
 		genutiltypes.ModuleName,
 		feegrant.ModuleName,
 		authz.ModuleName,
@@ -491,7 +476,6 @@ func New(
 		evidencetypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		ssimoduletypes.ModuleName,
-		identifyfeetypes.ModuleName,
 		feegrant.ModuleName,
 		authz.ModuleName,
 		paramstypes.ModuleName,
@@ -520,7 +504,7 @@ func New(
 				FeegrantKeeper:  app.FeeGrantKeeper,
 				SigGasConsumer:  ante.DefaultSigVerificationGasConsumer,
 			},
-			IdentityFeeKeeper: app.IdentityFeeKeeper,
+			SsiKeeper: app.SsiKeeper,
 		},
 	)
 	if err != nil {
@@ -687,9 +671,8 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(crisistypes.ModuleName)
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
-	paramsKeeper.Subspace(ssimoduletypes.ModuleName)
-	paramsKeeper.Subspace(identifyfeetypes.ModuleName).WithKeyTable(identifyfeetypes.ParamKeyTable())
-	
+	paramsKeeper.Subspace(ssimoduletypes.ModuleName).WithKeyTable(ssimoduletypes.ParamKeyTable())
+
 	return paramsKeeper
 }
 

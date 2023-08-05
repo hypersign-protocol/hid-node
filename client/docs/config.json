@@ -10,9 +10,6 @@
         "url": "./.cache/tmp/swagger-gen/ssi/v1/query.swagger.json"
       },
       {
-        "url": "./.cache/tmp/swagger-gen/identityfee/v1/query.swagger.json"
-      },
-      {
         "url": "https://github.com/cosmos/cosmos-sdk/raw/v0.45.7/client/docs/swagger-ui/swagger.yaml",
         "dereference": {
           "circular": "ignore"

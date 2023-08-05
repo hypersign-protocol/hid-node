@@ -6,26 +6,25 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
-	identityfeetypes "github.com/hypersign-protocol/hid-node/x/identityfee/types"
 	ssitypes "github.com/hypersign-protocol/hid-node/x/ssi/types"
 )
 
 type DeductFeeDecorator struct {
-	ak                AccountKeeper
-	bankKeeper        BankKeeper
-	feegrantKeeper    FeegrantKeeper
-	identityFeeKeeper IdentityFeeKeeper
+	ak             AccountKeeper
+	bankKeeper     BankKeeper
+	feegrantKeeper FeegrantKeeper
+	ssiKeeper      SsiKeeper
 }
 
 // ModifiedFeeDecorator extends NewDeductFeeDecorator by making all x/ssi module related transactions incur fixed fee cost.
 // Fixed fee is seperate for each x/ssi module transactions and are updated through Governance based proposals. Please refer
 // HIP-9 to know more: https://github.com/hypersign-protocol/HIPs/blob/main/HIPs/hip-9.md
-func NewDeductFeeDecorator(ak AccountKeeper, bk BankKeeper, fk FeegrantKeeper, ifk IdentityFeeKeeper) DeductFeeDecorator {
+func NewDeductFeeDecorator(ak AccountKeeper, bk BankKeeper, fk FeegrantKeeper, ifk SsiKeeper) DeductFeeDecorator {
 	return DeductFeeDecorator{
-		ak:                ak,
-		bankKeeper:        bk,
-		feegrantKeeper:    fk,
-		identityFeeKeeper: ifk,
+		ak:             ak,
+		bankKeeper:     bk,
+		feegrantKeeper: fk,
+		ssiKeeper:      ifk,
 	}
 }
 
@@ -72,19 +71,19 @@ func (mfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 		for _, msg := range tx.GetMsgs() {
 			switch msg.(type) {
 			case *ssitypes.MsgCreateDID:
-				createDidFee := mfd.identityFeeKeeper.GetFeeParams(ctx, identityfeetypes.ParamStoreKeyCreateDidFee)
+				createDidFee := mfd.ssiKeeper.GetFeeParams(ctx, ssitypes.ParamStoreKeyCreateDidFee)
 				fixedSSIFee = fixedSSIFee.Add(createDidFee)
 			case *ssitypes.MsgUpdateDID:
-				updateDidFee := mfd.identityFeeKeeper.GetFeeParams(ctx, identityfeetypes.ParamStoreKeyUpdateDidFee)
+				updateDidFee := mfd.ssiKeeper.GetFeeParams(ctx, ssitypes.ParamStoreKeyUpdateDidFee)
 				fixedSSIFee = fixedSSIFee.Add(updateDidFee)
 			case *ssitypes.MsgDeactivateDID:
-				deactivateDidFee := mfd.identityFeeKeeper.GetFeeParams(ctx, identityfeetypes.ParamStoreKeyDeactivateDidFee)
+				deactivateDidFee := mfd.ssiKeeper.GetFeeParams(ctx, ssitypes.ParamStoreKeyDeactivateDidFee)
 				fixedSSIFee = fixedSSIFee.Add(deactivateDidFee)
 			case *ssitypes.MsgCreateSchema:
-				createSchemaFee := mfd.identityFeeKeeper.GetFeeParams(ctx, identityfeetypes.ParamStoreKeyCreateSchemaFee)
+				createSchemaFee := mfd.ssiKeeper.GetFeeParams(ctx, ssitypes.ParamStoreKeyCreateSchemaFee)
 				fixedSSIFee = fixedSSIFee.Add(createSchemaFee)
 			case *ssitypes.MsgRegisterCredentialStatus:
-				registerCredentialStatusFee := mfd.identityFeeKeeper.GetFeeParams(ctx, identityfeetypes.ParamStoreKeyRegisterCredentialStatusFee)
+				registerCredentialStatusFee := mfd.ssiKeeper.GetFeeParams(ctx, ssitypes.ParamStoreKeyRegisterCredentialStatusFee)
 				fixedSSIFee = fixedSSIFee.Add(registerCredentialStatusFee)
 			}
 		}
@@ -94,7 +93,7 @@ func (mfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 		if !fee.IsEqual(fixedSSIFee) {
 			errMsg1 := "the transaction consists of x/ssi module based messages which incurs fixed cost. "
 			errMsg2 := "The fee provided MUST BE equal to the required fees which is the sum of all fixed-fee x/ssi. "
-			errMsg3 := "To know about the fixed-fee cost of all x/ssi transactions, refer to the API endpoint /hypersign-protocol/hidnode/identityfee . "
+			errMsg3 := "To know about the fixed-fee cost of all x/ssi transactions, refer to the API endpoint /hypersign-protocol/hidnode/fixedfee . "
 
 			return ctx, sdkerrors.Wrapf(
 				sdkerrors.ErrInsufficientFee,
@@ -154,46 +153,6 @@ func deductFees(bankKeeper BankKeeper, ctx sdk.Context, acc types.AccountI, fees
 	}
 
 	return nil
-}
-
-// isSSIMsgPresentInTx checks if there is any SSI message present in the transaction
-func isSSIMsgPresentInTx(tx sdk.Tx) bool {
-	for _, msg := range tx.GetMsgs() {
-		if isSSIMsg(msg) {
-			return true
-		}
-	}
-
-	return false
-}
-
-// isNonSSIMsgPresentInTx checks if there is any non-SSI message present in the transaction
-func isNonSSIMsgPresentInTx(tx sdk.Tx) bool {
-	for _, msg := range tx.GetMsgs() {
-		if !isSSIMsg(msg) {
-			return true
-		}
-	}
-
-	return false
-}
-
-// isSSIMsg checks if the message is of SSI type or not
-func isSSIMsg(msg sdk.Msg) bool {
-	switch msg.(type) {
-	case *ssitypes.MsgCreateDID:
-		return true
-	case *ssitypes.MsgUpdateDID:
-		return true
-	case *ssitypes.MsgDeactivateDID:
-		return true
-	case *ssitypes.MsgCreateSchema:
-		return true
-	case *ssitypes.MsgRegisterCredentialStatus:
-		return true
-	default:
-		return false
-	}
 }
 
 // MempoolFeeDecorator will check if the transaction's fee is at least as large

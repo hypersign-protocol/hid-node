@@ -20,6 +20,6 @@ type FeegrantKeeper interface {
 	UseGrantedFees(ctx sdk.Context, granter, grantee sdk.AccAddress, fee sdk.Coins, msgs []sdk.Msg) error
 }
 
-type IdentityFeeKeeper interface {
-	GetFeeParams(ctx sdk.Context, identityfeeParamStoreKey []byte) sdk.Coin
+type SsiKeeper interface {
+	GetFeeParams(ctx sdk.Context, ssiParamStoreKey []byte) sdk.Coin
 }

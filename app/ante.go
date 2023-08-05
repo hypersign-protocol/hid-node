@@ -5,13 +5,13 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	identityfeeante "github.com/hypersign-protocol/hid-node/x/identityfee/ante"
+	ssiante "github.com/hypersign-protocol/hid-node/x/ssi/ante"
 )
 
 type HandlerOptions struct {
 	ante.HandlerOptions
 
-	IdentityFeeKeeper identityfeeante.IdentityFeeKeeper
+	SsiKeeper ssiante.SsiKeeper
 }
 
 func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
@@ -27,6 +27,10 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrLogic, "sign mode handler is required for ante builder")
 	}
 
+	if options.SsiKeeper == nil {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrLogic, "ssi keeper is required for ante builder")
+	}
+
 	sigGasConsumer := options.SigGasConsumer
 	if sigGasConsumer == nil {
 		sigGasConsumer = ante.DefaultSigVerificationGasConsumer
@@ -35,13 +39,13 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 	anteDecorators := []sdk.AnteDecorator{
 		ante.NewSetUpContextDecorator(), // outermost AnteDecorator. SetUpContext must be called first
 		ante.NewRejectExtensionOptionsDecorator(),
-		identityfeeante.NewSSITxDecorator(),
-		identityfeeante.NewMempoolFeeDecorator(),
+		ssiante.NewSSITxDecorator(),
+		ssiante.NewMempoolFeeDecorator(),
 		ante.NewValidateBasicDecorator(),
 		ante.NewTxTimeoutHeightDecorator(),
 		ante.NewValidateMemoDecorator(options.AccountKeeper),
 		ante.NewConsumeGasForTxSizeDecorator(options.AccountKeeper),
-		identityfeeante.NewDeductFeeDecorator(options.AccountKeeper, options.BankKeeper, options.FeegrantKeeper, options.IdentityFeeKeeper),
+		ssiante.NewDeductFeeDecorator(options.AccountKeeper, options.BankKeeper, options.FeegrantKeeper, options.SsiKeeper),
 		ante.NewSetPubKeyDecorator(options.AccountKeeper), // SetPubKeyDecorator must be called before all signature verification decorators
 		ante.NewValidateSigCountDecorator(options.AccountKeeper),
 		ante.NewSigGasConsumeDecorator(options.AccountKeeper, sigGasConsumer),
