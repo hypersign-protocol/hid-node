@@ -14,11 +14,8 @@ RUN apt-get update
 RUN apt-get install ${PACKAGES} -y
 RUN make install 
 
-# Setup the node
-RUN bash ./scripts/docker-node/setup.sh
-
 # Expose Ports
 EXPOSE 26657 1317 9090 9091 26656
 
 # Entry for containers
-ENTRYPOINT [ "hid-noded" ]
+ENTRYPOINT [ "./scripts/docker-node/setup.sh" ]
