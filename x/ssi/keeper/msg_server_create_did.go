@@ -40,6 +40,21 @@ func (k msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*t
 		return nil, sdkerrors.Wrap(types.ErrDidDocExists, msgDidDocument.Id)
 	}
 
+	// Check if any of the blockchainAccountId is present in any registered DID Document. If so, throw error
+	for _, vm := range msgDidDocument.VerificationMethod {
+		if vm.BlockchainAccountId != "" {
+			if existingDidDocId := k.GetBlockchainAddressFromStore(&ctx, vm.BlockchainAccountId); len(existingDidDocId) != 0 {
+				return nil, sdkerrors.Wrapf(
+					types.ErrInvalidDidDoc,
+					"blockchainAccountId %v of verification method %v is already part of DID Document %v",
+					vm.BlockchainAccountId,
+					vm.Id,
+					string(existingDidDocId),
+				)
+			}
+		}
+	}
+
 	// Get the list of controllers and check the non-subject controller's existance in the state
 	controllerList := getControllersForCreateDID(msgDidDocument)
 
@@ -78,6 +93,19 @@ func (k msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*t
 
 	// Register DID Document in Store once all validation checks are passed
 	id := k.RegisterDidDocumentInStore(ctx, &didDocumentState)
+
+	// After successful registration of the DID Document, every blockchainAccountIds
+	// can be added to the store
+	for _, vm := range didDocumentState.DidDocument.VerificationMethod {
+		if vm.BlockchainAccountId != "" {
+			k.SetBlockchainAddressInStore(&ctx, vm.BlockchainAccountId, vm.Controller)
+		}
+	}
+
+	// Emit a successful DID Document Registration event
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent("create_did", sdk.NewAttribute("tx_author", msg.GetCreator())),
+	)
 
 	return &types.MsgCreateDIDResponse{Id: id}, nil
 }
@@ -142,6 +170,13 @@ func getVerificationMethodsForCreateDID(didDocument *types.Did) ([]*types.Verifi
 		if vm.Controller == didDocument.Id {
 			foundAtleastOneSubjectVM = true
 		}
+
+		// Skip X25519KeyAgreementKey2020 or X25519KeyAgreementKey2020 because these
+		// are not allowed for Authentication and Assertion purposes
+		if (vm.Type == types.X25519KeyAgreementKey2020) || (vm.Type == types.X25519KeyAgreementKeyEIP5630) {
+			continue
+		}
+
 		mustHaveVerificaitonMethods = append(mustHaveVerificaitonMethods, vm)
 	}
 

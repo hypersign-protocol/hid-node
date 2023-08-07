@@ -81,5 +81,10 @@ func (k msgServer) CreateSchema(goCtx context.Context, msg *types.MsgCreateSchem
 
 	id := k.RegisterSchemaInStore(ctx, schema)
 
+	// Emit a successful Schema Registration event
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent("create_schema", sdk.NewAttribute("tx_author", msg.GetCreator())),
+	)
+
 	return &types.MsgCreateSchemaResponse{Id: id}, nil
 }

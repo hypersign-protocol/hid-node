@@ -53,11 +53,26 @@ def generate_key_pair(algo="ed25519"):
         cmd = "hid-noded debug secp256k1 random"
     elif algo == "recover-eth":
         cmd = "hid-noded debug secp256k1 eth-hex-random"
+    elif algo == "bbs":
+        cmd = "hid-noded debug bbs random"
     else:
         raise Exception(algo + " is not a supported signing algorithm")
     result_str, _ = run_command(cmd)
     kp = json.loads(result_str)
     return kp
+
+def add_keyAgreeemnt_pubKeyMultibase(verification_method, type):
+    if verification_method["type"] != "Ed25519VerificationKey2020":
+        raise Exception("verification method " + verification_method["id"] + " must be of type Ed25519VerificationKey2020")
+    
+    if type == "X25519KeyAgreementKey2020":
+        verification_method["type"] = "X25519KeyAgreementKey2020"
+    elif type == "X25519KeyAgreementKeyEIP5630":
+        verification_method["type"] = "X25519KeyAgreementKeyEIP5630"
+    else:
+        raise Exception("invalid key agreement type " + type)
+
+    return verification_method
 
 def generate_document_id(doc_type: str, kp: dict = None, algo: str = "ed25519", is_uuid: bool =False):
     id = ""

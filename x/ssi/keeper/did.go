@@ -89,3 +89,21 @@ func (k Keeper) RegisterDidDocumentInStore(ctx sdk.Context, didDoc *types.DidDoc
 	k.SetDidCount(ctx, didCount+1)
 	return didCount
 }
+
+// Set the BlockchainAccountId in Store
+func (k Keeper) SetBlockchainAddressInStore(ctx *sdk.Context, blockchainAccountId string, didId string) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.BlockchainAccountIdStoreKey))
+	store.Set([]byte(blockchainAccountId), []byte(didId))
+}
+
+// Get the BlockchainAccountId from Store
+func (k Keeper) GetBlockchainAddressFromStore(ctx *sdk.Context, blockchainAccountId string) []byte {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.BlockchainAccountIdStoreKey))
+	return store.Get([]byte(blockchainAccountId))
+}
+
+// Remove the BlockchainAccountId from Store
+func (k Keeper) RemoveBlockchainAddressInStore(ctx *sdk.Context, blockchainAccountId string) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.BlockchainAccountIdStoreKey))
+	store.Delete([]byte(blockchainAccountId))
+}

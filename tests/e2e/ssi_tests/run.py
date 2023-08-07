@@ -33,7 +33,10 @@ def run_all_tests():
     caip10_cosmos_support_test()
     vm_type_test()
     method_specific_id_test()
-
+    unique_wallet_address_test()
+    key_agrement_test()
+    bbs_signature_test()
+    
     print("============= 😃️ All test cases completed successfully ============== \n")
 
 if __name__=='__main__':

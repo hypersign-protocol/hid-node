@@ -17,6 +17,8 @@ import (
 	etherhexutil "github.com/ethereum/go-ethereum/common/hexutil"
 	ethercrypto "github.com/ethereum/go-ethereum/crypto"
 
+	bbs "github.com/hyperledger/aries-framework-go/component/kmscrypto/crypto/primitive/bbs12381g2pub"
+
 	"github.com/spf13/cobra"
 )
 
@@ -45,6 +47,23 @@ func extractDIDSigningElements(cmdArgs []string) ([]DIDSigningElements, error) {
 	}
 
 	return didSigningElementsList, nil
+}
+
+// GetBBSSignature signs a message and returns a BBS signature
+func GetBBSSignature(privateKey string, message []byte) (string, error) {
+	privKeyBytes, err := base64.StdEncoding.DecodeString(privateKey)
+	if err != nil {
+		panic(err)
+	}
+
+	bbsObj := bbs.New()
+
+	signatureBytes, err := bbsObj.Sign([][]byte{message}, privKeyBytes)
+	if err != nil {
+		panic(err)
+	}
+
+	return base64.StdEncoding.EncodeToString(signatureBytes), nil
 }
 
 func GetEthRecoverySignature(privateKey string, message []byte) (string, error) {
@@ -132,8 +151,13 @@ func getSignatures(cmd *cobra.Command, message []byte, cmdArgs []string) ([]*typ
 			if err != nil {
 				return nil, err
 			}
+		case "bbs":
+			signInfoList[i].Signature, err = GetBBSSignature(didSigningElementsList[i].SignKey, message)
+			if err != nil {
+				return nil, err
+			}
 		default:
-			return nil, fmt.Errorf("unsupported signing algorithm %s, supported signing algorithms: ['ed25519','secp256k1']", didSigningElementsList[i].SignAlgo)
+			return nil, fmt.Errorf("unsupported signing algorithm %s, supported signing algorithms: ['ed25519', 'secp256k1', 'recover-eth', 'bbs']", didSigningElementsList[i].SignAlgo)
 		}
 	}
 

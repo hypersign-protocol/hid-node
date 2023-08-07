@@ -106,6 +106,7 @@ import (
 	"github.com/CosmWasm/wasmd/x/wasm"
 	wasmclient "github.com/CosmWasm/wasmd/x/wasm/client"
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
+	wasmbinding "github.com/hypersign-protocol/hid-node/wasmbinding"
 )
 
 const (
@@ -408,23 +409,13 @@ func NewHidnodeApp(
 		app.BaseApp,
 	)
 
-	app.UpgradeKeeper.SetUpgradeHandler("v011", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-		ctx.Logger().Info("IBC upgrade to v3")
+	app.UpgradeKeeper.SetUpgradeHandler("v018", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+		ctx.Logger().Info("v0.1.8 upgrade")
 		return fromVM, nil
 	})
 
-	app.UpgradeKeeper.SetUpgradeHandler("v013", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-		ctx.Logger().Info("v0.1.3 upgrade")
-		return fromVM, nil
-	})
-
-	app.UpgradeKeeper.SetUpgradeHandler("v014", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-		ctx.Logger().Info("v0.1.4 upgrade")
-		return fromVM, nil
-	})
-
-	app.UpgradeKeeper.SetUpgradeHandler("v015", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-		ctx.Logger().Info("v0.1.5 upgrade")
+	app.UpgradeKeeper.SetUpgradeHandler("v019", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+		ctx.Logger().Info("v0.1.9 upgrade")
 		return fromVM, nil
 	})
 
@@ -502,9 +493,12 @@ func NewHidnodeApp(
 		panic(fmt.Sprintf("error while reading wasm config: %s", err))
 	}
 
+	// Add Custom Query and Message Plugin
+	wasmOpts = append(wasmbinding.RegisterCustomPlugins(&app.SsiKeeper), wasmOpts...)
+
 	// The last arguments can contain custom message handlers, and custom query handlers,
 	// if we want to allow any custom callbacks
-	availableCapabilities := "iterator,staking,stargate,cosmwasm_1_1"
+	availableCapabilities := "iterator,staking,stargate,custom,cosmwasm_1_1"
 
 	app.WasmKeeper = wasm.NewKeeper(
 		appCodec,
