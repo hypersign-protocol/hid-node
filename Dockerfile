@@ -17,5 +17,8 @@ RUN make install
 # Expose Ports
 EXPOSE 26657 1317 9090 9091 26656
 
+# Provide permission to the script
+RUN chmod +x ./scripts/docker-node/entrypoint.sh
+
 # Entry for containers
-ENTRYPOINT [ "./scripts/docker-node/setup.sh" ]
+ENTRYPOINT [ "./scripts/docker-node/entrypoint.sh" ]
