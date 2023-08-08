@@ -21,4 +21,5 @@ EXPOSE 26657 1317 9090 9091 26656
 RUN chmod +x ./scripts/docker-node/entrypoint.sh
 
 # Entry for containers
-ENTRYPOINT [ "./scripts/docker-node/entrypoint.sh" ]
+ENTRYPOINT [ "/bin/sh", "-c", "echo N | ./scripts/docker-node/entrypoint.sh" ]
+

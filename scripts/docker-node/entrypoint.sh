@@ -16,7 +16,7 @@ if [ ${RET_VAL} -ne 0 ]; then
 fi
 
 # Setting up config files
-rm -rf /root/.hid-node/
+# rm -rf /root/.hid-node/
 
 # Make directories for hid-node config
 mkdir /root/.hid-node
