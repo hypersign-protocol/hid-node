@@ -37,6 +37,7 @@ def run_all_tests():
     key_agrement_test()
     ssi_fee_test()
     big_did_tx_test()
+    bbs_signature_test()
     
     print("============= 😃️ All test cases completed successfully ============== \n")
 

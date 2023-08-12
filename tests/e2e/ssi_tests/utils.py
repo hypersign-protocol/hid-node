@@ -53,6 +53,8 @@ def generate_key_pair(algo="ed25519"):
         cmd = "hid-noded debug secp256k1 random"
     elif algo == "recover-eth":
         cmd = "hid-noded debug secp256k1 eth-hex-random"
+    elif algo == "bbs":
+        cmd = "hid-noded debug bbs random"
     else:
         raise Exception(algo + " is not a supported signing algorithm")
     result_str, _ = run_command(cmd)
