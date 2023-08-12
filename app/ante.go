@@ -39,8 +39,8 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 	anteDecorators := []sdk.AnteDecorator{
 		ante.NewSetUpContextDecorator(), // outermost AnteDecorator. SetUpContext must be called first
 		ante.NewRejectExtensionOptionsDecorator(),
-		ssiante.NewSSITxDecorator(),
-		ssiante.NewMempoolFeeDecorator(),
+		ssiante.NewSSITxDecorator(), // SSITxDecorator MUST always be called before MempoolFeeDecorator
+		ssiante.NewMempoolFeeDecorator(), // MempoolFeeDecorator MUST always be called before DeductFeeDecorator
 		ante.NewValidateBasicDecorator(),
 		ante.NewTxTimeoutHeightDecorator(),
 		ante.NewValidateMemoDecorator(options.AccountKeeper),

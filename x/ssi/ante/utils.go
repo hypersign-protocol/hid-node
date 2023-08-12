@@ -2,10 +2,21 @@ package ante
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/x/authz"
 	ssitypes "github.com/hypersign-protocol/hid-node/x/ssi/types"
 )
 
-// isSSIMsg checks if the message is of SSI type or not
+// isAuthzExecMsg checks if the message is of authz.MsgExec type
+func isAuthzExecMsg(msg sdk.Msg) bool {
+	switch msg.(type) {
+	case *authz.MsgExec:
+		return true
+	default:
+		return false
+	}
+}
+
+// isSSIMsg checks if the message is of SSI type
 func isSSIMsg(msg sdk.Msg) bool {
 	switch msg.(type) {
 	case *ssitypes.MsgCreateDID:
@@ -21,26 +32,4 @@ func isSSIMsg(msg sdk.Msg) bool {
 	default:
 		return false
 	}
-}
-
-// isSSIMsgPresentInTx checks if there is any SSI message present in the transaction
-func isSSIMsgPresentInTx(tx sdk.Tx) bool {
-	for _, msg := range tx.GetMsgs() {
-		if isSSIMsg(msg) {
-			return true
-		}
-	}
-
-	return false
-}
-
-// isNonSSIMsgPresentInTx checks if there is any non-SSI message present in the transaction
-func isNonSSIMsgPresentInTx(tx sdk.Tx) bool {
-	for _, msg := range tx.GetMsgs() {
-		if !isSSIMsg(msg) {
-			return true
-		}
-	}
-
-	return false
 }
