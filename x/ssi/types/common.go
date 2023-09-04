@@ -11,6 +11,7 @@ const EcdsaSecp256k1RecoveryMethod2020 = "EcdsaSecp256k1RecoveryMethod2020"
 const X25519KeyAgreementKey2020 = "X25519KeyAgreementKey2020"
 const X25519KeyAgreementKeyEIP5630 = "X25519KeyAgreementKeyEIP5630" // TODO: Temporary spec name for KeyAgreement type from Metamask
 const Bls12381G2Key2020 = "Bls12381G2Key2020"
+const BabyJubJubVerificationKey2023 = "BabyJubJubVerificationKey2023"
 
 // Mapping between Verification Key and its corresponding Signature
 var VerificationKeySignatureMap = map[string]string{
@@ -19,6 +20,7 @@ var VerificationKeySignatureMap = map[string]string{
 	EcdsaSecp256k1RecoveryMethod2020:  "EcdsaSecp256k1RecoverySignature2020",
 	X25519KeyAgreementKey2020:         "", // Authentication and Assertion are not allowed
 	X25519KeyAgreementKeyEIP5630:      "", // Authentication and Assertion are not allowed
+	BabyJubJubVerificationKey2023:     "",
 	Bls12381G2Key2020:                 "BbsBlsSignature2020",
 }
 
