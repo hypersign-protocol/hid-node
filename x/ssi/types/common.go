@@ -20,7 +20,7 @@ var VerificationKeySignatureMap = map[string]string{
 	EcdsaSecp256k1RecoveryMethod2020:  "EcdsaSecp256k1RecoverySignature2020",
 	X25519KeyAgreementKey2020:         "", // Authentication and Assertion are not allowed
 	X25519KeyAgreementKeyEIP5630:      "", // Authentication and Assertion are not allowed
-	BabyJubJubVerificationKey2023:     "",
+	BabyJubJubVerificationKey2023:     "BabyJubJubSignature2023",
 	Bls12381G2Key2020:                 "BbsBlsSignature2020",
 }
 
