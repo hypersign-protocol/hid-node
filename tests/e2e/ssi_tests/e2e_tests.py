@@ -1432,3 +1432,65 @@ def method_specific_id_test():
     run_blockchain_command(update_tx_cmd, f"Removal of Verification Method associated with method specific id")
 
     print("--- Test Completed ---\n")
+
+def bjj_signature_test():
+    print("\n--1. PASS: Create a DID using BabyJubJub Key Pair--\n")
+
+    kp_alice = generate_key_pair("bjj")
+    signers = []
+    did_doc_string = generate_did_document(kp_alice, "bjj")
+    did_doc_alice = did_doc_string["id"]
+    signPair_alice = {
+        "kp": kp_alice,
+        "verificationMethodId": did_doc_string["verificationMethod"][0]["id"],
+        "signing_algo": "bjj"
+    }
+    signers.append(signPair_alice)
+    create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
+    run_blockchain_command(create_tx_cmd, f"Registering Alice's DID with Id: {did_doc_alice}")
+
+    print("\n--2. PASS: Create a Schema using BabyJubJub Key Pair--\n")
+
+    schema_doc, schema_proof = generate_schema_document(
+        kp_alice, 
+        did_doc_alice, 
+        did_doc_string["verificationMethod"][0]["id"],
+        algo="bjj"
+    )
+    create_schema_cmd = form_create_schema_tx(
+        schema_doc, 
+        schema_proof, 
+        DEFAULT_BLOCKCHAIN_ACCOUNT_NAME
+    )
+    schema_doc_id = schema_doc["id"]
+    run_blockchain_command(create_schema_cmd, f"Registering Schema with Id: {schema_doc_id}")
+
+    print("\n--3. PASS: Create a Credential Status using BabyJubJub Key Pair--\n")
+
+    cred_doc, cred_proof = generate_cred_status_document(
+        kp_alice,
+        did_doc_alice,
+        did_doc_string["verificationMethod"][0]["id"],
+        algo="bjj"
+    )
+    register_cred_status_cmd = form_create_cred_status_tx(
+        cred_doc,
+        cred_proof,
+        DEFAULT_BLOCKCHAIN_ACCOUNT_NAME
+    )
+    cred_id = cred_doc["claim"]["id"]
+    run_blockchain_command(register_cred_status_cmd, f"Registering Credential status with Id: {cred_id}")
+
+
+    print("\n--4. PASS: Update a DID using BabyJubJub Key Pair--\n")
+    did_doc_string["context"] = ["http://example.com"]
+    signers = []
+    signers.append(signPair_alice)
+    update_tx_cmd = form_did_update_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
+    run_blockchain_command(update_tx_cmd, f"Bob (non-controller) attempts to update Org DID with Id: {did_doc_alice}")
+
+    print("\n--5. PASS: Deactivate a DID using BabyJubJub Key Pair--\n")
+    signers = []
+    signers.append(signPair_alice)
+    deactivate_tx_cmd = form_did_deactivate_tx_multisig(did_doc_alice, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
+    run_blockchain_command(deactivate_tx_cmd, f"Deactivation of Org's DID with Id: {did_doc_alice}")

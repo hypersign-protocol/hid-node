@@ -55,6 +55,8 @@ def generate_key_pair(algo="ed25519"):
         cmd = "hid-noded debug secp256k1 eth-hex-random"
     elif algo == "bbs":
         cmd = "hid-noded debug bbs random"
+    elif algo == "bjj":
+        cmd = "hid-noded debug bjj random"
     else:
         raise Exception(algo + " is not a supported signing algorithm")
     result_str, _ = run_command(cmd)
@@ -107,7 +109,7 @@ def is_blockchain_active(rpc_port):
         assert s.connect_ex(('localhost', rpc_port)) == 0, f"hid-noded is not running"
 
 def get_document_signature(doc: dict, doc_type: str, key_pair: dict, algo: str = "ed25519"):
-    if algo in ["recover-eth"]:
+    if algo in ["recover-eth", "bjj"]:
         private_key = key_pair["priv_key_hex"]
     else:
         private_key = key_pair["priv_key_base_64"]
