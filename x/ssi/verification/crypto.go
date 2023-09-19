@@ -57,7 +57,7 @@ func verify(extendedVm *types.ExtendedVerificationMethod, ssiMsg types.SsiMsg) e
 
 	switch extendedVm.Type {
 	case types.Ed25519VerificationKey2020:
-		return verifyEd25519VerificationKey2020Key(extendedVm, docBytes)
+		return verifyEd25519Signature2020(extendedVm, docBytes)
 	case types.EcdsaSecp256k1VerificationKey2019:
 		return verifyEcdsaSecp256k1VerificationKey2019Key(extendedVm, docBytes)
 	case types.EcdsaSecp256k1RecoveryMethod2020:
@@ -175,21 +175,43 @@ func verifyEcdsaSecp256k1RecoveryMethod2020Key(extendedVm *types.ExtendedVerific
 	}
 }
 
-// verifyEd25519VerificationKey2020Key verifies the verification key for verification method type Ed25519VerificationKey2020
-func verifyEd25519VerificationKey2020Key(extendedVm *types.ExtendedVerificationMethod, documentBytes []byte) error {
+// verifyEd25519Signature2020 verifies Ed25519Signature2020 signature using Ed25519VerificationKey2020 publicKeyMultibase 
+func verifyEd25519Signature2020(extendedVm *types.ExtendedVerificationMethod, documentBytes []byte) error {
 	// Decode Public Key
-	_, publicKeyBytes, err := multibase.Decode(extendedVm.PublicKeyMultibase)
+	encoding, publicKeyBytes, err := multibase.Decode(extendedVm.PublicKeyMultibase)
 	if err != nil {
 		return fmt.Errorf(
 			"cannot decode Ed25519 public key %s",
 			extendedVm.PublicKeyMultibase,
 		)
 	}
+	if encoding != multibase.Base58BTC {
+		return fmt.Errorf(
+			"publicKeyMultibase of verification method %v must be multibase base58btc encoded",
+			extendedVm.Id,
+		)
+	}
+
+	// Incoming publicKeyMultibase is expected to be of 34 byte length (2-byte header + 32-byte public key)
+	if len(publicKeyBytes) != 34 {
+		return fmt.Errorf(
+			"provided publicKeyMultibase %v of verification method %v is expected to be of byte-length 34",
+			extendedVm.PublicKeyMultibase,
+			extendedVm.Id,
+		)
+	}
+	publicKeyBytes = publicKeyBytes[2:]
 
 	// Decode Signatures
-	signatureBytes, err := base64.StdEncoding.DecodeString(extendedVm.Signature)
+	encoding, signatureBytes, err := multibase.Decode(extendedVm.Signature)
 	if err != nil {
 		return err
+	}
+	if encoding != multibase.Base58BTC {
+		return fmt.Errorf(
+			"signature provided for verification method %v must be multibase base58btc encoded",
+			extendedVm.Id,
+		)
 	}
 
 	if !ed25519.Verify(publicKeyBytes, documentBytes, signatureBytes) {

@@ -13,15 +13,22 @@ const X25519KeyAgreementKeyEIP5630 = "X25519KeyAgreementKeyEIP5630" // TODO: Tem
 const Bls12381G2Key2020 = "Bls12381G2Key2020"
 const BabyJubJubVerificationKey2023 = "BabyJubJubVerificationKey2023"
 
+// Supported Proof Types
+const Ed25519Signature2020 = "Ed25519Signature2020"
+const EcdsaSecp256k1Signature2019 = "EcdsaSecp256k1Signature2019"
+const EcdsaSecp256k1RecoverySignature2020 = "EcdsaSecp256k1RecoverySignature2020"
+const BabyJubJubSignature2023 = "BabyJubJubSignature2023"
+const BbsBlsSignature2020 = "BbsBlsSignature2020"
+
 // Mapping between Verification Key and its corresponding Signature
 var VerificationKeySignatureMap = map[string]string{
-	Ed25519VerificationKey2020:        "Ed25519Signature2020",
-	EcdsaSecp256k1VerificationKey2019: "EcdsaSecp256k1Signature2019",
-	EcdsaSecp256k1RecoveryMethod2020:  "EcdsaSecp256k1RecoverySignature2020",
+	Ed25519VerificationKey2020:        Ed25519Signature2020,
+	EcdsaSecp256k1VerificationKey2019: EcdsaSecp256k1Signature2019,
+	EcdsaSecp256k1RecoveryMethod2020:  EcdsaSecp256k1RecoverySignature2020,
 	X25519KeyAgreementKey2020:         "", // Authentication and Assertion are not allowed
 	X25519KeyAgreementKeyEIP5630:      "", // Authentication and Assertion are not allowed
-	BabyJubJubVerificationKey2023:     "BabyJubJubSignature2023",
-	Bls12381G2Key2020:                 "BbsBlsSignature2020",
+	BabyJubJubVerificationKey2023:     BabyJubJubSignature2023,
+	Bls12381G2Key2020:                 BbsBlsSignature2020,
 }
 
 var supportedVerificationMethodTypes []string = func() []string {

@@ -45,9 +45,9 @@ def run_blockchain_command(cmd_string: str, transaction_name: str = None, expect
             print(f"{transaction_name} : Error while executing transaction command\n")
             raise(e)
 
-def generate_key_pair(algo="ed25519"):
+def generate_key_pair(algo="Ed25519Signature2020"):
     cmd = ""
-    if algo == "ed25519":
+    if algo == "Ed25519Signature2020":
         cmd = "hid-noded debug ed25519 random"
     elif algo == "secp256k1":
         cmd = "hid-noded debug secp256k1 random"
@@ -76,7 +76,7 @@ def add_keyAgreeemnt_pubKeyMultibase(verification_method, type):
 
     return verification_method
 
-def generate_document_id(doc_type: str, kp: dict = None, algo: str = "ed25519", is_uuid: bool =False):
+def generate_document_id(doc_type: str, kp: dict = None, algo: str = "Ed25519Signature2020", is_uuid: bool =False):
     id = ""
     if not kp:
         kp = generate_key_pair(algo)
@@ -123,6 +123,9 @@ def get_document_signature(doc: dict, doc_type: str, key_pair: dict, algo: str =
     
     cmd_string = f"hid-noded debug sign-ssi-doc {doc_cmd} '{json.dumps(doc)}' {private_key} {algo}"
     signature, _ = run_command(cmd_string)
+
+    if signature == "":
+        raise Exception(f"Signature came empty while running command: {cmd_string}")
     return signature
 
 def secp256k1_pubkey_to_address(pub_key, prefix):

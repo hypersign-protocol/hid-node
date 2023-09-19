@@ -6,22 +6,27 @@ import json
 from utils import run_command, generate_document_id, get_document_signature, \
     secp256k1_pubkey_to_address
 
-def generate_did_document(key_pair, algo="ed25519", bech32prefix="hid", is_uuid=False):
+ED25519_CONTEXT = "https://w3id.org/security/suites/ed25519-2020/v1"
+DID_CONTEXT = "https://www.w3.org/ns/did/v1"
+
+def generate_did_document(key_pair, algo="Ed25519Signature2020", bech32prefix="hid", is_uuid=False):
     base_document = {
         "context" : [
-            "https://www.w3.org/ns/did/v1"
+            DID_CONTEXT,
         ],
         "id": "",
         "controller": [],
         "verificationMethod": [],
         "authentication": [],
     }
+    if algo == "Ed25519Signature2020":
+        base_document["context"].append(ED25519_CONTEXT)
 
     did_id = generate_document_id("did", key_pair, algo, is_uuid)
 
     # Form the DID Document
     vm_type = ""
-    if algo == "ed25519":
+    if algo == "Ed25519Signature2020":
         vm_type = "Ed25519VerificationKey2020"
     elif algo == "secp256k1":
         vm_type = "EcdsaSecp256k1VerificationKey2019"
@@ -34,13 +39,21 @@ def generate_did_document(key_pair, algo="ed25519", bech32prefix="hid", is_uuid=
     else:
         raise Exception("unknown signing algorithm: " + key_pair)
 
-    verification_method = {
-        "id": "",
-        "type": "",
-        "controller": "",
-        "blockchainAccountId": "",
-        "publicKeyMultibase": ""
-    }
+    verification_method = {}
+    if algo == "recover-eth":
+        verification_method = {
+            "id": "",
+            "type": "",
+            "controller": "",
+            "blockchainAccountId": ""
+        }
+    else:
+        verification_method = {
+            "id": "",
+            "type": "",
+            "controller": "",
+            "publicKeyMultibase": ""
+        }
 
     if algo == "recover-eth":
         verification_method["blockchainAccountId"] = "eip155:1:" + key_pair["ethereum_address"]
@@ -72,7 +85,7 @@ def generate_did_document(key_pair, algo="ed25519", bech32prefix="hid", is_uuid=
     base_document["assertionMethod"] = []
     return base_document
     
-def generate_schema_document(key_pair, schema_author, vm, signature=None, algo="ed25519"):
+def generate_schema_document(key_pair, schema_author, vm, signature=None, algo="Ed25519Signature2020"):
     base_schema_doc = {
         "type": "https://schema.org/Person",
         "modelVersion": "v1.0",
@@ -90,7 +103,7 @@ def generate_schema_document(key_pair, schema_author, vm, signature=None, algo="
     }
     
     proof_type = ""
-    if algo == "ed25519":
+    if algo == "Ed25519Signature2020":
         proof_type = "Ed25519Signature2020"
     elif algo == "secp256k1":
         proof_type = "EcdsaSecp256k1Signature2019"
@@ -124,7 +137,7 @@ def generate_schema_document(key_pair, schema_author, vm, signature=None, algo="
 
     return base_schema_doc, base_schema_proof
 
-def generate_cred_status_document(key_pair, cred_author, vm, signature=None, algo="ed25519"):
+def generate_cred_status_document(key_pair, cred_author, vm, signature=None, algo="Ed25519Signature2020"):
     base_cred_status_doc = {
         "claim": {
                 "id": "",
@@ -138,7 +151,7 @@ def generate_cred_status_document(key_pair, cred_author, vm, signature=None, alg
     }
     
     proof_type = ""
-    if algo == "ed25519":
+    if algo == "Ed25519Signature2020":
         proof_type = "Ed25519Signature2020"
     elif algo == "secp256k1":
         proof_type = "EcdsaSecp256k1Signature2019"

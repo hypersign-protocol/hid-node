@@ -15,10 +15,10 @@ import (
 	bbs "github.com/hyperledger/aries-framework-go/component/kmscrypto/crypto/primitive/bbs12381g2pub"
 	hidnodecli "github.com/hypersign-protocol/hid-node/x/ssi/client/cli"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
+	"github.com/iden3/go-iden3-crypto/babyjub"
 	"github.com/multiformats/go-multibase"
 	"github.com/spf13/cobra"
 	secp256k1 "github.com/tendermint/tendermint/crypto/secp256k1"
-	"github.com/iden3/go-iden3-crypto/babyjub"
 )
 
 func extendDebug(debugCmd *cobra.Command) *cobra.Command {
@@ -327,8 +327,8 @@ func signSchemaDocCmd() *cobra.Command {
 			// Sign Schema Document
 			var signature string
 			switch argSigningAlgo {
-			case "ed25519":
-				signature, err = hidnodecli.GetEd25519Signature(argPrivateKey, schemaDocBytes)
+			case types.Ed25519Signature2020:
+				signature, err = hidnodecli.GetEd25519Signature2020(argPrivateKey, schemaDocBytes)
 				if err != nil {
 					return err
 				}
@@ -389,8 +389,8 @@ func signCredStatusDocCmd() *cobra.Command {
 			// Sign Credential Status Document
 			var signature string
 			switch argSigningAlgo {
-			case "ed25519":
-				signature, err = hidnodecli.GetEd25519Signature(argPrivateKey, credStatusDocBytes)
+			case types.Ed25519Signature2020:
+				signature, err = hidnodecli.GetEd25519Signature2020(argPrivateKey, credStatusDocBytes)
 				if err != nil {
 					return err
 				}
@@ -436,14 +436,21 @@ func ed25519RandomCmd() *cobra.Command {
 				return err
 			}
 
+			// A 2-byte header must be prefixed before Ed25519 public key based on
+			// W3C's Ed25519VerificationKey2020 Specification for the attribute `publicKeyMultibase`
+			// Read more: https://www.w3.org/community/reports/credentials/CG-FINAL-di-eddsa-2020-20220724/#ed25519verificationkey2020
+			var publicKeyWithHeader []byte
+			publicKeyWithHeader = append(publicKeyWithHeader, append([]byte{0xed, 0x01}, pubKey...)...)
+
 			keyInfo := struct {
-				PubKeyBase64    string `json:"pub_key_base_64"`
 				PubKeyMultibase string `json:"pub_key_multibase"`
-				PrivKeyBase64   string `json:"priv_key_base_64"`
+				PrivKeyMultibase   string `json:"priv_key_base_64"`
 			}{
-				PubKeyBase64:    base64.StdEncoding.EncodeToString(pubKey),
-				PubKeyMultibase: "z" + base58.Encode(pubKey),
-				PrivKeyBase64:   base64.StdEncoding.EncodeToString(privKey),
+				PubKeyMultibase: "z" + base58.Encode(publicKeyWithHeader),
+				// W3C's Ed25519VerificationKey2020 Specification has not explicitly mentioned about the encoding of the private key
+				// or whether it should be prefixed similar to the public key. For now, the encoding of private key remains Base64
+				// with no prefix 
+				PrivKeyMultibase:   base64.StdEncoding.EncodeToString(privKey),
 			}
 
 			keyInfoJson, err := json.Marshal(keyInfo)

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	ldcontext "github.com/hypersign-protocol/hid-node/x/ssi/ld-context"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 )
 
@@ -65,6 +66,18 @@ func getDocBytesByClientSpec(ssiMsg types.SsiMsg, extendedVm *types.ExtendedVeri
 			)
 		}
 	} else {
+		// If DID Document, perform RDF normalisation and return its SHA-256 Hash
+		didDoc, ok := ssiMsg.(*types.Did)
+		if ok {
+			switch extendedVm.Type {
+			case types.Ed25519VerificationKey2020:
+				didDocBytes, err := ldcontext.EdDSACryptoSuite2020Canonize(didDoc)
+				if err != nil {
+					return nil, err
+				}
+				return didDocBytes, nil
+			}
+		}
 		return ssiMsg.GetSignBytes(), nil
 	}
 }
