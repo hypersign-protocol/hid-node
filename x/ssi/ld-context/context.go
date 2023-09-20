@@ -2,6 +2,7 @@ package ldcontext
 
 const didContext string = "https://www.w3.org/ns/did/v1"
 const ed25519Context2020 string = "https://w3id.org/security/suites/ed25519-2020/v1"
+const x25519KeyAgreement2020Context string = "https://ns.did.ai/suites/x25519-2020/v1"
 
 // As hid-node is not supposed to perform any GET request, the complete Context body of their
 // respective Context urls has been maintained below.
@@ -148,6 +149,31 @@ var ContextUrlMap map[string]contextObject = map[string]contextObject{
 				"verificationMethod": map[string]interface{}{
 					"@id":   "https://w3id.org/security#verificationMethod",
 					"@type": "@id",
+				},
+			},
+		},
+	},
+	x25519KeyAgreement2020Context: {
+		"id":        "@id",
+		"type":      "@type",
+		"@protected": true,
+		"X25519KeyAgreementKey2020": map[string]interface{}{
+			"@id": "https://w3id.org/security#X25519KeyAgreementKey2020",
+			"@context": map[string]interface{}{
+				"@protected": true,
+				"id":         "@id",
+				"type":       "@type",
+				"controller": map[string]interface{}{
+					"@id":   "https://w3id.org/security#controller",
+					"@type": "@id",
+				},
+				"revoked": map[string]interface{}{
+					"@id":   "https://w3id.org/security#revoked",
+					"@type": "http://www.w3.org/2001/XMLSchema#dateTime",
+				},
+				"publicKeyMultibase": map[string]interface{}{
+					"@id":   "https://w3id.org/security#publicKeyMultibase",
+					"@type": "https://w3id.org/security#multibase",
 				},
 			},
 		},
