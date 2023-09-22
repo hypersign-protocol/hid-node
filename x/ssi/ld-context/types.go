@@ -1,6 +1,7 @@
 package ldcontext
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
@@ -56,19 +57,39 @@ func NewJsonLdDid(didDoc *types.Did) *JsonLdDid {
 	return jsonLdDoc
 }
 
+// Convert JsonLdDid to interface
+func jsonLdDidToInterface(jsonLd *JsonLdDid) interface{} {
+	var intf interface{}
+	
+	jsonLdBytes, err := json.Marshal(jsonLd)
+	if err != nil {
+		panic(err)
+	}
+
+	err = json.Unmarshal(jsonLdBytes, &intf)
+	if err != nil {
+		panic(err)
+	}
+
+	return intf
+}
+
 // NormalizeWithURDNA2015 performs RDF Canonization upon JsonLdDid using URDNA2015 
 // algorithm and returns the canonized document in string
-func (doc *JsonLdDid) NormalizeWithURDNA2015() (string, error) {
+func (jsonLd *JsonLdDid) NormalizeWithURDNA2015() (string, error) {
 	proc := ld.NewJsonLdProcessor()
 	options := ld.NewJsonLdOptions("")
 	options.Algorithm = ld.AlgorithmURDNA2015
 	options.Format = "application/n-quads"
 
-	normalisedJsonLdDid, err := proc.Normalize(doc, options)
+	normalisedJsonLdDid, err := proc.Normalize(jsonLdDidToInterface(jsonLd), options)
 	if err != nil {
 		return "", fmt.Errorf("unable to Normalize DID Document: %v", err.Error())
 	}
 
 	canonizedDocString := normalisedJsonLdDid.(string)
+	if canonizedDocString == "" {
+		return "", fmt.Errorf("normalization yield empty RDF string for did document: %v", jsonLd.Id)
+	}
 	return canonizedDocString, nil
 }
