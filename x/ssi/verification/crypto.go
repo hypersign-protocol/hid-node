@@ -67,7 +67,7 @@ func verify(extendedVm *types.ExtendedVerificationMethod, ssiMsg types.SsiMsg) e
 	case types.X25519KeyAgreementKeyEIP5630:
 		return verifyX25519KeyAgreementKeyEIP5630Key(extendedVm)
 	case types.Bls12381G2Key2020:
-		return verifyBls12381G2Key2020Key(extendedVm, docBytes)
+		return verifyBbsBlsSignature2020(extendedVm, docBytes)
 	case types.BabyJubJubVerificationKey2023:
 		return verifyBabyJubJubVerificationKey2023Key(extendedVm, docBytes)
 	default:
@@ -121,8 +121,8 @@ func verifyBabyJubJubVerificationKey2023Key(extendedVm *types.ExtendedVerificati
 	return nil
 }
 
-// verifyBls12381G2Key2020Key verifies the verification key for verification method type Bls12381G2Key2020
-func verifyBls12381G2Key2020Key(extendedVm *types.ExtendedVerificationMethod, documentBytes []byte) error {
+// verifyBbsBlsSignature2020 verifies the verification key for verification method type BbsBlsSignature2020
+func verifyBbsBlsSignature2020(extendedVm *types.ExtendedVerificationMethod, documentBytes []byte) error {
 	bbsObj := bbs.New()
 
 	// Unlike in tranditional cryptographic algorithms where a message is signed as-is, the message in BBS+ Signature

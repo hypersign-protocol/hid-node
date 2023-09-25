@@ -343,7 +343,7 @@ func signSchemaDocCmd() *cobra.Command {
 					return err
 				}
 			case types.BbsBlsSignature2020:
-				signature, err = hidnodecli.GetBBSSignature(argPrivateKey, schemaDocBytes)
+				signature, err = hidnodecli.GetBbsBlsSignature2020(argPrivateKey, schemaDocBytes)
 				if err != nil {
 					return err
 				}
@@ -353,7 +353,7 @@ func signSchemaDocCmd() *cobra.Command {
 					return err
 				}
 			default:
-				panic("recieved unsupported signing-algo. Supported algorithms are: ['ed25519', 'secp256k1', 'recover-eth', 'bbs', 'bjj']")
+				panic("recieved unsupported signing-algo. Supported algorithms are: [Ed25519Signature2020, EcdsaSecp256k1Signature2019, EcdsaSecp256k1RecoverySignature2020, BbsBlsSignature2020, 'bjj']")
 			}
 
 			_, err = fmt.Fprintln(cmd.OutOrStdout(), signature)
@@ -405,7 +405,7 @@ func signCredStatusDocCmd() *cobra.Command {
 					return err
 				}
 			case types.BbsBlsSignature2020:
-				signature, err = hidnodecli.GetBBSSignature(argPrivateKey, credStatusDocBytes)
+				signature, err = hidnodecli.GetBbsBlsSignature2020(argPrivateKey, credStatusDocBytes)
 				if err != nil {
 					return err
 				}
@@ -415,7 +415,7 @@ func signCredStatusDocCmd() *cobra.Command {
 					return err
 				}
 			default:
-				panic("recieved unsupported signing-algo. Supported algorithms are: ['ed25519', 'secp256k1', 'recover-eth', 'bbs', 'bjj']")
+				panic("recieved unsupported signing-algo. Supported algorithms are: [Ed25519Signature2020, EcdsaSecp256k1Signature2019, EcdsaSecp256k1RecoverySignature2020, BbsBlsSignature2020, 'bjj']")
 			}
 
 			_, err = fmt.Fprintln(cmd.OutOrStdout(), signature)

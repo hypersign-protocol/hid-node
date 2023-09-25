@@ -53,8 +53,8 @@ func extractDIDSigningElements(cmdArgs []string) ([]DIDSigningElements, error) {
 	return didSigningElementsList, nil
 }
 
-// GetBBSSignature signs a message and returns a BBS signature
-func GetBBSSignature(privateKey string, message []byte) (string, error) {
+// GetBbsBlsSignature2020 signs a message and returns a BBS signature
+func GetBbsBlsSignature2020(privateKey string, message []byte) (string, error) {
 	privKeyBytes, err := base64.StdEncoding.DecodeString(privateKey)
 	if err != nil {
 		panic(err)
@@ -200,7 +200,7 @@ func getSignatures(cmd *cobra.Command, didDoc *types.Did, cmdArgs []string) ([]*
 				return nil, err
 			}
 
-			signInfoList[i].Signature, err = GetBBSSignature(didSigningElementsList[i].SignKey, didDocBytes)
+			signInfoList[i].Signature, err = GetBbsBlsSignature2020(didSigningElementsList[i].SignKey, didDocBytes)
 			if err != nil {
 				return nil, err
 			}
