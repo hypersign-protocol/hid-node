@@ -116,7 +116,7 @@ func GetEcdsaSecp256k1RecoverySignature2020(privateKey string, message []byte) (
 	return etherhexutil.Encode(sigBytes), nil
 }
 
-func GetSecp256k1Signature(privateKey string, message []byte) (string, error) {
+func GetEcdsaSecp256k1Signature2019(privateKey string, message []byte) (string, error) {
 	// Decode key into bytes
 	privKeyBytes, err := base64.StdEncoding.DecodeString(privateKey)
 	if err != nil {
@@ -174,8 +174,13 @@ func getSignatures(cmd *cobra.Command, didDoc *types.Did, cmdArgs []string) ([]*
 			if err != nil {
 				return nil, err
 			}
-		case "secp256k1":
-			signInfoList[i].Signature, err = GetSecp256k1Signature(didSigningElementsList[i].SignKey, didDoc.GetSignBytes())
+		case types.EcdsaSecp256k1Signature2019:
+			didDocBytes, err := ldcontext.EcdsaSecp256k1Signature2019Canonize(didDoc)
+			if err != nil {
+				return nil, err
+			}
+
+			signInfoList[i].Signature, err = GetEcdsaSecp256k1Signature2019(didSigningElementsList[i].SignKey, didDocBytes)
 			if err != nil {
 				return nil, err
 			}

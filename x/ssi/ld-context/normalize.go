@@ -26,6 +26,12 @@ func NormalizeByVerificationMethodType(didDoc *types.Did, vmType string) ([]byte
 			return nil, err
 		}
 		return didDocBytes, nil
+	case types.EcdsaSecp256k1VerificationKey2019:
+		didDocBytes, err := EcdsaSecp256k1Signature2019Canonize(didDoc)
+		if err != nil {
+			return nil, err
+		}
+		return didDocBytes, nil
 	default:
 		return didDoc.GetSignBytes(), nil
 	}

@@ -59,7 +59,7 @@ func verify(extendedVm *types.ExtendedVerificationMethod, ssiMsg types.SsiMsg) e
 	case types.Ed25519VerificationKey2020:
 		return verifyEd25519Signature2020(extendedVm, docBytes)
 	case types.EcdsaSecp256k1VerificationKey2019:
-		return verifyEcdsaSecp256k1VerificationKey2019Key(extendedVm, docBytes)
+		return verifyEcdsaSecp256k1Signature2019Key(extendedVm, docBytes)
 	case types.EcdsaSecp256k1RecoveryMethod2020:
 		return verifyEcdsaSecp256k1RecoverySignature2020(extendedVm, docBytes)
 	case types.X25519KeyAgreementKey2020:
@@ -221,8 +221,8 @@ func verifyEd25519Signature2020(extendedVm *types.ExtendedVerificationMethod, do
 	}
 }
 
-// verifyEcdsaSecp256k1VerificationKey2019Key verifies the verification key for verification method type EcdsaSecp256k1VerificationKey2019
-func verifyEcdsaSecp256k1VerificationKey2019Key(extendedVm *types.ExtendedVerificationMethod, documentBytes []byte) error {
+// verifyEcdsaSecp256k1Signature2019Key verifies the verification key for verification method type EcdsaSecp256k1VerificationKey2019
+func verifyEcdsaSecp256k1Signature2019Key(extendedVm *types.ExtendedVerificationMethod, documentBytes []byte) error {
 	// Decode and Parse Signature
 	signatureBytes, err := base64.StdEncoding.DecodeString(extendedVm.Signature)
 	if err != nil {

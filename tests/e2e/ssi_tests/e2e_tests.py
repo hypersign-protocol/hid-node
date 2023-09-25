@@ -952,7 +952,7 @@ def caip10_ethereum_support_test():
 def caip10_cosmos_support_test():
     print("\n--- CAIP-10 Test: Cosmos Chains ---\n")
 
-    kp_algo = "secp256k1"
+    kp_algo = "EcdsaSecp256k1Signature2019"
 
     # Invalid blockchain Account Ids
     invalid_blockchain_account_ids = [
@@ -1209,7 +1209,7 @@ def vm_type_test():
 
     # EcdsaSecp256k1VerificationKey2019
     print("4. PASS: Registering DID Document with a verification method of type EcdsaSecp256k1VerificationKey2019. Only publicKeyMultibase is passed.")
-    kp_algo = "secp256k1"
+    kp_algo = "EcdsaSecp256k1Signature2019"
     kp = generate_key_pair(algo=kp_algo)
     did_doc_string = generate_did_document(kp, kp_algo, is_uuid=True, bech32prefix="")
     did_doc_id = did_doc_string["id"]
@@ -1225,7 +1225,7 @@ def vm_type_test():
     run_blockchain_command(create_tx_cmd, f"Registering DID with Id: {did_doc_id}")
 
     print("5. PASS: Registering DID Document with a verification method of type EcdsaSecp256k1VerificationKey2019. Both publicKeyMultibase and blockchainAccountId are passed.")
-    kp_algo = "secp256k1"
+    kp_algo = "EcdsaSecp256k1Signature2019"
     kp = generate_key_pair(algo=kp_algo)
     did_doc_string = generate_did_document(kp, kp_algo)
     did_doc_id = did_doc_string["id"]
@@ -1240,7 +1240,7 @@ def vm_type_test():
     run_blockchain_command(create_tx_cmd, f"Registering DID with Id: {did_doc_id}")
 
     print("6. FAIL: Registering DID Document with a verification method of type EcdsaSecp256k1VerificationKey2019. Only blockchainAccountId is passed.")
-    kp_algo = "secp256k1"
+    kp_algo = "EcdsaSecp256k1Signature2019"
     kp = generate_key_pair(algo=kp_algo)
     did_doc_string = generate_did_document(kp, kp_algo)
     did_doc_id = did_doc_string["id"]
@@ -1311,7 +1311,7 @@ def method_specific_id_test():
 
     print("1. PASS: Registering a DID Document where the user provides a blockchain address in MSI that they own")
 
-    kp_algo = "secp256k1"
+    kp_algo = "EcdsaSecp256k1Signature2019"
     kp_alice = generate_key_pair(algo=kp_algo)
     signers = []
     did_doc_string = generate_did_document(kp_alice, algo=kp_algo)
@@ -1328,7 +1328,7 @@ def method_specific_id_test():
 
     print("2. FAIL: Registering a DID Document where the user provides a blockchain address in MSI that they don't own")
     
-    kp_algo = "secp256k1"
+    kp_algo = "EcdsaSecp256k1Signature2019"
     kp_bob = generate_key_pair(algo=kp_algo)
     signers = []
     did_doc_string = generate_did_document(kp_bob, algo=kp_algo)
@@ -1392,7 +1392,7 @@ def method_specific_id_test():
 
     print("6. PASS: Alice tries to update their DID Document by removing the Verification Method associated with the method specific id (CAIP-10 Blockchain Address)")
 
-    kp_algo = "secp256k1"
+    kp_algo = "EcdsaSecp256k1Signature2019"
     kp_alice = generate_key_pair(algo=kp_algo)
     signers = []
     did_doc_string = generate_did_document(kp_alice, algo=kp_algo)

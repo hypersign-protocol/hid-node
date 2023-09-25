@@ -9,6 +9,7 @@ from utils import run_command, generate_document_id, get_document_signature, \
 ED25519_CONTEXT = "https://w3id.org/security/suites/ed25519-2020/v1"
 DID_CONTEXT = "https://www.w3.org/ns/did/v1"
 SECP256K1_RECOVERY_CONTEXT = "https://ns.did.ai/suites/secp256k1-2020/v1"
+SECP256K1_VER_KEY_2019_CONTEXT = "https://ns.did.ai/suites/secp256k1-2019/v1"
 
 def generate_did_document(key_pair, algo="Ed25519Signature2020", bech32prefix="hid", is_uuid=False):
     base_document = {
@@ -24,14 +25,16 @@ def generate_did_document(key_pair, algo="Ed25519Signature2020", bech32prefix="h
         base_document["context"].append(ED25519_CONTEXT)
     if algo == "EcdsaSecp256k1RecoverySignature2020":
         base_document["context"].append(SECP256K1_RECOVERY_CONTEXT)
+    if algo == "EcdsaSecp256k1Signature2019":
+        base_document["context"].append(SECP256K1_VER_KEY_2019_CONTEXT)
 
     did_id = generate_document_id("did", key_pair, algo, is_uuid)
-
+    
     # Form the DID Document
     vm_type = ""
     if algo == "Ed25519Signature2020":
         vm_type = "Ed25519VerificationKey2020"
-    elif algo == "secp256k1":
+    elif algo == "EcdsaSecp256k1Signature2019":
         vm_type = "EcdsaSecp256k1VerificationKey2019"
     elif algo == "EcdsaSecp256k1RecoverySignature2020":
         vm_type = "EcdsaSecp256k1RecoveryMethod2020"
@@ -40,7 +43,7 @@ def generate_did_document(key_pair, algo="Ed25519Signature2020", bech32prefix="h
     elif algo == "bjj":
         vm_type = "BabyJubJubVerificationKey2023"
     else:
-        raise Exception("unknown signing algorithm: " + key_pair)
+        raise Exception("unknown signing algorithm: " + algo)
 
     verification_method = {}
     if algo == "EcdsaSecp256k1RecoverySignature2020":
@@ -60,7 +63,7 @@ def generate_did_document(key_pair, algo="Ed25519Signature2020", bech32prefix="h
 
     if algo == "EcdsaSecp256k1RecoverySignature2020":
         verification_method["blockchainAccountId"] = "eip155:1:" + key_pair["ethereum_address"]
-    elif algo == "secp256k1":
+    elif algo == "EcdsaSecp256k1Signature2019":
 
         if bech32prefix == "hid":
             verification_method["blockchainAccountId"] = "cosmos:jagrat:" + \
@@ -108,7 +111,7 @@ def generate_schema_document(key_pair, schema_author, vm, signature=None, algo="
     proof_type = ""
     if algo == "Ed25519Signature2020":
         proof_type = "Ed25519Signature2020"
-    elif algo == "secp256k1":
+    elif algo == "EcdsaSecp256k1Signature2019":
         proof_type = "EcdsaSecp256k1Signature2019"
     elif algo == "EcdsaSecp256k1RecoverySignature2020":
         proof_type = "EcdsaSecp256k1RecoverySignature2020"
@@ -156,7 +159,7 @@ def generate_cred_status_document(key_pair, cred_author, vm, signature=None, alg
     proof_type = ""
     if algo == "Ed25519Signature2020":
         proof_type = "Ed25519Signature2020"
-    elif algo == "secp256k1":
+    elif algo == "EcdsaSecp256k1Signature2019":
         proof_type = "EcdsaSecp256k1Signature2019"
     elif algo == "EcdsaSecp256k1RecoverySignature2020":
         proof_type = "EcdsaSecp256k1RecoverySignature2020"

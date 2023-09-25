@@ -45,3 +45,17 @@ func BbsBlsSignature2020Canonize(didDoc *types.Did) ([]byte, error) {
 	canonizedDidDocumentHash := sha256.Sum256([]byte(canonizedDidDocument))
 	return canonizedDidDocumentHash[:], nil
 }
+
+
+// EcdsaSecp256k1Signature2019Canonize canonizes the DID Document for the
+// EcdsaSecp256k1Signature2019 signature type
+func EcdsaSecp256k1Signature2019Canonize(didDoc *types.Did) ([]byte, error) {
+	jsonLdDid := NewJsonLdDid(didDoc)
+	canonizedDidDocument, err := jsonLdDid.NormalizeWithURDNA2015()
+	if err != nil {
+		return nil, err
+	}
+
+	canonizedDidDocumentHash := sha256.Sum256([]byte(canonizedDidDocument))
+	return canonizedDidDocumentHash[:], nil
+}

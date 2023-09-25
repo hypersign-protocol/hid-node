@@ -332,8 +332,8 @@ func signSchemaDocCmd() *cobra.Command {
 				if err != nil {
 					return err
 				}
-			case "secp256k1":
-				signature, err = hidnodecli.GetSecp256k1Signature(argPrivateKey, schemaDocBytes)
+			case types.EcdsaSecp256k1Signature2019:
+				signature, err = hidnodecli.GetEcdsaSecp256k1Signature2019(argPrivateKey, schemaDocBytes)
 				if err != nil {
 					return err
 				}
@@ -394,8 +394,8 @@ func signCredStatusDocCmd() *cobra.Command {
 				if err != nil {
 					return err
 				}
-			case "secp256k1":
-				signature, err = hidnodecli.GetSecp256k1Signature(argPrivateKey, credStatusDocBytes)
+			case types.EcdsaSecp256k1Signature2019:
+				signature, err = hidnodecli.GetEcdsaSecp256k1Signature2019(argPrivateKey, credStatusDocBytes)
 				if err != nil {
 					return err
 				}

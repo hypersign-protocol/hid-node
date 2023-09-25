@@ -12,7 +12,7 @@ import (
 
 // Read more about Cosmos's ADR Spec from the following:
 // https://docs.cosmos.network/v0.45/architecture/adr-036-arbitrary-signature.html
-func getCosmosADR036SignDocBytes(ssiMsg types.SsiMsg, clientSpec *types.ClientSpec) ([]byte, error) {
+func getCosmosADR036SignDocBytes(ssiDocBytes []byte, clientSpec *types.ClientSpec) ([]byte, error) {
 	var msgSignData types.Msg = types.Msg{
 		Type: "sign/MsgSignData",
 		Value: types.Val{
@@ -34,7 +34,7 @@ func getCosmosADR036SignDocBytes(ssiMsg types.SsiMsg, clientSpec *types.ClientSp
 		},
 		Sequence: "0",
 	}
-	ssiDocBytes := ssiMsg.GetSignBytes()
+
 	baseCosmosADR036SignDoc.Msgs[0].Value.Data = base64.StdEncoding.EncodeToString(
 		ssiDocBytes)
 	baseCosmosADR036SignDoc.Msgs[0].Value.Signer = clientSpec.Adr036SignerAddress
@@ -57,7 +57,15 @@ func getDocBytesByClientSpec(ssiMsg types.SsiMsg, extendedVm *types.ExtendedVeri
 	if extendedVm.ClientSpec != nil {
 		switch extendedVm.ClientSpec.Type {
 		case types.ADR036ClientSpec:
-			return getCosmosADR036SignDocBytes(ssiMsg, extendedVm.ClientSpec)
+			if didDoc, ok := ssiMsg.(*types.Did); ok {
+				canonizedDidDocHash, err := ldcontext.EcdsaSecp256k1Signature2019Canonize(didDoc)
+				if err != nil {
+					return nil, err
+				}
+
+				return getCosmosADR036SignDocBytes(canonizedDidDocHash, extendedVm.ClientSpec)
+			}
+			return getCosmosADR036SignDocBytes(ssiMsg.GetSignBytes(), extendedVm.ClientSpec)
 		case types.PersonalSignClientSpec:
 			if didDoc, ok := ssiMsg.(*types.Did); ok {
 				canonizedDidDocHash, err := ldcontext.EcdsaSecp256k1RecoverySignature2020Canonize(didDoc)
