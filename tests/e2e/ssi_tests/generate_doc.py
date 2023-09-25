@@ -35,7 +35,7 @@ def generate_did_document(key_pair, algo="Ed25519Signature2020", bech32prefix="h
         vm_type = "EcdsaSecp256k1VerificationKey2019"
     elif algo == "EcdsaSecp256k1RecoverySignature2020":
         vm_type = "EcdsaSecp256k1RecoveryMethod2020"
-    elif algo == "bbs":
+    elif algo == "BbsBlsSignature2020":
         vm_type = "Bls12381G2Key2020"
     elif algo == "bjj":
         vm_type = "BabyJubJubVerificationKey2023"
@@ -112,7 +112,7 @@ def generate_schema_document(key_pair, schema_author, vm, signature=None, algo="
         proof_type = "EcdsaSecp256k1Signature2019"
     elif algo == "EcdsaSecp256k1RecoverySignature2020":
         proof_type = "EcdsaSecp256k1RecoverySignature2020"
-    elif algo == "bbs":
+    elif algo == "BbsBlsSignature2020":
         proof_type = "BbsBlsSignature2020"
     elif algo == "bjj":
         proof_type = "BabyJubJubSignature2023"
@@ -160,7 +160,7 @@ def generate_cred_status_document(key_pair, cred_author, vm, signature=None, alg
         proof_type = "EcdsaSecp256k1Signature2019"
     elif algo == "EcdsaSecp256k1RecoverySignature2020":
         proof_type = "EcdsaSecp256k1RecoverySignature2020"
-    elif algo == "bbs":
+    elif algo == "BbsBlsSignature2020":
         proof_type = "BbsBlsSignature2020"
     elif algo == "bjj":
         proof_type = "BabyJubJubSignature2023"

@@ -53,7 +53,7 @@ def generate_key_pair(algo="Ed25519Signature2020"):
         cmd = "hid-noded debug secp256k1 random"
     elif algo == "EcdsaSecp256k1RecoverySignature2020":
         cmd = "hid-noded debug secp256k1 eth-hex-random"
-    elif algo == "bbs":
+    elif algo == "BbsBlsSignature2020":
         cmd = "hid-noded debug bbs random"
     elif algo == "bjj":
         cmd = "hid-noded debug bjj random"

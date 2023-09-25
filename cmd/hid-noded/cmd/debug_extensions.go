@@ -342,7 +342,7 @@ func signSchemaDocCmd() *cobra.Command {
 				if err != nil {
 					return err
 				}
-			case "bbs":
+			case types.BbsBlsSignature2020:
 				signature, err = hidnodecli.GetBBSSignature(argPrivateKey, schemaDocBytes)
 				if err != nil {
 					return err
@@ -404,7 +404,7 @@ func signCredStatusDocCmd() *cobra.Command {
 				if err != nil {
 					return err
 				}
-			case "bbs":
+			case types.BbsBlsSignature2020:
 				signature, err = hidnodecli.GetBBSSignature(argPrivateKey, credStatusDocBytes)
 				if err != nil {
 					return err

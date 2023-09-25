@@ -4,6 +4,7 @@ const didContext string = "https://www.w3.org/ns/did/v1"
 const ed25519Context2020 string = "https://w3id.org/security/suites/ed25519-2020/v1"
 const x25519KeyAgreement2020Context string = "https://ns.did.ai/suites/x25519-2020/v1"
 const secp256k1Recovery2020Context string = "https://ns.did.ai/suites/secp256k1-2020/v1"
+const bbsSignature2020Context string = "https://ns.did.ai/suites/bls12381-2020/v1"
 
 // As hid-node is not supposed to perform any GET request, the complete Context body of their
 // respective Context urls has been maintained below.
@@ -356,6 +357,153 @@ var ContextUrlMap map[string]contextObject = map[string]contextObject{
 				"verificationMethod": map[string]interface{}{
 					"@id":   "https://w3id.org/security#verificationMethod",
 					"@type": "@id",
+				},
+			},
+		},
+	},
+	bbsSignature2020Context: {
+		"@version": 1.1,
+		"id":       "@id",
+		"type":     "@type",
+		"proof": map[string]interface{}{
+			"@id":       "https://w3id.org/security#proof",
+			"@type":     "@id",
+			"@container": "@graph",
+		},
+		"BbsBlsSignature2020": map[string]interface{}{
+			"@id": "https://w3id.org/security#BbsBlsSignature2020",
+			"@context": map[string]interface{}{
+				"@version":   1.1,
+				"@protected": true,
+				"id":         "@id",
+				"type":       "@type",
+				"challenge":  "https://w3id.org/security#challenge",
+				"created": map[string]interface{}{
+					"@id":   "http://purl.org/dc/terms/created",
+					"@type": "http://www.w3.org/2001/XMLSchema#dateTime",
+				},
+				"domain": "https://w3id.org/security#domain",
+				"proofValue": "https://w3id.org/security#proofValue",
+				"nonce":     "https://w3id.org/security#nonce",
+				"proofPurpose": map[string]interface{}{
+					"@id":      "https://w3id.org/security#proofPurpose",
+					"@type":    "@vocab",
+					"@context": map[string]interface{}{
+						"@version":   1.1,
+						"@protected": true,
+						"id":         "@id",
+						"type":       "@type",
+						"assertionMethod": map[string]interface{}{
+							"@id":       "https://w3id.org/security#assertionMethod",
+							"@type":     "@id",
+							"@container": "@set",
+						},
+						"authentication": map[string]interface{}{
+							"@id":       "https://w3id.org/security#authenticationMethod",
+							"@type":     "@id",
+							"@container": "@set",
+						},
+					},
+				},
+				"verificationMethod": map[string]interface{}{
+					"@id":   "https://w3id.org/security#verificationMethod",
+					"@type": "@id",
+				},
+			},
+		},
+		"BbsBlsSignatureProof2020": map[string]interface{}{
+			"@id": "https://w3id.org/security#BbsBlsSignatureProof2020",
+			"@context": map[string]interface{}{
+				"@version":   1.1,
+				"@protected": true,
+				"id":         "@id",
+				"type":       "@type",
+				"challenge":  "https://w3id.org/security#challenge",
+				"created": map[string]interface{}{
+					"@id":   "http://purl.org/dc/terms/created",
+					"@type": "http://www.w3.org/2001/XMLSchema#dateTime",
+				},
+				"domain": "https://w3id.org/security#domain",
+				"nonce":  "https://w3id.org/security#nonce",
+				"proofPurpose": map[string]interface{}{
+					"@id":      "https://w3id.org/security#proofPurpose",
+					"@type":    "@vocab",
+					"@context": map[string]interface{}{
+						"@version":   1.1,
+						"@protected": true,
+						"id":         "@id",
+						"type":       "@type",
+						"sec":        "https://w3id.org/security#",
+						"assertionMethod": map[string]interface{}{
+							"@id":       "https://w3id.org/security#assertionMethod",
+							"@type":     "@id",
+							"@container": "@set",
+						},
+						"authentication": map[string]interface{}{
+							"@id":       "https://w3id.org/security#authenticationMethod",
+							"@type":     "@id",
+							"@container": "@set",
+						},
+					},
+				},
+				"proofValue": "https://w3id.org/security#proofValue",
+				"verificationMethod": map[string]interface{}{
+					"@id":   "https://w3id.org/security#verificationMethod",
+					"@type": "@id",
+				},
+			},
+		},
+		"Bls12381G1Key2020": map[string]interface{}{
+			"@id": "https://w3id.org/security#Bls12381G1Key2020",
+			"@context": map[string]interface{}{
+				"@protected": true,
+				"id":         "@id",
+				"type":       "@type",
+				"controller": map[string]interface{}{
+					"@id":   "https://w3id.org/security#controller",
+					"@type": "@id",
+				},
+				"revoked": map[string]interface{}{
+					"@id":   "https://w3id.org/security#revoked",
+					"@type": "http://www.w3.org/2001/XMLSchema#dateTime",
+				},
+				"publicKeyJwk": map[string]interface{}{
+					"@id":   "https://w3id.org/security#publicKeyJwk",
+					"@type": "@json",
+				},
+				"publicKeyBase58": map[string]interface{}{
+					"@id": "https://w3id.org/security#publicKeyBase58",
+				},
+				"publicKeyMultibase": map[string]interface{}{
+					"@id":   "https://w3id.org/security#publicKeyMultibase",
+					"@type": "https://w3id.org/security#multibase",
+				},
+			},
+		},
+		"Bls12381G2Key2020": map[string]interface{}{
+			"@id": "https://w3id.org/security#Bls12381G2Key2020",
+			"@context": map[string]interface{}{
+				"@protected": true,
+				"id":         "@id",
+				"type":       "@type",
+				"controller": map[string]interface{}{
+					"@id":   "https://w3id.org/security#controller",
+					"@type": "@id",
+				},
+				"revoked": map[string]interface{}{
+					"@id":   "https://w3id.org/security#revoked",
+					"@type": "http://www.w3.org/2001/XMLSchema#dateTime",
+				},
+				"publicKeyJwk": map[string]interface{}{
+					"@id":   "https://w3id.org/security#publicKeyJwk",
+					"@type": "@json",
+				},
+				"publicKeyBase58": map[string]interface{}{
+					"@id": "https://w3id.org/security#publicKeyBase58",
+				},
+				"publicKeyMultibase": map[string]interface{}{
+					"@id":   "https://w3id.org/security#publicKeyMultibase",
+					"@type": "https://w3id.org/security#multibase",
 				},
 			},
 		},

@@ -12,14 +12,14 @@ from constants import DEFAULT_BLOCKCHAIN_ACCOUNT_NAME
 def bbs_signature_test():
     print("\n--1. PASS: Create a DID using BLS12381G2 Key Pair--\n")
 
-    kp_alice = generate_key_pair("bbs")
+    kp_alice = generate_key_pair("BbsBlsSignature2020")
     signers = []
-    did_doc_string = generate_did_document(kp_alice, "bbs")
+    did_doc_string = generate_did_document(kp_alice, "BbsBlsSignature2020")
     did_doc_alice = did_doc_string["id"]
     signPair_alice = {
         "kp": kp_alice,
         "verificationMethodId": did_doc_string["verificationMethod"][0]["id"],
-        "signing_algo": "bbs"
+        "signing_algo": "BbsBlsSignature2020"
     }
     signers.append(signPair_alice)
     create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
@@ -31,7 +31,7 @@ def bbs_signature_test():
         kp_alice, 
         did_doc_alice, 
         did_doc_string["verificationMethod"][0]["id"],
-        algo="bbs"
+        algo="BbsBlsSignature2020"
     )
     create_schema_cmd = form_create_schema_tx(
         schema_doc, 
@@ -47,7 +47,7 @@ def bbs_signature_test():
         kp_alice,
         did_doc_alice,
         did_doc_string["verificationMethod"][0]["id"],
-        algo="bbs"
+        algo="BbsBlsSignature2020"
     )
     register_cred_status_cmd = form_create_cred_status_tx(
         cred_doc,

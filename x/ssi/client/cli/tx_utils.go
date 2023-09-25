@@ -189,8 +189,13 @@ func getSignatures(cmd *cobra.Command, didDoc *types.Did, cmdArgs []string) ([]*
 			if err != nil {
 				return nil, err
 			}
-		case "bbs":
-			signInfoList[i].Signature, err = GetBBSSignature(didSigningElementsList[i].SignKey, didDoc.GetSignBytes())
+		case types.BbsBlsSignature2020:
+			didDocBytes, err := ldcontext.BbsBlsSignature2020Canonize(didDoc)
+			if err != nil {
+				return nil, err
+			}
+
+			signInfoList[i].Signature, err = GetBBSSignature(didSigningElementsList[i].SignKey, didDocBytes)
 			if err != nil {
 				return nil, err
 			}
