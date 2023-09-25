@@ -154,24 +154,24 @@ def key_agrement_test():
 def unique_wallet_address_test():
     print("\n---1. FAIL: Alice Creates a DID Doc. Bob attempts to create a DID Document by adding one of Alice's VM.---\n")
 
-    kp_alice = generate_key_pair("recover-eth")
+    kp_alice = generate_key_pair("EcdsaSecp256k1RecoverySignature2020")
     signers = []
-    did_doc_string = generate_did_document(kp_alice, "recover-eth")
+    did_doc_string = generate_did_document(kp_alice, "EcdsaSecp256k1RecoverySignature2020")
     did_doc_alice = did_doc_string["id"]
     did_doc_alice_vm = did_doc_string["verificationMethod"][0]
     signPair_alice = {
         "kp": kp_alice,
         "verificationMethodId": did_doc_string["verificationMethod"][0]["id"],
-        "signing_algo": "recover-eth"
+        "signing_algo": "EcdsaSecp256k1RecoverySignature2020"
     }
     signers.append(signPair_alice)
     create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
     run_blockchain_command(create_tx_cmd, f"Registering Alice's DID with Id: {did_doc_alice}")
 
     # Create Bob's DID with Alice's VM
-    kp_bob = generate_key_pair("recover-eth")
+    kp_bob = generate_key_pair("EcdsaSecp256k1RecoverySignature2020")
     signers = []
-    did_doc_string = generate_did_document(kp_bob, "recover-eth")
+    did_doc_string = generate_did_document(kp_bob, "EcdsaSecp256k1RecoverySignature2020")
     did_doc_bob = did_doc_string["id"]
     did_doc_string["controller"] = [did_doc_alice]
     did_doc_string["verificationMethod"] = [did_doc_alice_vm]
@@ -181,15 +181,15 @@ def unique_wallet_address_test():
 
     print("\n---2. FAIL: Charlie creates a DID Document. After that, Charlie attempts to update its DID Document by adding one of Alice's VM for which valid signature is passed.---\n")
 
-    kp_charlie = generate_key_pair("recover-eth")
+    kp_charlie = generate_key_pair("EcdsaSecp256k1RecoverySignature2020")
     signers = []
-    did_doc_string_charlie = generate_did_document(kp_charlie, "recover-eth")
+    did_doc_string_charlie = generate_did_document(kp_charlie, "EcdsaSecp256k1RecoverySignature2020")
     did_doc_charlie_id = did_doc_string_charlie["id"]
     did_doc_charlie_vm = did_doc_string_charlie["verificationMethod"][0]
     signPair_charlie = {
         "kp": kp_charlie,
         "verificationMethodId": did_doc_string_charlie["verificationMethod"][0]["id"],
-        "signing_algo": "recover-eth"
+        "signing_algo": "EcdsaSecp256k1RecoverySignature2020"
     }
     signers.append(signPair_charlie)
     create_tx_cmd = form_did_create_tx_multisig(did_doc_string_charlie, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
@@ -219,15 +219,15 @@ def unique_wallet_address_test():
     print("\n---4. PASS: Charlie removes one of its Verification Methods. George creates a didDoc for himself. He then proceed to update his DID Document by adding the Verification method removed by Charlie---\n")
 
     # Create George's DIDDoc
-    kp_george = generate_key_pair("recover-eth")
+    kp_george = generate_key_pair("EcdsaSecp256k1RecoverySignature2020")
     signers = []
-    did_doc_string_george = generate_did_document(kp_george, "recover-eth")
+    did_doc_string_george = generate_did_document(kp_george, "EcdsaSecp256k1RecoverySignature2020")
     did_doc_george_id = did_doc_string_george["id"]
     did_doc_george_vm = did_doc_string_george["verificationMethod"][0]
     signPair_george = {
         "kp": kp_george,
         "verificationMethodId": did_doc_string_george["verificationMethod"][0]["id"],
-        "signing_algo": "recover-eth"
+        "signing_algo": "EcdsaSecp256k1RecoverySignature2020"
     }
     signers.append(signPair_george)
     create_tx_cmd = form_did_create_tx_multisig(did_doc_string_george, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
@@ -301,8 +301,8 @@ def create_did_test():
     run_blockchain_command(create_tx_cmd, f"Registering DID with Id: {did_doc_org}")
 
     #Alice creates a DID where the controller only has Alice's DID and the verfication method has two ETH wallets added. Signature of all hot wallets are passed
-    kp_hot_wallet_1 = generate_key_pair("recover-eth")
-    kp_hot_wallet_2 = generate_key_pair("recover-eth")
+    kp_hot_wallet_1 = generate_key_pair("EcdsaSecp256k1RecoverySignature2020")
+    kp_hot_wallet_2 = generate_key_pair("EcdsaSecp256k1RecoverySignature2020")
     kp_org = generate_key_pair()
 
     did_doc_string = generate_did_document(kp_org)
@@ -326,12 +326,12 @@ def create_did_test():
     signPair_hotWallet1 = {
         "kp": kp_hot_wallet_1,
         "verificationMethodId": did_doc_string["verificationMethod"][0]["id"],
-        "signing_algo": "recover-eth"
+        "signing_algo": "EcdsaSecp256k1RecoverySignature2020"
     }
     signPair_hotWallet2 = {
         "kp": kp_hot_wallet_2,
         "verificationMethodId": did_doc_string["verificationMethod"][1]["id"],
-        "signing_algo": "recover-eth"
+        "signing_algo": "EcdsaSecp256k1RecoverySignature2020"
     }
 
     print("4. FAIL: Alice has a registered DID Document where Alice is the controller. Alice tries to register an Org DID Document where Alice is the sole controller, and there are two verification Methods, of type EcdsaSecp256k1RecoveryMethod2020, and Alice is the controller for each one of them. Signature is provided by only one of the VMs.\n")
@@ -882,7 +882,7 @@ def credential_status_test():
 
 def caip10_ethereum_support_test():
     print("\n--- CAIP-10 Test: Ethereum Chains ---\n")
-    kp_algo = "recover-eth"
+    kp_algo = "EcdsaSecp256k1RecoverySignature2020"
 
     # Invalid blockchain Account Ids
     invalid_blockchain_account_ids = [
@@ -1257,7 +1257,7 @@ def vm_type_test():
 
     # EcdsaSecp256k1RecoveryMethod2020
     print("7. FAIL: Registering DID Document with a verification method of type EcdsaSecp256k1RecoveryMethod2020. Only publicKeyMultibase is passed.")
-    kp_algo = "recover-eth"
+    kp_algo = "EcdsaSecp256k1RecoverySignature2020"
     kp = generate_key_pair(algo=kp_algo)
     did_doc_string = generate_did_document(kp, kp_algo)
     did_doc_id = did_doc_string["id"]
@@ -1274,7 +1274,7 @@ def vm_type_test():
     run_blockchain_command(create_tx_cmd, f"Registering DID with Id: {did_doc_id}", True, True)
 
     print("8. FAIL: Registering DID Document with a verification method of type EcdsaSecp256k1RecoveryMethod2020. Both publicKeyMultibase and blockchainAccountId is passed.")
-    kp_algo = "recover-eth"
+    kp_algo = "EcdsaSecp256k1RecoverySignature2020"
     kp = generate_key_pair(algo=kp_algo)
     did_doc_string = generate_did_document(kp, kp_algo)
     did_doc_id = did_doc_string["id"]
@@ -1290,7 +1290,7 @@ def vm_type_test():
     run_blockchain_command(create_tx_cmd, f"Registering DID with Id: {did_doc_id}", True, True)
 
     print("9. PASS: Registering DID Document with a verification method of type EcdsaSecp256k1RecoveryMethod2020. Only blockchainAccountId is passed.")
-    kp_algo = "recover-eth"
+    kp_algo = "EcdsaSecp256k1RecoverySignature2020"
     kp = generate_key_pair(algo=kp_algo)
     did_doc_string = generate_did_document(kp, kp_algo)
     did_doc_id = did_doc_string["id"]

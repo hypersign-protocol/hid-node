@@ -51,7 +51,7 @@ def generate_key_pair(algo="Ed25519Signature2020"):
         cmd = "hid-noded debug ed25519 random"
     elif algo == "secp256k1":
         cmd = "hid-noded debug secp256k1 random"
-    elif algo == "recover-eth":
+    elif algo == "EcdsaSecp256k1RecoverySignature2020":
         cmd = "hid-noded debug secp256k1 eth-hex-random"
     elif algo == "bbs":
         cmd = "hid-noded debug bbs random"
@@ -84,7 +84,7 @@ def generate_document_id(doc_type: str, kp: dict = None, algo: str = "Ed25519Sig
     if is_uuid:
         method_specific_id = str(uuid.uuid4())
     else:
-        if algo in ["recover-eth"]:
+        if algo in ["EcdsaSecp256k1RecoverySignature2020"]:
             method_specific_id = kp["ethereum_address"]
         else:
             method_specific_id = kp["pub_key_multibase"]
@@ -109,7 +109,7 @@ def is_blockchain_active(rpc_port):
         assert s.connect_ex(('localhost', rpc_port)) == 0, f"hid-noded is not running"
 
 def get_document_signature(doc: dict, doc_type: str, key_pair: dict, algo: str = "ed25519"):
-    if algo in ["recover-eth", "bjj"]:
+    if algo in ["EcdsaSecp256k1RecoverySignature2020", "bjj"]:
         private_key = key_pair["priv_key_hex"]
     else:
         private_key = key_pair["priv_key_base_64"]

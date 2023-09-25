@@ -61,7 +61,7 @@ func verify(extendedVm *types.ExtendedVerificationMethod, ssiMsg types.SsiMsg) e
 	case types.EcdsaSecp256k1VerificationKey2019:
 		return verifyEcdsaSecp256k1VerificationKey2019Key(extendedVm, docBytes)
 	case types.EcdsaSecp256k1RecoveryMethod2020:
-		return verifyEcdsaSecp256k1RecoveryMethod2020Key(extendedVm, docBytes)
+		return verifyEcdsaSecp256k1RecoverySignature2020(extendedVm, docBytes)
 	case types.X25519KeyAgreementKey2020:
 		return verifyX25519KeyAgreementKey2020Key(extendedVm)
 	case types.X25519KeyAgreementKeyEIP5630:
@@ -152,8 +152,8 @@ func verifyBls12381G2Key2020Key(extendedVm *types.ExtendedVerificationMethod, do
 	return nil
 }
 
-// verifyEcdsaSecp256k1RecoveryMethod2020Key verifies the verification key for verification method type EcdsaSecp256k1RecoveryMethod2020
-func verifyEcdsaSecp256k1RecoveryMethod2020Key(extendedVm *types.ExtendedVerificationMethod, documentBytes []byte) error {
+// verifyEcdsaSecp256k1RecoverySignature2020 verifies the verification key for verification method type EcdsaSecp256k1RecoveryMethod2020
+func verifyEcdsaSecp256k1RecoverySignature2020(extendedVm *types.ExtendedVerificationMethod, documentBytes []byte) error {
 	extractedCAIP10Prefix, err := getCAIP10Prefix(extendedVm.BlockchainAccountId)
 	if err != nil {
 		return err

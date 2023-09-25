@@ -2,6 +2,7 @@ package verification
 
 import (
 	"encoding/base64"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 
@@ -58,6 +59,22 @@ func getDocBytesByClientSpec(ssiMsg types.SsiMsg, extendedVm *types.ExtendedVeri
 		case types.ADR036ClientSpec:
 			return getCosmosADR036SignDocBytes(ssiMsg, extendedVm.ClientSpec)
 		case types.PersonalSignClientSpec:
+			if didDoc, ok := ssiMsg.(*types.Did); ok {
+				canonizedDidDocHash, err := ldcontext.EcdsaSecp256k1RecoverySignature2020Canonize(didDoc)
+				if err != nil {
+					return nil, err
+				}
+
+				// TODO: This is temporary fix eth.personal.sign() client function, since it only signs JSON 
+				// stringified document and hence the following struct was used to sign from the Client end.
+				return json.Marshal(struct{
+					DidId string `json:"didId"`
+					DidDocDigest string `json:"didDocDigest"`
+				} {
+					DidId: didDoc.Id,
+					DidDocDigest: hex.EncodeToString(canonizedDidDocHash),
+				})
+			}
 			return getPersonalSignSpecDocBytes(ssiMsg)
 		default:
 			return nil, fmt.Errorf(

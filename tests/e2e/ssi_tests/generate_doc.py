@@ -8,6 +8,7 @@ from utils import run_command, generate_document_id, get_document_signature, \
 
 ED25519_CONTEXT = "https://w3id.org/security/suites/ed25519-2020/v1"
 DID_CONTEXT = "https://www.w3.org/ns/did/v1"
+SECP256K1_RECOVERY_CONTEXT = "https://ns.did.ai/suites/secp256k1-2020/v1"
 
 def generate_did_document(key_pair, algo="Ed25519Signature2020", bech32prefix="hid", is_uuid=False):
     base_document = {
@@ -21,6 +22,8 @@ def generate_did_document(key_pair, algo="Ed25519Signature2020", bech32prefix="h
     }
     if algo == "Ed25519Signature2020":
         base_document["context"].append(ED25519_CONTEXT)
+    if algo == "EcdsaSecp256k1RecoverySignature2020":
+        base_document["context"].append(SECP256K1_RECOVERY_CONTEXT)
 
     did_id = generate_document_id("did", key_pair, algo, is_uuid)
 
@@ -30,7 +33,7 @@ def generate_did_document(key_pair, algo="Ed25519Signature2020", bech32prefix="h
         vm_type = "Ed25519VerificationKey2020"
     elif algo == "secp256k1":
         vm_type = "EcdsaSecp256k1VerificationKey2019"
-    elif algo == "recover-eth":
+    elif algo == "EcdsaSecp256k1RecoverySignature2020":
         vm_type = "EcdsaSecp256k1RecoveryMethod2020"
     elif algo == "bbs":
         vm_type = "Bls12381G2Key2020"
@@ -40,7 +43,7 @@ def generate_did_document(key_pair, algo="Ed25519Signature2020", bech32prefix="h
         raise Exception("unknown signing algorithm: " + key_pair)
 
     verification_method = {}
-    if algo == "recover-eth":
+    if algo == "EcdsaSecp256k1RecoverySignature2020":
         verification_method = {
             "id": "",
             "type": "",
@@ -55,7 +58,7 @@ def generate_did_document(key_pair, algo="Ed25519Signature2020", bech32prefix="h
             "publicKeyMultibase": ""
         }
 
-    if algo == "recover-eth":
+    if algo == "EcdsaSecp256k1RecoverySignature2020":
         verification_method["blockchainAccountId"] = "eip155:1:" + key_pair["ethereum_address"]
     elif algo == "secp256k1":
 
@@ -107,7 +110,7 @@ def generate_schema_document(key_pair, schema_author, vm, signature=None, algo="
         proof_type = "Ed25519Signature2020"
     elif algo == "secp256k1":
         proof_type = "EcdsaSecp256k1Signature2019"
-    elif algo == "recover-eth":
+    elif algo == "EcdsaSecp256k1RecoverySignature2020":
         proof_type = "EcdsaSecp256k1RecoverySignature2020"
     elif algo == "bbs":
         proof_type = "BbsBlsSignature2020"
@@ -155,7 +158,7 @@ def generate_cred_status_document(key_pair, cred_author, vm, signature=None, alg
         proof_type = "Ed25519Signature2020"
     elif algo == "secp256k1":
         proof_type = "EcdsaSecp256k1Signature2019"
-    elif algo == "recover-eth":
+    elif algo == "EcdsaSecp256k1RecoverySignature2020":
         proof_type = "EcdsaSecp256k1RecoverySignature2020"
     elif algo == "bbs":
         proof_type = "BbsBlsSignature2020"

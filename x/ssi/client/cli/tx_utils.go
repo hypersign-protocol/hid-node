@@ -93,7 +93,7 @@ func GetBJJSignature(privateKey string, message []byte) (string, error) {
 	return signatureHex, nil
 }
 
-func GetEthRecoverySignature(privateKey string, message []byte) (string, error) {
+func GetEcdsaSecp256k1RecoverySignature2020(privateKey string, message []byte) (string, error) {
 	// Decode key into bytes
 	privKeyBytes, err := hex.DecodeString(privateKey)
 	if err != nil {
@@ -179,8 +179,13 @@ func getSignatures(cmd *cobra.Command, didDoc *types.Did, cmdArgs []string) ([]*
 			if err != nil {
 				return nil, err
 			}
-		case "recover-eth":
-			signInfoList[i].Signature, err = GetEthRecoverySignature(didSigningElementsList[i].SignKey, didDoc.GetSignBytes())
+		case types.EcdsaSecp256k1RecoverySignature2020:
+			didDocBytes, err := ldcontext.EcdsaSecp256k1RecoverySignature2020Canonize(didDoc)
+			if err != nil {
+				return nil, err
+			}
+
+			signInfoList[i].Signature, err = GetEcdsaSecp256k1RecoverySignature2020(didSigningElementsList[i].SignKey, didDocBytes)
 			if err != nil {
 				return nil, err
 			}

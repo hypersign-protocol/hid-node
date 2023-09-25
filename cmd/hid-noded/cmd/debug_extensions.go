@@ -337,8 +337,8 @@ func signSchemaDocCmd() *cobra.Command {
 				if err != nil {
 					return err
 				}
-			case "recover-eth":
-				signature, err = hidnodecli.GetEthRecoverySignature(argPrivateKey, schemaDocBytes)
+			case types.EcdsaSecp256k1RecoverySignature2020:
+				signature, err = hidnodecli.GetEcdsaSecp256k1RecoverySignature2020(argPrivateKey, schemaDocBytes)
 				if err != nil {
 					return err
 				}
@@ -399,8 +399,8 @@ func signCredStatusDocCmd() *cobra.Command {
 				if err != nil {
 					return err
 				}
-			case "recover-eth":
-				signature, err = hidnodecli.GetEthRecoverySignature(argPrivateKey, credStatusDocBytes)
+			case types.EcdsaSecp256k1RecoverySignature2020:
+				signature, err = hidnodecli.GetEcdsaSecp256k1RecoverySignature2020(argPrivateKey, credStatusDocBytes)
 				if err != nil {
 					return err
 				}
@@ -443,14 +443,14 @@ func ed25519RandomCmd() *cobra.Command {
 			publicKeyWithHeader = append(publicKeyWithHeader, append([]byte{0xed, 0x01}, pubKey...)...)
 
 			keyInfo := struct {
-				PubKeyMultibase string `json:"pub_key_multibase"`
-				PrivKeyMultibase   string `json:"priv_key_base_64"`
+				PubKeyMultibase  string `json:"pub_key_multibase"`
+				PrivKeyMultibase string `json:"priv_key_base_64"`
 			}{
 				PubKeyMultibase: "z" + base58.Encode(publicKeyWithHeader),
 				// W3C's Ed25519VerificationKey2020 Specification has not explicitly mentioned about the encoding of the private key
 				// or whether it should be prefixed similar to the public key. For now, the encoding of private key remains Base64
-				// with no prefix 
-				PrivKeyMultibase:   base64.StdEncoding.EncodeToString(privKey),
+				// with no prefix
+				PrivKeyMultibase: base64.StdEncoding.EncodeToString(privKey),
 			}
 
 			keyInfoJson, err := json.Marshal(keyInfo)

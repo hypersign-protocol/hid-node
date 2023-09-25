@@ -17,3 +17,18 @@ func EdDSACryptoSuite2020Canonize(didDoc *types.Did) ([]byte, error) {
 	canonizedDidDocumentHash := sha256.Sum256([]byte(canonizedDidDocument))
 	return canonizedDidDocumentHash[:], nil
 }
+
+// EcdsaSecp256k1RecoverySignature2020Canonize canonizes DID Document in accordance with
+// the Identity Foundation draft on EcdsaSecp256k1RecoverySignature2020 
+// Read more: https://identity.foundation/EcdsaSecp256k1RecoverySignature2020/
+// LD Context: https://ns.did.ai/suites/secp256k1-2020/v1
+func EcdsaSecp256k1RecoverySignature2020Canonize(didDoc *types.Did) ([]byte, error) {
+	jsonLdDid := NewJsonLdDid(didDoc)
+	canonizedDidDocument, err := jsonLdDid.NormalizeWithURDNA2015()
+	if err != nil {
+		return nil, err
+	}
+
+	canonizedDidDocumentHash := sha256.Sum256([]byte(canonizedDidDocument))
+	return canonizedDidDocumentHash[:], nil
+}
