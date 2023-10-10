@@ -29,6 +29,8 @@ def generate_did_document(key_pair, algo="ed25519", bech32prefix="hid", is_uuid=
         vm_type = "EcdsaSecp256k1RecoveryMethod2020"
     elif algo == "bbs":
         vm_type = "Bls12381G2Key2020"
+    elif algo == "bjj":
+        vm_type = "BabyJubJubVerificationKey2023"
     else:
         raise Exception("unknown signing algorithm: " + key_pair)
 
@@ -96,6 +98,8 @@ def generate_schema_document(key_pair, schema_author, vm, signature=None, algo="
         proof_type = "EcdsaSecp256k1RecoverySignature2020"
     elif algo == "bbs":
         proof_type = "BbsBlsSignature2020"
+    elif algo == "bjj":
+        proof_type = "BabyJubJubSignature2023"
     else:
         raise Exception("Invalid signing algo: " + algo)
 
@@ -142,6 +146,8 @@ def generate_cred_status_document(key_pair, cred_author, vm, signature=None, alg
         proof_type = "EcdsaSecp256k1RecoverySignature2020"
     elif algo == "bbs":
         proof_type = "BbsBlsSignature2020"
+    elif algo == "bjj":
+        proof_type = "BabyJubJubSignature2023"
     else:
         raise Exception("Invalid signing algo: " + algo)
     

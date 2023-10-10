@@ -18,6 +18,7 @@ import (
 	"github.com/multiformats/go-multibase"
 	"github.com/spf13/cobra"
 	secp256k1 "github.com/tendermint/tendermint/crypto/secp256k1"
+	"github.com/iden3/go-iden3-crypto/babyjub"
 )
 
 func extendDebug(debugCmd *cobra.Command) *cobra.Command {
@@ -25,9 +26,21 @@ func extendDebug(debugCmd *cobra.Command) *cobra.Command {
 		ed25519Cmd(),
 		secp256k1Cmd(),
 		bbsCmd(),
+		bjjCmd(),
 		signSSIDocCmd(),
 	)
 	return debugCmd
+}
+
+func bjjCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "bjj",
+		Short: "BabyJubJub debug commonds",
+	}
+
+	cmd.AddCommand(bjjRandomCmd())
+
+	return cmd
 }
 
 func bbsCmd() *cobra.Command {
@@ -93,6 +106,55 @@ func blsRandomCmd() *cobra.Command {
 				PubKeyBase64:    base64.StdEncoding.EncodeToString(pubKeyBytes),
 				PubKeyMultibase: publicKeyMultibase,
 				PrivKeyBase64:   base64.StdEncoding.EncodeToString(privKeyBytes),
+			}
+
+			keyInfoJson, err := json.Marshal(keyInfo)
+			if err != nil {
+				return err
+			}
+
+			_, err = fmt.Fprintln(cmd.OutOrStdout(), string(keyInfoJson))
+			return err
+		},
+	}
+
+	return cmd
+}
+
+func bjjRandomCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "random",
+		Short: "Generate random BabyJubJub keypair",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			// Generate Key Pair
+			babyJubjubPrivKey := babyjub.NewRandPrivKey()
+			babyJubjubPubKey := babyJubjubPrivKey.Public()
+
+			// Prepare Priv key
+			var privKeyBytes [32]byte = babyJubjubPrivKey
+			var privKeyHex string = hex.EncodeToString(privKeyBytes[:])
+
+			// Prepare Public Key
+			var pubKeyHex string = babyJubjubPubKey.Compress().String()
+
+			// Prepare Multibase Public Key
+			pubKeyBytes, err := hex.DecodeString(pubKeyHex)
+			if err != nil {
+				panic(err)
+			}
+			pubKeyMultibase, err := multibase.Encode(multibase.Base58BTC, pubKeyBytes)
+			if err != nil {
+				panic(err)
+			}
+
+			keyInfo := struct {
+				PubKeyBase64    string `json:"pub_key_hex"`
+				PubKeyMultibase string `json:"pub_key_multibase"`
+				PrivKeyBase64   string `json:"priv_key_hex"`
+			}{
+				PubKeyBase64:    pubKeyHex,
+				PubKeyMultibase: pubKeyMultibase,
+				PrivKeyBase64:   privKeyHex,
 			}
 
 			keyInfoJson, err := json.Marshal(keyInfo)
@@ -285,8 +347,13 @@ func signSchemaDocCmd() *cobra.Command {
 				if err != nil {
 					return err
 				}
+			case "bjj":
+				signature, err = hidnodecli.GetBJJSignature(argPrivateKey, schemaDocBytes)
+				if err != nil {
+					return err
+				}
 			default:
-				panic("recieved unsupported signing-algo. Supported algorithms are: ['ed25519', 'secp256k1', 'recover-eth', 'bbs']")
+				panic("recieved unsupported signing-algo. Supported algorithms are: ['ed25519', 'secp256k1', 'recover-eth', 'bbs', 'bjj']")
 			}
 
 			_, err = fmt.Fprintln(cmd.OutOrStdout(), signature)
@@ -342,8 +409,13 @@ func signCredStatusDocCmd() *cobra.Command {
 				if err != nil {
 					return err
 				}
+			case "bjj":
+				signature, err = hidnodecli.GetBJJSignature(argPrivateKey, credStatusDocBytes)
+				if err != nil {
+					return err
+				}
 			default:
-				panic("recieved unsupported signing-algo. Supported algorithms are: ['ed25519', 'secp256k1', 'recover-eth', 'bbs']")
+				panic("recieved unsupported signing-algo. Supported algorithms are: ['ed25519', 'secp256k1', 'recover-eth', 'bbs', 'bjj']")
 			}
 
 			_, err = fmt.Fprintln(cmd.OutOrStdout(), signature)

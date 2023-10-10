@@ -187,6 +187,21 @@ func verificationKeyCheck(vm *VerificationMethod) error {
 				vm.Type,
 			)
 		}
+	case BabyJubJubVerificationKey2023:
+		if vm.GetBlockchainAccountId() != "" {
+			return fmt.Errorf(
+				"blockchainAccountId is currently not supported for verification method %s as it is of type %s",
+				vm.Id,
+				vm.Type,
+			)
+		}
+		if vm.GetPublicKeyMultibase() == "" {
+			return fmt.Errorf(
+				"publicKeyMultibase cannot be empty for verification method %s as it is of type %s",
+				vm.Id,
+				vm.Type,
+			)
+		}
 	default:
 		return fmt.Errorf("unsupported verification method type: %v. Supported verification method types are: %v", vm.Type, supportedVerificationMethodTypes)
 	}

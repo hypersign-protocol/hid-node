@@ -36,6 +36,7 @@ def run_all_tests():
     unique_wallet_address_test()
     key_agrement_test()
     bbs_signature_test()
+    bjj_signature_test()
     
     print("============= 😃️ All test cases completed successfully ============== \n")
 

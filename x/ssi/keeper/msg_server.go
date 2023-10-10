@@ -210,7 +210,7 @@ func (k msgServer) VerifyDocumentProof(ctx sdk.Context, ssiMsg types.SsiMsg, inp
 	// However, they are not allowed to be used for Authentication or Assertion purposes. Since, their corresponding values in the map
 	// are empty string, the following check is in place.
 	if types.VerificationKeySignatureMap[docVm.Type] == "" {
-		return fmt.Errorf("proof type must be specified")
+		return fmt.Errorf("unsupported proof type: %v", docVm.Type)
 	}
 
 	// Check if the Proof Type is correct

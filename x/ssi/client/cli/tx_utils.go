@@ -6,7 +6,9 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"fmt"
+	"math/big"
 
+	"golang.org/x/crypto/sha3"
 	"github.com/cosmos/cosmos-sdk/types/bech32"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 	"github.com/multiformats/go-multibase"
@@ -20,6 +22,7 @@ import (
 	bbs "github.com/hyperledger/aries-framework-go/component/kmscrypto/crypto/primitive/bbs12381g2pub"
 
 	"github.com/spf13/cobra"
+	"github.com/iden3/go-iden3-crypto/babyjub"
 )
 
 // Extract Verification Method Ids and their respective signatures from Arguments
@@ -64,6 +67,29 @@ func GetBBSSignature(privateKey string, message []byte) (string, error) {
 	}
 
 	return base64.StdEncoding.EncodeToString(signatureBytes), nil
+}
+
+// Get BabyJubJub Signature
+func GetBJJSignature(privateKey string, message []byte) (string, error) {
+	// Decode private key from hex
+	privateKeyBytes, err := hex.DecodeString(privateKey)
+	if err != nil {
+		panic(err)
+	}
+	var privateKeyBytes32 [32]byte
+	copy(privateKeyBytes32[:], privateKeyBytes)
+
+	var privKeyObj babyjub.PrivateKey = privateKeyBytes32
+
+	// SHA-224 the message and convert it to BigInt
+	msgHash := sha3.Sum224(message)
+	msgBigInt := new(big.Int).SetBytes(msgHash[:])
+
+	// Get Signature
+	signatureObj := privKeyObj.SignPoseidon(msgBigInt)
+	signatureHex := signatureObj.Compress().String()
+
+	return signatureHex, nil
 }
 
 func GetEthRecoverySignature(privateKey string, message []byte) (string, error) {
@@ -156,8 +182,16 @@ func getSignatures(cmd *cobra.Command, message []byte, cmdArgs []string) ([]*typ
 			if err != nil {
 				return nil, err
 			}
+		case "bjj":
+			signInfoList[i].Signature, err = GetBJJSignature(didSigningElementsList[i].SignKey, message)
+			if err != nil {
+				return nil, err
+			}
 		default:
-			return nil, fmt.Errorf("unsupported signing algorithm %s, supported signing algorithms: ['ed25519', 'secp256k1', 'recover-eth', 'bbs']", didSigningElementsList[i].SignAlgo)
+			return nil, fmt.Errorf(
+				"unsupported signing algorithm %s, supported signing algorithms: ['ed25519', 'secp256k1', 'recover-eth', 'bbs', 'bjj']", 
+				didSigningElementsList[i].SignAlgo,
+			)
 		}
 	}
 

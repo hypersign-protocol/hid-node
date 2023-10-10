@@ -3,7 +3,10 @@ package verification
 import (
 	"crypto/ed25519"
 	"encoding/base64"
+	"encoding/hex"
 	"fmt"
+	"math/big"
+	"golang.org/x/crypto/sha3"
 
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 	"github.com/multiformats/go-multibase"
@@ -17,6 +20,9 @@ import (
 
 	// BBS+ Signatures
 	bbs "github.com/hyperledger/aries-framework-go/component/kmscrypto/crypto/primitive/bbs12381g2pub"
+
+	// BabyJubJub Signatures
+	"github.com/iden3/go-iden3-crypto/babyjub"
 )
 
 func verifyAll(extendedVmList []*types.ExtendedVerificationMethod, ssiMsg types.SsiMsg) error {
@@ -62,9 +68,57 @@ func verify(extendedVm *types.ExtendedVerificationMethod, ssiMsg types.SsiMsg) e
 		return verifyX25519KeyAgreementKeyEIP5630Key(extendedVm)
 	case types.Bls12381G2Key2020:
 		return verifyBls12381G2Key2020Key(extendedVm, docBytes)
+	case types.BabyJubJubVerificationKey2023:
+		return verifyBabyJubJubVerificationKey2023Key(extendedVm, docBytes)
 	default:
 		return fmt.Errorf("unsupported verification method: %s", extendedVm.Type)
 	}
+}
+
+func verifyBabyJubJubVerificationKey2023Key(extendedVm *types.ExtendedVerificationMethod, documentBytes []byte) error {
+	// Process siganture
+	signatureBytes, err := hex.DecodeString(extendedVm.Signature)
+	if err != nil {
+		panic(err)
+	}
+
+	signatureCompObj := new(babyjub.SignatureComp)
+	err = signatureCompObj.Scan(signatureBytes)
+	if err != nil {
+		panic(err)
+	}
+	signatureObj, err := signatureCompObj.Decompress()
+	if err != nil {
+		panic(err)
+	}
+
+	// Process Public Key
+	_, publicKeyBytes, err := multibase.Decode(extendedVm.PublicKeyMultibase)
+	if err != nil {
+		panic(err)
+	}
+
+	publicKeyCompObj := new(babyjub.PublicKeyComp)
+	err = publicKeyCompObj.Scan(publicKeyBytes)
+	if err != nil {
+		panic(err)
+	}
+
+	publicKeyObj, err := publicKeyCompObj.Decompress()
+	if err != nil {
+		panic(err)
+	}
+
+	// Process documentBytes
+	msgHash := sha3.Sum224(documentBytes)
+	msgBigInt := new(big.Int).SetBytes(msgHash[:])
+
+	// Verify Signature using Poseidon Hash
+	if !publicKeyObj.VerifyPoseidon(msgBigInt, signatureObj) {
+		return fmt.Errorf("signature could not be verified for verificationMethodId: %v", extendedVm.Id)
+	}
+	
+	return nil
 }
 
 // verifyBls12381G2Key2020Key verifies the verification key for verification method type Bls12381G2Key2020
