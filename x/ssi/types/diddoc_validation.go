@@ -327,7 +327,7 @@ func validateVerificationMethods(vms []*VerificationMethod) error {
 	return nil
 }
 
-func validateVmRelationships(didDoc *Did) error {
+func validateVmRelationships(didDoc *DidDocument) error {
 	// make verificationMethodType map between VM Id and VM type
 	vmTypeMap := map[string]string{}
 	for _, vm := range didDoc.VerificationMethod {
@@ -417,7 +417,7 @@ func validateBlockchainAccountId(blockchainAccountId string) error {
 }
 
 // ValidateDidDocument validates the DID Document
-func (didDoc *Did) ValidateDidDocument() error {
+func (didDoc *DidDocument) ValidateDidDocument() error {
 	// Id check
 	err := isValidDidDocId(didDoc.Id)
 	if err != nil {

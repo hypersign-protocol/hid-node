@@ -6,7 +6,8 @@ import time
 from utils import run_blockchain_command, generate_key_pair, secp256k1_pubkey_to_address, add_keyAgreeemnt_pubKeyMultibase
 from generate_doc import generate_did_document, generate_schema_document, generate_cred_status_document
 from transactions import form_did_create_tx_multisig, form_did_update_tx_multisig, \
-      query_did, form_create_schema_tx, form_did_deactivate_tx_multisig, form_create_cred_status_tx
+      query_did, form_create_schema_tx, form_did_deactivate_tx_multisig, form_create_cred_status_tx, \
+      form_update_schema_tx, form_update_cred_status_tx
 from constants import DEFAULT_BLOCKCHAIN_ACCOUNT_NAME
 
 def bbs_signature_test():
@@ -54,7 +55,7 @@ def bbs_signature_test():
         cred_proof,
         DEFAULT_BLOCKCHAIN_ACCOUNT_NAME
     )
-    cred_id = cred_doc["claim"]["id"]
+    cred_id = cred_doc["id"]
     run_blockchain_command(register_cred_status_cmd, f"Registering Credential status with Id: {cred_id}")
 
 
@@ -804,6 +805,27 @@ def schema_test():
     schema_doc_id = schema_doc["id"]
     run_blockchain_command(create_schema_cmd, f"Registering Schema with Id: {schema_doc_id}")
 
+    print("3. PASS: Bob updates a schema using one of her VMs\n")
+    updated_schema_doc = schema_doc
+    #Increment version in Schema id
+    schema_id_list = list(updated_schema_doc["id"])
+    schema_id_list[-3] = '4'
+    updated_schema_doc["id"] = "".join(schema_id_list)
+    updated_schema_doc_id = updated_schema_doc["id"]
+
+    _, schema_proof = generate_schema_document(
+        kp_bob,
+        did_doc_bob,
+        did_doc_bob_vm["id"],
+        updated_schema=updated_schema_doc
+    )
+    update_schema_cmd = form_update_schema_tx(
+        updated_schema_doc, 
+        schema_proof, 
+        DEFAULT_BLOCKCHAIN_ACCOUNT_NAME
+    )
+    run_blockchain_command(update_schema_cmd, f"Updating Schema with Id: {updated_schema_doc_id}")
+
     print("--- Test Completed ---\n")
 
 def credential_status_test():
@@ -843,7 +865,7 @@ def credential_status_test():
         cred_proof,
         DEFAULT_BLOCKCHAIN_ACCOUNT_NAME
     )
-    cred_id = cred_doc["claim"]["id"]
+    cred_id = cred_doc["id"]
     run_blockchain_command(register_cred_status_cmd, f"Registering Credential status with Id: {cred_id}", True)
 
     print("2. PASS: Bob creates a DID with herself being the controller. He attempts to registers a credential status using one of his VMs\n")
@@ -875,8 +897,76 @@ def credential_status_test():
         cred_proof,
         DEFAULT_BLOCKCHAIN_ACCOUNT_NAME
     )
-    cred_id = cred_doc["claim"]["id"]
+    cred_id = cred_doc["id"]
     run_blockchain_command(register_cred_status_cmd, f"Registering Credential status with Id: {cred_id}")
+
+    print("3. PASS: Bob suspends the credential status using one of his VMs\n")
+    cred_doc["suspended"] = True
+
+    _, cred_proof = generate_cred_status_document(
+        kp_bob,
+        did_doc_bob,
+        did_doc_bob_vm["id"],
+        updated_credstatus_doc=cred_doc
+    )
+    register_cred_status_cmd = form_update_cred_status_tx(
+        cred_doc,
+        cred_proof,
+        DEFAULT_BLOCKCHAIN_ACCOUNT_NAME
+    )
+    cred_id = cred_doc["id"]
+    run_blockchain_command(register_cred_status_cmd, f"Updating Credential status with Id: {cred_id}")
+
+    print("4. PASS: Bob un-suspends the credential status using one of his VMs\n")
+    cred_doc["suspended"] = False
+
+    _, cred_proof = generate_cred_status_document(
+        kp_bob,
+        did_doc_bob,
+        did_doc_bob_vm["id"],
+        updated_credstatus_doc=cred_doc
+    )
+    register_cred_status_cmd = form_update_cred_status_tx(
+        cred_doc,
+        cred_proof,
+        DEFAULT_BLOCKCHAIN_ACCOUNT_NAME
+    )
+    cred_id = cred_doc["id"]
+    run_blockchain_command(register_cred_status_cmd, f"Updating Credential status with Id: {cred_id}")
+    
+    print("5. PASS: Bob revokes the credential status using one of his VMs\n")
+    cred_doc["revoked"] = True
+
+    _, cred_proof = generate_cred_status_document(
+        kp_bob,
+        did_doc_bob,
+        did_doc_bob_vm["id"],
+        updated_credstatus_doc=cred_doc
+    )
+    register_cred_status_cmd = form_update_cred_status_tx(
+        cred_doc,
+        cred_proof,
+        DEFAULT_BLOCKCHAIN_ACCOUNT_NAME
+    )
+    cred_id = cred_doc["id"]
+    run_blockchain_command(register_cred_status_cmd, f"Updating Credential status with Id: {cred_id}")
+
+    print("6. FAIL: Bob attempts to un-revoke the credential status using one of his VMs\n")
+    cred_doc["revoked"] = False
+
+    _, cred_proof = generate_cred_status_document(
+        kp_bob,
+        did_doc_bob,
+        did_doc_bob_vm["id"],
+        updated_credstatus_doc=cred_doc
+    )
+    register_cred_status_cmd = form_update_cred_status_tx(
+        cred_doc,
+        cred_proof,
+        DEFAULT_BLOCKCHAIN_ACCOUNT_NAME
+    )
+    cred_id = cred_doc["id"]
+    run_blockchain_command(register_cred_status_cmd, f"Updating Credential status with Id: {cred_id}", True)
 
     print("--- Test Completed ---\n")
 
@@ -1437,14 +1527,14 @@ def method_specific_id_test():
 def bjj_signature_test():
     print("\n--1. PASS: Create a DID using BabyJubJub Key Pair--\n")
 
-    kp_alice = generate_key_pair("bjj")
+    kp_alice = generate_key_pair("BabyJubJubSignature2023")
     signers = []
-    did_doc_string = generate_did_document(kp_alice, "bjj")
+    did_doc_string = generate_did_document(kp_alice, "BabyJubJubSignature2023")
     did_doc_alice = did_doc_string["id"]
     signPair_alice = {
         "kp": kp_alice,
         "verificationMethodId": did_doc_string["verificationMethod"][0]["id"],
-        "signing_algo": "bjj"
+        "signing_algo": "BabyJubJubSignature2023"
     }
     signers.append(signPair_alice)
     create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
@@ -1456,7 +1546,7 @@ def bjj_signature_test():
         kp_alice, 
         did_doc_alice, 
         did_doc_string["verificationMethod"][0]["id"],
-        algo="bjj"
+        algo="BabyJubJubSignature2023"
     )
     create_schema_cmd = form_create_schema_tx(
         schema_doc, 
@@ -1472,14 +1562,14 @@ def bjj_signature_test():
         kp_alice,
         did_doc_alice,
         did_doc_string["verificationMethod"][0]["id"],
-        algo="bjj"
+        algo="BabyJubJubSignature2023"
     )
     register_cred_status_cmd = form_create_cred_status_tx(
         cred_doc,
         cred_proof,
         DEFAULT_BLOCKCHAIN_ACCOUNT_NAME
     )
-    cred_id = cred_doc["claim"]["id"]
+    cred_id = cred_doc["id"]
     run_blockchain_command(register_cred_status_cmd, f"Registering Credential status with Id: {cred_id}")
 
 

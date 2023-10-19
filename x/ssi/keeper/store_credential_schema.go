@@ -41,34 +41,34 @@ func (k Keeper) SetSchemaCount(ctx sdk.Context, count uint64) {
 	store.Set(byteKey, bz)
 }
 
-func (k Keeper) RegisterSchemaInStore(ctx sdk.Context, schema types.Schema) uint64 {
+func (k Keeper) setCredentialSchemaInStore(ctx sdk.Context, schema types.CredentialSchemaState) {
 	// Get the current number of Schemas in the store
 	count := k.GetSchemaCount(ctx)
 	// Get the store
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.SchemaKey))
 	// Marshal the Schema into bytes
 	schemaBytes := k.cdc.MustMarshal(&schema)
-	store.Set([]byte(schema.Id), schemaBytes)
+	store.Set([]byte(schema.GetCredentialSchemaDocument().GetId()), schemaBytes)
 	// Update the Schema count
 	k.SetSchemaCount(ctx, count+1)
-	return count
 }
 
-// Get the schema from store
-func (k Keeper) GetSchemaFromStore(ctx sdk.Context, querySchemaId string) []*types.Schema {
+// Get Credential Schema from Store
+func (k Keeper) getCredentialSchemaFromStore(ctx sdk.Context, credentialSchemaId string) ([]*types.CredentialSchemaState, error) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.SchemaKey))
 	var versionNumLengthWithColon int = 4
-	var schemas []*types.Schema
+	var credentialSchemas []*types.CredentialSchemaState
 	iterator := sdk.KVStorePrefixIterator(store, []byte{})
 
 	for ; iterator.Valid(); iterator.Next() {
-		var schema types.Schema
-		k.cdc.MustUnmarshal(iterator.Value(), &schema)
+		var credentialSchema types.CredentialSchemaState
+		k.cdc.MustUnmarshal(iterator.Value(), &credentialSchema)
 
-		if querySchemaId == schema.Id[0:len(schema.Id)-versionNumLengthWithColon] || querySchemaId == schema.Id {
-			schemas = append(schemas, &schema)
+		storedSchemaId := credentialSchema.CredentialSchemaDocument.Id
+		if credentialSchemaId == storedSchemaId[0:len(storedSchemaId)-versionNumLengthWithColon] || credentialSchemaId == storedSchemaId {
+			credentialSchemas = append(credentialSchemas, &credentialSchema)
 		}
 	}
 
-	return schemas
+	return credentialSchemas, nil
 }

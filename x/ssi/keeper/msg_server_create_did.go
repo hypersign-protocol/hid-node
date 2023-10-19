@@ -8,16 +8,17 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 	"github.com/hypersign-protocol/hid-node/x/ssi/verification"
+	"github.com/hypersign-protocol/hid-node/x/ssi/utils"
 )
 
-// CreateDID is a RPC method for registration of a DID Document
-func (k msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*types.MsgCreateDIDResponse, error) {
+// RegisterDID is a RPC method for registration of a DID Document
+func (k msgServer) RegisterDID(goCtx context.Context, msg *types.MsgRegisterDID) (*types.MsgRegisterDIDResponse, error) {
 	// Unwrap Go Context to Cosmos SDK Context
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// Get the RPC inputs
-	msgDidDocument := msg.DidDocString
-	msgSignatures := msg.Signatures
+	msgDidDocument := msg.DidDocument
+	msgDidDocumentProofs := msg.DidDocumentProofs
 
 	// Validate DID Document
 	if err := msgDidDocument.ValidateDidDocument(); err != nil {
@@ -38,6 +39,13 @@ func (k msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*t
 	// Checks if the Did Document is already registered
 	if k.HasDid(ctx, msgDidDocument.Id) {
 		return nil, sdkerrors.Wrap(types.ErrDidDocExists, msgDidDocument.Id)
+	}
+
+	// Validate Document Proofs
+	for _, proof := range msgDidDocumentProofs {
+		if err := proof.Validate(); err != nil {
+			return nil, err
+		}
 	}
 
 	// Check if any of the blockchainAccountId is present in any registered DID Document. If so, throw error
@@ -69,7 +77,7 @@ func (k msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*t
 	}
 
 	// Associate Signatures
-	signMap := makeSignatureMap(msgSignatures)
+	signMap := makeSignatureMap(msgDidDocumentProofs)
 
 	requiredVmMap, err := k.formMustControllerVmListMap(ctx, controllerList, requiredVMs, signMap)
 	if err != nil {
@@ -92,7 +100,7 @@ func (k msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*t
 	}
 
 	// Register DID Document in Store once all validation checks are passed
-	id := k.RegisterDidDocumentInStore(ctx, &didDocumentState)
+	k.RegisterDidDocumentInStore(ctx, &didDocumentState)
 
 	// After successful registration of the DID Document, every blockchainAccountIds
 	// can be added to the store
@@ -104,10 +112,10 @@ func (k msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*t
 
 	// Emit a successful DID Document Registration event
 	ctx.EventManager().EmitEvent(
-		sdk.NewEvent("create_did", sdk.NewAttribute("tx_author", msg.GetCreator())),
+		sdk.NewEvent("create_did", sdk.NewAttribute("tx_author", msg.GetTxAuthor())),
 	)
 
-	return &types.MsgCreateDIDResponse{Id: id}, nil
+	return &types.MsgRegisterDIDResponse{}, nil
 }
 
 // checkMethodSpecificIdOwnership validates the ownership of blockchain account id passed in the method specific
@@ -143,7 +151,7 @@ func checkMethodSpecificIdOwnership(verificationMethods []*types.VerificationMet
 
 // getControllersForCreateDID returns a list of controller DIDs
 // from controller and verification method attributes
-func getControllersForCreateDID(didDocument *types.Did) []string {
+func getControllersForCreateDID(didDocument *types.DidDocument) []string {
 	var controllerList []string
 
 	// DID Subject is assumed to be the DID Controller if the controller list is empty
@@ -161,7 +169,7 @@ func getControllersForCreateDID(didDocument *types.Did) []string {
 }
 
 // getVerificationMethodsForCreateDID fetches all the Verification Methods needed to be verified
-func getVerificationMethodsForCreateDID(didDocument *types.Did) ([]*types.VerificationMethod, error) {
+func getVerificationMethodsForCreateDID(didDocument *types.DidDocument) ([]*types.VerificationMethod, error) {
 	var mustHaveVerificaitonMethods []*types.VerificationMethod = []*types.VerificationMethod{}
 	var foundAtleastOneSubjectVM bool = false
 
@@ -180,7 +188,7 @@ func getVerificationMethodsForCreateDID(didDocument *types.Did) ([]*types.Verifi
 		mustHaveVerificaitonMethods = append(mustHaveVerificaitonMethods, vm)
 	}
 
-	if !foundAtleastOneSubjectVM && types.FindInSlice(didDocument.Controller, didDocument.Id) {
+	if !foundAtleastOneSubjectVM && utils.FindInSlice(didDocument.Controller, didDocument.Id) {
 		return nil, fmt.Errorf(
 			"there should be atleast one verification method of DID Subject %v", didDocument.Id)
 	}

@@ -1,9 +1,0 @@
-syntax = "proto3";
-package hypersignprotocol.hidnode.ssi;
-
-option go_package = "github.com/hypersign-protocol/hid-node/x/ssi/types";
-
-message ClientSpec {
-    string type = 1;
-    string adr036SignerAddress = 2;
-}

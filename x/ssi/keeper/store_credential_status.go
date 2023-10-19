@@ -3,29 +3,27 @@ package keeper
 import (
 	"encoding/binary"
 	"fmt"
-	"time"
 
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 )
 
-func (k Keeper) RegisterCredentialStatusInState(ctx sdk.Context, cred *types.Credential) uint64 {
+func (k Keeper) SetCredentialStatusInState(ctx sdk.Context, cred *types.CredentialStatusState) {
 	count := k.GetCredentialStatusCount(ctx)
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.CredKey))
 
-	id := cred.GetClaim().GetId()
+	id := cred.CredentialStatusDocument.Id
 	credBytes := k.cdc.MustMarshal(cred)
 
 	store.Set([]byte(id), credBytes)
 	k.SetCredentialStatusCount(ctx, count+1)
-	return count
 }
 
-func (k Keeper) GetCredentialStatusFromState(ctx *sdk.Context, id string) (*types.Credential, error) {
+func (k Keeper) GetCredentialStatusFromState(ctx *sdk.Context, id string) (*types.CredentialStatusState, error) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.CredKey))
 
-	var cred types.Credential
+	var cred types.CredentialStatusState
 	var bytes = store.Get([]byte(id))
 	if len(bytes) == 0 {
 		return nil, fmt.Errorf("credential status document %s not found", id)
@@ -60,37 +58,4 @@ func (k Keeper) SetCredentialStatusCount(ctx sdk.Context, count uint64) {
 	bz := make([]byte, 8)
 	binary.BigEndian.PutUint64(bz, count)
 	store.Set(byteKey, bz)
-}
-
-// Invoked during BeginBlock, it checks the block time against credential
-// expiration date. If the expiration date is past current block time, the status
-// of the credential(s) are set to `Expired`.
-func (k Keeper) SetCredentialStatusToExpired(ctx sdk.Context) error {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.CredKey))
-	iterator := sdk.KVStorePrefixIterator(store, []byte{})
-	defer iterator.Close()
-
-	for ; iterator.Valid(); iterator.Next() {
-		var cred types.Credential
-		if err := k.cdc.Unmarshal(iterator.Value(), &cred); err != nil {
-			return err
-		}
-
-		currentBlockTime := ctx.BlockTime()
-		expirationDate, err := time.Parse(time.RFC3339, cred.GetExpirationDate())
-		if err != nil {
-			return err
-		}
-
-		// Set the Credential Status to Expired
-		if currentBlockTime.After(expirationDate) {
-			cred.Claim.CurrentStatus = "Expired"
-			cred.Claim.StatusReason = "Credential Expired"
-			cred.Proof.Updated = currentBlockTime.Format(time.RFC3339)
-
-			updatedCredBytes := k.cdc.MustMarshal(&cred)
-			store.Set([]byte(cred.Claim.Id), updatedCredBytes)
-		}
-	}
-	return nil
 }

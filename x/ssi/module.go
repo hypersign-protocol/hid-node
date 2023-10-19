@@ -172,7 +172,6 @@ func (AppModule) ConsensusVersion() uint64 { return 2 }
 
 // BeginBlock executes all ABCI BeginBlock logic respective to the capability module.
 func (am AppModule) BeginBlock(ctx sdk.Context, _ abci.RequestBeginBlock) {
-	BeginBlocker(ctx, am.keeper)
 }
 
 // EndBlock executes all ABCI EndBlock logic respective to the capability module. It

@@ -3,7 +3,7 @@ package keeper
 import (
 	"encoding/binary"
 	"fmt"
-
+	
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/hypersign-protocol/hid-node/utils"
@@ -78,16 +78,15 @@ func (k Keeper) UpdateDidDocumentInStore(ctx sdk.Context, didDoc types.DidDocume
 }
 
 // Creates record for a new DID Document
-func (k Keeper) RegisterDidDocumentInStore(ctx sdk.Context, didDoc *types.DidDocumentState) uint64 {
+func (k Keeper) RegisterDidDocumentInStore(ctx sdk.Context, didDoc *types.DidDocumentState) {
 	didCount := k.GetDidCount(ctx)
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidKey))
 
 	idBytes := []byte(didDoc.GetDidDocument().GetId())
 	didDocBytes := k.cdc.MustMarshal(didDoc)
-
+	
 	store.Set(idBytes, didDocBytes)
 	k.SetDidCount(ctx, didCount+1)
-	return didCount
 }
 
 // Set the BlockchainAccountId in Store

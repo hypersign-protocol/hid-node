@@ -22,7 +22,7 @@ def generate_report(func):
         print("Test report generation failed\n", e)
 
 def run_all_tests():
-    print("============= 🔧️ Running all x/ssi e2e tests ============== \n")
+    print("============= Running all x/ssi e2e tests ============== \n")
     
     create_did_test()
     update_did_test()
@@ -38,7 +38,7 @@ def run_all_tests():
     bbs_signature_test()
     bjj_signature_test()
     
-    print("============= 😃️ All test cases completed successfully ============== \n")
+    print("============= All test cases completed successfully ============== \n")
 
 if __name__=='__main__':
     # Assert if blockchain is currently running

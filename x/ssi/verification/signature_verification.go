@@ -43,8 +43,8 @@ func VerifySignatureOfAnyController(
 }
 
 // VerifyDocumentProofSignature verfies the proof of the SSI Document such as Credential Schema and Credential Status
-func VerifyDocumentProofSignature(ssiMsg types.SsiMsg, vm *types.VerificationMethod, signInfo *types.SignInfo) error {
-	vmExtended := types.CreateExtendedVerificationMethod(vm, signInfo)
+func VerifyDocumentProofSignature(ssiMsg types.SsiMsg, vm *types.VerificationMethod, documentProof *types.DocumentProof) error {
+	vmExtended := types.CreateExtendedVerificationMethod(vm, documentProof)
 	if err := verify(vmExtended, ssiMsg); err != nil {
 		return err
 	}

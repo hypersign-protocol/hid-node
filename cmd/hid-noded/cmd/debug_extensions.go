@@ -14,6 +14,7 @@ import (
 	ethercrypto "github.com/ethereum/go-ethereum/crypto"
 	bbs "github.com/hyperledger/aries-framework-go/component/kmscrypto/crypto/primitive/bbs12381g2pub"
 	hidnodecli "github.com/hypersign-protocol/hid-node/x/ssi/client/cli"
+	ldcontext "github.com/hypersign-protocol/hid-node/x/ssi/ld-context"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 	"github.com/iden3/go-iden3-crypto/babyjub"
 	"github.com/multiformats/go-multibase"
@@ -295,9 +296,91 @@ func signSSIDocCmd() *cobra.Command {
 	}
 
 	cmd.AddCommand(
+		signDidDocCmd(),
 		signSchemaDocCmd(),
 		signCredStatusDocCmd(),
 	)
+	return cmd
+}
+
+func signDidDocCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "did-doc [doc] [private-key] [signing-algo]",
+		Short: "Did Document signature",
+		Args:  cobra.ExactArgs(3),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			argDidDoc := args[0]
+			argPrivateKey := args[1]
+			argSigningAlgo := args[2]
+
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			// Unmarshal Schema Document
+			var didDoc types.DidDocument
+			err = clientCtx.Codec.UnmarshalJSON([]byte(argDidDoc), &didDoc)
+			if err != nil {
+				return err
+			}
+
+			// Sign Schema Document
+			var signature string
+			switch argSigningAlgo {
+			case types.Ed25519Signature2020:
+				didDocBytes, err := ldcontext.EdDSACryptoSuite2020Canonize(&didDoc)
+				if err != nil {
+					return err
+				}
+
+				signature, err = hidnodecli.GetEd25519Signature2020(argPrivateKey, didDocBytes[:])
+				if err != nil {
+					return err
+				}
+			case types.EcdsaSecp256k1Signature2019:
+				didDocBytes, err := ldcontext.EcdsaSecp256k1Signature2019Canonize(&didDoc)
+				if err != nil {
+					return err
+				}
+
+				signature, err = hidnodecli.GetEcdsaSecp256k1Signature2019(argPrivateKey, didDocBytes[:])
+				if err != nil {
+					return err
+				}
+			case types.EcdsaSecp256k1RecoverySignature2020:
+				didDocBytes, err := ldcontext.EcdsaSecp256k1RecoverySignature2020Canonize(&didDoc)
+				if err != nil {
+					return err
+				}
+
+				signature, err = hidnodecli.GetEcdsaSecp256k1RecoverySignature2020(argPrivateKey, didDocBytes[:])
+				if err != nil {
+					return err
+				}
+			case types.BbsBlsSignature2020:
+				didDocBytes, err := ldcontext.BbsBlsSignature2020Canonize(&didDoc)
+				if err != nil {
+					return err
+				}
+
+				signature, err = hidnodecli.GetBbsBlsSignature2020(argPrivateKey, didDocBytes[:])
+				if err != nil {
+					return err
+				}
+			case types.BabyJubJubSignature2023:
+				signature, err = hidnodecli.GetBabyJubJubSignature2023(argPrivateKey, didDoc.GetSignBytes())
+				if err != nil {
+					return err
+				}
+			default:
+				panic("recieved unsupported signing-algo. Supported algorithms are: [Ed25519Signature2020, EcdsaSecp256k1Signature2019, EcdsaSecp256k1RecoverySignature2020, BbsBlsSignature2020, BabyJubJubSignature2023]")
+			}
+
+			_, err = fmt.Fprintln(cmd.OutOrStdout(), signature)
+			return err
+		},
+	}
 	return cmd
 }
 
@@ -317,7 +400,7 @@ func signSchemaDocCmd() *cobra.Command {
 			}
 
 			// Unmarshal Schema Document
-			var schemaDoc types.SchemaDocument
+			var schemaDoc types.CredentialSchemaDocument
 			err = clientCtx.Codec.UnmarshalJSON([]byte(argSchemaDoc), &schemaDoc)
 			if err != nil {
 				return err
@@ -347,13 +430,13 @@ func signSchemaDocCmd() *cobra.Command {
 				if err != nil {
 					return err
 				}
-			case "bjj":
-				signature, err = hidnodecli.GetBJJSignature(argPrivateKey, schemaDocBytes)
+			case types.BabyJubJubSignature2023:
+				signature, err = hidnodecli.GetBabyJubJubSignature2023(argPrivateKey, schemaDocBytes)
 				if err != nil {
 					return err
 				}
 			default:
-				panic("recieved unsupported signing-algo. Supported algorithms are: [Ed25519Signature2020, EcdsaSecp256k1Signature2019, EcdsaSecp256k1RecoverySignature2020, BbsBlsSignature2020, 'bjj']")
+				panic("recieved unsupported signing-algo. Supported algorithms are: [Ed25519Signature2020, EcdsaSecp256k1Signature2019, EcdsaSecp256k1RecoverySignature2020, BbsBlsSignature2020, BabyJubJubSignature2023]")
 			}
 
 			_, err = fmt.Fprintln(cmd.OutOrStdout(), signature)
@@ -379,7 +462,7 @@ func signCredStatusDocCmd() *cobra.Command {
 			}
 
 			// Unmarshal Credential Status Document
-			var credStatusDoc types.CredentialStatus
+			var credStatusDoc types.CredentialStatusDocument
 			err = clientCtx.Codec.UnmarshalJSON([]byte(argCredStatusDoc), &credStatusDoc)
 			if err != nil {
 				return err
@@ -409,13 +492,13 @@ func signCredStatusDocCmd() *cobra.Command {
 				if err != nil {
 					return err
 				}
-			case "bjj":
-				signature, err = hidnodecli.GetBJJSignature(argPrivateKey, credStatusDocBytes)
+			case types.BabyJubJubSignature2023:
+				signature, err = hidnodecli.GetBabyJubJubSignature2023(argPrivateKey, credStatusDocBytes)
 				if err != nil {
 					return err
 				}
 			default:
-				panic("recieved unsupported signing-algo. Supported algorithms are: [Ed25519Signature2020, EcdsaSecp256k1Signature2019, EcdsaSecp256k1RecoverySignature2020, BbsBlsSignature2020, 'bjj']")
+				panic("recieved unsupported signing-algo. Supported algorithms are: [Ed25519Signature2020, EcdsaSecp256k1Signature2019, EcdsaSecp256k1RecoverySignature2020, BbsBlsSignature2020, BabyJubJubSignature2023]")
 			}
 
 			_, err = fmt.Fprintln(cmd.OutOrStdout(), signature)

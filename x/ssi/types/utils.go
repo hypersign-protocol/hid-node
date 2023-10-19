@@ -38,16 +38,6 @@ func GetUniqueElements(list []string) []string {
 	return uniqueList
 }
 
-// FindInSlice checks if an element is present in the list
-func FindInSlice(list []string, element string) bool {
-	for _, x := range list {
-		if x == element {
-			return true
-		}
-	}
-	return false
-}
-
 // checkDuplicateItems return a duplicate Id from the list, if found
 func checkDuplicateItems(list []string) string {
 	presentMap := map[string]bool{}

@@ -1,0 +1,14 @@
+syntax = "proto3";
+package hypersign.ssi.v1;
+
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/hypersign-protocol/hid-node/x/ssi/types";
+
+enum ClientSpecType {
+    option (gogoproto.goproto_enum_prefix) = false;
+    
+    CLIENT_SPEC_TYPE_NONE = 0;
+    CLIENT_SPEC_TYPE_COSMOS_ADR036 = 1;
+    CLIENT_SPEC_TYPE_ETH_PERSONAL_SIGN = 2;
+}

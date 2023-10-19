@@ -29,7 +29,7 @@ export GO111MODULE=on
 ###############################################################################
 .PHONY: build install 
 
-all: proto-gen swagger-docs-gen build
+all: proto-gen-go proto-gen-swagger build
 
 go-version-check:
 ifneq ($(GO_MINOR_VERSION),19)
@@ -51,18 +51,17 @@ build: go-version-check
 ###                                  Proto                                  ###
 ###############################################################################
 
-proto-gen:
+proto-gen-go:
 	@echo "Generating golang code from protobuf"
 	./scripts/protocgen.sh
 
-###############################################################################
-###                                  Docs                                   ###
-###############################################################################
-
-swagger-docs-gen:
+proto-gen-swagger:
 	@echo "Generating swagger docs"
 	./scripts/protoc-swagger-gen.sh
 
+proto-gen-ts:
+	@echo "Generating typescript code from protobuf"
+	./scripts/protocgen-ts.sh
 
 ###############################################################################
 ###                                  Docker                                 ###
