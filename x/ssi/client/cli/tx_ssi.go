@@ -88,7 +88,16 @@ func CmdRegisterDID() *cobra.Command {
 				}
 
 				// Sign the DID Document using Keyring to get theSignInfo. Currently, "test" keyring-backend is only supported
-				didDocCanonizedHash, err := ldcontext.EcdsaSecp256k1Signature2019Canonize(&didDoc)
+				didDocumentProofs = []*types.DocumentProof{
+					{
+						Type:               types.EcdsaSecp256k1Signature2019,
+						VerificationMethod: didDoc.VerificationMethod[0].Id,
+						ProofPurpose:       "assertionMethod",
+						Created:            time.Now().Format("2006-01-02T15:04:00Z"), // RFC3339 format
+					},
+				}
+
+				didDocCanonizedHash, err := ldcontext.EcdsaSecp256k1Signature2019Canonize(&didDoc, didDocumentProofs[0])
 				if err != nil {
 					return err
 				}
@@ -110,17 +119,7 @@ func CmdRegisterDID() *cobra.Command {
 				if err != nil {
 					return err
 				}
-				signatureStr := base64.StdEncoding.EncodeToString(signatureBytes)
-
-				didDocumentProofs = []*types.DocumentProof{
-					{
-						Type:               types.EcdsaSecp256k1Signature2019,
-						VerificationMethod: didDoc.VerificationMethod[0].Id,
-						ProofPurpose:       "assertionMethod",
-						ProofValue:         signatureStr,
-						Created:            time.Now().Format("2006-01-02T15:04:00Z"), // RFC3339 format
-					},
-				}
+				didDocumentProofs[0].ProofValue = base64.StdEncoding.EncodeToString(signatureBytes)				
 			}
 
 			// Submit RegisterDID Tx

@@ -6,28 +6,28 @@ import (
 
 // NormalizeByVerificationMethodType canonizes DID Document based on the input Verification
 // Method type
-func NormalizeByVerificationMethodType(didDoc *types.DidDocument, vmType string) ([]byte, error) {
+func NormalizeByVerificationMethodType(didDoc *types.DidDocument, vmType string, didDocumentProof *types.DocumentProof) ([]byte, error) {
 	switch vmType {
 	case types.Ed25519VerificationKey2020:
-		didDocBytes, err := EdDSACryptoSuite2020Canonize(didDoc)
+		didDocBytes, err := EdDSACryptoSuite2020Canonize(didDoc, didDocumentProof)
 		if err != nil {
 			return nil, err
 		}
 		return didDocBytes, nil
 	case types.EcdsaSecp256k1RecoveryMethod2020:
-		didDocBytes, err := EcdsaSecp256k1RecoverySignature2020Canonize(didDoc)
+		didDocBytes, err := EcdsaSecp256k1RecoverySignature2020Canonize(didDoc, didDocumentProof)
 		if err != nil {
 			return nil, err
 		}
 		return didDocBytes, nil
 	case types.Bls12381G2Key2020:
-		didDocBytes, err := BbsBlsSignature2020Canonize(didDoc)
+		didDocBytes, err := BbsBlsSignature2020Canonize(didDoc, didDocumentProof)
 		if err != nil {
 			return nil, err
 		}
 		return didDocBytes, nil
 	case types.EcdsaSecp256k1VerificationKey2019:
-		didDocBytes, err := EcdsaSecp256k1Signature2019Canonize(didDoc)
+		didDocBytes, err := EcdsaSecp256k1Signature2019Canonize(didDoc, didDocumentProof)
 		if err != nil {
 			return nil, err
 		}

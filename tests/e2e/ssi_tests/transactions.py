@@ -24,7 +24,7 @@ def form_did_create_tx_multisig(diddoc, signPairs, blockchain_account):
             "proofValue": "",
         }
 
-        signature = get_document_signature(diddoc, "did", signPair["kp"], signAlgo)
+        signature = get_document_signature(diddoc, "did", signPair["kp"], signAlgo, base_diddoc_proof)
         base_diddoc_proof["proofValue"] = signature
         proofsStr += f"'{json.dumps(base_diddoc_proof)}' "
 
@@ -46,7 +46,7 @@ def form_did_update_tx_multisig(diddoc, signPairs, blockchain_account):
             "proofValue": "",
         }
 
-        signature = get_document_signature(diddoc, "did", signPair["kp"], signAlgo)
+        signature = get_document_signature(diddoc, "did", signPair["kp"], signAlgo, base_diddoc_proof)
         base_diddoc_proof["proofValue"] = signature
         proofsStr += f"'{json.dumps(base_diddoc_proof)}' "
 
@@ -72,7 +72,7 @@ def form_did_deactivate_tx_multisig(didId, signPairs, blockchain_account):
             "proofValue": "",
         }
 
-        signature = get_document_signature(diddoc, "did", signPair["kp"], signAlgo)
+        signature = get_document_signature(diddoc, "did", signPair["kp"], signAlgo, base_diddoc_proof)
         base_diddoc_proof["proofValue"] = signature
         proofsStr += f"'{json.dumps(base_diddoc_proof)}' "
     

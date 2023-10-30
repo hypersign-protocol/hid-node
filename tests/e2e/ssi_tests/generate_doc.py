@@ -10,6 +10,7 @@ ED25519_CONTEXT = "https://w3id.org/security/suites/ed25519-2020/v1"
 DID_CONTEXT = "https://www.w3.org/ns/did/v1"
 SECP256K1_RECOVERY_CONTEXT = "https://ns.did.ai/suites/secp256k1-2020/v1"
 SECP256K1_VER_KEY_2019_CONTEXT = "https://ns.did.ai/suites/secp256k1-2019/v1"
+BBS_CONTEXT = "https://ns.did.ai/suites/bls12381-2020/v1"
 
 def generate_did_document(key_pair, algo="Ed25519Signature2020", bech32prefix="hid", is_uuid=False):
     base_document = {
@@ -27,7 +28,8 @@ def generate_did_document(key_pair, algo="Ed25519Signature2020", bech32prefix="h
         base_document["context"].append(SECP256K1_RECOVERY_CONTEXT)
     if algo == "EcdsaSecp256k1Signature2019":
         base_document["context"].append(SECP256K1_VER_KEY_2019_CONTEXT)
-
+    if algo == "BbsBlsSignature2020":
+        base_document["context"].append(BBS_CONTEXT)
     did_id = generate_document_id("did", key_pair, algo, is_uuid)
     
     # Form the DID Document
