@@ -3,6 +3,7 @@ package keeper
 import (
 	"context"
 	"fmt"
+	"reflect"
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -24,6 +25,11 @@ func (k msgServer) UpdateCredentialStatus(goCtx context.Context, msg *types.MsgU
 		return nil, sdkerrors.Wrap(types.ErrCredentialStatusNotFound, err.Error())
 	}
 	oldCredStatus := oldCredStatusState.CredentialStatusDocument
+
+	// Check if the incoming Credential Status is equal to registered Credential Status
+	if reflect.DeepEqual(oldCredStatus, msgNewCredStatus) {
+		return nil, sdkerrors.Wrap(types.ErrInvalidCredentialStatus, "incoming Credential Status Document does not have any changes")
+	}
 
 	// Check if the DID of the issuer exists
 	issuerId := msgNewCredStatus.GetIssuer()
@@ -75,7 +81,7 @@ func (k msgServer) UpdateCredentialStatus(goCtx context.Context, msg *types.MsgU
 	// Check if input Merkle Root Hash is different. The Credential Merkle Root Hash MUST NEVER change.
 	if msgNewCredStatus.CredentialMerkleRootHash != oldCredStatus.CredentialMerkleRootHash {
 		return nil, sdkerrors.Wrapf(
-			types.ErrInvalidCredentialMerkleRootHash, 
+			types.ErrInvalidCredentialMerkleRootHash,
 			"recieved credential merkle root hash '%v' is different from the merkle root hash of registered credential status document '%v'",
 			msgNewCredStatus.CredentialMerkleRootHash,
 			oldCredStatus.CredentialMerkleRootHash,
