@@ -154,7 +154,7 @@ def generate_cred_status_document(key_pair, cred_author, vm, signature=None, alg
         "id": "",
         "issuer": "did:hid:devnet:z3861habXtUFLNuu6J7m5p8VPsoBMduYbYeUxfx9CnWZR",
         "issuanceDate": "2022-08-16T09:37:12Z",
-        "merkleRootHash": "f35c3a4e3f1b8ba54ee3cf59d3de91b8b357f707fdb72a46473b65b46f92f80b"
+        "credentialMerkleRootHash": "f35c3a4e3f1b8ba54ee3cf59d3de91b8b357f707fdb72a46473b65b46f92f80b"
     }
     
     proof_type = ""

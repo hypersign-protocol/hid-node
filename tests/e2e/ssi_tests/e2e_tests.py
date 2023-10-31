@@ -934,7 +934,26 @@ def credential_status_test():
     cred_id = cred_doc["id"]
     run_blockchain_command(register_cred_status_cmd, f"Updating Credential status with Id: {cred_id}")
     
-    print("5. PASS: Bob revokes the credential status using one of his VMs\n")
+    print("5. FAIL: Bob attempts to update the VC status document by changing the Credential Merkle Root Hash\n")
+    valid_cred_merkle_root_hash = cred_doc["credentialMerkleRootHash"] # for later re-assignment in next test case
+    cred_doc["credentialMerkleRootHash"] = "9de17abaffe74f4675c738f5d69c28a329aff8721cb0ed4808d8616e26280ed9"
+
+    _, cred_proof = generate_cred_status_document(
+        kp_bob,
+        did_doc_bob,
+        did_doc_bob_vm["id"],
+        updated_credstatus_doc=cred_doc
+    )
+    register_cred_status_cmd = form_update_cred_status_tx(
+        cred_doc,
+        cred_proof,
+        DEFAULT_BLOCKCHAIN_ACCOUNT_NAME
+    )
+    cred_id = cred_doc["id"]
+    run_blockchain_command(register_cred_status_cmd, f"Updating Credential status with Id: {cred_id}", True)
+    cred_doc["credentialMerkleRootHash"] = valid_cred_merkle_root_hash
+    
+    print("6. PASS: Bob revokes the credential status using one of his VMs\n")
     cred_doc["revoked"] = True
 
     _, cred_proof = generate_cred_status_document(
@@ -951,7 +970,7 @@ def credential_status_test():
     cred_id = cred_doc["id"]
     run_blockchain_command(register_cred_status_cmd, f"Updating Credential status with Id: {cred_id}")
 
-    print("6. FAIL: Bob attempts to un-revoke the credential status using one of his VMs\n")
+    print("7. FAIL: Bob attempts to un-revoke the credential status using one of his VMs\n")
     cred_doc["revoked"] = False
 
     _, cred_proof = generate_cred_status_document(

@@ -60,7 +60,7 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 	}
 
 	// Validate Merkle Root Hash
-	if err := verifyCredentialMerkleRootHash(msgCredStatus.GetMerkleRootHash()); err != nil {
+	if err := verifyCredentialMerkleRootHash(msgCredStatus.GetCredentialMerkleRootHash()); err != nil {
 		return nil, sdkerrors.Wrapf(types.ErrInvalidCredentialMerkleRootHash, err.Error())
 	}
 

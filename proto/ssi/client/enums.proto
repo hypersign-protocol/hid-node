@@ -4,12 +4,7 @@ package hypersign.ssi.client;
 
 option go_package = "github.com/hypersign-protocol/hid-node/x/ssi/types";
 
-enum SupportedChainID {
-    jagrat = 0;
-    prajna = 1;
-}
-
-enum SupportedVerificationMethodRelationships {
+enum VerificationMethodRelationships {
     authentication = 0;
     assertionMethod = 1;
     keyAgreement = 2;
@@ -17,7 +12,7 @@ enum SupportedVerificationMethodRelationships {
     capabilityDelegation = 4;
 }
 
-enum SupportedVerificationMethodTypes {
+enum VerificationMethodTypes {
     Ed25519VerificationKey2020 = 0;
     EcdsaSecp256k1VerificationKey2019 = 1;
     EcdsaSecp256k1RecoveryMethod2020 = 2;
@@ -27,7 +22,7 @@ enum SupportedVerificationMethodTypes {
     BabyJubJubVerificationKey2023 = 6;
 }
 
-enum SupportedProofTypes {
+enum ProofTypes {
     Ed25519Signature2020 = 0;
     EcdsaSecp256k1Signature2019 = 1;
     EcdsaSecp256k1RecoverySignature2020 = 2;

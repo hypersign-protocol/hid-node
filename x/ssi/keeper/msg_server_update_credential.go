@@ -68,8 +68,18 @@ func (k msgServer) UpdateCredentialStatus(goCtx context.Context, msg *types.MsgU
 	}
 
 	// Validate Merkle Root Hash
-	if err := verifyCredentialMerkleRootHash(msgNewCredStatus.GetMerkleRootHash()); err != nil {
+	if err := verifyCredentialMerkleRootHash(msgNewCredStatus.GetCredentialMerkleRootHash()); err != nil {
 		return nil, sdkerrors.Wrapf(types.ErrInvalidCredentialMerkleRootHash, err.Error())
+	}
+
+	// Check if input Merkle Root Hash is different. The Credential Merkle Root Hash MUST NEVER change.
+	if msgNewCredStatus.CredentialMerkleRootHash != oldCredStatus.CredentialMerkleRootHash {
+		return nil, sdkerrors.Wrapf(
+			types.ErrInvalidCredentialMerkleRootHash, 
+			"recieved credential merkle root hash '%v' is different from the merkle root hash of registered credential status document '%v'",
+			msgNewCredStatus.CredentialMerkleRootHash,
+			oldCredStatus.CredentialMerkleRootHash,
+		)
 	}
 
 	// Check if the created date before issuance date
