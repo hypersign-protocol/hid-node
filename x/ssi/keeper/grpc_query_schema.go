@@ -61,6 +61,6 @@ func (k Keeper) CredentialSchemas(
 	}
 	return &types.QueryCredentialSchemasResponse{
 		CredentialSchemas: schemas,
-		Count:             k.GetSchemaCount(ctx),
+		Count:             k.getCredentialSchemaCount(ctx),
 	}, nil
 }

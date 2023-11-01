@@ -20,7 +20,7 @@ func (k msgServer) UpdateCredentialStatus(goCtx context.Context, msg *types.MsgU
 	credId := msgNewCredStatus.GetId()
 
 	// Get Credential from store
-	oldCredStatusState, err := k.GetCredentialStatusFromState(&ctx, credId)
+	oldCredStatusState, err := k.getCredentialStatusFromState(&ctx, credId)
 	if err != nil {
 		return nil, sdkerrors.Wrap(types.ErrCredentialStatusNotFound, err.Error())
 	}
@@ -33,12 +33,12 @@ func (k msgServer) UpdateCredentialStatus(goCtx context.Context, msg *types.MsgU
 
 	// Check if the DID of the issuer exists
 	issuerId := msgNewCredStatus.GetIssuer()
-	if !k.HasDid(ctx, issuerId) {
+	if !k.hasDidDocument(ctx, issuerId) {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("Issuer`s DID %s doesnt exists", issuerId))
 	}
 
 	// Check if issuer's DID is deactivated
-	issuerDidDocument, err := k.GetDidDocumentState(&ctx, issuerId)
+	issuerDidDocument, err := k.getDidDocumentState(&ctx, issuerId)
 	if err != nil {
 		return nil, sdkerrors.Wrap(types.ErrDidDocNotFound, err.Error())
 	}
@@ -110,7 +110,7 @@ func (k msgServer) UpdateCredentialStatus(goCtx context.Context, msg *types.MsgU
 		CredentialStatusProof:    msgNewCredProof,
 	}
 
-	k.SetCredentialStatusInState(ctx, &cred)
+	k.setCredentialStatusInState(ctx, &cred)
 
 	return &types.MsgUpdateCredentialStatusResponse{}, nil
 }

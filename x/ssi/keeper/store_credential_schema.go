@@ -8,7 +8,8 @@ import (
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 )
 
-func (k Keeper) GetSchemaCount(ctx sdk.Context) uint64 {
+// getCredentialSchemaCount gets the credential schema count from store 
+func (k Keeper) getCredentialSchemaCount(ctx sdk.Context) uint64 {
 	// Get the store using storeKey and SchemaCountKey (which is "Schema-count-")
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.SchemaCountKey))
 	// Convert the SchemaCountKey to bytes
@@ -23,13 +24,14 @@ func (k Keeper) GetSchemaCount(ctx sdk.Context) uint64 {
 	return binary.BigEndian.Uint64(bz)
 }
 
-// Check whether the given Schema already exists in the store
-func (k Keeper) HasSchema(ctx sdk.Context, id string) bool {
+// hasCredentialSchema checks whether credential schema already exists in the store
+func (k Keeper) hasCredentialSchema(ctx sdk.Context, id string) bool {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.SchemaKey))
 	return store.Has([]byte(id))
 }
 
-func (k Keeper) SetSchemaCount(ctx sdk.Context, count uint64) {
+// setCredentialSchemaCount sets credential schema count in store
+func (k Keeper) setCredentialSchemaCount(ctx sdk.Context, count uint64) {
 	// Get the store using storeKey and SchemaCountKey (which is "Schema-count-")
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.SchemaCountKey))
 	// Convert the SchemaCountKey to bytes
@@ -41,19 +43,20 @@ func (k Keeper) SetSchemaCount(ctx sdk.Context, count uint64) {
 	store.Set(byteKey, bz)
 }
 
+// setCredentialSchemaInStore stores credential schema in store
 func (k Keeper) setCredentialSchemaInStore(ctx sdk.Context, schema types.CredentialSchemaState) {
 	// Get the current number of Schemas in the store
-	count := k.GetSchemaCount(ctx)
+	count := k.getCredentialSchemaCount(ctx)
 	// Get the store
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.SchemaKey))
 	// Marshal the Schema into bytes
 	schemaBytes := k.cdc.MustMarshal(&schema)
 	store.Set([]byte(schema.GetCredentialSchemaDocument().GetId()), schemaBytes)
 	// Update the Schema count
-	k.SetSchemaCount(ctx, count+1)
+	k.setCredentialSchemaCount(ctx, count+1)
 }
 
-// Get Credential Schema from Store
+// getCredentialSchemaFromStore gets credential schema from store
 func (k Keeper) getCredentialSchemaFromStore(ctx sdk.Context, credentialSchemaId string) ([]*types.CredentialSchemaState, error) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.SchemaKey))
 	var versionNumLengthWithColon int = 4

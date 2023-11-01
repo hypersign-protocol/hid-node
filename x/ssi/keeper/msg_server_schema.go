@@ -11,15 +11,15 @@ import (
 )
 
 func storeCredentialSchema(
-	k msgServer, 
-	goCtx context.Context, 
-	schemaDoc *types.CredentialSchemaDocument, 
+	k msgServer,
+	goCtx context.Context,
+	schemaDoc *types.CredentialSchemaDocument,
 	schemaProof *types.DocumentProof,
 	txAuthor string,
 	msgTypeUrl string,
 ) error {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	
+
 	schemaID := schemaDoc.GetId()
 	chainNamespace := k.GetChainNamespace(&ctx)
 
@@ -29,7 +29,7 @@ func storeCredentialSchema(
 	}
 
 	// Get the Did Document of Schema's Author and check if Author's DID is deactivated
-	authorDidDocumentState, err := k.GetDidDocumentState(&ctx, schemaDoc.GetAuthor())
+	authorDidDocumentState, err := k.getDidDocumentState(&ctx, schemaDoc.GetAuthor())
 	if err != nil {
 		return sdkerrors.Wrap(err, fmt.Sprintf("unable to get author`s DID %s from store", schemaDoc.GetAuthor()))
 	}
@@ -43,7 +43,7 @@ func storeCredentialSchema(
 	}
 
 	// Check if Schema already exists
-	if k.HasSchema(ctx, schemaID) {
+	if k.hasCredentialSchema(ctx, schemaID) {
 		return sdkerrors.Wrap(types.ErrSchemaExists, fmt.Sprintf("Schema ID:  %s", schemaID))
 	}
 
@@ -67,7 +67,7 @@ func storeCredentialSchema(
 	return nil
 }
 
-func (k msgServer) RegisterCredentialSchema(goCtx context.Context, msg *types.MsgRegisterCredentialSchema) (*types.MsgRegisterCredentialSchemaResponse, error) { 
+func (k msgServer) RegisterCredentialSchema(goCtx context.Context, msg *types.MsgRegisterCredentialSchema) (*types.MsgRegisterCredentialSchemaResponse, error) {
 	if err := storeCredentialSchema(k, goCtx, msg.CredentialSchemaDocument, msg.CredentialSchemaProof, msg.TxAuthor, msg.Type()); err != nil {
 		return nil, err
 	}
@@ -75,11 +75,10 @@ func (k msgServer) RegisterCredentialSchema(goCtx context.Context, msg *types.Ms
 	return &types.MsgRegisterCredentialSchemaResponse{}, nil
 }
 
-func (k msgServer) UpdateCredentialSchema(goCtx context.Context, msg *types.MsgUpdateCredentialSchema) (*types.MsgUpdateCredentialSchemaResponse, error) { 
+func (k msgServer) UpdateCredentialSchema(goCtx context.Context, msg *types.MsgUpdateCredentialSchema) (*types.MsgUpdateCredentialSchemaResponse, error) {
 	if err := storeCredentialSchema(k, goCtx, msg.CredentialSchemaDocument, msg.CredentialSchemaProof, msg.TxAuthor, msg.Type()); err != nil {
 		return nil, err
 	}
 
 	return &types.MsgUpdateCredentialSchemaResponse{}, nil
 }
-

@@ -32,7 +32,7 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 	}
 
 	// Checks if the Did Document is already registered
-	if !k.HasDid(ctx, msgDidDocument.Id) {
+	if !k.hasDidDocument(ctx, msgDidDocument.Id) {
 		return nil, sdkerrors.Wrap(types.ErrDidDocNotFound, msgDidDocument.Id)
 	}
 
@@ -42,9 +42,9 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 			return nil, err
 		}
 	}
-	
+
 	// Fetch registered Did Document from state
-	existingDidDocumentState, err := k.GetDidDocumentState(&ctx, msgDidDocument.Id)
+	existingDidDocumentState, err := k.getDidDocumentState(&ctx, msgDidDocument.Id)
 	if err != nil {
 		return nil, sdkerrors.Wrap(types.ErrDidDocNotFound, err.Error())
 	}
@@ -182,20 +182,20 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 	}
 
 	// Update the DID Document in store
-	if err := k.UpdateDidDocumentInStore(ctx, didDocumentState); err != nil {
+	if err := k.updateDidDocumentInStore(ctx, didDocumentState); err != nil {
 		return nil, err
 	}
 
 	// Iterate through the removed Verification Methods having `blockchainAccountId` populated
 	// and remove them from store
 	for _, vm := range vmsToBeRemoved {
-		k.RemoveBlockchainAddressInStore(&ctx, vm.BlockchainAccountId)
+		k.removeBlockchainAddressInStore(&ctx, vm.BlockchainAccountId)
 	}
 
 	// Iterate through the added Verification Methods having `blockchainAccountId` populated
 	// and add them to store
 	for _, vm := range vmsToBeAdded {
-		k.SetBlockchainAddressInStore(&ctx, vm.BlockchainAccountId, vm.Controller)
+		k.setBlockchainAddressInStore(&ctx, vm.BlockchainAccountId, vm.Controller)
 	}
 
 	return &types.MsgUpdateDIDResponse{}, nil
@@ -279,7 +279,7 @@ func getVerificationMethodsForUpdateDID(existingVMs []*types.VerificationMethod,
 	for _, vm := range existingVMs {
 		// Skip X25519KeyAgreementKey2020 or X25519KeyAgreementKey2020 because these
 		// are not allowed for Authentication and Assertion purposes
-		if ((vm.Type == types.X25519KeyAgreementKey2020) || (vm.Type == types.X25519KeyAgreementKeyEIP5630)) {
+		if (vm.Type == types.X25519KeyAgreementKey2020) || (vm.Type == types.X25519KeyAgreementKeyEIP5630) {
 			continue
 		}
 		existingVmMap[vm.Id] = vm
@@ -292,7 +292,7 @@ func getVerificationMethodsForUpdateDID(existingVMs []*types.VerificationMethod,
 		// Check if VM is present in existing VM map.
 		// If it's not present, the VM is being added to existing Did Document.
 		// Add the VM to "required" group
-		if _, present := existingVmMap[vm.Id]; !present && ((vm.Type != types.X25519KeyAgreementKey2020) && (vm.Type != types.X25519KeyAgreementKeyEIP5630))  {
+		if _, present := existingVmMap[vm.Id]; !present && ((vm.Type != types.X25519KeyAgreementKey2020) && (vm.Type != types.X25519KeyAgreementKeyEIP5630)) {
 			updatedVms = append(
 				updatedVms,
 				vm,
@@ -322,7 +322,7 @@ func processBlockchainAccountIdForUpdateDID(k msgServer, ctx sdk.Context, existi
 		// Add the VM to "required" group
 		if _, present := existingVmMap[vm.Id]; !present {
 			if vm.BlockchainAccountId != "" {
-				if didIdBytes := k.GetBlockchainAddressFromStore(&ctx, vm.BlockchainAccountId); len(didIdBytes) != 0 {
+				if didIdBytes := k.getBlockchainAddressFromStore(&ctx, vm.BlockchainAccountId); len(didIdBytes) != 0 {
 					return nil, nil, fmt.Errorf(
 						"blockchainAccountId %v of verification method %v is already part of DID Document %v",
 						vm.BlockchainAccountId,
