@@ -100,7 +100,9 @@ func (k msgServer) RegisterDID(goCtx context.Context, msg *types.MsgRegisterDID)
 	}
 
 	// Register DID Document in Store once all validation checks are passed
-	k.registerDidDocumentInStore(ctx, &didDocumentState)
+	// and increment the DID Document count
+	k.setDidDocumentInStore(ctx, &didDocumentState)
+	k.incrementDidCount(ctx)
 
 	// After successful registration of the DID Document, every blockchainAccountIds
 	// can be added to the store

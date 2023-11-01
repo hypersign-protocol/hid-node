@@ -182,9 +182,7 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 	}
 
 	// Update the DID Document in store
-	if err := k.updateDidDocumentInStore(ctx, didDocumentState); err != nil {
-		return nil, err
-	}
+	k.setDidDocumentInStore(ctx, &didDocumentState)
 
 	// Iterate through the removed Verification Methods having `blockchainAccountId` populated
 	// and remove them from store

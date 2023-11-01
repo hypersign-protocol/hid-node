@@ -88,9 +88,7 @@ func (k msgServer) DeactivateDID(goCtx context.Context, msg *types.MsgDeactivate
 	}
 
 	// Update the DID Document in Store
-	if err := k.updateDidDocumentInStore(ctx, updatedDidDocumentState); err != nil {
-		return nil, err
-	}
+	k.setDidDocumentInStore(ctx, &updatedDidDocumentState)
 
 	// Remove the BlockchainAccountId from BlockchainAddressStore
 	for _, vm := range didDocumentState.DidDocument.VerificationMethod {
