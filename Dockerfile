@@ -14,11 +14,12 @@ RUN apt-get update
 RUN apt-get install ${PACKAGES} -y
 RUN make install 
 
-# Setup the node
-RUN bash ./scripts/docker-node/setup.sh
-
 # Expose Ports
 EXPOSE 26657 1317 9090 9091 26656
 
+# Provide permission to the script
+RUN chmod +x ./scripts/docker-node/entrypoint.sh
+
 # Entry for containers
-ENTRYPOINT [ "hid-noded" ]
+ENTRYPOINT [ "/bin/sh", "-c", "echo N | ./scripts/docker-node/entrypoint.sh" ]
+
