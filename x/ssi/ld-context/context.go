@@ -6,6 +6,7 @@ const X25519KeyAgreement2020Context string = "https://ns.did.ai/suites/x25519-20
 const Secp256k1Recovery2020Context string = "https://ns.did.ai/suites/secp256k1-2020/v1"
 const BbsSignature2020Context string = "https://ns.did.ai/suites/bls12381-2020/v1"
 const Secp256k12019Context string = "https://ns.did.ai/suites/secp256k1-2019/v1"
+const X25519KeyAgreementKeyEIP5630 string = "https://raw.githubusercontent.com/hypersign-protocol/hypersign-contexts/main/X25519KeyAgreementKeyEIP5630.jsonld"
 
 // As hid-node is not supposed to perform any GET request, the complete Context body of their
 // respective Context urls has been maintained below.
@@ -605,6 +606,40 @@ var ContextUrlMap map[string]contextObject = map[string]contextObject{
 				"verificationMethod": map[string]interface{}{
 					"@id":   "https://w3id.org/security#verificationMethod",
 					"@type": "@id",
+				},
+			},
+		},
+	},
+	X25519KeyAgreementKeyEIP5630: {
+		"id":        "@id",
+		"type":      "@type",
+		"@protected": true,
+		"proof": map[string]interface{}{
+			"@id":       "https://w3id.org/security#proof",
+			"@type":     "@id",
+			"@container": "@graph",
+		},
+		"X25519KeyAgreementKeyEIP5630": map[string]interface{}{
+			"@id": "https://w3id.org/security#X25519KeyAgreementKeyEIP5630",
+			"@context": map[string]interface{}{
+				"@protected": true,
+				"id":         "@id",
+				"type":       "@type",
+				"controller": map[string]interface{}{
+					"@id":   "https://w3id.org/security#controller",
+					"@type": "@id",
+				},
+				"revoked": map[string]interface{}{
+					"@id":   "https://w3id.org/security#revoked",
+					"@type": "http://www.w3.org/2001/XMLSchema#dateTime",
+				},
+				"publicKeyMultibase": map[string]interface{}{
+					"@id":   "https://w3id.org/security#publicKeyMultibase",
+					"@type": "https://w3id.org/security#multibase",
+				},
+				"blockchainAccountId": map[string]interface{}{
+					"@id":   "https://w3c.github.io/vc-data-integrity/vocab/security/vocabulary.jsonld#blockchainAccountId",
+					"@type": "https://w3id.org/security#blockchainAccountId",
 				},
 			},
 		},
