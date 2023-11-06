@@ -6,7 +6,7 @@ const X25519KeyAgreement2020Context string = "https://ns.did.ai/suites/x25519-20
 const Secp256k1Recovery2020Context string = "https://ns.did.ai/suites/secp256k1-2020/v1"
 const BbsSignature2020Context string = "https://ns.did.ai/suites/bls12381-2020/v1"
 const Secp256k12019Context string = "https://ns.did.ai/suites/secp256k1-2019/v1"
-const X25519KeyAgreementKeyEIP5630 string = "https://raw.githubusercontent.com/hypersign-protocol/hypersign-contexts/main/X25519KeyAgreementKeyEIP5630.jsonld"
+const X25519KeyAgreementKeyEIP5630Context string = "https://raw.githubusercontent.com/hypersign-protocol/hypersign-contexts/main/X25519KeyAgreementKeyEIP5630.jsonld"
 
 // As hid-node is not supposed to perform any GET request, the complete Context body of their
 // respective Context urls has been maintained below.
@@ -610,7 +610,7 @@ var ContextUrlMap map[string]contextObject = map[string]contextObject{
 			},
 		},
 	},
-	X25519KeyAgreementKeyEIP5630: {
+	X25519KeyAgreementKeyEIP5630Context: {
 		"id":        "@id",
 		"type":      "@type",
 		"@protected": true,
