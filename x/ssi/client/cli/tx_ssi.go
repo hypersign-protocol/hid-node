@@ -97,7 +97,7 @@ func CmdRegisterDID() *cobra.Command {
 					},
 				}
 
-				didDocCanonizedHash, err := ldcontext.EcdsaSecp256k1Signature2019Canonize(&didDoc, didDocumentProofs[0])
+				didDocCanonizedHash, err := ldcontext.EcdsaSecp256k1Signature2019Normalize(&didDoc, didDocumentProofs[0])
 				if err != nil {
 					return err
 				}
@@ -119,7 +119,7 @@ func CmdRegisterDID() *cobra.Command {
 				if err != nil {
 					return err
 				}
-				didDocumentProofs[0].ProofValue = base64.StdEncoding.EncodeToString(signatureBytes)				
+				didDocumentProofs[0].ProofValue = base64.StdEncoding.EncodeToString(signatureBytes)
 			}
 
 			// Submit RegisterDID Tx

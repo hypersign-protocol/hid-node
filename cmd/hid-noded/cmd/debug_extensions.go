@@ -338,14 +338,14 @@ func signDidDocCmd() *cobra.Command {
 			case types.Ed25519Signature2020:
 				var didDocBytes []byte
 				if len(didDoc.Context) > 0 {
-					didDocBytes, err = ldcontext.EdDSACryptoSuite2020Canonize(&didDoc, &didDocProof)
+					didDocBytes, err = ldcontext.Ed25519Signature2020Normalize(&didDoc, &didDocProof)
 					if err != nil {
 						return err
 					}
 				} else {
 					didDocBytes = didDoc.GetSignBytes()
 				}
-				
+
 				signature, err = hidnodecli.GetEd25519Signature2020(argPrivateKey, didDocBytes[:])
 				if err != nil {
 					return err
@@ -353,7 +353,7 @@ func signDidDocCmd() *cobra.Command {
 			case types.EcdsaSecp256k1Signature2019:
 				var didDocBytes []byte
 				if len(didDoc.Context) > 0 {
-					didDocBytes, err = ldcontext.EcdsaSecp256k1Signature2019Canonize(&didDoc, &didDocProof)
+					didDocBytes, err = ldcontext.EcdsaSecp256k1Signature2019Normalize(&didDoc, &didDocProof)
 					if err != nil {
 						return err
 					}
@@ -368,7 +368,7 @@ func signDidDocCmd() *cobra.Command {
 			case types.EcdsaSecp256k1RecoverySignature2020:
 				var didDocBytes []byte
 				if len(didDoc.Context) > 0 {
-					didDocBytes, err = ldcontext.EcdsaSecp256k1RecoverySignature2020Canonize(&didDoc, &didDocProof)
+					didDocBytes, err = ldcontext.EcdsaSecp256k1RecoverySignature2020Normalize(&didDoc, &didDocProof)
 					if err != nil {
 						return err
 					}
@@ -383,7 +383,7 @@ func signDidDocCmd() *cobra.Command {
 			case types.BbsBlsSignature2020:
 				var didDocBytes []byte
 				if len(didDoc.Context) > 0 {
-					didDocBytes, err = ldcontext.BbsBlsSignature2020Canonize(&didDoc, &didDocProof)
+					didDocBytes, err = ldcontext.BbsBlsSignature2020Normalize(&didDoc, &didDocProof)
 					if err != nil {
 						return err
 					}
