@@ -10,6 +10,7 @@ ED25519_CONTEXT = "https://w3id.org/security/suites/ed25519-2020/v1"
 DID_CONTEXT = "https://www.w3.org/ns/did/v1"
 SECP256K1_RECOVERY_CONTEXT = "https://ns.did.ai/suites/secp256k1-2020/v1"
 SECP256K1_VER_KEY_2019_CONTEXT = "https://ns.did.ai/suites/secp256k1-2019/v1"
+BBS_CONTEXT = "https://ns.did.ai/suites/bls12381-2020/v1"
 
 def generate_did_document(key_pair, algo="Ed25519Signature2020", bech32prefix="hid", is_uuid=False):
     base_document = {
@@ -27,7 +28,8 @@ def generate_did_document(key_pair, algo="Ed25519Signature2020", bech32prefix="h
         base_document["context"].append(SECP256K1_RECOVERY_CONTEXT)
     if algo == "EcdsaSecp256k1Signature2019":
         base_document["context"].append(SECP256K1_VER_KEY_2019_CONTEXT)
-
+    if algo == "BbsBlsSignature2020":
+        base_document["context"].append(BBS_CONTEXT)
     did_id = generate_document_id("did", key_pair, algo, is_uuid)
     
     # Form the DID Document
@@ -152,7 +154,7 @@ def generate_cred_status_document(key_pair, cred_author, vm, signature=None, alg
         "id": "",
         "issuer": "did:hid:devnet:z3861habXtUFLNuu6J7m5p8VPsoBMduYbYeUxfx9CnWZR",
         "issuanceDate": "2022-08-16T09:37:12Z",
-        "merkleRootHash": "f35c3a4e3f1b8ba54ee3cf59d3de91b8b357f707fdb72a46473b65b46f92f80b"
+        "credentialMerkleRootHash": "f35c3a4e3f1b8ba54ee3cf59d3de91b8b357f707fdb72a46473b65b46f92f80b"
     }
     
     proof_type = ""

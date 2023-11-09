@@ -32,7 +32,7 @@ func (k msgServer) checkControllerPresenceInState(
 			continue
 		}
 
-		didDoc, err := k.GetDidDocumentState(&ctx, controller)
+		didDoc, err := k.getDidDocumentState(&ctx, controller)
 		if err != nil {
 			return err
 		}
@@ -170,7 +170,7 @@ func (k msgServer) formAnyControllerVmListMap(ctx sdk.Context,
 func (k msgServer) getControllerVmFromState(ctx sdk.Context, verificationMethodId string) (*types.VerificationMethod, error) {
 	didId, _ := types.SplitDidUrl(verificationMethodId)
 
-	didDocumentState, err := k.GetDidDocumentState(&ctx, didId)
+	didDocumentState, err := k.getDidDocumentState(&ctx, didId)
 	if err != nil {
 		return nil, err
 	}
@@ -189,7 +189,7 @@ func (k msgServer) VerifyDocumentProof(ctx sdk.Context, ssiMsg types.SsiMsg, inp
 	// Get DID Document from State
 	docProofVmId := inputDocProof.GetVerificationMethod()
 	didId, _ := types.SplitDidUrl(docProofVmId)
-	didDocumentState, err := k.GetDidDocumentState(&ctx, didId)
+	didDocumentState, err := k.getDidDocumentState(&ctx, didId)
 	if err != nil {
 		return err
 	}

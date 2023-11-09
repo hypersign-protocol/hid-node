@@ -28,18 +28,18 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 	}
 
 	// Check if the credential already exist in the store
-	if k.HasCredential(ctx, credId) {
+	if k.hasCredential(ctx, credId) {
 		return nil, types.ErrCredentialStatusExists
 	}
 
 	// Check if the DID of the issuer exists
 	issuerId := msgCredStatus.GetIssuer()
-	if !k.HasDid(ctx, issuerId) {
+	if !k.hasDidDocument(ctx, issuerId) {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("Issuer`s DID %s doesnt exists", issuerId))
 	}
 
 	// Check if issuer's DID is deactivated
-	issuerDidDocument, err := k.GetDidDocumentState(&ctx, issuerId)
+	issuerDidDocument, err := k.getDidDocumentState(&ctx, issuerId)
 	if err != nil {
 		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, err.Error())
 	}
@@ -60,7 +60,7 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 	}
 
 	// Validate Merkle Root Hash
-	if err := verifyCredentialMerkleRootHash(msgCredStatus.GetMerkleRootHash()); err != nil {
+	if err := verifyCredentialMerkleRootHash(msgCredStatus.GetCredentialMerkleRootHash()); err != nil {
 		return nil, sdkerrors.Wrapf(types.ErrInvalidCredentialMerkleRootHash, err.Error())
 	}
 
@@ -80,7 +80,7 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 		CredentialStatusProof:    msgCredProof,
 	}
 
-	k.SetCredentialStatusInState(ctx, cred)
+	k.setCredentialStatusInState(ctx, cred)
 
 	// Emit a successful Credential Status Registration event
 	ctx.EventManager().EmitEvent(

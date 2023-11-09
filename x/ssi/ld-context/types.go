@@ -60,7 +60,7 @@ func NewJsonLdDid(didDoc *types.DidDocument) *JsonLdDid {
 // Convert JsonLdDid to interface
 func jsonLdDidToInterface(jsonLd *JsonLdDid) interface{} {
 	var intf interface{}
-	
+
 	jsonLdBytes, err := json.Marshal(jsonLd)
 	if err != nil {
 		panic(err)
@@ -74,7 +74,7 @@ func jsonLdDidToInterface(jsonLd *JsonLdDid) interface{} {
 	return intf
 }
 
-// NormalizeWithURDNA2015 performs RDF Canonization upon JsonLdDid using URDNA2015 
+// NormalizeWithURDNA2015 performs RDF Canonization upon JsonLdDid using URDNA2015
 // algorithm and returns the canonized document in string
 func (jsonLd *JsonLdDid) NormalizeWithURDNA2015() (string, error) {
 	proc := ld.NewJsonLdProcessor()
@@ -90,6 +90,76 @@ func (jsonLd *JsonLdDid) NormalizeWithURDNA2015() (string, error) {
 	canonizedDocString := normalisedJsonLdDid.(string)
 	if canonizedDocString == "" {
 		return "", fmt.Errorf("normalization yield empty RDF string for did document: %v", jsonLd.Id)
+	}
+	return canonizedDocString, nil
+}
+
+// -------------------------
+
+type JsonLdDocumentProof struct {
+	Context            []contextObject `json:"@context,omitempty"`
+	Type               string          `json:"type,omitempty"`
+	Created            string          `json:"created,omitempty"`
+	VerificationMethod string          `json:"verificationMethod,omitempty"`
+	ProofPurpose       string          `json:"proofPurpose,omitempty"`
+}
+
+func NewJsonLdDocumentProof(didDocProof *types.DocumentProof, didContexts []string) *JsonLdDocumentProof {	
+	if len(didContexts) == 0 {
+		panic("atleast one context url must be provided for DID Document for Canonization")
+	}
+
+	var jsonLdDoc *JsonLdDocumentProof = &JsonLdDocumentProof{}
+
+	for _, url := range didContexts {
+		contextObj, ok := ContextUrlMap[url]
+		if !ok {
+			panic(fmt.Sprintf("invalid or unsupported context url: %v", url))
+		}
+		jsonLdDoc.Context = append(jsonLdDoc.Context, contextObj)
+	}
+
+	jsonLdDoc.Created = didDocProof.Created
+	jsonLdDoc.ProofPurpose = didDocProof.ProofPurpose
+	jsonLdDoc.Type = didDocProof.Type
+	jsonLdDoc.VerificationMethod = didDocProof.VerificationMethod
+
+	return jsonLdDoc
+}
+
+// Convert JsonLdDid to interface
+func jsonLdDocumentProofToInterface(jsonLd *JsonLdDocumentProof) interface{} {
+	var intf interface{}
+
+	jsonLdBytes, err := json.Marshal(jsonLd)
+	if err != nil {
+		panic(err)
+	}
+
+	err = json.Unmarshal(jsonLdBytes, &intf)
+	if err != nil {
+		panic(err)
+	}
+
+	return intf
+}
+
+// NormalizeWithURDNA2015 performs RDF Canonization upon JsonLdDid using URDNA2015
+// algorithm and returns the canonized document in string
+func (jsonLd *JsonLdDocumentProof) NormalizeWithURDNA2015() (string, error) {
+	proc := ld.NewJsonLdProcessor()
+	options := ld.NewJsonLdOptions("")
+	options.Algorithm = ld.AlgorithmURDNA2015
+	options.Format = "application/n-quads"
+
+	normalisedJsonLdDocumentProof, err := proc.Normalize(jsonLdDocumentProofToInterface(jsonLd), options)
+	if err != nil {
+		return "", fmt.Errorf("unable to Normalize Document Proof: %v", err.Error())
+	}
+
+	canonizedDocString := normalisedJsonLdDocumentProof.(string)
+	if canonizedDocString == "" {
+		return "", fmt.Errorf("normalization yield empty RDF string for proof")
 	}
 	return canonizedDocString, nil
 }

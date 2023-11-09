@@ -9,18 +9,20 @@ import (
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 )
 
-func (k Keeper) SetCredentialStatusInState(ctx sdk.Context, cred *types.CredentialStatusState) {
-	count := k.GetCredentialStatusCount(ctx)
+// setCredentialStatusInState stores credential status in store
+func (k Keeper) setCredentialStatusInState(ctx sdk.Context, cred *types.CredentialStatusState) {
+	count := k.getCredentialStatusCount(ctx)
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.CredKey))
 
 	id := cred.CredentialStatusDocument.Id
 	credBytes := k.cdc.MustMarshal(cred)
 
 	store.Set([]byte(id), credBytes)
-	k.SetCredentialStatusCount(ctx, count+1)
+	k.setCredentialStatusCount(ctx, count+1)
 }
 
-func (k Keeper) GetCredentialStatusFromState(ctx *sdk.Context, id string) (*types.CredentialStatusState, error) {
+// getCredentialStatusFromState gets credential status from store
+func (k Keeper) getCredentialStatusFromState(ctx *sdk.Context, id string) (*types.CredentialStatusState, error) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.CredKey))
 
 	var cred types.CredentialStatusState
@@ -36,13 +38,14 @@ func (k Keeper) GetCredentialStatusFromState(ctx *sdk.Context, id string) (*type
 	return &cred, nil
 }
 
-// Check whether the given Cred is already present in the store
-func (k Keeper) HasCredential(ctx sdk.Context, id string) bool {
+// hasCredential returns whether a credential status is present in the store
+func (k Keeper) hasCredential(ctx sdk.Context, id string) bool {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.CredKey))
 	return store.Has([]byte(id))
 }
 
-func (k Keeper) GetCredentialStatusCount(ctx sdk.Context) uint64 {
+// getCredentialStatusCount gets credential status count in store
+func (k Keeper) getCredentialStatusCount(ctx sdk.Context) uint64 {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.CredCountKey))
 	byteKey := []byte(types.CredCountKey)
 	bz := store.Get(byteKey)
@@ -52,7 +55,8 @@ func (k Keeper) GetCredentialStatusCount(ctx sdk.Context) uint64 {
 	return binary.BigEndian.Uint64(bz)
 }
 
-func (k Keeper) SetCredentialStatusCount(ctx sdk.Context, count uint64) {
+// setCredentialStatusCount stores credential status count in store
+func (k Keeper) setCredentialStatusCount(ctx sdk.Context, count uint64) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.CredCountKey))
 	byteKey := []byte(types.CredCountKey)
 	bz := make([]byte, 8)

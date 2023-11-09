@@ -7,8 +7,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
-	"github.com/hypersign-protocol/hid-node/x/ssi/verification"
 	"github.com/hypersign-protocol/hid-node/x/ssi/utils"
+	"github.com/hypersign-protocol/hid-node/x/ssi/verification"
 )
 
 // RegisterDID is a RPC method for registration of a DID Document
@@ -37,7 +37,7 @@ func (k msgServer) RegisterDID(goCtx context.Context, msg *types.MsgRegisterDID)
 	}
 
 	// Checks if the Did Document is already registered
-	if k.HasDid(ctx, msgDidDocument.Id) {
+	if k.hasDidDocument(ctx, msgDidDocument.Id) {
 		return nil, sdkerrors.Wrap(types.ErrDidDocExists, msgDidDocument.Id)
 	}
 
@@ -51,7 +51,7 @@ func (k msgServer) RegisterDID(goCtx context.Context, msg *types.MsgRegisterDID)
 	// Check if any of the blockchainAccountId is present in any registered DID Document. If so, throw error
 	for _, vm := range msgDidDocument.VerificationMethod {
 		if vm.BlockchainAccountId != "" {
-			if existingDidDocId := k.GetBlockchainAddressFromStore(&ctx, vm.BlockchainAccountId); len(existingDidDocId) != 0 {
+			if existingDidDocId := k.getBlockchainAddressFromStore(&ctx, vm.BlockchainAccountId); len(existingDidDocId) != 0 {
 				return nil, sdkerrors.Wrapf(
 					types.ErrInvalidDidDoc,
 					"blockchainAccountId %v of verification method %v is already part of DID Document %v",
@@ -100,13 +100,15 @@ func (k msgServer) RegisterDID(goCtx context.Context, msg *types.MsgRegisterDID)
 	}
 
 	// Register DID Document in Store once all validation checks are passed
-	k.RegisterDidDocumentInStore(ctx, &didDocumentState)
+	// and increment the DID Document count
+	k.setDidDocumentInStore(ctx, &didDocumentState)
+	k.incrementDidCount(ctx)
 
 	// After successful registration of the DID Document, every blockchainAccountIds
 	// can be added to the store
 	for _, vm := range didDocumentState.DidDocument.VerificationMethod {
 		if vm.BlockchainAccountId != "" {
-			k.SetBlockchainAddressInStore(&ctx, vm.BlockchainAccountId, vm.Controller)
+			k.setBlockchainAddressInStore(&ctx, vm.BlockchainAccountId, vm.Controller)
 		}
 	}
 

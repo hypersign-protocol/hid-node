@@ -23,7 +23,7 @@ func (k Keeper) DidDocuments(goCtx context.Context, req *types.QueryDidDocuments
 
 	var didDocuments []*types.DidDocumentState
 	_, err := query.Paginate(store, req.Pagination, func(key []byte, value []byte) error {
-		didDoc, err := k.GetDidDocumentState(&ctx, string(key))
+		didDoc, err := k.getDidDocumentState(&ctx, string(key))
 		if err != nil {
 			return sdkerrors.Wrap(types.ErrDidDocNotFound, err.Error())
 		}
@@ -37,7 +37,7 @@ func (k Keeper) DidDocuments(goCtx context.Context, req *types.QueryDidDocuments
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	var didDocCount uint64 = k.GetDidCount(ctx)
+	var didDocCount uint64 = k.getDidDocumentCount(ctx)
 
 	return &types.QueryDidDocumentsResponse{DidDocuments: didDocuments, Count: didDocCount}, nil
 }
@@ -50,7 +50,7 @@ func (k Keeper) DidDocumentByID(goCtx context.Context, req *types.QueryDidDocume
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// Check if DID Document exists
-	didDoc, err := k.GetDidDocumentState(&ctx, req.DidId)
+	didDoc, err := k.getDidDocumentState(&ctx, req.DidId)
 	if err != nil {
 		return nil, sdkerrors.Wrap(types.ErrDidDocNotFound, err.Error())
 	}

@@ -54,10 +54,10 @@ func getPersonalSignSpecDocBytes(ssiMsg types.SsiMsg) ([]byte, error) {
 
 // Get the updated marshaled SSI document for the respective ClientSpec
 func getDocBytesByClientSpec(ssiMsg types.SsiMsg, extendedVm *types.ExtendedVerificationMethod) ([]byte, error) {
-	switch extendedVm.ClientSpecType {
+	switch extendedVm.Proof.ClientSpecType {
 	case types.CLIENT_SPEC_TYPE_NONE:
 		if didDoc, ok := ssiMsg.(*types.DidDocument); ok && len(didDoc.Context) > 0 {
-			return ldcontext.NormalizeByVerificationMethodType(didDoc, extendedVm.Type)
+			return ldcontext.NormalizeByVerificationMethodType(didDoc, extendedVm.Type, extendedVm.Proof)
 		}
 		return ssiMsg.GetSignBytes(), nil
 	case types.CLIENT_SPEC_TYPE_COSMOS_ADR036:
@@ -67,7 +67,7 @@ func getDocBytesByClientSpec(ssiMsg types.SsiMsg, extendedVm *types.ExtendedVeri
 		}
 
 		if didDoc, ok := ssiMsg.(*types.DidDocument); ok && len(didDoc.Context) > 0 {
-			canonizedDidDocHash, err := ldcontext.EcdsaSecp256k1Signature2019Canonize(didDoc)
+			canonizedDidDocHash, err := ldcontext.EcdsaSecp256k1Signature2019Normalize(didDoc, extendedVm.Proof)
 			if err != nil {
 				return nil, err
 			}
@@ -77,23 +77,23 @@ func getDocBytesByClientSpec(ssiMsg types.SsiMsg, extendedVm *types.ExtendedVeri
 		return getCosmosADR036SignDocBytes(ssiMsg.GetSignBytes(), signerAddress)
 	case types.CLIENT_SPEC_TYPE_ETH_PERSONAL_SIGN:
 		if didDoc, ok := ssiMsg.(*types.DidDocument); ok && len(didDoc.Context) > 0 {
-			canonizedDidDocHash, err := ldcontext.EcdsaSecp256k1RecoverySignature2020Canonize(didDoc)
+			canonizedDidDocHash, err := ldcontext.EcdsaSecp256k1RecoverySignature2020Normalize(didDoc, extendedVm.Proof)
 			if err != nil {
 				return nil, err
 			}
 
-			// TODO: This is temporary fix eth.personal.sign() client function, since it only signs JSON 
+			// TODO: This is temporary fix eth.personal.sign() client function, since it only signs JSON
 			// stringified document and hence the following struct was used to sign from the Client end.
-			return json.Marshal(struct{
-				DidId string `json:"didId"`
+			return json.Marshal(struct {
+				DidId        string `json:"didId"`
 				DidDocDigest string `json:"didDocDigest"`
-			} {
-				DidId: didDoc.Id,
+			}{
+				DidId:        didDoc.Id,
 				DidDocDigest: hex.EncodeToString(canonizedDidDocHash),
 			})
 		}
 		return getPersonalSignSpecDocBytes(ssiMsg)
 	default:
-		return nil, fmt.Errorf("unsupported clientSpecType %v", extendedVm.ClientSpecType)
+		return nil, fmt.Errorf("unsupported clientSpecType %v", extendedVm.Proof.ClientSpecType)
 	}
 }

@@ -21,7 +21,7 @@ func (k msgServer) DeactivateDID(goCtx context.Context, msg *types.MsgDeactivate
 	msgDidDocumentProofs := msg.DidDocumentProofs
 
 	// Checks if the Did Document is already registered
-	if !k.HasDid(ctx, msgDidId) {
+	if !k.hasDidDocument(ctx, msgDidId) {
 		return nil, sdkerrors.Wrap(types.ErrDidDocNotFound, msgDidId)
 	}
 
@@ -33,7 +33,7 @@ func (k msgServer) DeactivateDID(goCtx context.Context, msg *types.MsgDeactivate
 	}
 
 	// Get the DID Document from state
-	didDocumentState, err := k.GetDidDocumentState(&ctx, msgDidId)
+	didDocumentState, err := k.getDidDocumentState(&ctx, msgDidId)
 	if err != nil {
 		return nil, sdkerrors.Wrap(types.ErrDidDocNotFound, err.Error())
 	}
@@ -88,14 +88,12 @@ func (k msgServer) DeactivateDID(goCtx context.Context, msg *types.MsgDeactivate
 	}
 
 	// Update the DID Document in Store
-	if err := k.UpdateDidDocumentInStore(ctx, updatedDidDocumentState); err != nil {
-		return nil, err
-	}
+	k.setDidDocumentInStore(ctx, &updatedDidDocumentState)
 
 	// Remove the BlockchainAccountId from BlockchainAddressStore
 	for _, vm := range didDocumentState.DidDocument.VerificationMethod {
 		if vm.BlockchainAccountId != "" {
-			k.RemoveBlockchainAddressInStore(&ctx, vm.BlockchainAccountId)
+			k.removeBlockchainAddressInStore(&ctx, vm.BlockchainAccountId)
 		}
 	}
 

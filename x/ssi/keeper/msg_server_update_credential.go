@@ -3,6 +3,7 @@ package keeper
 import (
 	"context"
 	"fmt"
+	"reflect"
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -19,20 +20,25 @@ func (k msgServer) UpdateCredentialStatus(goCtx context.Context, msg *types.MsgU
 	credId := msgNewCredStatus.GetId()
 
 	// Get Credential from store
-	oldCredStatusState, err := k.GetCredentialStatusFromState(&ctx, credId)
+	oldCredStatusState, err := k.getCredentialStatusFromState(&ctx, credId)
 	if err != nil {
 		return nil, sdkerrors.Wrap(types.ErrCredentialStatusNotFound, err.Error())
 	}
 	oldCredStatus := oldCredStatusState.CredentialStatusDocument
 
+	// Check if the incoming Credential Status is equal to registered Credential Status
+	if reflect.DeepEqual(oldCredStatus, msgNewCredStatus) {
+		return nil, sdkerrors.Wrap(types.ErrInvalidCredentialStatus, "incoming Credential Status Document does not have any changes")
+	}
+
 	// Check if the DID of the issuer exists
 	issuerId := msgNewCredStatus.GetIssuer()
-	if !k.HasDid(ctx, issuerId) {
+	if !k.hasDidDocument(ctx, issuerId) {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("Issuer`s DID %s doesnt exists", issuerId))
 	}
 
 	// Check if issuer's DID is deactivated
-	issuerDidDocument, err := k.GetDidDocumentState(&ctx, issuerId)
+	issuerDidDocument, err := k.getDidDocumentState(&ctx, issuerId)
 	if err != nil {
 		return nil, sdkerrors.Wrap(types.ErrDidDocNotFound, err.Error())
 	}
@@ -68,8 +74,18 @@ func (k msgServer) UpdateCredentialStatus(goCtx context.Context, msg *types.MsgU
 	}
 
 	// Validate Merkle Root Hash
-	if err := verifyCredentialMerkleRootHash(msgNewCredStatus.GetMerkleRootHash()); err != nil {
+	if err := verifyCredentialMerkleRootHash(msgNewCredStatus.GetCredentialMerkleRootHash()); err != nil {
 		return nil, sdkerrors.Wrapf(types.ErrInvalidCredentialMerkleRootHash, err.Error())
+	}
+
+	// Check if input Merkle Root Hash is different. The Credential Merkle Root Hash MUST NEVER change.
+	if msgNewCredStatus.CredentialMerkleRootHash != oldCredStatus.CredentialMerkleRootHash {
+		return nil, sdkerrors.Wrapf(
+			types.ErrInvalidCredentialMerkleRootHash,
+			"recieved credential merkle root hash '%v' is different from the merkle root hash of registered credential status document '%v'",
+			msgNewCredStatus.CredentialMerkleRootHash,
+			oldCredStatus.CredentialMerkleRootHash,
+		)
 	}
 
 	// Check if the created date before issuance date
@@ -94,7 +110,7 @@ func (k msgServer) UpdateCredentialStatus(goCtx context.Context, msg *types.MsgU
 		CredentialStatusProof:    msgNewCredProof,
 	}
 
-	k.SetCredentialStatusInState(ctx, &cred)
+	k.setCredentialStatusInState(ctx, &cred)
 
 	return &types.MsgUpdateCredentialStatusResponse{}, nil
 }

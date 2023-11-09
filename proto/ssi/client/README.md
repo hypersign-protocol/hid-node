@@ -1,0 +1,1 @@
+This client Proto package is only meant to be used by external clients apart from `hid-node` itself. These are supposed to be the de facto constants based on the Protocol.

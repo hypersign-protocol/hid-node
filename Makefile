@@ -53,7 +53,7 @@ build: go-version-check
 
 proto-gen-go:
 	@echo "Generating golang code from protobuf"
-	./scripts/protocgen.sh
+	./scripts/protocgen-go.sh
 
 proto-gen-swagger:
 	@echo "Generating swagger docs"

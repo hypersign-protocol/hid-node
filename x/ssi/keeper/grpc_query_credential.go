@@ -13,7 +13,7 @@ import (
 )
 
 func (k Keeper) CredentialStatusByID(
-	goCtx context.Context, 
+	goCtx context.Context,
 	req *types.QueryCredentialStatusRequest,
 ) (*types.QueryCredentialStatusResponse, error) {
 	if req == nil {
@@ -21,7 +21,7 @@ func (k Keeper) CredentialStatusByID(
 	}
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	cred, err := k.GetCredentialStatusFromState(&ctx, req.CredId)
+	cred, err := k.getCredentialStatusFromState(&ctx, req.CredId)
 	if err != nil {
 		return nil, sdkerrors.Wrap(types.ErrCredentialStatusNotFound, err.Error())
 	}
@@ -30,7 +30,7 @@ func (k Keeper) CredentialStatusByID(
 }
 
 func (k Keeper) CredentialStatuses(
-	goCtx context.Context, 
+	goCtx context.Context,
 	req *types.QueryCredentialStatusesRequest,
 ) (*types.QueryCredentialStatusesResponse, error) {
 	if req == nil {
@@ -60,7 +60,7 @@ func (k Keeper) CredentialStatuses(
 	}
 
 	return &types.QueryCredentialStatusesResponse{
-		CredentialStatuses: credentials, 
-		Count: k.GetCredentialStatusCount(ctx),
+		CredentialStatuses: credentials,
+		Count:              k.getCredentialStatusCount(ctx),
 	}, nil
 }

@@ -79,7 +79,7 @@ func verify(extendedVm *types.ExtendedVerificationMethod, ssiMsg types.SsiMsg) e
 // verifyBabyJubJubSignature2023 verifies the verification key for verification method type BabyJubJubSignature2023
 func verifyBabyJubJubSignature2023(extendedVm *types.ExtendedVerificationMethod, documentBytes []byte) error {
 	// Process siganture
-	signatureBytes, err := hex.DecodeString(extendedVm.ProofValue)
+	signatureBytes, err := hex.DecodeString(extendedVm.Proof.ProofValue)
 	if err != nil {
 		panic(err)
 	}
@@ -135,7 +135,7 @@ func verifyBbsBlsSignature2020(extendedVm *types.ExtendedVerificationMethod, doc
 	}
 
 	// Decode Signature to Bytes
-	sigBytes, err := base64.StdEncoding.DecodeString(extendedVm.ProofValue)
+	sigBytes, err := base64.StdEncoding.DecodeString(extendedVm.Proof.ProofValue)
 	if err != nil {
 		return err
 	}
@@ -205,7 +205,7 @@ func verifyEd25519Signature2020(extendedVm *types.ExtendedVerificationMethod, do
 	publicKeyBytes = publicKeyBytes[2:]
 
 	// Decode Signatures
-	encoding, signatureBytes, err := multibase.Decode(extendedVm.ProofValue)
+	encoding, signatureBytes, err := multibase.Decode(extendedVm.Proof.ProofValue)
 	if err != nil {
 		return err
 	}
@@ -226,7 +226,7 @@ func verifyEd25519Signature2020(extendedVm *types.ExtendedVerificationMethod, do
 // verifyEcdsaSecp256k1Signature2019 verifies the verification key for verification method type EcdsaSecp256k1VerificationKey2019
 func verifyEcdsaSecp256k1Signature2019(extendedVm *types.ExtendedVerificationMethod, documentBytes []byte) error {
 	// Decode and Parse Signature
-	signatureBytes, err := base64.StdEncoding.DecodeString(extendedVm.ProofValue)
+	signatureBytes, err := base64.StdEncoding.DecodeString(extendedVm.Proof.ProofValue)
 	if err != nil {
 		return err
 	}
@@ -333,7 +333,7 @@ func verifyEthereumBlockchainAccountId(extendedVm *types.ExtendedVerificationMet
 	msgHash := etheraccounts.TextHash(documentBytes)
 
 	// Decode hex-encoded signature string to bytes
-	signatureBytes, err := etherhexutil.Decode(extendedVm.ProofValue)
+	signatureBytes, err := etherhexutil.Decode(extendedVm.Proof.ProofValue)
 	if err != nil {
 		return err
 	}

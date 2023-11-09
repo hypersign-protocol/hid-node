@@ -26,6 +26,8 @@ for dir in $proto_dirs; do
   --ts_proto_opt=unrecognizedEnum=false \
   --ts_proto_opt=useJsonName=true \
   --ts_proto_opt=esModuleInterop=true \
+  --ts_proto_opt=stringEnums=true \
+  --ts_proto_opt=outputExtensions=true \
   -I "proto" \
   -I "third_party/proto" \
   -I "$cosmos_sdk_dir/third_party/proto" \

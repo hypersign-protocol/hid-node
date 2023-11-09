@@ -35,20 +35,26 @@ type (
 		Controller          string
 		PublicKeyMultibase  string
 		BlockchainAccountId string
-		ProofValue          string
-		ClientSpecType      ClientSpecType
+		Proof               *DocumentProof
 	}
 )
 
 func CreateExtendedVerificationMethod(vm *VerificationMethod, documentProof *DocumentProof) *ExtendedVerificationMethod {
+	if vm.Id != documentProof.VerificationMethod {
+		panic(fmt.Sprintf(
+			"unexpected behaviour: while creating ExtendedVerificationMethod the verification method Id of the VM object %v is different from verification method id of Proof %v",
+			vm.Id,
+			documentProof.VerificationMethod,
+		))
+	}
+
 	extendedVm := &ExtendedVerificationMethod{
 		Id:                  vm.Id,
 		Type:                vm.Type,
 		Controller:          vm.Controller,
 		PublicKeyMultibase:  vm.PublicKeyMultibase,
 		BlockchainAccountId: vm.BlockchainAccountId,
-		ProofValue:          documentProof.ProofValue,
-		ClientSpecType:      documentProof.ClientSpecType,
+		Proof:               documentProof,
 	}
 
 	return extendedVm
