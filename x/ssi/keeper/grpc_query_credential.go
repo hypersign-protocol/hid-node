@@ -12,7 +12,10 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (k Keeper) QueryCredential(goCtx context.Context, req *types.QueryCredentialRequest) (*types.QueryCredentialResponse, error) {
+func (k Keeper) CredentialStatusByID(
+	goCtx context.Context, 
+	req *types.QueryCredentialStatusRequest,
+) (*types.QueryCredentialStatusResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -23,16 +26,19 @@ func (k Keeper) QueryCredential(goCtx context.Context, req *types.QueryCredentia
 		return nil, sdkerrors.Wrap(types.ErrCredentialStatusNotFound, err.Error())
 	}
 
-	return &types.QueryCredentialResponse{CredStatus: cred}, nil
+	return &types.QueryCredentialStatusResponse{CredentialStatus: cred}, nil
 }
 
-func (k Keeper) QueryCredentials(goCtx context.Context, req *types.QueryCredentialsRequest) (*types.QueryCredentialsResponse, error) {
+func (k Keeper) CredentialStatuses(
+	goCtx context.Context, 
+	req *types.QueryCredentialStatusesRequest,
+) (*types.QueryCredentialStatusesResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 
 	// Define a variable that will store a list of credentials
-	var credentials []*types.Credential
+	var credentials []*types.CredentialStatusState
 	// Get context with the information about the environment
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	// Get the key-value module store using the store key
@@ -41,7 +47,7 @@ func (k Keeper) QueryCredentials(goCtx context.Context, req *types.QueryCredenti
 	credStore := prefix.NewStore(store, []byte(types.CredKey))
 	// Paginate the credential store based on PageRequest
 	_, err := query.Paginate(credStore, req.Pagination, func(key []byte, value []byte) error {
-		var credential types.Credential
+		var credential types.CredentialStatusState
 		if err := k.cdc.Unmarshal(value, &credential); err != nil {
 			return err
 		}
@@ -52,5 +58,9 @@ func (k Keeper) QueryCredentials(goCtx context.Context, req *types.QueryCredenti
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
-	return &types.QueryCredentialsResponse{Credentials: credentials, TotalCount: k.GetCredentialStatusCount(ctx)}, nil
+
+	return &types.QueryCredentialStatusesResponse{
+		CredentialStatuses: credentials, 
+		Count: k.GetCredentialStatusCount(ctx),
+	}, nil
 }

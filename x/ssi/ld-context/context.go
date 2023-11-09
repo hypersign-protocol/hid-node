@@ -1,16 +1,16 @@
 package ldcontext
 
-const didContext string = "https://www.w3.org/ns/did/v1"
-const ed25519Context2020 string = "https://w3id.org/security/suites/ed25519-2020/v1"
-const x25519KeyAgreement2020Context string = "https://ns.did.ai/suites/x25519-2020/v1"
-const secp256k1Recovery2020Context string = "https://ns.did.ai/suites/secp256k1-2020/v1"
-const bbsSignature2020Context string = "https://ns.did.ai/suites/bls12381-2020/v1"
-const secp256k12019Context string = "https://ns.did.ai/suites/secp256k1-2019/v1"
+const DidContext string = "https://www.w3.org/ns/did/v1"
+const Ed25519Context2020 string = "https://w3id.org/security/suites/ed25519-2020/v1"
+const X25519KeyAgreement2020Context string = "https://ns.did.ai/suites/x25519-2020/v1"
+const Secp256k1Recovery2020Context string = "https://ns.did.ai/suites/secp256k1-2020/v1"
+const BbsSignature2020Context string = "https://ns.did.ai/suites/bls12381-2020/v1"
+const Secp256k12019Context string = "https://ns.did.ai/suites/secp256k1-2019/v1"
 
 // As hid-node is not supposed to perform any GET request, the complete Context body of their
 // respective Context urls has been maintained below.
 var ContextUrlMap map[string]contextObject = map[string]contextObject{
-	didContext: {
+	DidContext: {
 		"@protected": true,
 		"id":         "@id",
 		"type":       "@type",
@@ -65,7 +65,7 @@ var ContextUrlMap map[string]contextObject = map[string]contextObject{
 			"@type": "@id",
 		},
 	},
-	ed25519Context2020: {
+	Ed25519Context2020: {
 		"id":         "@id",
 		"type":       "@type",
 		"@protected": true,
@@ -156,7 +156,7 @@ var ContextUrlMap map[string]contextObject = map[string]contextObject{
 			},
 		},
 	},
-	x25519KeyAgreement2020Context: {
+	X25519KeyAgreement2020Context: {
 		"id":        "@id",
 		"type":      "@type",
 		"@protected": true,
@@ -181,7 +181,7 @@ var ContextUrlMap map[string]contextObject = map[string]contextObject{
 			},
 		},
 	},
-	secp256k1Recovery2020Context: {
+	Secp256k1Recovery2020Context: {
 		"id":       "@id",
 		"type":     "@type",
 		"@protected": true,
@@ -362,7 +362,7 @@ var ContextUrlMap map[string]contextObject = map[string]contextObject{
 			},
 		},
 	},
-	bbsSignature2020Context: {
+	BbsSignature2020Context: {
 		"@version": 1.1,
 		"id":       "@id",
 		"type":     "@type",
@@ -509,7 +509,7 @@ var ContextUrlMap map[string]contextObject = map[string]contextObject{
 			},
 		},
 	},
-	secp256k12019Context: {
+	Secp256k12019Context: {
 		"id":        "@id",
 		"type":      "@type",
 		"@protected": true,

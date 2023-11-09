@@ -6,7 +6,7 @@ import (
 
 // NormalizeByVerificationMethodType canonizes DID Document based on the input Verification
 // Method type
-func NormalizeByVerificationMethodType(didDoc *types.Did, vmType string) ([]byte, error) {
+func NormalizeByVerificationMethodType(didDoc *types.DidDocument, vmType string) ([]byte, error) {
 	switch vmType {
 	case types.Ed25519VerificationKey2020:
 		didDocBytes, err := EdDSACryptoSuite2020Canonize(didDoc)

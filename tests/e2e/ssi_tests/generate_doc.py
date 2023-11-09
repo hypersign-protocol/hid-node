@@ -40,7 +40,7 @@ def generate_did_document(key_pair, algo="Ed25519Signature2020", bech32prefix="h
         vm_type = "EcdsaSecp256k1RecoveryMethod2020"
     elif algo == "BbsBlsSignature2020":
         vm_type = "Bls12381G2Key2020"
-    elif algo == "bjj":
+    elif algo == "BabyJubJubSignature2023":
         vm_type = "BabyJubJubVerificationKey2023"
     else:
         raise Exception("unknown signing algorithm: " + algo)
@@ -91,7 +91,7 @@ def generate_did_document(key_pair, algo="Ed25519Signature2020", bech32prefix="h
     base_document["assertionMethod"] = []
     return base_document
     
-def generate_schema_document(key_pair, schema_author, vm, signature=None, algo="Ed25519Signature2020"):
+def generate_schema_document(key_pair, schema_author, vm, signature=None, algo="Ed25519Signature2020", updated_schema=None):
     base_schema_doc = {
         "type": "https://schema.org/Person",
         "modelVersion": "v1.0",
@@ -117,7 +117,7 @@ def generate_schema_document(key_pair, schema_author, vm, signature=None, algo="
         proof_type = "EcdsaSecp256k1RecoverySignature2020"
     elif algo == "BbsBlsSignature2020":
         proof_type = "BbsBlsSignature2020"
-    elif algo == "bjj":
+    elif algo == "BabyJubJubSignature2023":
         proof_type = "BabyJubJubSignature2023"
     else:
         raise Exception("Invalid signing algo: " + algo)
@@ -127,33 +127,32 @@ def generate_schema_document(key_pair, schema_author, vm, signature=None, algo="
         "created": "2022-08-16T10:22:12Z",
         "verificationMethod": "",
         "proofValue": "",
-        "proofPurpose": "assertion"
+        "proofPurpose": "assertionMethod"
     }
-
+    
     schema_id = generate_document_id("schema", algo=algo)
     base_schema_doc["id"] = schema_id
     base_schema_doc["author"] = schema_author
     base_schema_proof["verificationMethod"] = vm
 
     # Form Signature
-    if not signature:
-        signature = get_document_signature(base_schema_doc, "schema", key_pair, algo)
-        
-    base_schema_proof["proofValue"] = signature
+    if not updated_schema:
+        if not signature:
+            signature = get_document_signature(base_schema_doc, "schema", key_pair, algo)
+        base_schema_proof["proofValue"] = signature
+        return base_schema_doc, base_schema_proof
+    else:
+        if not signature:
+            signature = get_document_signature(updated_schema, "schema", key_pair, algo)
+        base_schema_proof["proofValue"] = signature
+        return updated_schema, base_schema_proof
 
-    return base_schema_doc, base_schema_proof
-
-def generate_cred_status_document(key_pair, cred_author, vm, signature=None, algo="Ed25519Signature2020"):
+def generate_cred_status_document(key_pair, cred_author, vm, signature=None, algo="Ed25519Signature2020", updated_credstatus_doc=None):
     base_cred_status_doc = {
-        "claim": {
-                "id": "",
-                "currentStatus": "Live",
-                "statusReason": "Credential Active"
-        },
+        "id": "",
         "issuer": "did:hid:devnet:z3861habXtUFLNuu6J7m5p8VPsoBMduYbYeUxfx9CnWZR",
         "issuanceDate": "2022-08-16T09:37:12Z",
-        "expirationDate": "2023-08-16T09:40:12Z",
-        "credentialHash": "f35c3a4e3f1b8ba54ee3cf59d3de91b8b357f707fdb72a46473b65b46f92f80b"
+        "merkleRootHash": "f35c3a4e3f1b8ba54ee3cf59d3de91b8b357f707fdb72a46473b65b46f92f80b"
     }
     
     proof_type = ""
@@ -165,7 +164,7 @@ def generate_cred_status_document(key_pair, cred_author, vm, signature=None, alg
         proof_type = "EcdsaSecp256k1RecoverySignature2020"
     elif algo == "BbsBlsSignature2020":
         proof_type = "BbsBlsSignature2020"
-    elif algo == "bjj":
+    elif algo == "BabyJubJubSignature2023":
         proof_type = "BabyJubJubSignature2023"
     else:
         raise Exception("Invalid signing algo: " + algo)
@@ -173,21 +172,24 @@ def generate_cred_status_document(key_pair, cred_author, vm, signature=None, alg
     base_cred_status_proof = {
         "type": proof_type,
         "created": "2022-08-16T09:37:12Z",
-        "updated": "2022-08-16T09:37:12Z",
         "verificationMethod": "",
         "proofValue": "",
-        "proofPurpose": "assertion"
+        "proofPurpose": "assertionMethod"
     }
 
     cred_id = generate_document_id("cred-status", algo=algo)
-    base_cred_status_doc["claim"]["id"] = cred_id
+    base_cred_status_doc["id"] = cred_id
     base_cred_status_doc["issuer"] = cred_author
     base_cred_status_proof["verificationMethod"] = vm
 
     # Form Signature
-    if not signature:
-        signature = get_document_signature(base_cred_status_doc, "cred-status", key_pair, algo)
-
-    base_cred_status_proof["proofValue"] = signature
-
-    return base_cred_status_doc, base_cred_status_proof
+    if not updated_credstatus_doc:
+        if not signature:
+            signature = get_document_signature(base_cred_status_doc, "cred-status", key_pair, algo)
+        base_cred_status_proof["proofValue"] = signature
+        return base_cred_status_doc, base_cred_status_proof
+    else:
+        if not signature:
+            signature = get_document_signature(updated_credstatus_doc, "cred-status", key_pair, algo)
+        base_cred_status_proof["proofValue"] = signature
+        return updated_credstatus_doc, base_cred_status_proof

@@ -17,12 +17,19 @@ func (k msgServer) DeactivateDID(goCtx context.Context, msg *types.MsgDeactivate
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// Get the RPC inputs
-	msgDidId := msg.DidId
-	msgSignatures := msg.Signatures
+	msgDidId := msg.DidDocumentId
+	msgDidDocumentProofs := msg.DidDocumentProofs
 
 	// Checks if the Did Document is already registered
 	if !k.HasDid(ctx, msgDidId) {
 		return nil, sdkerrors.Wrap(types.ErrDidDocNotFound, msgDidId)
+	}
+
+	// Validate Document Proofs
+	for _, proof := range msgDidDocumentProofs {
+		if err := proof.Validate(); err != nil {
+			return nil, err
+		}
 	}
 
 	// Get the DID Document from state
@@ -54,7 +61,7 @@ func (k msgServer) DeactivateDID(goCtx context.Context, msg *types.MsgDeactivate
 		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, err.Error())
 	}
 
-	signMap := makeSignatureMap(msgSignatures)
+	signMap := makeSignatureMap(msgDidDocumentProofs)
 
 	// Get controller VM map
 	controllerMap, err := k.formAnyControllerVmListMap(ctx, controllers,
@@ -92,11 +99,11 @@ func (k msgServer) DeactivateDID(goCtx context.Context, msg *types.MsgDeactivate
 		}
 	}
 
-	return &types.MsgDeactivateDIDResponse{Id: 1}, nil
+	return &types.MsgDeactivateDIDResponse{}, nil
 }
 
 // getControllersForDeactivateDID returns a list of controllers required for Deactivate DID Operation
-func getControllersForDeactivateDID(didDocument *types.Did) []string {
+func getControllersForDeactivateDID(didDocument *types.DidDocument) []string {
 	var controllers []string = []string{}
 
 	// If the controller list is empty, DID Subject is assumed to be the sole controller of DID Document

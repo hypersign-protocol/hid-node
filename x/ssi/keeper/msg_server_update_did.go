@@ -17,8 +17,8 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// Get the RPC inputs
-	msgDidDocument := msg.DidDocString
-	msgSignatures := msg.Signatures
+	msgDidDocument := msg.DidDocument
+	msgDidDocumentProofs := msg.DidDocumentProofs
 
 	// Validate DID Document
 	if err := msgDidDocument.ValidateDidDocument(); err != nil {
@@ -36,6 +36,13 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 		return nil, sdkerrors.Wrap(types.ErrDidDocNotFound, msgDidDocument.Id)
 	}
 
+	// Verify Document Proofs
+	for _, proof := range msgDidDocumentProofs {
+		if err := proof.Validate(); err != nil {
+			return nil, err
+		}
+	}
+	
 	// Fetch registered Did Document from state
 	existingDidDocumentState, err := k.GetDidDocumentState(&ctx, msgDidDocument.Id)
 	if err != nil {
@@ -63,7 +70,7 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 		return nil, sdkerrors.Wrap(types.ErrUnexpectedDidVersion, errMsg)
 	}
 
-	signMap := makeSignatureMap(msgSignatures)
+	signMap := makeSignatureMap(msgDidDocumentProofs)
 
 	// Check if there is any change in controllers
 	var optionalVmMap map[string][]*types.ExtendedVerificationMethod
@@ -191,13 +198,13 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 		k.SetBlockchainAddressInStore(&ctx, vm.BlockchainAccountId, vm.Controller)
 	}
 
-	return &types.MsgUpdateDIDResponse{UpdateId: msgDidDocument.Id}, nil
+	return &types.MsgUpdateDIDResponse{}, nil
 }
 
 // getControllersForUpdateDID returns two lists of controllers. The first parameter is a list of controllers,
 // where every controller needs to be verified. The second parameter is a list of controllers, where atleast one
 // of the controllers require verification.
-func getControllersForUpdateDID(existingDidDoc *types.Did, incomingDidDoc *types.Did) ([]string, []string) {
+func getControllersForUpdateDID(existingDidDoc *types.DidDocument, incomingDidDoc *types.DidDocument) ([]string, []string) {
 	var mandatoryControllers []string = []string{}
 	var anyControllers []string = []string{}
 

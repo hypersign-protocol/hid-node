@@ -55,7 +55,7 @@ def generate_key_pair(algo="Ed25519Signature2020"):
         cmd = "hid-noded debug secp256k1 eth-hex-random"
     elif algo == "BbsBlsSignature2020":
         cmd = "hid-noded debug bbs random"
-    elif algo == "bjj":
+    elif algo == "BabyJubJubSignature2023":
         cmd = "hid-noded debug bjj random"
     else:
         raise Exception(algo + " is not a supported signing algorithm")
@@ -109,7 +109,7 @@ def is_blockchain_active(rpc_port):
         assert s.connect_ex(('localhost', rpc_port)) == 0, f"hid-noded is not running"
 
 def get_document_signature(doc: dict, doc_type: str, key_pair: dict, algo: str = "ed25519"):
-    if algo in ["EcdsaSecp256k1RecoverySignature2020", "bjj"]:
+    if algo in ["EcdsaSecp256k1RecoverySignature2020", "BabyJubJubSignature2023"]:
         private_key = key_pair["priv_key_hex"]
     else:
         private_key = key_pair["priv_key_base_64"]
@@ -118,6 +118,8 @@ def get_document_signature(doc: dict, doc_type: str, key_pair: dict, algo: str =
         doc_cmd = "cred-status-doc"
     elif doc_type == "schema":
         doc_cmd = "schema-doc"
+    elif doc_type == "did":
+        doc_cmd = "did-doc"
     else:
         raise Exception("Invalid value for doc_type param: " + doc_type)
     

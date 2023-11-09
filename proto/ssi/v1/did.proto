@@ -1,13 +1,12 @@
 syntax = "proto3";
-package hypersignprotocol.hidnode.ssi;
+package hypersign.ssi.v1;
 
 option go_package = "github.com/hypersign-protocol/hid-node/x/ssi/types";
 
-import "ssi/v1/clientSpec.proto";
 import "gogoproto/gogo.proto";
 
-message Did {
-  repeated string context = 1 [(gogoproto.jsontag) = "@context"];
+message DidDocument {
+  repeated string context = 1 [json_name = "@context", (gogoproto.jsontag) = "@context"];
   string id = 2;
   repeated string controller = 3;
   repeated string alsoKnownAs = 4;
@@ -20,7 +19,7 @@ message Did {
   repeated Service service = 11;
 }
 
-message Metadata {
+message DidDocumentMetadata {
   string created = 1;
   string updated = 2;
   bool deactivated = 3;
@@ -41,13 +40,7 @@ message Service {
   string serviceEndpoint = 3;
 }
 
-message SignInfo {
-  string verification_method_id = 1;
-  string signature = 2;
-  ClientSpec clientSpec = 3;
-}
-
 message DidDocumentState {
-  Did didDocument = 1;
-  Metadata didDocumentMetadata = 2;
+  DidDocument didDocument = 1;
+  DidDocumentMetadata didDocumentMetadata = 2;
 }

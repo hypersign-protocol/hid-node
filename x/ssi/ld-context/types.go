@@ -28,7 +28,7 @@ type JsonLdDid struct {
 }
 
 // NewJsonLdDid returns a new JsonLdDid struct from input Did
-func NewJsonLdDid(didDoc *types.Did) *JsonLdDid {
+func NewJsonLdDid(didDoc *types.DidDocument) *JsonLdDid {
 	if len(didDoc.Context) == 0 {
 		panic("atleast one context url must be provided for DID Document for Canonization")
 	}

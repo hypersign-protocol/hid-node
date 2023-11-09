@@ -23,8 +23,8 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-type Did struct {
-	Context              []string              `protobuf:"bytes,1,rep,name=context,proto3" json:"@context"`
+type DidDocument struct {
+	Context              []string              `protobuf:"bytes,1,rep,name=context,json=@context,proto3" json:"@context"`
 	Id                   string                `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
 	Controller           []string              `protobuf:"bytes,3,rep,name=controller,proto3" json:"controller,omitempty"`
 	AlsoKnownAs          []string              `protobuf:"bytes,4,rep,name=alsoKnownAs,proto3" json:"alsoKnownAs,omitempty"`
@@ -37,18 +37,18 @@ type Did struct {
 	Service              []*Service            `protobuf:"bytes,11,rep,name=service,proto3" json:"service,omitempty"`
 }
 
-func (m *Did) Reset()         { *m = Did{} }
-func (m *Did) String() string { return proto.CompactTextString(m) }
-func (*Did) ProtoMessage()    {}
-func (*Did) Descriptor() ([]byte, []int) {
+func (m *DidDocument) Reset()         { *m = DidDocument{} }
+func (m *DidDocument) String() string { return proto.CompactTextString(m) }
+func (*DidDocument) ProtoMessage()    {}
+func (*DidDocument) Descriptor() ([]byte, []int) {
 	return fileDescriptor_cddfa22cf6c6aba3, []int{0}
 }
-func (m *Did) XXX_Unmarshal(b []byte) error {
+func (m *DidDocument) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *Did) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *DidDocument) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_Did.Marshal(b, m, deterministic)
+		return xxx_messageInfo_DidDocument.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -58,114 +58,114 @@ func (m *Did) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
-func (m *Did) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Did.Merge(m, src)
+func (m *DidDocument) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DidDocument.Merge(m, src)
 }
-func (m *Did) XXX_Size() int {
+func (m *DidDocument) XXX_Size() int {
 	return m.Size()
 }
-func (m *Did) XXX_DiscardUnknown() {
-	xxx_messageInfo_Did.DiscardUnknown(m)
+func (m *DidDocument) XXX_DiscardUnknown() {
+	xxx_messageInfo_DidDocument.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_Did proto.InternalMessageInfo
+var xxx_messageInfo_DidDocument proto.InternalMessageInfo
 
-func (m *Did) GetContext() []string {
+func (m *DidDocument) GetContext() []string {
 	if m != nil {
 		return m.Context
 	}
 	return nil
 }
 
-func (m *Did) GetId() string {
+func (m *DidDocument) GetId() string {
 	if m != nil {
 		return m.Id
 	}
 	return ""
 }
 
-func (m *Did) GetController() []string {
+func (m *DidDocument) GetController() []string {
 	if m != nil {
 		return m.Controller
 	}
 	return nil
 }
 
-func (m *Did) GetAlsoKnownAs() []string {
+func (m *DidDocument) GetAlsoKnownAs() []string {
 	if m != nil {
 		return m.AlsoKnownAs
 	}
 	return nil
 }
 
-func (m *Did) GetVerificationMethod() []*VerificationMethod {
+func (m *DidDocument) GetVerificationMethod() []*VerificationMethod {
 	if m != nil {
 		return m.VerificationMethod
 	}
 	return nil
 }
 
-func (m *Did) GetAuthentication() []string {
+func (m *DidDocument) GetAuthentication() []string {
 	if m != nil {
 		return m.Authentication
 	}
 	return nil
 }
 
-func (m *Did) GetAssertionMethod() []string {
+func (m *DidDocument) GetAssertionMethod() []string {
 	if m != nil {
 		return m.AssertionMethod
 	}
 	return nil
 }
 
-func (m *Did) GetKeyAgreement() []string {
+func (m *DidDocument) GetKeyAgreement() []string {
 	if m != nil {
 		return m.KeyAgreement
 	}
 	return nil
 }
 
-func (m *Did) GetCapabilityInvocation() []string {
+func (m *DidDocument) GetCapabilityInvocation() []string {
 	if m != nil {
 		return m.CapabilityInvocation
 	}
 	return nil
 }
 
-func (m *Did) GetCapabilityDelegation() []string {
+func (m *DidDocument) GetCapabilityDelegation() []string {
 	if m != nil {
 		return m.CapabilityDelegation
 	}
 	return nil
 }
 
-func (m *Did) GetService() []*Service {
+func (m *DidDocument) GetService() []*Service {
 	if m != nil {
 		return m.Service
 	}
 	return nil
 }
 
-type Metadata struct {
+type DidDocumentMetadata struct {
 	Created     string `protobuf:"bytes,1,opt,name=created,proto3" json:"created,omitempty"`
 	Updated     string `protobuf:"bytes,2,opt,name=updated,proto3" json:"updated,omitempty"`
 	Deactivated bool   `protobuf:"varint,3,opt,name=deactivated,proto3" json:"deactivated,omitempty"`
 	VersionId   string `protobuf:"bytes,4,opt,name=versionId,proto3" json:"versionId,omitempty"`
 }
 
-func (m *Metadata) Reset()         { *m = Metadata{} }
-func (m *Metadata) String() string { return proto.CompactTextString(m) }
-func (*Metadata) ProtoMessage()    {}
-func (*Metadata) Descriptor() ([]byte, []int) {
+func (m *DidDocumentMetadata) Reset()         { *m = DidDocumentMetadata{} }
+func (m *DidDocumentMetadata) String() string { return proto.CompactTextString(m) }
+func (*DidDocumentMetadata) ProtoMessage()    {}
+func (*DidDocumentMetadata) Descriptor() ([]byte, []int) {
 	return fileDescriptor_cddfa22cf6c6aba3, []int{1}
 }
-func (m *Metadata) XXX_Unmarshal(b []byte) error {
+func (m *DidDocumentMetadata) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *Metadata) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *DidDocumentMetadata) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_Metadata.Marshal(b, m, deterministic)
+		return xxx_messageInfo_DidDocumentMetadata.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -175,40 +175,40 @@ func (m *Metadata) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
-func (m *Metadata) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Metadata.Merge(m, src)
+func (m *DidDocumentMetadata) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DidDocumentMetadata.Merge(m, src)
 }
-func (m *Metadata) XXX_Size() int {
+func (m *DidDocumentMetadata) XXX_Size() int {
 	return m.Size()
 }
-func (m *Metadata) XXX_DiscardUnknown() {
-	xxx_messageInfo_Metadata.DiscardUnknown(m)
+func (m *DidDocumentMetadata) XXX_DiscardUnknown() {
+	xxx_messageInfo_DidDocumentMetadata.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_Metadata proto.InternalMessageInfo
+var xxx_messageInfo_DidDocumentMetadata proto.InternalMessageInfo
 
-func (m *Metadata) GetCreated() string {
+func (m *DidDocumentMetadata) GetCreated() string {
 	if m != nil {
 		return m.Created
 	}
 	return ""
 }
 
-func (m *Metadata) GetUpdated() string {
+func (m *DidDocumentMetadata) GetUpdated() string {
 	if m != nil {
 		return m.Updated
 	}
 	return ""
 }
 
-func (m *Metadata) GetDeactivated() bool {
+func (m *DidDocumentMetadata) GetDeactivated() bool {
 	if m != nil {
 		return m.Deactivated
 	}
 	return false
 }
 
-func (m *Metadata) GetVersionId() string {
+func (m *DidDocumentMetadata) GetVersionId() string {
 	if m != nil {
 		return m.VersionId
 	}
@@ -351,76 +351,16 @@ func (m *Service) GetServiceEndpoint() string {
 	return ""
 }
 
-type SignInfo struct {
-	VerificationMethodId string      `protobuf:"bytes,1,opt,name=verification_method_id,json=verificationMethodId,proto3" json:"verification_method_id,omitempty"`
-	Signature            string      `protobuf:"bytes,2,opt,name=signature,proto3" json:"signature,omitempty"`
-	ClientSpec           *ClientSpec `protobuf:"bytes,3,opt,name=clientSpec,proto3" json:"clientSpec,omitempty"`
-}
-
-func (m *SignInfo) Reset()         { *m = SignInfo{} }
-func (m *SignInfo) String() string { return proto.CompactTextString(m) }
-func (*SignInfo) ProtoMessage()    {}
-func (*SignInfo) Descriptor() ([]byte, []int) {
-	return fileDescriptor_cddfa22cf6c6aba3, []int{4}
-}
-func (m *SignInfo) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *SignInfo) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_SignInfo.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *SignInfo) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_SignInfo.Merge(m, src)
-}
-func (m *SignInfo) XXX_Size() int {
-	return m.Size()
-}
-func (m *SignInfo) XXX_DiscardUnknown() {
-	xxx_messageInfo_SignInfo.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_SignInfo proto.InternalMessageInfo
-
-func (m *SignInfo) GetVerificationMethodId() string {
-	if m != nil {
-		return m.VerificationMethodId
-	}
-	return ""
-}
-
-func (m *SignInfo) GetSignature() string {
-	if m != nil {
-		return m.Signature
-	}
-	return ""
-}
-
-func (m *SignInfo) GetClientSpec() *ClientSpec {
-	if m != nil {
-		return m.ClientSpec
-	}
-	return nil
-}
-
 type DidDocumentState struct {
-	DidDocument         *Did      `protobuf:"bytes,1,opt,name=didDocument,proto3" json:"didDocument,omitempty"`
-	DidDocumentMetadata *Metadata `protobuf:"bytes,2,opt,name=didDocumentMetadata,proto3" json:"didDocumentMetadata,omitempty"`
+	DidDocument         *DidDocument         `protobuf:"bytes,1,opt,name=didDocument,proto3" json:"didDocument,omitempty"`
+	DidDocumentMetadata *DidDocumentMetadata `protobuf:"bytes,2,opt,name=didDocumentMetadata,proto3" json:"didDocumentMetadata,omitempty"`
 }
 
 func (m *DidDocumentState) Reset()         { *m = DidDocumentState{} }
 func (m *DidDocumentState) String() string { return proto.CompactTextString(m) }
 func (*DidDocumentState) ProtoMessage()    {}
 func (*DidDocumentState) Descriptor() ([]byte, []int) {
-	return fileDescriptor_cddfa22cf6c6aba3, []int{5}
+	return fileDescriptor_cddfa22cf6c6aba3, []int{4}
 }
 func (m *DidDocumentState) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -449,14 +389,14 @@ func (m *DidDocumentState) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_DidDocumentState proto.InternalMessageInfo
 
-func (m *DidDocumentState) GetDidDocument() *Did {
+func (m *DidDocumentState) GetDidDocument() *DidDocument {
 	if m != nil {
 		return m.DidDocument
 	}
 	return nil
 }
 
-func (m *DidDocumentState) GetDidDocumentMetadata() *Metadata {
+func (m *DidDocumentState) GetDidDocumentMetadata() *DidDocumentMetadata {
 	if m != nil {
 		return m.DidDocumentMetadata
 	}
@@ -464,63 +404,58 @@ func (m *DidDocumentState) GetDidDocumentMetadata() *Metadata {
 }
 
 func init() {
-	proto.RegisterType((*Did)(nil), "hypersignprotocol.hidnode.ssi.Did")
-	proto.RegisterType((*Metadata)(nil), "hypersignprotocol.hidnode.ssi.Metadata")
-	proto.RegisterType((*VerificationMethod)(nil), "hypersignprotocol.hidnode.ssi.VerificationMethod")
-	proto.RegisterType((*Service)(nil), "hypersignprotocol.hidnode.ssi.Service")
-	proto.RegisterType((*SignInfo)(nil), "hypersignprotocol.hidnode.ssi.SignInfo")
-	proto.RegisterType((*DidDocumentState)(nil), "hypersignprotocol.hidnode.ssi.DidDocumentState")
+	proto.RegisterType((*DidDocument)(nil), "hypersign.ssi.v1.DidDocument")
+	proto.RegisterType((*DidDocumentMetadata)(nil), "hypersign.ssi.v1.DidDocumentMetadata")
+	proto.RegisterType((*VerificationMethod)(nil), "hypersign.ssi.v1.VerificationMethod")
+	proto.RegisterType((*Service)(nil), "hypersign.ssi.v1.Service")
+	proto.RegisterType((*DidDocumentState)(nil), "hypersign.ssi.v1.DidDocumentState")
 }
 
 func init() { proto.RegisterFile("ssi/v1/did.proto", fileDescriptor_cddfa22cf6c6aba3) }
 
 var fileDescriptor_cddfa22cf6c6aba3 = []byte{
-	// 671 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x54, 0xc1, 0x6e, 0xd3, 0x4a,
-	0x14, 0xad, 0x9b, 0xbc, 0x26, 0xb9, 0xae, 0xda, 0x6a, 0x5a, 0xbd, 0x67, 0x55, 0xef, 0xf9, 0x45,
-	0x5e, 0x94, 0xb0, 0xa8, 0x4d, 0x03, 0x1f, 0xd0, 0x96, 0xb0, 0x88, 0x4a, 0x37, 0x8e, 0x04, 0x82,
-	0x4d, 0x35, 0x99, 0x99, 0xda, 0xa3, 0xba, 0x33, 0x96, 0x3d, 0x0e, 0xcd, 0x86, 0x05, 0x5f, 0xc0,
-	0x6f, 0xb0, 0x66, 0xc7, 0x17, 0xb0, 0xec, 0x92, 0x15, 0x42, 0xed, 0x8e, 0xaf, 0x40, 0x9e, 0xd8,
-	0x89, 0x9b, 0x44, 0x84, 0xdd, 0xcc, 0x39, 0xf7, 0xcc, 0x3d, 0xbe, 0xf7, 0xc8, 0xb0, 0x93, 0xa6,
-	0xdc, 0x1b, 0x1d, 0x79, 0x94, 0x53, 0x37, 0x4e, 0xa4, 0x92, 0xe8, 0xbf, 0x70, 0x1c, 0xb3, 0x24,
-	0xe5, 0x81, 0xd0, 0x77, 0x22, 0x23, 0x37, 0xe4, 0x54, 0x48, 0xca, 0xdc, 0x34, 0xe5, 0xfb, 0xff,
-	0x14, 0x02, 0x12, 0x71, 0x26, 0xd4, 0x20, 0x66, 0x64, 0xa2, 0xdb, 0xdf, 0x0b, 0x64, 0x20, 0xf5,
-	0xd1, 0xcb, 0x4f, 0x13, 0xd4, 0xf9, 0x50, 0x87, 0x5a, 0x8f, 0x53, 0x74, 0x00, 0x0d, 0x22, 0x85,
-	0x62, 0x37, 0xca, 0x32, 0xda, 0xb5, 0x4e, 0xeb, 0x74, 0xf3, 0xe7, 0xf7, 0xff, 0x9b, 0xc7, 0x05,
-	0xe6, 0x97, 0x24, 0xda, 0x82, 0x75, 0x4e, 0xad, 0xf5, 0xb6, 0xd1, 0x69, 0xf9, 0xeb, 0x9c, 0x22,
-	0x1b, 0x20, 0xa7, 0x12, 0x19, 0x45, 0x2c, 0xb1, 0x6a, 0xb9, 0xd4, 0xaf, 0x20, 0xa8, 0x0d, 0x26,
-	0x8e, 0x52, 0x79, 0x26, 0xe4, 0x3b, 0x71, 0x92, 0x5a, 0x75, 0x5d, 0x50, 0x85, 0x10, 0x06, 0x34,
-	0x62, 0x09, 0xbf, 0xe4, 0x04, 0x2b, 0x2e, 0xc5, 0x39, 0x53, 0xa1, 0xa4, 0xd6, 0x5f, 0xed, 0x5a,
-	0xc7, 0xec, 0x1e, 0xb9, 0xbf, 0xfd, 0x58, 0xf7, 0xd5, 0x82, 0xd0, 0x5f, 0xf2, 0x18, 0x3a, 0x80,
-	0x2d, 0x9c, 0xa9, 0x90, 0x09, 0x55, 0xe0, 0xd6, 0x86, 0xf6, 0x31, 0x87, 0xa2, 0x0e, 0x6c, 0xe3,
-	0x34, 0x65, 0x49, 0xc5, 0x47, 0x43, 0x17, 0xce, 0xc3, 0xc8, 0x81, 0xcd, 0x2b, 0x36, 0x3e, 0x09,
-	0x12, 0xc6, 0xae, 0x99, 0x50, 0x56, 0x53, 0x97, 0x3d, 0xc0, 0x50, 0x17, 0xf6, 0x08, 0x8e, 0xf1,
-	0x90, 0x47, 0x5c, 0x8d, 0xfb, 0x62, 0x24, 0x8b, 0xde, 0x2d, 0x5d, 0xbb, 0x94, 0x7b, 0xa8, 0xe9,
-	0xb1, 0x88, 0x05, 0x13, 0x0d, 0xcc, 0x6b, 0x66, 0x1c, 0x3a, 0x86, 0x46, 0xca, 0x92, 0x11, 0x27,
-	0xcc, 0x32, 0xf5, 0xd4, 0x0e, 0x56, 0x4c, 0x6d, 0x30, 0xa9, 0xf6, 0x4b, 0x99, 0xf3, 0x1e, 0x9a,
-	0xe7, 0x4c, 0x61, 0x8a, 0x15, 0x46, 0x16, 0x34, 0x48, 0xc2, 0xb0, 0x62, 0xd4, 0x32, 0xf4, 0x96,
-	0xcb, 0x6b, 0xce, 0x64, 0x31, 0xd5, 0xcc, 0x64, 0xff, 0xe5, 0x35, 0x5f, 0x32, 0x65, 0x98, 0x28,
-	0x3e, 0xd2, 0x6c, 0xad, 0x6d, 0x74, 0x9a, 0x7e, 0x15, 0x42, 0xff, 0x42, 0x6b, 0x94, 0x3b, 0x92,
-	0xa2, 0x4f, 0xad, 0xba, 0x56, 0xcf, 0x00, 0xe7, 0x8b, 0x01, 0x68, 0x71, 0x95, 0x45, 0xd6, 0x8c,
-	0x69, 0xd6, 0x10, 0xd4, 0xd5, 0x38, 0x66, 0x45, 0x77, 0x7d, 0x5e, 0xc8, 0x9f, 0x31, 0x97, 0x3f,
-	0x17, 0x50, 0x9c, 0x0d, 0x23, 0x4e, 0xce, 0xd8, 0xf8, 0x3c, 0x8b, 0x14, 0x1f, 0xe2, 0x94, 0x15,
-	0x0e, 0x96, 0x30, 0xe8, 0x09, 0xec, 0x0e, 0x23, 0x49, 0xae, 0x48, 0x88, 0xb9, 0x38, 0x21, 0x44,
-	0x66, 0x42, 0xf5, 0xf3, 0x38, 0xe6, 0x82, 0x65, 0x94, 0xf3, 0x1a, 0x1a, 0xc5, 0x40, 0xff, 0xc8,
-	0x70, 0x07, 0xb6, 0x8b, 0xb1, 0xbf, 0x10, 0x34, 0x96, 0x5c, 0xa8, 0xc2, 0xf5, 0x3c, 0xec, 0x7c,
-	0x32, 0xa0, 0x39, 0xe0, 0x81, 0xe8, 0x8b, 0x4b, 0x89, 0x9e, 0xc1, 0xdf, 0xd5, 0x60, 0x5f, 0x5c,
-	0xeb, 0x11, 0x5d, 0x4c, 0xdb, 0xed, 0x2d, 0xc6, 0xbe, 0xaf, 0xc7, 0x9e, 0xa7, 0x00, 0xab, 0x2c,
-	0x29, 0x5d, 0xcc, 0x00, 0xd4, 0x07, 0x98, 0xfd, 0x25, 0xb4, 0x0b, 0xb3, 0xfb, 0x78, 0x45, 0x76,
-	0x9e, 0x4f, 0x05, 0x7e, 0x45, 0xec, 0x7c, 0x36, 0x60, 0xa7, 0xc7, 0x69, 0x4f, 0x92, 0x2c, 0xcf,
-	0xfe, 0x40, 0x61, 0xc5, 0x50, 0x0f, 0x4c, 0x3a, 0xc3, 0xb4, 0x51, 0xb3, 0xeb, 0xac, 0x68, 0xd0,
-	0xe3, 0xd4, 0xaf, 0xca, 0xd0, 0x1b, 0xd8, 0xad, 0x5c, 0xcb, 0x9c, 0xea, 0xaf, 0x31, 0xbb, 0x8f,
-	0x56, 0xbc, 0x56, 0x96, 0xfb, 0xcb, 0xde, 0x38, 0x7d, 0xf9, 0xf5, 0xce, 0x36, 0x6e, 0xef, 0x6c,
-	0xe3, 0xc7, 0x9d, 0x6d, 0x7c, 0xbc, 0xb7, 0xd7, 0x6e, 0xef, 0xed, 0xb5, 0x6f, 0xf7, 0xf6, 0xda,
-	0xdb, 0x6e, 0xc0, 0x55, 0x98, 0x0d, 0x5d, 0x22, 0xaf, 0xbd, 0x69, 0x87, 0xc3, 0xb2, 0x85, 0x17,
-	0x72, 0x7a, 0x98, 0xf7, 0xf0, 0x6e, 0xbc, 0xfc, 0x77, 0x9b, 0x2f, 0x36, 0x1d, 0x6e, 0x68, 0xfa,
-	0xe9, 0xaf, 0x00, 0x00, 0x00, 0xff, 0xff, 0x5d, 0x6f, 0x49, 0xfe, 0xb3, 0x05, 0x00, 0x00,
+	// 597 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x54, 0x4d, 0x4e, 0xdb, 0x4e,
+	0x14, 0x67, 0x08, 0x7f, 0x42, 0x9e, 0x11, 0xa0, 0x81, 0x85, 0xff, 0x55, 0xeb, 0x46, 0x51, 0x3f,
+	0xb2, 0xc1, 0x2e, 0xe1, 0x00, 0x2d, 0x88, 0x2e, 0x10, 0x65, 0x63, 0xaa, 0x22, 0x75, 0x37, 0x99,
+	0x79, 0x4d, 0x46, 0x98, 0x19, 0xcb, 0x33, 0x76, 0xc9, 0x11, 0xba, 0xeb, 0x41, 0x7a, 0x82, 0x9e,
+	0xa0, 0x4b, 0x96, 0x5d, 0x55, 0x15, 0xec, 0xba, 0xeb, 0x0d, 0x2a, 0x4f, 0x1c, 0x62, 0x92, 0xa8,
+	0xea, 0x6e, 0xfc, 0xfb, 0x98, 0xf7, 0xfc, 0x7e, 0x4f, 0x03, 0x5b, 0xc6, 0xc8, 0xa8, 0xd8, 0x8b,
+	0x84, 0x14, 0x61, 0x9a, 0x69, 0xab, 0xe9, 0xd6, 0x70, 0x94, 0x62, 0x66, 0xe4, 0x40, 0x85, 0xc6,
+	0xc8, 0xb0, 0xd8, 0x7b, 0xb0, 0x33, 0xd0, 0x03, 0xed, 0xc8, 0xa8, 0x3c, 0x8d, 0x75, 0x9d, 0xdf,
+	0x0d, 0xf0, 0x8e, 0xa4, 0x38, 0xd2, 0x3c, 0xbf, 0x44, 0x65, 0xe9, 0x73, 0x68, 0x72, 0xad, 0x2c,
+	0x5e, 0x59, 0x9f, 0xb4, 0x1b, 0xdd, 0xd6, 0xe1, 0xfa, 0xaf, 0x1f, 0x8f, 0xd7, 0x5e, 0x55, 0x58,
+	0x7c, 0x77, 0xa2, 0x1b, 0xb0, 0x2c, 0x85, 0xbf, 0xdc, 0x26, 0xdd, 0x56, 0xbc, 0x2c, 0x05, 0x0d,
+	0x00, 0x4a, 0x2a, 0xd3, 0x49, 0x82, 0x99, 0xdf, 0x28, 0xbd, 0x71, 0x0d, 0xa1, 0x6d, 0xf0, 0x58,
+	0x62, 0xf4, 0x89, 0xd2, 0x1f, 0xd5, 0x81, 0xf1, 0x57, 0x9c, 0xa0, 0x0e, 0xd1, 0xb7, 0x40, 0x0b,
+	0xcc, 0xe4, 0x07, 0xc9, 0x99, 0x95, 0x5a, 0x9d, 0xa2, 0x1d, 0x6a, 0xe1, 0xff, 0xd7, 0x6e, 0x74,
+	0xbd, 0xde, 0x93, 0x70, 0xf6, 0x7f, 0xc2, 0x77, 0x73, 0xda, 0x78, 0x81, 0x9f, 0x3e, 0x83, 0x0d,
+	0x96, 0xdb, 0x21, 0x2a, 0x5b, 0xe1, 0xfe, 0xaa, 0x2b, 0x3d, 0x83, 0xd2, 0x2e, 0x6c, 0x32, 0x63,
+	0x30, 0xab, 0x95, 0x6e, 0x3a, 0xe1, 0x2c, 0x4c, 0x3b, 0xb0, 0x7e, 0x81, 0xa3, 0x83, 0x41, 0x86,
+	0x58, 0x8e, 0xcc, 0x5f, 0x73, 0xb2, 0x7b, 0x18, 0xed, 0xc1, 0x0e, 0x67, 0x29, 0xeb, 0xcb, 0x44,
+	0xda, 0xd1, 0xb1, 0x2a, 0x74, 0x55, 0xbb, 0xe5, 0xb4, 0x0b, 0xb9, 0xfb, 0x9e, 0x23, 0x4c, 0x70,
+	0x30, 0xf6, 0xc0, 0xac, 0x67, 0xca, 0xd1, 0x7d, 0x68, 0x1a, 0xcc, 0x0a, 0xc9, 0xd1, 0xf7, 0xdc,
+	0xa0, 0xfe, 0x9f, 0x1f, 0xd4, 0xd9, 0x58, 0x10, 0x4f, 0x94, 0x9d, 0x4f, 0x04, 0xb6, 0x6b, 0x99,
+	0x9f, 0xa2, 0x65, 0x82, 0x59, 0x46, 0x7d, 0x68, 0xf2, 0x0c, 0x99, 0x45, 0xe1, 0x13, 0x97, 0xeb,
+	0xe4, 0xb3, 0x64, 0xf2, 0x54, 0x38, 0x66, 0x9c, 0xf8, 0xe4, 0xb3, 0x8c, 0x55, 0x20, 0xe3, 0x56,
+	0x16, 0x8e, 0x6d, 0xb4, 0x49, 0x77, 0x2d, 0xae, 0x43, 0xf4, 0x21, 0xb4, 0x8a, 0xb2, 0x21, 0xad,
+	0x8e, 0x85, 0xbf, 0xe2, 0xdc, 0x53, 0xa0, 0xf3, 0x95, 0x00, 0x9d, 0x4f, 0xb2, 0xda, 0x2e, 0x72,
+	0xb7, 0x5d, 0x14, 0x56, 0xec, 0x28, 0xc5, 0xaa, 0xba, 0x3b, 0xcf, 0x6d, 0x1c, 0x99, 0xd9, 0xb8,
+	0x10, 0x68, 0x9a, 0xf7, 0x13, 0xc9, 0x4f, 0x70, 0x74, 0x9a, 0x27, 0x56, 0xf6, 0x99, 0xc1, 0xaa,
+	0x83, 0x05, 0x0c, 0x7d, 0x01, 0xdb, 0xfd, 0x44, 0xf3, 0x0b, 0x3e, 0x64, 0x52, 0x1d, 0x70, 0xae,
+	0x73, 0x65, 0x8f, 0xcb, 0x05, 0x2c, 0x0d, 0x8b, 0xa8, 0xce, 0x39, 0x34, 0xab, 0xe1, 0xfe, 0x53,
+	0xc3, 0x5d, 0xd8, 0xac, 0x22, 0x78, 0xad, 0x44, 0xaa, 0xa5, 0xb2, 0x55, 0xd7, 0xb3, 0x70, 0xe7,
+	0x0b, 0x81, 0xad, 0x5a, 0x42, 0x67, 0x96, 0x59, 0xa4, 0x2f, 0xc1, 0x13, 0x53, 0xcc, 0xd5, 0xf2,
+	0x7a, 0x8f, 0xe6, 0xf3, 0xae, 0x19, 0xe3, 0xba, 0x83, 0x9e, 0xc3, 0xb6, 0x98, 0x8f, 0xdd, 0xb5,
+	0xe8, 0xf5, 0x9e, 0xfe, 0xf5, 0xa2, 0x89, 0x38, 0x5e, 0x74, 0xc3, 0xe1, 0x9b, 0x6f, 0x37, 0x01,
+	0xb9, 0xbe, 0x09, 0xc8, 0xcf, 0x9b, 0x80, 0x7c, 0xbe, 0x0d, 0x96, 0xae, 0x6f, 0x83, 0xa5, 0xef,
+	0xb7, 0xc1, 0xd2, 0xfb, 0xde, 0x40, 0xda, 0x61, 0xde, 0x0f, 0xb9, 0xbe, 0x8c, 0xee, 0xee, 0xdf,
+	0x75, 0x4f, 0x0f, 0xd7, 0x49, 0x34, 0x94, 0x62, 0x57, 0x69, 0x81, 0xd1, 0x55, 0x54, 0xbe, 0x60,
+	0xe5, 0x94, 0x4c, 0x7f, 0xd5, 0xd1, 0xfb, 0x7f, 0x02, 0x00, 0x00, 0xff, 0xff, 0xfe, 0x95, 0xd0,
+	0x89, 0xd5, 0x04, 0x00, 0x00,
 }
 
-func (m *Did) Marshal() (dAtA []byte, err error) {
+func (m *DidDocument) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -530,12 +465,12 @@ func (m *Did) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *Did) MarshalTo(dAtA []byte) (int, error) {
+func (m *DidDocument) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *Did) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *DidDocument) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -650,7 +585,7 @@ func (m *Did) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *Metadata) Marshal() (dAtA []byte, err error) {
+func (m *DidDocumentMetadata) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -660,12 +595,12 @@ func (m *Metadata) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *Metadata) MarshalTo(dAtA []byte) (int, error) {
+func (m *DidDocumentMetadata) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *Metadata) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *DidDocumentMetadata) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -806,55 +741,6 @@ func (m *Service) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *SignInfo) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *SignInfo) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *SignInfo) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.ClientSpec != nil {
-		{
-			size, err := m.ClientSpec.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintDid(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x1a
-	}
-	if len(m.Signature) > 0 {
-		i -= len(m.Signature)
-		copy(dAtA[i:], m.Signature)
-		i = encodeVarintDid(dAtA, i, uint64(len(m.Signature)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if len(m.VerificationMethodId) > 0 {
-		i -= len(m.VerificationMethodId)
-		copy(dAtA[i:], m.VerificationMethodId)
-		i = encodeVarintDid(dAtA, i, uint64(len(m.VerificationMethodId)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
 func (m *DidDocumentState) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -913,7 +799,7 @@ func encodeVarintDid(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-func (m *Did) Size() (n int) {
+func (m *DidDocument) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -986,7 +872,7 @@ func (m *Did) Size() (n int) {
 	return n
 }
 
-func (m *Metadata) Size() (n int) {
+func (m *DidDocumentMetadata) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1060,27 +946,6 @@ func (m *Service) Size() (n int) {
 	return n
 }
 
-func (m *SignInfo) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.VerificationMethodId)
-	if l > 0 {
-		n += 1 + l + sovDid(uint64(l))
-	}
-	l = len(m.Signature)
-	if l > 0 {
-		n += 1 + l + sovDid(uint64(l))
-	}
-	if m.ClientSpec != nil {
-		l = m.ClientSpec.Size()
-		n += 1 + l + sovDid(uint64(l))
-	}
-	return n
-}
-
 func (m *DidDocumentState) Size() (n int) {
 	if m == nil {
 		return 0
@@ -1104,7 +969,7 @@ func sovDid(x uint64) (n int) {
 func sozDid(x uint64) (n int) {
 	return sovDid(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-func (m *Did) Unmarshal(dAtA []byte) error {
+func (m *DidDocument) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1127,10 +992,10 @@ func (m *Did) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: Did: wiretype end group for non-group")
+			return fmt.Errorf("proto: DidDocument: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: Did: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: DidDocument: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -1510,7 +1375,7 @@ func (m *Did) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *Metadata) Unmarshal(dAtA []byte) error {
+func (m *DidDocumentMetadata) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1533,10 +1398,10 @@ func (m *Metadata) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: Metadata: wiretype end group for non-group")
+			return fmt.Errorf("proto: DidDocumentMetadata: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: Metadata: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: DidDocumentMetadata: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -2032,156 +1897,6 @@ func (m *Service) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *SignInfo) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowDid
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: SignInfo: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: SignInfo: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field VerificationMethodId", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowDid
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthDid
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthDid
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.VerificationMethodId = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Signature", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowDid
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthDid
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthDid
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Signature = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ClientSpec", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowDid
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthDid
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthDid
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.ClientSpec == nil {
-				m.ClientSpec = &ClientSpec{}
-			}
-			if err := m.ClientSpec.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipDid(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthDid
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
 func (m *DidDocumentState) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -2241,7 +1956,7 @@ func (m *DidDocumentState) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.DidDocument == nil {
-				m.DidDocument = &Did{}
+				m.DidDocument = &DidDocument{}
 			}
 			if err := m.DidDocument.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -2277,7 +1992,7 @@ func (m *DidDocumentState) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.DidDocumentMetadata == nil {
-				m.DidDocumentMetadata = &Metadata{}
+				m.DidDocumentMetadata = &DidDocumentMetadata{}
 			}
 			if err := m.DidDocumentMetadata.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err

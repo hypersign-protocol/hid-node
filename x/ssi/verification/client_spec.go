@@ -12,7 +12,7 @@ import (
 
 // Read more about Cosmos's ADR Spec from the following:
 // https://docs.cosmos.network/v0.45/architecture/adr-036-arbitrary-signature.html
-func getCosmosADR036SignDocBytes(ssiDocBytes []byte, clientSpec *types.ClientSpec) ([]byte, error) {
+func getCosmosADR036SignDocBytes(ssiDocBytes []byte, signerAddress string) ([]byte, error) {
 	var msgSignData types.Msg = types.Msg{
 		Type: "sign/MsgSignData",
 		Value: types.Val{
@@ -37,7 +37,7 @@ func getCosmosADR036SignDocBytes(ssiDocBytes []byte, clientSpec *types.ClientSpe
 
 	baseCosmosADR036SignDoc.Msgs[0].Value.Data = base64.StdEncoding.EncodeToString(
 		ssiDocBytes)
-	baseCosmosADR036SignDoc.Msgs[0].Value.Signer = clientSpec.Adr036SignerAddress
+	baseCosmosADR036SignDoc.Msgs[0].Value.Signer = signerAddress
 
 	updatedSignDocBytes, err := json.Marshal(baseCosmosADR036SignDoc)
 	if err != nil {
@@ -54,48 +54,46 @@ func getPersonalSignSpecDocBytes(ssiMsg types.SsiMsg) ([]byte, error) {
 
 // Get the updated marshaled SSI document for the respective ClientSpec
 func getDocBytesByClientSpec(ssiMsg types.SsiMsg, extendedVm *types.ExtendedVerificationMethod) ([]byte, error) {
-	if extendedVm.ClientSpec != nil {
-		switch extendedVm.ClientSpec.Type {
-		case types.ADR036ClientSpec:
-			if didDoc, ok := ssiMsg.(*types.Did); ok {
-				canonizedDidDocHash, err := ldcontext.EcdsaSecp256k1Signature2019Canonize(didDoc)
-				if err != nil {
-					return nil, err
-				}
-
-				return getCosmosADR036SignDocBytes(canonizedDidDocHash, extendedVm.ClientSpec)
-			}
-			return getCosmosADR036SignDocBytes(ssiMsg.GetSignBytes(), extendedVm.ClientSpec)
-		case types.PersonalSignClientSpec:
-			if didDoc, ok := ssiMsg.(*types.Did); ok {
-				canonizedDidDocHash, err := ldcontext.EcdsaSecp256k1RecoverySignature2020Canonize(didDoc)
-				if err != nil {
-					return nil, err
-				}
-
-				// TODO: This is temporary fix eth.personal.sign() client function, since it only signs JSON 
-				// stringified document and hence the following struct was used to sign from the Client end.
-				return json.Marshal(struct{
-					DidId string `json:"didId"`
-					DidDocDigest string `json:"didDocDigest"`
-				} {
-					DidId: didDoc.Id,
-					DidDocDigest: hex.EncodeToString(canonizedDidDocHash),
-				})
-			}
-			return getPersonalSignSpecDocBytes(ssiMsg)
-		default:
-			return nil, fmt.Errorf(
-				"supported clientSpecs: %v",
-				types.SupportedClientSpecs,
-			)
-		}
-	} else {
-		// If DID Document, perform RDF normalisation and return its SHA-256 Hash
-		didDoc, ok := ssiMsg.(*types.Did)
-		if ok {
+	switch extendedVm.ClientSpecType {
+	case types.CLIENT_SPEC_TYPE_NONE:
+		if didDoc, ok := ssiMsg.(*types.DidDocument); ok && len(didDoc.Context) > 0 {
 			return ldcontext.NormalizeByVerificationMethodType(didDoc, extendedVm.Type)
 		}
 		return ssiMsg.GetSignBytes(), nil
+	case types.CLIENT_SPEC_TYPE_COSMOS_ADR036:
+		signerAddress, err := getBlockchainAddress(extendedVm.BlockchainAccountId)
+		if err != nil {
+			return nil, err
+		}
+
+		if didDoc, ok := ssiMsg.(*types.DidDocument); ok && len(didDoc.Context) > 0 {
+			canonizedDidDocHash, err := ldcontext.EcdsaSecp256k1Signature2019Canonize(didDoc)
+			if err != nil {
+				return nil, err
+			}
+
+			return getCosmosADR036SignDocBytes(canonizedDidDocHash, signerAddress)
+		}
+		return getCosmosADR036SignDocBytes(ssiMsg.GetSignBytes(), signerAddress)
+	case types.CLIENT_SPEC_TYPE_ETH_PERSONAL_SIGN:
+		if didDoc, ok := ssiMsg.(*types.DidDocument); ok && len(didDoc.Context) > 0 {
+			canonizedDidDocHash, err := ldcontext.EcdsaSecp256k1RecoverySignature2020Canonize(didDoc)
+			if err != nil {
+				return nil, err
+			}
+
+			// TODO: This is temporary fix eth.personal.sign() client function, since it only signs JSON 
+			// stringified document and hence the following struct was used to sign from the Client end.
+			return json.Marshal(struct{
+				DidId string `json:"didId"`
+				DidDocDigest string `json:"didDocDigest"`
+			} {
+				DidId: didDoc.Id,
+				DidDocDigest: hex.EncodeToString(canonizedDidDocHash),
+			})
+		}
+		return getPersonalSignSpecDocBytes(ssiMsg)
+	default:
+		return nil, fmt.Errorf("unsupported clientSpecType %v", extendedVm.ClientSpecType)
 	}
 }

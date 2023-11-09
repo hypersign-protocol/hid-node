@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"encoding/hex"
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -48,7 +49,7 @@ func (k msgServer) checkControllerPresenceInState(
 // every verification method of every controller needs to be valid
 func (k msgServer) formMustControllerVmListMap(ctx sdk.Context,
 	controllers []string, verificationMethods []*types.VerificationMethod,
-	inputSignMap map[string]*types.SignInfo,
+	inputSignMap map[string]*types.DocumentProof,
 ) (map[string][]*types.ExtendedVerificationMethod, error) {
 	var controllerMap map[string][]*types.ExtendedVerificationMethod = map[string][]*types.ExtendedVerificationMethod{}
 	var vmMap map[string]*types.VerificationMethod = map[string]*types.VerificationMethod{}
@@ -116,7 +117,7 @@ func (k msgServer) formMustControllerVmListMap(ctx sdk.Context,
 // atleast one verification method of any controller needs to be valid
 func (k msgServer) formAnyControllerVmListMap(ctx sdk.Context,
 	controllers []string, verificationMethods []*types.VerificationMethod,
-	inputSignMap map[string]*types.SignInfo,
+	inputSignMap map[string]*types.DocumentProof,
 ) (map[string][]*types.ExtendedVerificationMethod, error) {
 	var controllerMap map[string][]*types.ExtendedVerificationMethod = map[string][]*types.ExtendedVerificationMethod{}
 	var vmMap map[string]*types.VerificationMethod = map[string]*types.VerificationMethod{}
@@ -154,8 +155,8 @@ func (k msgServer) formAnyControllerVmListMap(ctx sdk.Context,
 				_, presentInControllerMap := controllerMap[vmState.Controller]
 				if presentInControllerMap {
 					// Skip X25519KeyAgreementKey2020 or X25519KeyAgreementKey2020 because these
-		            // are not allowed for Authentication and Assertion purposes
-					if (vmState.Type != types.X25519KeyAgreementKey2020) && (vmState.Type != types.X25519KeyAgreementKeyEIP5630) { 
+					// are not allowed for Authentication and Assertion purposes
+					if (vmState.Type != types.X25519KeyAgreementKey2020) && (vmState.Type != types.X25519KeyAgreementKeyEIP5630) {
 						vmExtended := types.CreateExtendedVerificationMethod(vmState, sign)
 						controllerMap[controller] = append(controllerMap[controller], vmExtended)
 					}
@@ -184,7 +185,7 @@ func (k msgServer) getControllerVmFromState(ctx sdk.Context, verificationMethodI
 }
 
 // VerifyDocumentProof verifies the proof of a SSI Document
-func (k msgServer) VerifyDocumentProof(ctx sdk.Context, ssiMsg types.SsiMsg, inputDocProof types.SSIProofInterface, clientSpec *types.ClientSpec) error {
+func (k msgServer) VerifyDocumentProof(ctx sdk.Context, ssiMsg types.SsiMsg, inputDocProof types.SSIProofInterface) error {
 	// Get DID Document from State
 	docProofVmId := inputDocProof.GetVerificationMethod()
 	didId, _ := types.SplitDidUrl(docProofVmId)
@@ -210,7 +211,7 @@ func (k msgServer) VerifyDocumentProof(ctx sdk.Context, ssiMsg types.SsiMsg, inp
 	// However, they are not allowed to be used for Authentication or Assertion purposes. Since, their corresponding values in the map
 	// are empty string, the following check is in place.
 	if types.VerificationKeySignatureMap[docVm.Type] == "" {
-		return fmt.Errorf("unsupported proof type: %v", docVm.Type)
+		return fmt.Errorf("proof type must be specified")
 	}
 
 	// Check if the Proof Type is correct
@@ -225,12 +226,12 @@ func (k msgServer) VerifyDocumentProof(ctx sdk.Context, ssiMsg types.SsiMsg, inp
 	}
 
 	// Verify signature
-	signInfo := &types.SignInfo{
-		VerificationMethodId: inputDocProof.GetVerificationMethod(),
-		Signature:            inputDocProof.GetProofValue(),
-		ClientSpec:           clientSpec,
+	documentProof := &types.DocumentProof{
+		VerificationMethod: inputDocProof.GetVerificationMethod(),
+		ProofValue:         inputDocProof.GetProofValue(),
+		ClientSpecType:     inputDocProof.GetClientSpecType(),
 	}
-	err = verification.VerifyDocumentProofSignature(ssiMsg, docVm, signInfo)
+	err = verification.VerifyDocumentProofSignature(ssiMsg, docVm, documentProof)
 	if err != nil {
 		return err
 	}
@@ -239,12 +240,31 @@ func (k msgServer) VerifyDocumentProof(ctx sdk.Context, ssiMsg types.SsiMsg, inp
 }
 
 // makeSignatureMap converts []SignInfo to map
-func makeSignatureMap(inputSignatures []*types.SignInfo) map[string]*types.SignInfo {
-	var signMap map[string]*types.SignInfo = map[string]*types.SignInfo{}
+func makeSignatureMap(inputSignatures []*types.DocumentProof) map[string]*types.DocumentProof {
+	var signMap map[string]*types.DocumentProof = map[string]*types.DocumentProof{}
 
 	for _, sign := range inputSignatures {
-		signMap[sign.VerificationMethodId] = sign
+		signMap[sign.VerificationMethod] = sign
 	}
 
 	return signMap
+}
+
+// verifyCredentialMerkleRootHash verifies the MerkleRootHash of Credential Status
+func verifyCredentialMerkleRootHash(credHash string) error {
+	decodedCredentialHash, err := hex.DecodeString(credHash)
+	if err != nil {
+		return fmt.Errorf("merkle root hash %v is an invalid hex string", credHash)
+	}
+
+	if len(decodedCredentialHash) != 32 {
+		return fmt.Errorf(
+			"expected merkle root hash %v to be of length %v, got %v",
+			credHash,
+			32,
+			len(credHash),
+		)
+	}
+
+	return nil
 }

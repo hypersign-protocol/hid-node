@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"math/big"
+
 	"golang.org/x/crypto/sha3"
 
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
@@ -59,25 +60,26 @@ func verify(extendedVm *types.ExtendedVerificationMethod, ssiMsg types.SsiMsg) e
 	case types.Ed25519VerificationKey2020:
 		return verifyEd25519Signature2020(extendedVm, docBytes)
 	case types.EcdsaSecp256k1VerificationKey2019:
-		return verifyEcdsaSecp256k1Signature2019Key(extendedVm, docBytes)
+		return verifyEcdsaSecp256k1Signature2019(extendedVm, docBytes)
 	case types.EcdsaSecp256k1RecoveryMethod2020:
 		return verifyEcdsaSecp256k1RecoverySignature2020(extendedVm, docBytes)
 	case types.X25519KeyAgreementKey2020:
-		return verifyX25519KeyAgreementKey2020Key(extendedVm)
+		return verifyX25519KeyAgreementKey2020(extendedVm)
 	case types.X25519KeyAgreementKeyEIP5630:
-		return verifyX25519KeyAgreementKeyEIP5630Key(extendedVm)
+		return verifyX25519KeyAgreementKeyEIP5630(extendedVm)
 	case types.Bls12381G2Key2020:
 		return verifyBbsBlsSignature2020(extendedVm, docBytes)
 	case types.BabyJubJubVerificationKey2023:
-		return verifyBabyJubJubVerificationKey2023Key(extendedVm, docBytes)
+		return verifyBabyJubJubSignature2023(extendedVm, docBytes)
 	default:
 		return fmt.Errorf("unsupported verification method: %s", extendedVm.Type)
 	}
 }
 
-func verifyBabyJubJubVerificationKey2023Key(extendedVm *types.ExtendedVerificationMethod, documentBytes []byte) error {
+// verifyBabyJubJubSignature2023 verifies the verification key for verification method type BabyJubJubSignature2023
+func verifyBabyJubJubSignature2023(extendedVm *types.ExtendedVerificationMethod, documentBytes []byte) error {
 	// Process siganture
-	signatureBytes, err := hex.DecodeString(extendedVm.Signature)
+	signatureBytes, err := hex.DecodeString(extendedVm.ProofValue)
 	if err != nil {
 		panic(err)
 	}
@@ -117,7 +119,7 @@ func verifyBabyJubJubVerificationKey2023Key(extendedVm *types.ExtendedVerificati
 	if !publicKeyObj.VerifyPoseidon(msgBigInt, signatureObj) {
 		return fmt.Errorf("signature could not be verified for verificationMethodId: %v", extendedVm.Id)
 	}
-	
+
 	return nil
 }
 
@@ -133,7 +135,7 @@ func verifyBbsBlsSignature2020(extendedVm *types.ExtendedVerificationMethod, doc
 	}
 
 	// Decode Signature to Bytes
-	sigBytes, err := base64.StdEncoding.DecodeString(extendedVm.Signature)
+	sigBytes, err := base64.StdEncoding.DecodeString(extendedVm.ProofValue)
 	if err != nil {
 		return err
 	}
@@ -175,7 +177,7 @@ func verifyEcdsaSecp256k1RecoverySignature2020(extendedVm *types.ExtendedVerific
 	}
 }
 
-// verifyEd25519Signature2020 verifies Ed25519Signature2020 signature using Ed25519VerificationKey2020 publicKeyMultibase 
+// verifyEd25519Signature2020 verifies Ed25519Signature2020 signature using Ed25519VerificationKey2020 publicKeyMultibase
 func verifyEd25519Signature2020(extendedVm *types.ExtendedVerificationMethod, documentBytes []byte) error {
 	// Decode Public Key
 	encoding, publicKeyBytes, err := multibase.Decode(extendedVm.PublicKeyMultibase)
@@ -203,7 +205,7 @@ func verifyEd25519Signature2020(extendedVm *types.ExtendedVerificationMethod, do
 	publicKeyBytes = publicKeyBytes[2:]
 
 	// Decode Signatures
-	encoding, signatureBytes, err := multibase.Decode(extendedVm.Signature)
+	encoding, signatureBytes, err := multibase.Decode(extendedVm.ProofValue)
 	if err != nil {
 		return err
 	}
@@ -221,10 +223,10 @@ func verifyEd25519Signature2020(extendedVm *types.ExtendedVerificationMethod, do
 	}
 }
 
-// verifyEcdsaSecp256k1Signature2019Key verifies the verification key for verification method type EcdsaSecp256k1VerificationKey2019
-func verifyEcdsaSecp256k1Signature2019Key(extendedVm *types.ExtendedVerificationMethod, documentBytes []byte) error {
+// verifyEcdsaSecp256k1Signature2019 verifies the verification key for verification method type EcdsaSecp256k1VerificationKey2019
+func verifyEcdsaSecp256k1Signature2019(extendedVm *types.ExtendedVerificationMethod, documentBytes []byte) error {
 	// Decode and Parse Signature
-	signatureBytes, err := base64.StdEncoding.DecodeString(extendedVm.Signature)
+	signatureBytes, err := base64.StdEncoding.DecodeString(extendedVm.ProofValue)
 	if err != nil {
 		return err
 	}
@@ -331,7 +333,7 @@ func verifyEthereumBlockchainAccountId(extendedVm *types.ExtendedVerificationMet
 	msgHash := etheraccounts.TextHash(documentBytes)
 
 	// Decode hex-encoded signature string to bytes
-	signatureBytes, err := etherhexutil.Decode(extendedVm.Signature)
+	signatureBytes, err := etherhexutil.Decode(extendedVm.ProofValue)
 	if err != nil {
 		return err
 	}
@@ -358,8 +360,8 @@ func verifyEthereumBlockchainAccountId(extendedVm *types.ExtendedVerificationMet
 	}
 }
 
-// verifyX25519KeyAgreementKey2020Key verifies the verification key for verification method type X25519KeyAgreementKey2020
-func verifyX25519KeyAgreementKey2020Key(extendedVm *types.ExtendedVerificationMethod) error {
+// verifyX25519KeyAgreementKey2020 verifies the verification key for verification method type X25519KeyAgreementKey2020
+func verifyX25519KeyAgreementKey2020(extendedVm *types.ExtendedVerificationMethod) error {
 	_, _, err := multibase.Decode(extendedVm.PublicKeyMultibase)
 	if err != nil {
 		return fmt.Errorf(
@@ -371,8 +373,8 @@ func verifyX25519KeyAgreementKey2020Key(extendedVm *types.ExtendedVerificationMe
 	return nil
 }
 
-// verifyX25519KeyAgreementKeyEIP5630Key verifies the verification key for verification method type X25519KeyAgreementKeyEIP5630
-func verifyX25519KeyAgreementKeyEIP5630Key(extendedVm *types.ExtendedVerificationMethod) error {
+// verifyX25519KeyAgreementKeyEIP5630 verifies the verification key for verification method type X25519KeyAgreementKeyEIP5630
+func verifyX25519KeyAgreementKeyEIP5630(extendedVm *types.ExtendedVerificationMethod) error {
 	_, _, err := multibase.Decode(extendedVm.PublicKeyMultibase)
 	if err != nil {
 		return fmt.Errorf(
