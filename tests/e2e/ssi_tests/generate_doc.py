@@ -6,45 +6,64 @@ import json
 from utils import run_command, generate_document_id, get_document_signature, \
     secp256k1_pubkey_to_address
 
-def generate_did_document(key_pair, algo="ed25519", bech32prefix="hid", is_uuid=False):
+ED25519_CONTEXT = "https://w3id.org/security/suites/ed25519-2020/v1"
+DID_CONTEXT = "https://www.w3.org/ns/did/v1"
+SECP256K1_RECOVERY_CONTEXT = "https://ns.did.ai/suites/secp256k1-2020/v1"
+SECP256K1_VER_KEY_2019_CONTEXT = "https://ns.did.ai/suites/secp256k1-2019/v1"
+
+def generate_did_document(key_pair, algo="Ed25519Signature2020", bech32prefix="hid", is_uuid=False):
     base_document = {
         "context" : [
-            "https://www.w3.org/ns/did/v1"
+            DID_CONTEXT,
         ],
         "id": "",
         "controller": [],
         "verificationMethod": [],
         "authentication": [],
     }
+    if algo == "Ed25519Signature2020":
+        base_document["context"].append(ED25519_CONTEXT)
+    if algo == "EcdsaSecp256k1RecoverySignature2020":
+        base_document["context"].append(SECP256K1_RECOVERY_CONTEXT)
+    if algo == "EcdsaSecp256k1Signature2019":
+        base_document["context"].append(SECP256K1_VER_KEY_2019_CONTEXT)
 
     did_id = generate_document_id("did", key_pair, algo, is_uuid)
-
+    
     # Form the DID Document
     vm_type = ""
-    if algo == "ed25519":
+    if algo == "Ed25519Signature2020":
         vm_type = "Ed25519VerificationKey2020"
-    elif algo == "secp256k1":
+    elif algo == "EcdsaSecp256k1Signature2019":
         vm_type = "EcdsaSecp256k1VerificationKey2019"
-    elif algo == "recover-eth":
+    elif algo == "EcdsaSecp256k1RecoverySignature2020":
         vm_type = "EcdsaSecp256k1RecoveryMethod2020"
-    elif algo == "bbs":
+    elif algo == "BbsBlsSignature2020":
         vm_type = "Bls12381G2Key2020"
     elif algo == "bjj":
         vm_type = "BabyJubJubVerificationKey2023"
     else:
-        raise Exception("unknown signing algorithm: " + key_pair)
+        raise Exception("unknown signing algorithm: " + algo)
 
-    verification_method = {
-        "id": "",
-        "type": "",
-        "controller": "",
-        "blockchainAccountId": "",
-        "publicKeyMultibase": ""
-    }
+    verification_method = {}
+    if algo == "EcdsaSecp256k1RecoverySignature2020":
+        verification_method = {
+            "id": "",
+            "type": "",
+            "controller": "",
+            "blockchainAccountId": ""
+        }
+    else:
+        verification_method = {
+            "id": "",
+            "type": "",
+            "controller": "",
+            "publicKeyMultibase": ""
+        }
 
-    if algo == "recover-eth":
+    if algo == "EcdsaSecp256k1RecoverySignature2020":
         verification_method["blockchainAccountId"] = "eip155:1:" + key_pair["ethereum_address"]
-    elif algo == "secp256k1":
+    elif algo == "EcdsaSecp256k1Signature2019":
 
         if bech32prefix == "hid":
             verification_method["blockchainAccountId"] = "cosmos:jagrat:" + \
@@ -72,7 +91,7 @@ def generate_did_document(key_pair, algo="ed25519", bech32prefix="hid", is_uuid=
     base_document["assertionMethod"] = []
     return base_document
     
-def generate_schema_document(key_pair, schema_author, vm, signature=None, algo="ed25519"):
+def generate_schema_document(key_pair, schema_author, vm, signature=None, algo="Ed25519Signature2020"):
     base_schema_doc = {
         "type": "https://schema.org/Person",
         "modelVersion": "v1.0",
@@ -90,13 +109,13 @@ def generate_schema_document(key_pair, schema_author, vm, signature=None, algo="
     }
     
     proof_type = ""
-    if algo == "ed25519":
+    if algo == "Ed25519Signature2020":
         proof_type = "Ed25519Signature2020"
-    elif algo == "secp256k1":
+    elif algo == "EcdsaSecp256k1Signature2019":
         proof_type = "EcdsaSecp256k1Signature2019"
-    elif algo == "recover-eth":
+    elif algo == "EcdsaSecp256k1RecoverySignature2020":
         proof_type = "EcdsaSecp256k1RecoverySignature2020"
-    elif algo == "bbs":
+    elif algo == "BbsBlsSignature2020":
         proof_type = "BbsBlsSignature2020"
     elif algo == "bjj":
         proof_type = "BabyJubJubSignature2023"
@@ -124,7 +143,7 @@ def generate_schema_document(key_pair, schema_author, vm, signature=None, algo="
 
     return base_schema_doc, base_schema_proof
 
-def generate_cred_status_document(key_pair, cred_author, vm, signature=None, algo="ed25519"):
+def generate_cred_status_document(key_pair, cred_author, vm, signature=None, algo="Ed25519Signature2020"):
     base_cred_status_doc = {
         "claim": {
                 "id": "",
@@ -138,13 +157,13 @@ def generate_cred_status_document(key_pair, cred_author, vm, signature=None, alg
     }
     
     proof_type = ""
-    if algo == "ed25519":
+    if algo == "Ed25519Signature2020":
         proof_type = "Ed25519Signature2020"
-    elif algo == "secp256k1":
+    elif algo == "EcdsaSecp256k1Signature2019":
         proof_type = "EcdsaSecp256k1Signature2019"
-    elif algo == "recover-eth":
+    elif algo == "EcdsaSecp256k1RecoverySignature2020":
         proof_type = "EcdsaSecp256k1RecoverySignature2020"
-    elif algo == "bbs":
+    elif algo == "BbsBlsSignature2020":
         proof_type = "BbsBlsSignature2020"
     elif algo == "bjj":
         proof_type = "BabyJubJubSignature2023"

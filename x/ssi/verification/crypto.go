@@ -57,17 +57,17 @@ func verify(extendedVm *types.ExtendedVerificationMethod, ssiMsg types.SsiMsg) e
 
 	switch extendedVm.Type {
 	case types.Ed25519VerificationKey2020:
-		return verifyEd25519VerificationKey2020Key(extendedVm, docBytes)
+		return verifyEd25519Signature2020(extendedVm, docBytes)
 	case types.EcdsaSecp256k1VerificationKey2019:
-		return verifyEcdsaSecp256k1VerificationKey2019Key(extendedVm, docBytes)
+		return verifyEcdsaSecp256k1Signature2019Key(extendedVm, docBytes)
 	case types.EcdsaSecp256k1RecoveryMethod2020:
-		return verifyEcdsaSecp256k1RecoveryMethod2020Key(extendedVm, docBytes)
+		return verifyEcdsaSecp256k1RecoverySignature2020(extendedVm, docBytes)
 	case types.X25519KeyAgreementKey2020:
 		return verifyX25519KeyAgreementKey2020Key(extendedVm)
 	case types.X25519KeyAgreementKeyEIP5630:
 		return verifyX25519KeyAgreementKeyEIP5630Key(extendedVm)
 	case types.Bls12381G2Key2020:
-		return verifyBls12381G2Key2020Key(extendedVm, docBytes)
+		return verifyBbsBlsSignature2020(extendedVm, docBytes)
 	case types.BabyJubJubVerificationKey2023:
 		return verifyBabyJubJubVerificationKey2023Key(extendedVm, docBytes)
 	default:
@@ -121,8 +121,8 @@ func verifyBabyJubJubVerificationKey2023Key(extendedVm *types.ExtendedVerificati
 	return nil
 }
 
-// verifyBls12381G2Key2020Key verifies the verification key for verification method type Bls12381G2Key2020
-func verifyBls12381G2Key2020Key(extendedVm *types.ExtendedVerificationMethod, documentBytes []byte) error {
+// verifyBbsBlsSignature2020 verifies the verification key for verification method type BbsBlsSignature2020
+func verifyBbsBlsSignature2020(extendedVm *types.ExtendedVerificationMethod, documentBytes []byte) error {
 	bbsObj := bbs.New()
 
 	// Unlike in tranditional cryptographic algorithms where a message is signed as-is, the message in BBS+ Signature
@@ -152,8 +152,8 @@ func verifyBls12381G2Key2020Key(extendedVm *types.ExtendedVerificationMethod, do
 	return nil
 }
 
-// verifyEcdsaSecp256k1RecoveryMethod2020Key verifies the verification key for verification method type EcdsaSecp256k1RecoveryMethod2020
-func verifyEcdsaSecp256k1RecoveryMethod2020Key(extendedVm *types.ExtendedVerificationMethod, documentBytes []byte) error {
+// verifyEcdsaSecp256k1RecoverySignature2020 verifies the verification key for verification method type EcdsaSecp256k1RecoveryMethod2020
+func verifyEcdsaSecp256k1RecoverySignature2020(extendedVm *types.ExtendedVerificationMethod, documentBytes []byte) error {
 	extractedCAIP10Prefix, err := getCAIP10Prefix(extendedVm.BlockchainAccountId)
 	if err != nil {
 		return err
@@ -175,21 +175,43 @@ func verifyEcdsaSecp256k1RecoveryMethod2020Key(extendedVm *types.ExtendedVerific
 	}
 }
 
-// verifyEd25519VerificationKey2020Key verifies the verification key for verification method type Ed25519VerificationKey2020
-func verifyEd25519VerificationKey2020Key(extendedVm *types.ExtendedVerificationMethod, documentBytes []byte) error {
+// verifyEd25519Signature2020 verifies Ed25519Signature2020 signature using Ed25519VerificationKey2020 publicKeyMultibase 
+func verifyEd25519Signature2020(extendedVm *types.ExtendedVerificationMethod, documentBytes []byte) error {
 	// Decode Public Key
-	_, publicKeyBytes, err := multibase.Decode(extendedVm.PublicKeyMultibase)
+	encoding, publicKeyBytes, err := multibase.Decode(extendedVm.PublicKeyMultibase)
 	if err != nil {
 		return fmt.Errorf(
 			"cannot decode Ed25519 public key %s",
 			extendedVm.PublicKeyMultibase,
 		)
 	}
+	if encoding != multibase.Base58BTC {
+		return fmt.Errorf(
+			"publicKeyMultibase of verification method %v must be multibase base58btc encoded",
+			extendedVm.Id,
+		)
+	}
+
+	// Incoming publicKeyMultibase is expected to be of 34 byte length (2-byte header + 32-byte public key)
+	if len(publicKeyBytes) != 34 {
+		return fmt.Errorf(
+			"provided publicKeyMultibase %v of verification method %v is expected to be of byte-length 34",
+			extendedVm.PublicKeyMultibase,
+			extendedVm.Id,
+		)
+	}
+	publicKeyBytes = publicKeyBytes[2:]
 
 	// Decode Signatures
-	signatureBytes, err := base64.StdEncoding.DecodeString(extendedVm.Signature)
+	encoding, signatureBytes, err := multibase.Decode(extendedVm.Signature)
 	if err != nil {
 		return err
+	}
+	if encoding != multibase.Base58BTC {
+		return fmt.Errorf(
+			"signature provided for verification method %v must be multibase base58btc encoded",
+			extendedVm.Id,
+		)
 	}
 
 	if !ed25519.Verify(publicKeyBytes, documentBytes, signatureBytes) {
@@ -199,8 +221,8 @@ func verifyEd25519VerificationKey2020Key(extendedVm *types.ExtendedVerificationM
 	}
 }
 
-// verifyEcdsaSecp256k1VerificationKey2019Key verifies the verification key for verification method type EcdsaSecp256k1VerificationKey2019
-func verifyEcdsaSecp256k1VerificationKey2019Key(extendedVm *types.ExtendedVerificationMethod, documentBytes []byte) error {
+// verifyEcdsaSecp256k1Signature2019Key verifies the verification key for verification method type EcdsaSecp256k1VerificationKey2019
+func verifyEcdsaSecp256k1Signature2019Key(extendedVm *types.ExtendedVerificationMethod, documentBytes []byte) error {
 	// Decode and Parse Signature
 	signatureBytes, err := base64.StdEncoding.DecodeString(extendedVm.Signature)
 	if err != nil {

@@ -2,15 +2,17 @@ package verification
 
 import (
 	"encoding/base64"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 
+	ldcontext "github.com/hypersign-protocol/hid-node/x/ssi/ld-context"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 )
 
 // Read more about Cosmos's ADR Spec from the following:
 // https://docs.cosmos.network/v0.45/architecture/adr-036-arbitrary-signature.html
-func getCosmosADR036SignDocBytes(ssiMsg types.SsiMsg, clientSpec *types.ClientSpec) ([]byte, error) {
+func getCosmosADR036SignDocBytes(ssiDocBytes []byte, clientSpec *types.ClientSpec) ([]byte, error) {
 	var msgSignData types.Msg = types.Msg{
 		Type: "sign/MsgSignData",
 		Value: types.Val{
@@ -32,7 +34,7 @@ func getCosmosADR036SignDocBytes(ssiMsg types.SsiMsg, clientSpec *types.ClientSp
 		},
 		Sequence: "0",
 	}
-	ssiDocBytes := ssiMsg.GetSignBytes()
+
 	baseCosmosADR036SignDoc.Msgs[0].Value.Data = base64.StdEncoding.EncodeToString(
 		ssiDocBytes)
 	baseCosmosADR036SignDoc.Msgs[0].Value.Signer = clientSpec.Adr036SignerAddress
@@ -55,8 +57,32 @@ func getDocBytesByClientSpec(ssiMsg types.SsiMsg, extendedVm *types.ExtendedVeri
 	if extendedVm.ClientSpec != nil {
 		switch extendedVm.ClientSpec.Type {
 		case types.ADR036ClientSpec:
-			return getCosmosADR036SignDocBytes(ssiMsg, extendedVm.ClientSpec)
+			if didDoc, ok := ssiMsg.(*types.Did); ok {
+				canonizedDidDocHash, err := ldcontext.EcdsaSecp256k1Signature2019Canonize(didDoc)
+				if err != nil {
+					return nil, err
+				}
+
+				return getCosmosADR036SignDocBytes(canonizedDidDocHash, extendedVm.ClientSpec)
+			}
+			return getCosmosADR036SignDocBytes(ssiMsg.GetSignBytes(), extendedVm.ClientSpec)
 		case types.PersonalSignClientSpec:
+			if didDoc, ok := ssiMsg.(*types.Did); ok {
+				canonizedDidDocHash, err := ldcontext.EcdsaSecp256k1RecoverySignature2020Canonize(didDoc)
+				if err != nil {
+					return nil, err
+				}
+
+				// TODO: This is temporary fix eth.personal.sign() client function, since it only signs JSON 
+				// stringified document and hence the following struct was used to sign from the Client end.
+				return json.Marshal(struct{
+					DidId string `json:"didId"`
+					DidDocDigest string `json:"didDocDigest"`
+				} {
+					DidId: didDoc.Id,
+					DidDocDigest: hex.EncodeToString(canonizedDidDocHash),
+				})
+			}
 			return getPersonalSignSpecDocBytes(ssiMsg)
 		default:
 			return nil, fmt.Errorf(
@@ -65,6 +91,11 @@ func getDocBytesByClientSpec(ssiMsg types.SsiMsg, extendedVm *types.ExtendedVeri
 			)
 		}
 	} else {
+		// If DID Document, perform RDF normalisation and return its SHA-256 Hash
+		didDoc, ok := ssiMsg.(*types.Did)
+		if ok {
+			return ldcontext.NormalizeByVerificationMethodType(didDoc, extendedVm.Type)
+		}
 		return ssiMsg.GetSignBytes(), nil
 	}
 }

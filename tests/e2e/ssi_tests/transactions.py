@@ -17,7 +17,7 @@ def form_did_create_tx_multisig(diddoc, signPairs, blockchain_account):
         vmId = signPair["verificationMethodId"]
         signAlgo = signPair["signing_algo"]
 
-        if signAlgo in ["recover-eth", "bjj"]:
+        if signAlgo in ["EcdsaSecp256k1RecoverySignature2020", "bjj"]:
             private_key = signPair["kp"]["priv_key_hex"]
         else:
             private_key = signPair["kp"]["priv_key_base_64"]
@@ -35,7 +35,7 @@ def form_did_update_tx_multisig(diddoc, signPairs, blockchain_account):
         vmId = signPair["verificationMethodId"]
         signAlgo = signPair["signing_algo"]
 
-        if signAlgo in ["recover-eth", "bjj"]:
+        if signAlgo in ["EcdsaSecp256k1RecoverySignature2020", "bjj"]:
             private_key = signPair["kp"]["priv_key_hex"]
         else:
             private_key = signPair["kp"]["priv_key_base_64"]
@@ -54,7 +54,7 @@ def form_did_deactivate_tx_multisig(didId, signPairs, blockchain_account):
         vmId = signPair["verificationMethodId"]
         signAlgo = signPair["signing_algo"]
 
-        if signAlgo in ["recover-eth", "bjj"]:
+        if signAlgo in ["EcdsaSecp256k1RecoverySignature2020", "bjj"]:
             private_key = signPair["kp"]["priv_key_hex"]
         else:
             private_key = signPair["kp"]["priv_key_base_64"]
@@ -66,7 +66,7 @@ def form_did_deactivate_tx_multisig(didId, signPairs, blockchain_account):
     return cmd_string
 
 def form_did_create_tx(did_doc, kp, blockchain_account, verificationMethodId=None, signing_algo="ed25519"):
-    if signing_algo in ["recover-eth", "bjj"]:
+    if signing_algo in ["EcdsaSecp256k1RecoverySignature2020", "bjj"]:
         private_key = kp["priv_key_hex"]
     else:
         private_key = kp["priv_key_base_64"]
@@ -86,7 +86,7 @@ def form_create_cred_status_tx(cred_msg, cred_proof, blockchain_account):
     return cmd_string
 
 def form_did_update_tx(did_doc, kp, blockchain_account, verificationMethodId=None, signing_algo="ed25519"):
-    if signing_algo in ["recover-eth", "bjj"]:
+    if signing_algo in ["EcdsaSecp256k1RecoverySignature2020", "bjj"]:
         private_key = kp["priv_key_hex"]
     else:
         private_key = kp["priv_key_base_64"]
@@ -98,7 +98,7 @@ def form_did_update_tx(did_doc, kp, blockchain_account, verificationMethodId=Non
     return cmd_string
 
 def form_did_deactivate_tx(did_doc_id, kp, blockchain_account, verificationMethodId=None, signing_algo="ed25519"):
-    if signing_algo in ["recover-eth", "hex"]:
+    if signing_algo in ["EcdsaSecp256k1RecoverySignature2020", "hex"]:
         private_key = kp["priv_key_hex"]
     else:
         private_key = kp["priv_key_base_64"]

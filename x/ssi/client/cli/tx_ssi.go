@@ -52,7 +52,7 @@ func CmdCreateDID() *cobra.Command {
 				}
 
 				// Prepare Signatures
-				signInfos, err = getSignatures(cmd, didDoc.GetSignBytes(), args[1:])
+				signInfos, err = getSignatures(cmd, &didDoc, args[1:])
 				if err != nil {
 					return err
 				}
@@ -99,7 +99,7 @@ func CmdCreateDID() *cobra.Command {
 					return err
 				}
 
-				signatureBytes, _, err := kr.SignByAddress(txAuthorAddr, didDoc.GetSignBytes())
+				signatureBytes, _, err := kr.SignByAddress(txAuthorAddr, didDocBytes)
 				if err != nil {
 					return err
 				}
@@ -153,7 +153,7 @@ func CmdUpdateDID() *cobra.Command {
 				return err
 			}
 
-			signInfos, err := getSignatures(cmd, didDoc.GetSignBytes(), args[2:])
+			signInfos, err := getSignatures(cmd, &didDoc, args[2:])
 			if err != nil {
 				return err
 			}
@@ -246,7 +246,7 @@ func CmdDeactivateDID() *cobra.Command {
 			}
 			didDoc := resolvedDidDocument.GetDidDocument()
 
-			signInfos, err := getSignatures(cmd, didDoc.GetSignBytes(), args[2:])
+			signInfos, err := getSignatures(cmd, didDoc, args[2:])
 			if err != nil {
 				return err
 			}

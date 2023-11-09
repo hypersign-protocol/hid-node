@@ -8,12 +8,13 @@ import (
 	"fmt"
 	"math/big"
 
-	"golang.org/x/crypto/sha3"
 	"github.com/cosmos/cosmos-sdk/types/bech32"
+	ldcontext "github.com/hypersign-protocol/hid-node/x/ssi/ld-context"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 	"github.com/multiformats/go-multibase"
 	secp256k1 "github.com/tendermint/tendermint/crypto/secp256k1"
 	"golang.org/x/crypto/ripemd160" // nolint: staticcheck
+	"golang.org/x/crypto/sha3"
 
 	etheraccounts "github.com/ethereum/go-ethereum/accounts"
 	etherhexutil "github.com/ethereum/go-ethereum/common/hexutil"
@@ -21,8 +22,8 @@ import (
 
 	bbs "github.com/hyperledger/aries-framework-go/component/kmscrypto/crypto/primitive/bbs12381g2pub"
 
-	"github.com/spf13/cobra"
 	"github.com/iden3/go-iden3-crypto/babyjub"
+	"github.com/spf13/cobra"
 )
 
 // Extract Verification Method Ids and their respective signatures from Arguments
@@ -52,8 +53,8 @@ func extractDIDSigningElements(cmdArgs []string) ([]DIDSigningElements, error) {
 	return didSigningElementsList, nil
 }
 
-// GetBBSSignature signs a message and returns a BBS signature
-func GetBBSSignature(privateKey string, message []byte) (string, error) {
+// GetBbsBlsSignature2020 signs a message and returns a BBS signature
+func GetBbsBlsSignature2020(privateKey string, message []byte) (string, error) {
 	privKeyBytes, err := base64.StdEncoding.DecodeString(privateKey)
 	if err != nil {
 		panic(err)
@@ -92,7 +93,7 @@ func GetBJJSignature(privateKey string, message []byte) (string, error) {
 	return signatureHex, nil
 }
 
-func GetEthRecoverySignature(privateKey string, message []byte) (string, error) {
+func GetEcdsaSecp256k1RecoverySignature2020(privateKey string, message []byte) (string, error) {
 	// Decode key into bytes
 	privKeyBytes, err := hex.DecodeString(privateKey)
 	if err != nil {
@@ -115,7 +116,7 @@ func GetEthRecoverySignature(privateKey string, message []byte) (string, error) 
 	return etherhexutil.Encode(sigBytes), nil
 }
 
-func GetSecp256k1Signature(privateKey string, message []byte) (string, error) {
+func GetEcdsaSecp256k1Signature2019(privateKey string, message []byte) (string, error) {
 	// Decode key into bytes
 	privKeyBytes, err := base64.StdEncoding.DecodeString(privateKey)
 	if err != nil {
@@ -133,7 +134,7 @@ func GetSecp256k1Signature(privateKey string, message []byte) (string, error) {
 	return base64.StdEncoding.EncodeToString(signature), nil
 }
 
-func GetEd25519Signature(privateKey string, message []byte) (string, error) {
+func GetEd25519Signature2020(privateKey string, message []byte) (string, error) {
 	// Decode key into bytes
 	privKeyBytes, err := base64.StdEncoding.DecodeString(privateKey)
 	if err != nil {
@@ -143,10 +144,10 @@ func GetEd25519Signature(privateKey string, message []byte) (string, error) {
 	// Sign Message
 	signatureBytes := ed25519.Sign(privKeyBytes, message)
 
-	return base64.StdEncoding.EncodeToString(signatureBytes), nil
+	return multibase.Encode(multibase.Base58BTC, signatureBytes)
 }
 
-func getSignatures(cmd *cobra.Command, message []byte, cmdArgs []string) ([]*types.SignInfo, error) {
+func getSignatures(cmd *cobra.Command, didDoc *types.Did, cmdArgs []string) ([]*types.SignInfo, error) {
 	var signInfoList []*types.SignInfo
 
 	didSigningElementsList, err := extractDIDSigningElements(cmdArgs)
@@ -162,34 +163,55 @@ func getSignatures(cmd *cobra.Command, message []byte, cmdArgs []string) ([]*typ
 
 		// Sign based on the Signing Algorithm
 		switch didSigningElementsList[i].SignAlgo {
-		case "ed25519":
-			signInfoList[i].Signature, err = GetEd25519Signature(didSigningElementsList[i].SignKey, message)
+		case types.Ed25519Signature2020:
+			// Perform EdDSACryptoSuite2020 Normalization
+			didDocBytes, err := ldcontext.EdDSACryptoSuite2020Canonize(didDoc)
 			if err != nil {
 				return nil, err
 			}
-		case "secp256k1":
-			signInfoList[i].Signature, err = GetSecp256k1Signature(didSigningElementsList[i].SignKey, message)
+
+			signInfoList[i].Signature, err = GetEd25519Signature2020(didSigningElementsList[i].SignKey, didDocBytes[:])
 			if err != nil {
 				return nil, err
 			}
-		case "recover-eth":
-			signInfoList[i].Signature, err = GetEthRecoverySignature(didSigningElementsList[i].SignKey, message)
+		case types.EcdsaSecp256k1Signature2019:
+			didDocBytes, err := ldcontext.EcdsaSecp256k1Signature2019Canonize(didDoc)
 			if err != nil {
 				return nil, err
 			}
-		case "bbs":
-			signInfoList[i].Signature, err = GetBBSSignature(didSigningElementsList[i].SignKey, message)
+
+			signInfoList[i].Signature, err = GetEcdsaSecp256k1Signature2019(didSigningElementsList[i].SignKey, didDocBytes)
+			if err != nil {
+				return nil, err
+			}
+		case types.EcdsaSecp256k1RecoverySignature2020:
+			didDocBytes, err := ldcontext.EcdsaSecp256k1RecoverySignature2020Canonize(didDoc)
+			if err != nil {
+				return nil, err
+			}
+
+			signInfoList[i].Signature, err = GetEcdsaSecp256k1RecoverySignature2020(didSigningElementsList[i].SignKey, didDocBytes)
+			if err != nil {
+				return nil, err
+			}
+		case types.BbsBlsSignature2020:
+			didDocBytes, err := ldcontext.BbsBlsSignature2020Canonize(didDoc)
+			if err != nil {
+				return nil, err
+			}
+
+			signInfoList[i].Signature, err = GetBbsBlsSignature2020(didSigningElementsList[i].SignKey, didDocBytes)
 			if err != nil {
 				return nil, err
 			}
 		case "bjj":
-			signInfoList[i].Signature, err = GetBJJSignature(didSigningElementsList[i].SignKey, message)
+			signInfoList[i].Signature, err = GetBJJSignature(didSigningElementsList[i].SignKey, didDoc.GetSignBytes())
 			if err != nil {
 				return nil, err
 			}
 		default:
 			return nil, fmt.Errorf(
-				"unsupported signing algorithm %s, supported signing algorithms: ['ed25519', 'secp256k1', 'recover-eth', 'bbs', 'bjj']", 
+				"unsupported signing algorithm %s, supported signing algorithms: ['Ed25519Signature2020', 'secp256k1', 'recover-eth', 'bbs', 'bjj']",
 				didSigningElementsList[i].SignAlgo,
 			)
 		}
