@@ -2,8 +2,11 @@ package ldcontext
 
 import (
 	"crypto/sha256"
+	"encoding/json"
+	"fmt"
 
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
+	"github.com/piprate/json-gold/ld"
 )
 
 // NormalizeByVerificationMethodType normalizes DID Document based on the input Verification
@@ -64,7 +67,13 @@ func normalizeDocumentWithProof(msg types.SsiMsg, docProof *types.DocumentProof)
 		}
 		context = doc.Context
 	case *types.CredentialSchemaDocument:
-		return doc.GetSignBytes(), nil
+		var err error
+		jsonLdCredentialSchema := NewJsonLdCredentialSchema(doc)
+		canonizedDocument, err = normalizeWithURDNA2015(jsonLdCredentialSchema)
+		if err != nil {
+			return nil, err
+		}
+		context = doc.Context
 	}
 
 	canonizedDocumentHash := sha256.Sum256([]byte(canonizedDocument))
@@ -83,6 +92,48 @@ func normalizeDocumentWithProof(msg types.SsiMsg, docProof *types.DocumentProof)
 	finalNormalizedHash = append(finalNormalizedHash, canonizedDocumentHash[:]...)
 
 	return finalNormalizedHash, nil
+}
+
+// normalizeWithURDNA2015 performs RDF Canonization upon JsonLdDid using URDNA2015
+// algorithm and returns the canonized document in string
+func normalizeWithURDNA2015(jsonLdDocument JsonLdDocument) (string, error) {
+	return normalize(ld.AlgorithmURDNA2015, jsonLdDocument)
+}
+
+func normalize(algorithm string, jsonLdDocument JsonLdDocument) (string, error) {
+	proc := ld.NewJsonLdProcessor()
+	options := ld.NewJsonLdOptions("")
+	options.Algorithm = algorithm // ld.AlgorithmURDNA2015
+	options.Format = "application/n-quads"
+
+	normalisedJsonLd, err := proc.Normalize(jsonLdDocToInterface(jsonLdDocument), options)
+	if err != nil {
+		return "", fmt.Errorf("unable to Normalize DID Document: %v", err.Error())
+	}
+
+	canonizedDocString := normalisedJsonLd.(string)
+	if canonizedDocString == "" {
+		return "", fmt.Errorf("normalization of JSON-LD document yielded empty RDF string")
+	}
+
+	return canonizedDocString, nil
+}
+
+// Convert JsonLdDid to interface
+func jsonLdDocToInterface(jsonLd any) interface{} {
+	var intf interface{}
+
+	jsonLdBytes, err := json.Marshal(jsonLd)
+	if err != nil {
+		panic(err)
+	}
+
+	err = json.Unmarshal(jsonLdBytes, &intf)
+	if err != nil {
+		panic(err)
+	}
+
+	return intf
 }
 
 // Ed25519Signature2020Normalize normalizes DID Document in accordance with
