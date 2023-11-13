@@ -56,7 +56,7 @@ func getPersonalSignSpecDocBytes(ssiMsg types.SsiMsg) ([]byte, error) {
 func getDocBytesByClientSpec(ssiMsg types.SsiMsg, extendedVm *types.ExtendedVerificationMethod) ([]byte, error) {
 	switch extendedVm.Proof.ClientSpecType {
 	case types.CLIENT_SPEC_TYPE_NONE:
-		if didDoc, ok := ssiMsg.(*types.DidDocument); ok && len(didDoc.Context) == 0 {
+		if extendedVm.Proof.Type == types.BabyJubJubSignature2023 {
 			return ssiMsg.GetSignBytes(), nil
 		}
 
@@ -67,7 +67,7 @@ func getDocBytesByClientSpec(ssiMsg types.SsiMsg, extendedVm *types.ExtendedVeri
 			return nil, err
 		}
 
-		if didDoc, ok := ssiMsg.(*types.DidDocument); ok && len(didDoc.Context) == 0 {
+		if extendedVm.Proof.Type == types.BabyJubJubSignature2023 {
 			return getCosmosADR036SignDocBytes(ssiMsg.GetSignBytes(), signerAddress)
 		}
 
@@ -79,7 +79,7 @@ func getDocBytesByClientSpec(ssiMsg types.SsiMsg, extendedVm *types.ExtendedVeri
 		return getCosmosADR036SignDocBytes(canonizedDidDocHash, signerAddress)
 		
 	case types.CLIENT_SPEC_TYPE_ETH_PERSONAL_SIGN:
-		if didDoc, ok := ssiMsg.(*types.DidDocument); ok && len(didDoc.Context) == 0 {
+		if extendedVm.Proof.Type == types.BabyJubJubSignature2023 {
 			return getPersonalSignSpecDocBytes(ssiMsg)
 		}
 
