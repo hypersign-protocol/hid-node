@@ -7,6 +7,7 @@ const Secp256k1Recovery2020Context string = "https://ns.did.ai/suites/secp256k1-
 const BbsSignature2020Context string = "https://ns.did.ai/suites/bls12381-2020/v1"
 const Secp256k12019Context string = "https://ns.did.ai/suites/secp256k1-2019/v1"
 const X25519KeyAgreementKeyEIP5630Context string = "https://raw.githubusercontent.com/hypersign-protocol/hypersign-contexts/main/X25519KeyAgreementKeyEIP5630.jsonld"
+const CredentialStatusContext string = "https://raw.githubusercontent.com/hypersign-protocol/hypersign-contexts/main/CredentialStatus.jsonld"
 
 // As hid-node is not supposed to perform any GET request, the complete Context body of their
 // respective Context urls has been maintained below.
@@ -158,8 +159,8 @@ var ContextUrlMap map[string]contextObject = map[string]contextObject{
 		},
 	},
 	X25519KeyAgreement2020Context: {
-		"id":        "@id",
-		"type":      "@type",
+		"id":         "@id",
+		"type":       "@type",
 		"@protected": true,
 		"X25519KeyAgreementKey2020": map[string]interface{}{
 			"@id": "https://w3id.org/security#X25519KeyAgreementKey2020",
@@ -183,8 +184,8 @@ var ContextUrlMap map[string]contextObject = map[string]contextObject{
 		},
 	},
 	Secp256k1Recovery2020Context: {
-		"id":       "@id",
-		"type":     "@type",
+		"id":         "@id",
+		"type":       "@type",
 		"@protected": true,
 		"EcdsaSecp256k1VerificationKey2020": map[string]interface{}{
 			"@id": "https://w3id.org/security#EcdsaSecp256k1VerificationKey2020",
@@ -224,35 +225,35 @@ var ContextUrlMap map[string]contextObject = map[string]contextObject{
 				},
 				"nonce": "https://w3id.org/security#nonce",
 				"proofPurpose": map[string]interface{}{
-					"@id":      "https://w3id.org/security#proofPurpose",
-					"@type":    "@vocab",
+					"@id":   "https://w3id.org/security#proofPurpose",
+					"@type": "@vocab",
 					"@context": map[string]interface{}{
 						"@protected": true,
 						"id":         "@id",
 						"type":       "@type",
 						"assertionMethod": map[string]interface{}{
-							"@id":       "https://w3id.org/security#assertionMethod",
-							"@type":     "@id",
+							"@id":        "https://w3id.org/security#assertionMethod",
+							"@type":      "@id",
 							"@container": "@set",
 						},
 						"authentication": map[string]interface{}{
-							"@id":       "https://w3id.org/security#authenticationMethod",
-							"@type":     "@id",
+							"@id":        "https://w3id.org/security#authenticationMethod",
+							"@type":      "@id",
 							"@container": "@set",
 						},
 						"capabilityInvocation": map[string]interface{}{
-							"@id":       "https://w3id.org/security#capabilityInvocationMethod",
-							"@type":     "@id",
+							"@id":        "https://w3id.org/security#capabilityInvocationMethod",
+							"@type":      "@id",
 							"@container": "@set",
 						},
 						"capabilityDelegation": map[string]interface{}{
-							"@id":       "https://w3id.org/security#capabilityDelegationMethod",
-							"@type":     "@id",
+							"@id":        "https://w3id.org/security#capabilityDelegationMethod",
+							"@type":      "@id",
 							"@container": "@set",
 						},
 						"keyAgreement": map[string]interface{}{
-							"@id":       "https://w3id.org/security#keyAgreementMethod",
-							"@type":     "@id",
+							"@id":        "https://w3id.org/security#keyAgreementMethod",
+							"@type":      "@id",
 							"@container": "@set",
 						},
 					},
@@ -320,35 +321,35 @@ var ContextUrlMap map[string]contextObject = map[string]contextObject{
 				},
 				"nonce": "https://w3id.org/security#nonce",
 				"proofPurpose": map[string]interface{}{
-					"@id":      "https://w3id.org/security#proofPurpose",
-					"@type":    "@vocab",
+					"@id":   "https://w3id.org/security#proofPurpose",
+					"@type": "@vocab",
 					"@context": map[string]interface{}{
 						"@protected": true,
 						"id":         "@id",
 						"type":       "@type",
 						"assertionMethod": map[string]interface{}{
-							"@id":       "https://w3id.org/security#assertionMethod",
-							"@type":     "@id",
+							"@id":        "https://w3id.org/security#assertionMethod",
+							"@type":      "@id",
 							"@container": "@set",
 						},
 						"authentication": map[string]interface{}{
-							"@id":       "https://w3id.org/security#authenticationMethod",
-							"@type":     "@id",
+							"@id":        "https://w3id.org/security#authenticationMethod",
+							"@type":      "@id",
 							"@container": "@set",
 						},
 						"capabilityInvocation": map[string]interface{}{
-							"@id":       "https://w3id.org/security#capabilityInvocationMethod",
-							"@type":     "@id",
+							"@id":        "https://w3id.org/security#capabilityInvocationMethod",
+							"@type":      "@id",
 							"@container": "@set",
 						},
 						"capabilityDelegation": map[string]interface{}{
-							"@id":       "https://w3id.org/security#capabilityDelegationMethod",
-							"@type":     "@id",
+							"@id":        "https://w3id.org/security#capabilityDelegationMethod",
+							"@type":      "@id",
 							"@container": "@set",
 						},
 						"keyAgreement": map[string]interface{}{
-							"@id":       "https://w3id.org/security#keyAgreementMethod",
-							"@type":     "@id",
+							"@id":        "https://w3id.org/security#keyAgreementMethod",
+							"@type":      "@id",
 							"@container": "@set",
 						},
 					},
@@ -368,8 +369,8 @@ var ContextUrlMap map[string]contextObject = map[string]contextObject{
 		"id":       "@id",
 		"type":     "@type",
 		"proof": map[string]interface{}{
-			"@id":       "https://w3id.org/security#proof",
-			"@type":     "@id",
+			"@id":        "https://w3id.org/security#proof",
+			"@type":      "@id",
 			"@container": "@graph",
 		},
 		"BbsBlsSignature2020": map[string]interface{}{
@@ -384,25 +385,25 @@ var ContextUrlMap map[string]contextObject = map[string]contextObject{
 					"@id":   "http://purl.org/dc/terms/created",
 					"@type": "http://www.w3.org/2001/XMLSchema#dateTime",
 				},
-				"domain": "https://w3id.org/security#domain",
+				"domain":     "https://w3id.org/security#domain",
 				"proofValue": "https://w3id.org/security#proofValue",
-				"nonce":     "https://w3id.org/security#nonce",
+				"nonce":      "https://w3id.org/security#nonce",
 				"proofPurpose": map[string]interface{}{
-					"@id":      "https://w3id.org/security#proofPurpose",
-					"@type":    "@vocab",
+					"@id":   "https://w3id.org/security#proofPurpose",
+					"@type": "@vocab",
 					"@context": map[string]interface{}{
 						"@version":   1.1,
 						"@protected": true,
 						"id":         "@id",
 						"type":       "@type",
 						"assertionMethod": map[string]interface{}{
-							"@id":       "https://w3id.org/security#assertionMethod",
-							"@type":     "@id",
+							"@id":        "https://w3id.org/security#assertionMethod",
+							"@type":      "@id",
 							"@container": "@set",
 						},
 						"authentication": map[string]interface{}{
-							"@id":       "https://w3id.org/security#authenticationMethod",
-							"@type":     "@id",
+							"@id":        "https://w3id.org/security#authenticationMethod",
+							"@type":      "@id",
 							"@container": "@set",
 						},
 					},
@@ -428,8 +429,8 @@ var ContextUrlMap map[string]contextObject = map[string]contextObject{
 				"domain": "https://w3id.org/security#domain",
 				"nonce":  "https://w3id.org/security#nonce",
 				"proofPurpose": map[string]interface{}{
-					"@id":      "https://w3id.org/security#proofPurpose",
-					"@type":    "@vocab",
+					"@id":   "https://w3id.org/security#proofPurpose",
+					"@type": "@vocab",
 					"@context": map[string]interface{}{
 						"@version":   1.1,
 						"@protected": true,
@@ -437,13 +438,13 @@ var ContextUrlMap map[string]contextObject = map[string]contextObject{
 						"type":       "@type",
 						"sec":        "https://w3id.org/security#",
 						"assertionMethod": map[string]interface{}{
-							"@id":       "https://w3id.org/security#assertionMethod",
-							"@type":     "@id",
+							"@id":        "https://w3id.org/security#assertionMethod",
+							"@type":      "@id",
 							"@container": "@set",
 						},
 						"authentication": map[string]interface{}{
-							"@id":       "https://w3id.org/security#authenticationMethod",
-							"@type":     "@id",
+							"@id":        "https://w3id.org/security#authenticationMethod",
+							"@type":      "@id",
 							"@container": "@set",
 						},
 					},
@@ -511,12 +512,12 @@ var ContextUrlMap map[string]contextObject = map[string]contextObject{
 		},
 	},
 	Secp256k12019Context: {
-		"id":        "@id",
-		"type":      "@type",
+		"id":         "@id",
+		"type":       "@type",
 		"@protected": true,
 		"proof": map[string]interface{}{
-			"@id":       "https://w3id.org/security#proof",
-			"@type":     "@id",
+			"@id":        "https://w3id.org/security#proof",
+			"@type":      "@id",
 			"@container": "@graph",
 		},
 		"EcdsaSecp256k1VerificationKey2019": map[string]interface{}{
@@ -567,35 +568,35 @@ var ContextUrlMap map[string]contextObject = map[string]contextObject{
 				},
 				"nonce": "https://w3id.org/security#nonce",
 				"proofPurpose": map[string]interface{}{
-					"@id":      "https://w3id.org/security#proofPurpose",
-					"@type":    "@vocab",
+					"@id":   "https://w3id.org/security#proofPurpose",
+					"@type": "@vocab",
 					"@context": map[string]interface{}{
 						"@protected": true,
 						"id":         "@id",
 						"type":       "@type",
 						"assertionMethod": map[string]interface{}{
-							"@id":       "https://w3id.org/security#assertionMethod",
-							"@type":     "@id",
+							"@id":        "https://w3id.org/security#assertionMethod",
+							"@type":      "@id",
 							"@container": "@set",
 						},
 						"authentication": map[string]interface{}{
-							"@id":       "https://w3id.org/security#authenticationMethod",
-							"@type":     "@id",
+							"@id":        "https://w3id.org/security#authenticationMethod",
+							"@type":      "@id",
 							"@container": "@set",
 						},
 						"capabilityInvocation": map[string]interface{}{
-							"@id":       "https://w3id.org/security#capabilityInvocationMethod",
-							"@type":     "@id",
+							"@id":        "https://w3id.org/security#capabilityInvocationMethod",
+							"@type":      "@id",
 							"@container": "@set",
 						},
 						"capabilityDelegation": map[string]interface{}{
-							"@id":       "https://w3id.org/security#capabilityDelegationMethod",
-							"@type":     "@id",
+							"@id":        "https://w3id.org/security#capabilityDelegationMethod",
+							"@type":      "@id",
 							"@container": "@set",
 						},
 						"keyAgreement": map[string]interface{}{
-							"@id":       "https://w3id.org/security#keyAgreementMethod",
-							"@type":     "@id",
+							"@id":        "https://w3id.org/security#keyAgreementMethod",
+							"@type":      "@id",
 							"@container": "@set",
 						},
 					},
@@ -611,12 +612,12 @@ var ContextUrlMap map[string]contextObject = map[string]contextObject{
 		},
 	},
 	X25519KeyAgreementKeyEIP5630Context: {
-		"id":        "@id",
-		"type":      "@type",
+		"id":         "@id",
+		"type":       "@type",
 		"@protected": true,
 		"proof": map[string]interface{}{
-			"@id":       "https://w3id.org/security#proof",
-			"@type":     "@id",
+			"@id":        "https://w3id.org/security#proof",
+			"@type":      "@id",
 			"@container": "@graph",
 		},
 		"X25519KeyAgreementKeyEIP5630": map[string]interface{}{
@@ -642,6 +643,37 @@ var ContextUrlMap map[string]contextObject = map[string]contextObject{
 					"@type": "https://w3id.org/security#blockchainAccountId",
 				},
 			},
+		},
+	},
+	CredentialStatusContext: {
+		"@protected":      true,
+		"@version":        1.1,
+		"hypersign-vocab": "urn:uuid:13fe9318-bb82-4d95-8bf5-8e7fdf8b2026#",
+		"xsd":             "http://www.w3.org/2001/XMLSchema#",
+		"id":              "@id",
+		"revoked": map[string]interface{}{
+			"@id":   "hypersign-vocab:revoked",
+			"@type": "xsd:boolean",
+		},
+		"suspended": map[string]interface{}{
+			"@id":   "hypersign-vocab:suspended",
+			"@type": "xsd:boolean",
+		},
+		"remarks": map[string]interface{}{
+			"@id":   "hypersign-vocab:remarks",
+			"@type": "xsd:string",
+		},
+		"issuer": map[string]interface{}{
+			"@id":   "hypersign-vocab:issuer",
+			"@type": "xsd:string",
+		},
+		"issuanceDate": map[string]interface{}{
+			"@id":   "hypersign-vocab:issuanceDate",
+			"@type": "xsd:dateTime",
+		},
+		"credentialMerkleRootHash": map[string]interface{}{
+			"@id":   "hypersign-vocab:credentialMerkleRootHash",
+			"@type": "xsd:string",
 		},
 	},
 }

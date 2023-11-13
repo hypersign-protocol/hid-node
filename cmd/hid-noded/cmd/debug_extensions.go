@@ -475,13 +475,13 @@ func signSchemaDocCmd() *cobra.Command {
 
 func signCredStatusDocCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "cred-status-doc [doc] [private-key] [signing-algo]",
+		Use:   "cred-status-doc [doc] [private-key] [proof-object-without-signature]",
 		Short: "Credential Status Document signature",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			argCredStatusDoc := args[0]
 			argPrivateKey := args[1]
-			argSigningAlgo := args[2]
+			argProofObjectWithoutSignature := args[2]
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -494,33 +494,59 @@ func signCredStatusDocCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			credStatusDocBytes := credStatusDoc.GetSignBytes()
+
+			// Unmarshal Proof Object
+			var credStatusDocProof types.DocumentProof
+			err = clientCtx.Codec.UnmarshalJSON([]byte(argProofObjectWithoutSignature), &credStatusDocProof)
+			if err != nil {
+				return err
+			}
 
 			// Sign Credential Status Document
 			var signature string
-			switch argSigningAlgo {
+			switch credStatusDocProof.Type {
 			case types.Ed25519Signature2020:
+				credStatusDocBytes, err := ldcontext.Ed25519Signature2020Normalize(&credStatusDoc, &credStatusDocProof)
+				if err != nil {
+					return err
+				}
+
 				signature, err = hidnodecli.GetEd25519Signature2020(argPrivateKey, credStatusDocBytes)
 				if err != nil {
 					return err
 				}
 			case types.EcdsaSecp256k1Signature2019:
+				credStatusDocBytes, err := ldcontext.EcdsaSecp256k1Signature2019Normalize(&credStatusDoc, &credStatusDocProof)
+				if err != nil {
+					return err
+				}
+
 				signature, err = hidnodecli.GetEcdsaSecp256k1Signature2019(argPrivateKey, credStatusDocBytes)
 				if err != nil {
 					return err
 				}
 			case types.EcdsaSecp256k1RecoverySignature2020:
+				credStatusDocBytes, err := ldcontext.EcdsaSecp256k1RecoverySignature2020Normalize(&credStatusDoc, &credStatusDocProof)
+				if err != nil {
+					return err
+				}
+
 				signature, err = hidnodecli.GetEcdsaSecp256k1RecoverySignature2020(argPrivateKey, credStatusDocBytes)
 				if err != nil {
 					return err
 				}
 			case types.BbsBlsSignature2020:
+				credStatusDocBytes, err := ldcontext.BbsBlsSignature2020Normalize(&credStatusDoc, &credStatusDocProof)
+				if err != nil {
+					return err
+				}
+
 				signature, err = hidnodecli.GetBbsBlsSignature2020(argPrivateKey, credStatusDocBytes)
 				if err != nil {
 					return err
 				}
 			case types.BabyJubJubSignature2023:
-				signature, err = hidnodecli.GetBabyJubJubSignature2023(argPrivateKey, credStatusDocBytes)
+				signature, err = hidnodecli.GetBabyJubJubSignature2023(argPrivateKey, credStatusDoc.GetSignBytes())
 				if err != nil {
 					return err
 				}

@@ -10,10 +10,14 @@ import (
 
 type contextObject map[string]interface{}
 
+type JsonLdDocument interface {
+	GetContext() []contextObject
+}
+
 // It is a similar to `Did` struct, with the exception that the `context` attribute is of type
 // `contextObject` instead of `[]string`, which is meant for accomodating Context JSON body
 // having arbritrary attributes. It should be used for performing Canonization.
-type JsonLdDid struct {
+type JsonLdDidDocument struct {
 	Context              []contextObject             `json:"@context,omitempty"`
 	Id                   string                      `json:"id,omitempty"`
 	Controller           []string                    `json:"controller,omitempty"`
@@ -27,13 +31,17 @@ type JsonLdDid struct {
 	Service              []*types.Service            `json:"service,omitempty"`
 }
 
-// NewJsonLdDid returns a new JsonLdDid struct from input Did
-func NewJsonLdDid(didDoc *types.DidDocument) *JsonLdDid {
+func (doc *JsonLdDidDocument) GetContext() []contextObject {
+	return doc.Context
+}
+
+// NewJsonLdDidDocument returns a new JsonLdDid struct from input Did
+func NewJsonLdDidDocument(didDoc *types.DidDocument) *JsonLdDidDocument {
 	if len(didDoc.Context) == 0 {
 		panic("atleast one context url must be provided for DID Document for Canonization")
 	}
 
-	var jsonLdDoc *JsonLdDid = &JsonLdDid{}
+	var jsonLdDoc *JsonLdDidDocument = &JsonLdDidDocument{}
 
 	for _, url := range didDoc.Context {
 		contextObj, ok := ContextUrlMap[url]
@@ -57,44 +65,52 @@ func NewJsonLdDid(didDoc *types.DidDocument) *JsonLdDid {
 	return jsonLdDoc
 }
 
-// Convert JsonLdDid to interface
-func jsonLdDidToInterface(jsonLd *JsonLdDid) interface{} {
-	var intf interface{}
-
-	jsonLdBytes, err := json.Marshal(jsonLd)
-	if err != nil {
-		panic(err)
-	}
-
-	err = json.Unmarshal(jsonLdBytes, &intf)
-	if err != nil {
-		panic(err)
-	}
-
-	return intf
+// It is a similar to `Did` struct, with the exception that the `context` attribute is of type
+// `contextObject` instead of `[]string`, which is meant for accomodating Context JSON body
+// having arbritrary attributes. It should be used for performing Canonization.
+type JsonLdCredentialStatus struct {
+	Context                  []contextObject `json:"@context,omitempty"`
+	Id                       string          `json:"id,omitempty"`
+	Revoked                  bool            `json:"revoked,omitempty"`
+	Suspended                bool            `json:"suspended,omitempty"`
+	Remarks                  string          `json:"remarks,omitempty"`
+	Issuer                   string          `json:"issuer,omitempty"`
+	IssuanceDate             string          `json:"issuanceDate,omitempty"`
+	CredentialMerkleRootHash string          `json:"credentialMerkleRootHash,omitempty"`
 }
 
-// NormalizeWithURDNA2015 performs RDF Canonization upon JsonLdDid using URDNA2015
-// algorithm and returns the canonized document in string
-func (jsonLd *JsonLdDid) NormalizeWithURDNA2015() (string, error) {
-	proc := ld.NewJsonLdProcessor()
-	options := ld.NewJsonLdOptions("")
-	options.Algorithm = ld.AlgorithmURDNA2015
-	options.Format = "application/n-quads"
-
-	normalisedJsonLdDid, err := proc.Normalize(jsonLdDidToInterface(jsonLd), options)
-	if err != nil {
-		return "", fmt.Errorf("unable to Normalize DID Document: %v", err.Error())
-	}
-
-	canonizedDocString := normalisedJsonLdDid.(string)
-	if canonizedDocString == "" {
-		return "", fmt.Errorf("normalization yield empty RDF string for did document: %v", jsonLd.Id)
-	}
-	return canonizedDocString, nil
+func (doc *JsonLdCredentialStatus) GetContext() []contextObject {
+	return doc.Context
 }
 
-// -------------------------
+// NewJsonLdCredentialStatus returns a new JsonLdCredentialStatus struct from input Credential Status
+func NewJsonLdCredentialStatus(credStatusDoc *types.CredentialStatusDocument) *JsonLdCredentialStatus {
+	if len(credStatusDoc.Context) == 0 {
+		panic("atleast one context url must be provided in the Credential Status Document for Canonization")
+	}
+
+	var jsonLdCredentialStatus *JsonLdCredentialStatus = &JsonLdCredentialStatus{}
+
+	for _, url := range credStatusDoc.Context {
+		contextObj, ok := ContextUrlMap[url]
+		if !ok {
+			panic(fmt.Sprintf("invalid or unsupported context url: %v", url))
+		}
+		jsonLdCredentialStatus.Context = append(jsonLdCredentialStatus.Context, contextObj)
+	}
+
+	jsonLdCredentialStatus.Id = credStatusDoc.Id
+	jsonLdCredentialStatus.Revoked = credStatusDoc.Revoked
+	jsonLdCredentialStatus.Remarks = credStatusDoc.Remarks
+	jsonLdCredentialStatus.Suspended = credStatusDoc.Suspended
+	jsonLdCredentialStatus.Issuer = credStatusDoc.Issuer
+	jsonLdCredentialStatus.IssuanceDate = credStatusDoc.IssuanceDate
+	jsonLdCredentialStatus.CredentialMerkleRootHash = credStatusDoc.CredentialMerkleRootHash
+
+	return jsonLdCredentialStatus
+}
+
+// Document Proof
 
 type JsonLdDocumentProof struct {
 	Context            []contextObject `json:"@context,omitempty"`
@@ -104,7 +120,11 @@ type JsonLdDocumentProof struct {
 	ProofPurpose       string          `json:"proofPurpose,omitempty"`
 }
 
-func NewJsonLdDocumentProof(didDocProof *types.DocumentProof, didContexts []string) *JsonLdDocumentProof {	
+func (doc *JsonLdDocumentProof) GetContext() []contextObject {
+	return doc.Context
+}
+
+func NewJsonLdDocumentProof(didDocProof *types.DocumentProof, didContexts []string) *JsonLdDocumentProof {
 	if len(didContexts) == 0 {
 		panic("atleast one context url must be provided for DID Document for Canonization")
 	}
@@ -127,8 +147,33 @@ func NewJsonLdDocumentProof(didDocProof *types.DocumentProof, didContexts []stri
 	return jsonLdDoc
 }
 
+// normalizeWithURDNA2015 performs RDF Canonization upon JsonLdDid using URDNA2015
+// algorithm and returns the canonized document in string
+func normalizeWithURDNA2015(jsonLdDocument JsonLdDocument) (string, error) {
+	return normalize(ld.AlgorithmURDNA2015, jsonLdDocument)
+}
+
+func normalize(algorithm string, jsonLdDocument JsonLdDocument) (string, error) {
+	proc := ld.NewJsonLdProcessor()
+	options := ld.NewJsonLdOptions("")
+	options.Algorithm = algorithm // ld.AlgorithmURDNA2015
+	options.Format = "application/n-quads"
+
+	normalisedJsonLd, err := proc.Normalize(jsonLdDocToInterface(jsonLdDocument), options)
+	if err != nil {
+		return "", fmt.Errorf("unable to Normalize DID Document: %v", err.Error())
+	}
+
+	canonizedDocString := normalisedJsonLd.(string)
+	if canonizedDocString == "" {
+		return "", fmt.Errorf("normalization of JSON-LD document yielded empty RDF string")
+	}
+
+	return canonizedDocString, nil
+}
+
 // Convert JsonLdDid to interface
-func jsonLdDocumentProofToInterface(jsonLd *JsonLdDocumentProof) interface{} {
+func jsonLdDocToInterface(jsonLd any) interface{} {
 	var intf interface{}
 
 	jsonLdBytes, err := json.Marshal(jsonLd)
@@ -142,24 +187,4 @@ func jsonLdDocumentProofToInterface(jsonLd *JsonLdDocumentProof) interface{} {
 	}
 
 	return intf
-}
-
-// NormalizeWithURDNA2015 performs RDF Canonization upon JsonLdDid using URDNA2015
-// algorithm and returns the canonized document in string
-func (jsonLd *JsonLdDocumentProof) NormalizeWithURDNA2015() (string, error) {
-	proc := ld.NewJsonLdProcessor()
-	options := ld.NewJsonLdOptions("")
-	options.Algorithm = ld.AlgorithmURDNA2015
-	options.Format = "application/n-quads"
-
-	normalisedJsonLdDocumentProof, err := proc.Normalize(jsonLdDocumentProofToInterface(jsonLd), options)
-	if err != nil {
-		return "", fmt.Errorf("unable to Normalize Document Proof: %v", err.Error())
-	}
-
-	canonizedDocString := normalisedJsonLdDocumentProof.(string)
-	if canonizedDocString == "" {
-		return "", fmt.Errorf("normalization yield empty RDF string for proof")
-	}
-	return canonizedDocString, nil
 }

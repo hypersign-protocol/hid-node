@@ -56,43 +56,47 @@ func getPersonalSignSpecDocBytes(ssiMsg types.SsiMsg) ([]byte, error) {
 func getDocBytesByClientSpec(ssiMsg types.SsiMsg, extendedVm *types.ExtendedVerificationMethod) ([]byte, error) {
 	switch extendedVm.Proof.ClientSpecType {
 	case types.CLIENT_SPEC_TYPE_NONE:
-		if didDoc, ok := ssiMsg.(*types.DidDocument); ok && len(didDoc.Context) > 0 {
-			return ldcontext.NormalizeByVerificationMethodType(didDoc, extendedVm.Type, extendedVm.Proof)
+		if didDoc, ok := ssiMsg.(*types.DidDocument); ok && len(didDoc.Context) == 0 {
+			return ssiMsg.GetSignBytes(), nil
 		}
-		return ssiMsg.GetSignBytes(), nil
+
+		return ldcontext.NormalizeByVerificationMethodType(ssiMsg, extendedVm.Type, extendedVm.Proof)		
 	case types.CLIENT_SPEC_TYPE_COSMOS_ADR036:
 		signerAddress, err := getBlockchainAddress(extendedVm.BlockchainAccountId)
 		if err != nil {
 			return nil, err
 		}
 
-		if didDoc, ok := ssiMsg.(*types.DidDocument); ok && len(didDoc.Context) > 0 {
-			canonizedDidDocHash, err := ldcontext.EcdsaSecp256k1Signature2019Normalize(didDoc, extendedVm.Proof)
-			if err != nil {
-				return nil, err
-			}
-
-			return getCosmosADR036SignDocBytes(canonizedDidDocHash, signerAddress)
+		if didDoc, ok := ssiMsg.(*types.DidDocument); ok && len(didDoc.Context) == 0 {
+			return getCosmosADR036SignDocBytes(ssiMsg.GetSignBytes(), signerAddress)
 		}
-		return getCosmosADR036SignDocBytes(ssiMsg.GetSignBytes(), signerAddress)
+
+		canonizedDidDocHash, err := ldcontext.EcdsaSecp256k1Signature2019Normalize(ssiMsg, extendedVm.Proof)
+		if err != nil {
+			return nil, err
+		}
+
+		return getCosmosADR036SignDocBytes(canonizedDidDocHash, signerAddress)
+		
 	case types.CLIENT_SPEC_TYPE_ETH_PERSONAL_SIGN:
-		if didDoc, ok := ssiMsg.(*types.DidDocument); ok && len(didDoc.Context) > 0 {
-			canonizedDidDocHash, err := ldcontext.EcdsaSecp256k1RecoverySignature2020Normalize(didDoc, extendedVm.Proof)
-			if err != nil {
-				return nil, err
-			}
-
-			// TODO: This is temporary fix eth.personal.sign() client function, since it only signs JSON
-			// stringified document and hence the following struct was used to sign from the Client end.
-			return json.Marshal(struct {
-				DidId        string `json:"didId"`
-				DidDocDigest string `json:"didDocDigest"`
-			}{
-				DidId:        didDoc.Id,
-				DidDocDigest: hex.EncodeToString(canonizedDidDocHash),
-			})
+		if didDoc, ok := ssiMsg.(*types.DidDocument); ok && len(didDoc.Context) == 0 {
+			return getPersonalSignSpecDocBytes(ssiMsg)
 		}
-		return getPersonalSignSpecDocBytes(ssiMsg)
+
+		canonizedDidDocHash, err := ldcontext.EcdsaSecp256k1RecoverySignature2020Normalize(ssiMsg, extendedVm.Proof)
+		if err != nil {
+			return nil, err
+		}
+
+		// TODO: This is temporary fix eth.personal.sign() client function, since it only signs JSON
+		// stringified document and hence the following struct was used to sign from the Client end.
+		return json.Marshal(struct {
+			DidId        string `json:"didId"`
+			DidDocDigest string `json:"didDocDigest"`
+		}{
+			DidId:        ssiMsg.GetId(),
+			DidDocDigest: hex.EncodeToString(canonizedDidDocHash),
+		})		
 	default:
 		return nil, fmt.Errorf("unsupported clientSpecType %v", extendedVm.Proof.ClientSpecType)
 	}
