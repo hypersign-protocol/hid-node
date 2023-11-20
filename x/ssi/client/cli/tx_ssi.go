@@ -5,20 +5,22 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
+	ldcontext "github.com/hypersign-protocol/hid-node/x/ssi/ld-context"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 	"github.com/spf13/cobra"
 )
 
 const didAliasFlag = "did-alias"
 
-func CmdCreateDID() *cobra.Command {
+func CmdRegisterDID() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "create-did [did-doc-string] ([vm-id-1] [sign-key-1] [sign-key-algo-1] ... [vm-id-N] [sign-key-N] [sign-key-algo-N]) [flags]\n  hid-noded tx ssi create-did --did-alias <name of the DID Alias> [flags]",
+		Use:   "register-did [did-document] ([did-document-proof-1], [did-document-proof-2] .... [did-document-proof-N]) [flags]\n  hid-noded tx ssi register-did --did-alias <name of the DID Alias> [flags]",
 		Short: "Registers a DID Document",
 		Args:  cobra.ArbitraryArgs,
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
@@ -32,27 +34,27 @@ func CmdCreateDID() *cobra.Command {
 				return err
 			}
 
-			var didDoc types.Did
-			var signInfos []*types.SignInfo
+			var didDoc types.DidDocument
+			var didDocumentProofs []*types.DocumentProof
 			txAuthorAddr := clientCtx.GetFromAddress()
 			txAuthorAddrString := clientCtx.GetFromAddress().String()
 
 			if didAlias == "" {
-				// Minimum 4 CLI arguments are expected
-				if len(args) < 4 {
-					return fmt.Errorf("requires at least 4 arg(s), only received %v", len(args))
+				// Minimum 2 CLI arguments are expected
+				if len(args) < 2 {
+					return fmt.Errorf("requires at least 2 arg(s), only received %v", len(args))
 				}
 
-				argDidDocString := args[0]
+				argDidDoc := args[0]
 
 				// Unmarshal DidDocString
-				err = clientCtx.Codec.UnmarshalJSON([]byte(argDidDocString), &didDoc)
+				err = clientCtx.Codec.UnmarshalJSON([]byte(argDidDoc), &didDoc)
 				if err != nil {
 					return err
 				}
 
 				// Prepare Signatures
-				signInfos, err = getSignatures(cmd, didDoc.GetSignBytes(), args[1:])
+				didDocumentProofs, err = getDocumentProofs(clientCtx, args[1:])
 				if err != nil {
 					return err
 				}
@@ -86,12 +88,26 @@ func CmdCreateDID() *cobra.Command {
 				}
 
 				// Sign the DID Document using Keyring to get theSignInfo. Currently, "test" keyring-backend is only supported
+				didDocumentProofs = []*types.DocumentProof{
+					{
+						Type:               types.EcdsaSecp256k1Signature2019,
+						VerificationMethod: didDoc.VerificationMethod[0].Id,
+						ProofPurpose:       "assertionMethod",
+						Created:            time.Now().Format("2006-01-02T15:04:00Z"), // RFC3339 format
+					},
+				}
+
+				didDocCanonizedHash, err := ldcontext.EcdsaSecp256k1Signature2019Normalize(&didDoc, didDocumentProofs[0])
+				if err != nil {
+					return err
+				}
+
 				keyringBackend, err := cmd.Flags().GetString(flags.FlagKeyringBackend)
 				if err != nil {
 					return err
 				}
 				if keyringBackend != "test" {
-					return fmt.Errorf("unsupporeted keyring backend for DID Document Alias Signing: %v", keyringBackend)
+					return fmt.Errorf("unsupported keyring backend for DID Document Alias Signing: %v", keyringBackend)
 				}
 
 				kr, err := keyring.New("hid-node-app", keyringBackend, didAliasConfig.HidNodeConfigDir, nil)
@@ -99,25 +115,18 @@ func CmdCreateDID() *cobra.Command {
 					return err
 				}
 
-				signatureBytes, _, err := kr.SignByAddress(txAuthorAddr, didDoc.GetSignBytes())
+				signatureBytes, _, err := kr.SignByAddress(txAuthorAddr, didDocCanonizedHash)
 				if err != nil {
 					return err
 				}
-				signatureStr := base64.StdEncoding.EncodeToString(signatureBytes)
-
-				signInfos = []*types.SignInfo{
-					{
-						VerificationMethodId: didDoc.VerificationMethod[0].Id,
-						Signature:            signatureStr,
-					},
-				}
+				didDocumentProofs[0].ProofValue = base64.StdEncoding.EncodeToString(signatureBytes)
 			}
 
-			// Submit CreateDID Tx
-			msg := types.MsgCreateDID{
-				DidDocString: &didDoc,
-				Signatures:   signInfos,
-				Creator:      txAuthorAddrString,
+			// Submit RegisterDID Tx
+			msg := types.MsgRegisterDID{
+				DidDocument:       &didDoc,
+				DidDocumentProofs: didDocumentProofs,
+				TxAuthor:          txAuthorAddrString,
 			}
 
 			if err := msg.ValidateBasic(); err != nil {
@@ -134,11 +143,11 @@ func CmdCreateDID() *cobra.Command {
 
 func CmdUpdateDID() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "update-did [did-doc-string] [version-id] [vm-id-1] [sign-key-1] [sign-key-algo-1] ... [vm-id-N] [sign-key-N] [sign-key-algo-N]",
+		Use:   "update-did [did-doc] [version-id] ([did-document-proof-1], [did-document-proof-2] .... [did-document-proof-N])",
 		Short: "Updates Did Document",
-		Args:  cobra.MinimumNArgs(5),
+		Args:  cobra.MinimumNArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			argDidDocString := args[0]
+			argDidDoc := args[0]
 			argVersionId := args[1]
 
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -147,22 +156,22 @@ func CmdUpdateDID() *cobra.Command {
 			}
 
 			// Unmarshal DidDocString
-			var didDoc types.Did
-			err = clientCtx.Codec.UnmarshalJSON([]byte(argDidDocString), &didDoc)
+			var didDoc types.DidDocument
+			err = clientCtx.Codec.UnmarshalJSON([]byte(argDidDoc), &didDoc)
 			if err != nil {
 				return err
 			}
 
-			signInfos, err := getSignatures(cmd, didDoc.GetSignBytes(), args[2:])
+			didDocumentProofs, err := getDocumentProofs(clientCtx, args[2:])
 			if err != nil {
 				return err
 			}
 
 			msg := types.MsgUpdateDID{
-				Creator:      clientCtx.GetFromAddress().String(),
-				DidDocString: &didDoc,
-				VersionId:    argVersionId,
-				Signatures:   signInfos,
+				DidDocument:       &didDoc,
+				VersionId:         argVersionId,
+				DidDocumentProofs: didDocumentProofs,
+				TxAuthor:          clientCtx.GetFromAddress().String(),
 			}
 
 			if err := msg.ValidateBasic(); err != nil {
@@ -180,7 +189,7 @@ func CmdUpdateDID() *cobra.Command {
 func CmdCreateSchema() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create-schema [schema-doc] [schema-proof]",
-		Short: "Creates Schema",
+		Short: "Creates Credential Schema",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argSchemaDoc := args[0]
@@ -192,23 +201,69 @@ func CmdCreateSchema() *cobra.Command {
 			}
 
 			// Unmarshal Schema Document
-			var schemaDoc types.SchemaDocument
+			var schemaDoc types.CredentialSchemaDocument
 			err = clientCtx.Codec.UnmarshalJSON([]byte(argSchemaDoc), &schemaDoc)
 			if err != nil {
 				return err
 			}
 
 			// Unmarshal Schema Proof
-			var schemaProof types.SchemaProof
+			var schemaProof types.DocumentProof
 			err = clientCtx.Codec.UnmarshalJSON([]byte(argSchemaProof), &schemaProof)
 			if err != nil {
 				return err
 			}
 
-			msg := types.MsgCreateSchema{
-				SchemaDoc:   &schemaDoc,
-				SchemaProof: &schemaProof,
-				Creator:     clientCtx.GetFromAddress().String(),
+			msg := types.MsgRegisterCredentialSchema{
+				CredentialSchemaDocument: &schemaDoc,
+				CredentialSchemaProof:    &schemaProof,
+				TxAuthor:                 clientCtx.GetFromAddress().String(),
+			}
+
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), &msg)
+		},
+	}
+
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
+}
+
+func CmdUpdateSchema() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "update-schema [schema-doc] [schema-proof]",
+		Short: "Updates Credential Schema",
+		Args:  cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			argSchemaDoc := args[0]
+			argSchemaProof := args[1]
+
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			// Unmarshal Schema Document
+			var schemaDoc types.CredentialSchemaDocument
+			err = clientCtx.Codec.UnmarshalJSON([]byte(argSchemaDoc), &schemaDoc)
+			if err != nil {
+				return err
+			}
+
+			// Unmarshal Schema Proof
+			var schemaProof types.DocumentProof
+			err = clientCtx.Codec.UnmarshalJSON([]byte(argSchemaProof), &schemaProof)
+			if err != nil {
+				return err
+			}
+
+			msg := types.MsgUpdateCredentialSchema{
+				CredentialSchemaDocument: &schemaDoc,
+				CredentialSchemaProof:    &schemaProof,
+				TxAuthor:                 clientCtx.GetFromAddress().String(),
 			}
 
 			if err := msg.ValidateBasic(); err != nil {
@@ -225,9 +280,9 @@ func CmdCreateSchema() *cobra.Command {
 
 func CmdDeactivateDID() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "deactivate-did [did-id] [version-id] [vm-id-1] [sign-key-1] [sign-key-algo-1] ... [vm-id-N] [sign-key-N] [sign-key-algo-N]",
+		Use:   "deactivate-did [did-id] [version-id] ([did-document-proof-1], [did-document-proof-2] .... [did-document-proof-N])",
 		Short: "Deactivates Did Document",
-		Args:  cobra.MinimumNArgs(5),
+		Args:  cobra.MinimumNArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argDidId := args[0]
 			argVersionId := args[1]
@@ -240,22 +295,20 @@ func CmdDeactivateDID() *cobra.Command {
 			// Query Did Document from store using Did Id
 			queryClient := types.NewQueryClient(clientCtx)
 			requestParams := &types.QueryDidDocumentRequest{DidId: argDidId}
-			resolvedDidDocument, err := queryClient.QueryDidDocument(cmd.Context(), requestParams)
-			if err != nil {
+			if _, err := queryClient.DidDocumentByID(cmd.Context(), requestParams); err != nil {
 				return err
 			}
-			didDoc := resolvedDidDocument.GetDidDocument()
 
-			signInfos, err := getSignatures(cmd, didDoc.GetSignBytes(), args[2:])
+			didDocumentProofs, err := getDocumentProofs(clientCtx, args[2:])
 			if err != nil {
 				return err
 			}
 
 			msg := types.MsgDeactivateDID{
-				Creator:    clientCtx.GetFromAddress().String(),
-				DidId:      argDidId,
-				VersionId:  argVersionId,
-				Signatures: signInfos,
+				DidDocumentId:     argDidId,
+				VersionId:         argVersionId,
+				DidDocumentProofs: didDocumentProofs,
+				TxAuthor:          clientCtx.GetFromAddress().String(),
 			}
 
 			if err := msg.ValidateBasic(); err != nil {
@@ -286,8 +339,8 @@ func CmdRegisterCredentialStatus() *cobra.Command {
 
 			// Unmarshal Credential Status
 			var (
-				credentialStatus types.CredentialStatus
-				proof            types.CredentialProof
+				credentialStatus types.CredentialStatusDocument
+				proof            types.DocumentProof
 			)
 
 			err = clientCtx.Codec.UnmarshalJSON([]byte(argCredStatus), &credentialStatus)
@@ -302,9 +355,58 @@ func CmdRegisterCredentialStatus() *cobra.Command {
 			}
 
 			msg := types.MsgRegisterCredentialStatus{
-				CredentialStatus: &credentialStatus,
-				Proof:            &proof,
-				Creator:          clientCtx.GetFromAddress().String(),
+				CredentialStatusDocument: &credentialStatus,
+				CredentialStatusProof:    &proof,
+				TxAuthor:                 clientCtx.GetFromAddress().String(),
+			}
+
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), &msg)
+		},
+	}
+
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
+}
+
+func CmdUpdateCredentialStatus() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "update-credential-status [credential-status] [proof]",
+		Short: "Updates the status of Verifiable Credential",
+		Args:  cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			argCredStatus := args[0]
+			argProof := args[1]
+
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			// Unmarshal Credential Status
+			var (
+				credentialStatus types.CredentialStatusDocument
+				proof            types.DocumentProof
+			)
+
+			err = clientCtx.Codec.UnmarshalJSON([]byte(argCredStatus), &credentialStatus)
+			if err != nil {
+				return err
+			}
+
+			// Unmarshal Proof
+			err = clientCtx.Codec.UnmarshalJSON([]byte(argProof), &proof)
+			if err != nil {
+				return err
+			}
+
+			msg := types.MsgUpdateCredentialStatus{
+				CredentialStatusDocument: &credentialStatus,
+				CredentialStatusProof:    &proof,
+				TxAuthor:                 clientCtx.GetFromAddress().String(),
 			}
 
 			if err := msg.ValidateBasic(); err != nil {

@@ -73,7 +73,7 @@ func listAllDidAliasesCmd() *cobra.Command {
 						return err
 					}
 
-					var didDoc types.Did
+					var didDoc types.DidDocument
 					err = clientCtx.Codec.UnmarshalJSON(didDocBytes, &didDoc)
 					if err != nil {
 						// Ignore any files which are not able to parse into type.Did

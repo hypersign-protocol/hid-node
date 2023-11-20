@@ -11,17 +11,21 @@ import (
 func (k Keeper) QuerySSIFee(goCtx context.Context, _ *types.QuerySSIFeeRequest) (*types.QuerySSIFeeResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	createDidFee := k.GetFeeParams(ctx, types.ParamStoreKeyCreateDidFee)
+	registerDidFee := k.GetFeeParams(ctx, types.ParamStoreKeyRegisterDidFee)
 	updateDidFee := k.GetFeeParams(ctx, types.ParamStoreKeyUpdateDidFee)
 	deactivateDidFee := k.GetFeeParams(ctx, types.ParamStoreKeyDeactivateDidFee)
-	createSchemaFee := k.GetFeeParams(ctx, types.ParamStoreKeyCreateSchemaFee)
+	registerCredentialSchemaFee := k.GetFeeParams(ctx, types.ParamStoreKeyRegisterCredentialSchemaFee)
+	updateCredentialSchemaFee := k.GetFeeParams(ctx, types.ParamStoreKeyUpdateCredentialSchemaFee)
 	registerCredentialStatusFee := k.GetFeeParams(ctx, types.ParamStoreKeyRegisterCredentialStatusFee)
+	updateCredentialStatusFee := k.GetFeeParams(ctx, types.ParamStoreKeyUpdateCredentialStatusFee)
 
 	return &types.QuerySSIFeeResponse{
-		CreateDidFee:                &createDidFee,
+		RegisterDidFee:              &registerDidFee,
 		UpdateDidFee:                &updateDidFee,
 		DeactivateDidFee:            &deactivateDidFee,
-		CreateSchemaFee:             &createSchemaFee,
+		RegisterCredentialSchemaFee: &registerCredentialSchemaFee,
+		UpdateCredentialSchemaFee:   &updateCredentialSchemaFee,
 		RegisterCredentialStatusFee: &registerCredentialStatusFee,
+		UpdateCredentialStatusFee:   &updateCredentialStatusFee,
 	}, nil
 }

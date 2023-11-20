@@ -14,8 +14,8 @@ import (
 func TestFilterMsgsIntoSSIAndNonSSI(t *testing.T) {
 	t.Run("two SSI messages", func(t *testing.T) {
 		msgList := []sdk.Msg{
-			&ssitypes.MsgCreateDID{},
-			&ssitypes.MsgCreateSchema{},
+			&ssitypes.MsgRegisterDID{},
+			&ssitypes.MsgRegisterCredentialSchema{},
 		}
 
 		ssiMsgs, nonSSImsgs := filterMsgsIntoSSIAndNonSSI(msgList)
@@ -26,7 +26,7 @@ func TestFilterMsgsIntoSSIAndNonSSI(t *testing.T) {
 
 	t.Run("one SSI message and one non SSI message", func(t *testing.T) {
 		msgList := []sdk.Msg{
-			&ssitypes.MsgCreateDID{},
+			&ssitypes.MsgRegisterDID{},
 			&authz.MsgGrant{},
 		}
 
@@ -38,11 +38,11 @@ func TestFilterMsgsIntoSSIAndNonSSI(t *testing.T) {
 
 	t.Run("one SSI message and one AuthzExec message containing two SSI message", func(t *testing.T) {
 		msgList := []sdk.Msg{
-			&ssitypes.MsgCreateDID{},
+			&ssitypes.MsgRegisterDID{},
 			&authz.MsgExec{
 				Msgs: makeMsgsForAny(
-					&ssitypes.MsgCreateDID{},
-					&ssitypes.MsgCreateSchema{},
+					&ssitypes.MsgRegisterDID{},
+					&ssitypes.MsgRegisterCredentialSchema{},
 				),
 			},
 		}
@@ -55,7 +55,7 @@ func TestFilterMsgsIntoSSIAndNonSSI(t *testing.T) {
 
 	t.Run("one SSI message and one AuthzExec message containing two non SSI message", func(t *testing.T) {
 		msgList := []sdk.Msg{
-			&ssitypes.MsgCreateDID{},
+			&ssitypes.MsgRegisterDID{},
 			&authz.MsgExec{
 				Msgs: makeMsgsForAny(
 					&banktypes.MsgSend{},
@@ -76,8 +76,8 @@ func TestFilterMsgsIntoSSIAndNonSSI(t *testing.T) {
 			&banktypes.MsgSend{},
 			&authz.MsgExec{
 				Msgs: makeMsgsForAny(
-					&ssitypes.MsgCreateDID{},
-					&ssitypes.MsgCreateSchema{},
+					&ssitypes.MsgRegisterDID{},
+					&ssitypes.MsgRegisterCredentialSchema{},
 				),
 			},
 		}

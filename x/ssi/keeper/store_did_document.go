@@ -6,18 +6,17 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/hypersign-protocol/hid-node/utils"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 )
 
-// Set the Chain namespace
+// SetChainNamespace sets the Chain namespace in store
 func (k Keeper) SetChainNamespace(ctx *sdk.Context, namespace string) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.ChainNamespaceKey))
 	byteKey := []byte(types.ChainNamespaceKey)
 	store.Set(byteKey, []byte(namespace))
 }
 
-// Get the Chain namespace
+// GetChainNamespace gets the Chain namespace from store
 func (k Keeper) GetChainNamespace(ctx *sdk.Context) string {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.ChainNamespaceKey))
 	byteKey := []byte(types.ChainNamespaceKey)
@@ -25,25 +24,43 @@ func (k Keeper) GetChainNamespace(ctx *sdk.Context) string {
 	return string(bz)
 }
 
-// Get the count of registered Did Documents
-func (k Keeper) GetDidCount(ctx sdk.Context) uint64 {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.DidCountKey))
-	byteKey := []byte(types.DidCountKey)
-	bz := store.Get(byteKey)
-	if bz == nil {
+// getDidDocumentCount gets the did document count from store
+func (k Keeper) getDidDocumentCount(ctx sdk.Context) uint64 {
+	storePrefix := []byte(types.DidCountKey)
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), storePrefix)
+	val := store.Get(storePrefix)
+	if val == nil {
 		return 0
 	}
-	return binary.BigEndian.Uint64(bz)
+	return binary.BigEndian.Uint64(val)
 }
 
-// Check whether the Did document exist in the store
-func (k Keeper) HasDid(ctx sdk.Context, id string) bool {
+// setDidDocumentCount sets the did document count in store
+func setDidDocumentCount(k Keeper, ctx sdk.Context, count uint64) {
+	storePrefix := []byte(types.DidCountKey)
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), storePrefix)
+	
+	val := make([]byte, 8)
+	binary.BigEndian.PutUint64(val, count)
+	
+	store.Set(storePrefix, val)
+}
+
+// incrementDidCount increments did document count in store by 1
+func (k Keeper) incrementDidCount(ctx sdk.Context) {
+	didDocCount := k.getDidDocumentCount(ctx)
+	didDocCount += 1
+	setDidDocumentCount(k, ctx, didDocCount)
+}
+
+// hasDidDocument checks whether did document exists in store
+func (k Keeper) hasDidDocument(ctx sdk.Context, id string) bool {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidKey))
-	return store.Has(utils.UnsafeStrToBytes(id))
+	return store.Has([]byte(id))
 }
 
-// Retrieves the DID from the store
-func (k Keeper) GetDidDocumentState(ctx *sdk.Context, id string) (*types.DidDocumentState, error) {
+// getDidDocumentState gets the did document from store
+func (k Keeper) getDidDocumentState(ctx *sdk.Context, id string) (*types.DidDocumentState, error) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidKey))
 
 	var didDocState types.DidDocumentState
@@ -60,50 +77,30 @@ func (k Keeper) GetDidDocumentState(ctx *sdk.Context, id string) (*types.DidDocu
 	return &didDocState, nil
 }
 
-// Sets the Did Document Count
-func (k Keeper) SetDidCount(ctx sdk.Context, count uint64) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.DidCountKey))
-	byteKey := []byte(types.DidCountKey)
-	bz := make([]byte, 8)
-	binary.BigEndian.PutUint64(bz, count)
-	store.Set(byteKey, bz)
-}
-
-// Updates an existing Did document present in the store
-func (k Keeper) UpdateDidDocumentInStore(ctx sdk.Context, didDoc types.DidDocumentState) error {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidKey))
-	b := k.cdc.MustMarshal(&didDoc)
-	store.Set([]byte(didDoc.DidDocument.Id), b)
-	return nil
-}
-
-// Creates record for a new DID Document
-func (k Keeper) RegisterDidDocumentInStore(ctx sdk.Context, didDoc *types.DidDocumentState) uint64 {
-	didCount := k.GetDidCount(ctx)
+// setDidDocumentInStore sets a did document in store
+func (k Keeper) setDidDocumentInStore(ctx sdk.Context, didDoc *types.DidDocumentState) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidKey))
 
 	idBytes := []byte(didDoc.GetDidDocument().GetId())
 	didDocBytes := k.cdc.MustMarshal(didDoc)
 
 	store.Set(idBytes, didDocBytes)
-	k.SetDidCount(ctx, didCount+1)
-	return didCount
 }
 
 // Set the BlockchainAccountId in Store
-func (k Keeper) SetBlockchainAddressInStore(ctx *sdk.Context, blockchainAccountId string, didId string) {
+func (k Keeper) setBlockchainAddressInStore(ctx *sdk.Context, blockchainAccountId string, didId string) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.BlockchainAccountIdStoreKey))
 	store.Set([]byte(blockchainAccountId), []byte(didId))
 }
 
 // Get the BlockchainAccountId from Store
-func (k Keeper) GetBlockchainAddressFromStore(ctx *sdk.Context, blockchainAccountId string) []byte {
+func (k Keeper) getBlockchainAddressFromStore(ctx *sdk.Context, blockchainAccountId string) []byte {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.BlockchainAccountIdStoreKey))
 	return store.Get([]byte(blockchainAccountId))
 }
 
 // Remove the BlockchainAccountId from Store
-func (k Keeper) RemoveBlockchainAddressInStore(ctx *sdk.Context, blockchainAccountId string) {
+func (k Keeper) removeBlockchainAddressInStore(ctx *sdk.Context, blockchainAccountId string) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.BlockchainAccountIdStoreKey))
 	store.Delete([]byte(blockchainAccountId))
 }

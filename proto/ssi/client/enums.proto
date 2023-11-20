@@ -1,0 +1,31 @@
+// The messages defined here are meant only meant for TS client.
+syntax = "proto3";
+package hypersign.ssi.client;
+
+option go_package = "github.com/hypersign-protocol/hid-node/x/ssi/types";
+
+enum VerificationMethodRelationships {
+    authentication = 0;
+    assertionMethod = 1;
+    keyAgreement = 2;
+    capabilityInvocation = 3;
+    capabilityDelegation = 4;
+}
+
+enum VerificationMethodTypes {
+    Ed25519VerificationKey2020 = 0;
+    EcdsaSecp256k1VerificationKey2019 = 1;
+    EcdsaSecp256k1RecoveryMethod2020 = 2;
+    X25519KeyAgreementKey2020 = 3;
+    X25519KeyAgreementKeyEIP5630 = 4;
+    Bls12381G2Key2020 = 5;
+    BabyJubJubVerificationKey2023 = 6;
+}
+
+enum ProofTypes {
+    Ed25519Signature2020 = 0;
+    EcdsaSecp256k1Signature2019 = 1;
+    EcdsaSecp256k1RecoverySignature2020 = 2;
+    BabyJubJubSignature2023 = 3;
+    BbsBlsSignature2020 = 4;
+}

@@ -8,30 +8,36 @@ import (
 )
 
 var (
-	DefaultCreateDIDFee                = sdk.NewInt64Coin("uhid", 4000)
+	DefaultRegisterDIDFee              = sdk.NewInt64Coin("uhid", 4000)
 	DefaultUpdateDIDFee                = sdk.NewInt64Coin("uhid", 1000)
 	DefaultDeactivateDIDFee            = sdk.NewInt64Coin("uhid", 1000)
-	DefaultCreateSchemaFee             = sdk.NewInt64Coin("uhid", 2000)
+	DefaultRegisterCredentialSchemaFee = sdk.NewInt64Coin("uhid", 2000)
+	DefaultUpdateCredentialSchemaFee   = sdk.NewInt64Coin("uhid", 2000)
 	DefaultRegisterCredentialStatusFee = sdk.NewInt64Coin("uhid", 2000)
+	DefaultUpdateCredentialStatusFee   = sdk.NewInt64Coin("uhid", 2000)
 )
 
 func DefaultParams() *Params {
 	return &Params{
-		CreateDidFee:                &DefaultCreateDIDFee,
+		RegisterDidFee:              &DefaultRegisterDIDFee,
 		UpdateDidFee:                &DefaultUpdateDIDFee,
 		DeactivateDidFee:            &DefaultDeactivateDIDFee,
-		CreateSchemaFee:             &DefaultCreateSchemaFee,
+		RegisterCredentialSchemaFee: &DefaultRegisterCredentialSchemaFee,
+		UpdateCredentialSchemaFee:   &DefaultUpdateCredentialSchemaFee,
 		RegisterCredentialStatusFee: &DefaultRegisterCredentialStatusFee,
+		UpdateCredentialStatusFee:   &DefaultUpdateCredentialStatusFee,
 	}
 }
 
 func ParamKeyTable() paramtypes.KeyTable {
 	return paramtypes.NewKeyTable(
-		paramtypes.NewParamSetPair(ParamStoreKeyCreateDidFee, sdk.Coin{}, validateFeeParams),
+		paramtypes.NewParamSetPair(ParamStoreKeyRegisterDidFee, sdk.Coin{}, validateFeeParams),
 		paramtypes.NewParamSetPair(ParamStoreKeyUpdateDidFee, sdk.Coin{}, validateFeeParams),
 		paramtypes.NewParamSetPair(ParamStoreKeyDeactivateDidFee, sdk.Coin{}, validateFeeParams),
-		paramtypes.NewParamSetPair(ParamStoreKeyCreateSchemaFee, sdk.Coin{}, validateFeeParams),
+		paramtypes.NewParamSetPair(ParamStoreKeyRegisterCredentialSchemaFee, sdk.Coin{}, validateFeeParams),
+		paramtypes.NewParamSetPair(ParamStoreKeyUpdateCredentialSchemaFee, sdk.Coin{}, validateFeeParams),
 		paramtypes.NewParamSetPair(ParamStoreKeyRegisterCredentialStatusFee, sdk.Coin{}, validateFeeParams),
+		paramtypes.NewParamSetPair(ParamStoreKeyUpdateCredentialStatusFee, sdk.Coin{}, validateFeeParams),
 	)
 }
 

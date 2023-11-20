@@ -1,45 +1,44 @@
 syntax = "proto3";
-package hypersignprotocol.hidnode.ssi;
+package hypersign.ssi.v1;
 
-import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
-import "ssi/v1/schema.proto";
+import "ssi/v1/credential_schema.proto";
 import "ssi/v1/did.proto";
-import "ssi/v1/credential.proto";
 import "cosmos/base/v1beta1/coin.proto";
+import "ssi/v1/credential_status.proto";
 
 option go_package = "github.com/hypersign-protocol/hid-node/x/ssi/types";
 
 // Query defines the gRPC querier service.
 service Query {
   // Get the Schema Document for a specified schema id
-	rpc QuerySchema(QuerySchemaRequest) returns (QuerySchemaResponse) {
+	rpc CredentialSchemaByID(QueryCredentialSchemaRequest) returns (QueryCredentialSchemaResponse) {
 		option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/schema/{schemaId}";
 	}
 
   // Get the count and list of registered Schemas
-	rpc QuerySchemas(QuerySchemasRequest) returns (QuerySchemasResponse) {
+	rpc CredentialSchemas(QueryCredentialSchemasRequest) returns (QueryCredentialSchemasResponse) {
 		option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/schema";
 	}
 
   // Get the Did Document for a specified DID id
-	rpc QueryDidDocument(QueryDidDocumentRequest) returns (QueryDidDocumentResponse) {
+	rpc DidDocumentByID(QueryDidDocumentRequest) returns (QueryDidDocumentResponse) {
 		option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/did/{didId}";
 	}
 
   // Get the count and list of registered Did Documents
-  rpc QueryDidDocuments(QueryDidDocumentsRequest) returns (QueryDidDocumentsResponse) {
+  rpc DidDocuments(QueryDidDocumentsRequest) returns (QueryDidDocumentsResponse) {
     option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/did";
   }
 
   // Get the Credential Status for a given credential id
-  rpc QueryCredential(QueryCredentialRequest) returns (QueryCredentialResponse) {
+  rpc CredentialStatusByID(QueryCredentialStatusRequest) returns (QueryCredentialStatusResponse) {
     option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/credential/{credId}";
   }
 
   // Get all the registed Credential Statuses
-  rpc QueryCredentials(QueryCredentialsRequest) returns (QueryCredentialsResponse) {
+  rpc CredentialStatuses(QueryCredentialStatusesRequest) returns (QueryCredentialStatusesResponse) {
     option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/credential";
   }
 
@@ -54,49 +53,51 @@ service Query {
 message QuerySSIFeeRequest {}
 
 message QuerySSIFeeResponse {
-    cosmos.base.v1beta1.Coin create_did_fee = 1;
+    cosmos.base.v1beta1.Coin register_did_fee = 1;
     cosmos.base.v1beta1.Coin update_did_fee = 2;
     cosmos.base.v1beta1.Coin deactivate_did_fee = 3;
-    cosmos.base.v1beta1.Coin create_schema_fee = 4;
-    cosmos.base.v1beta1.Coin register_credential_status_fee = 5;
+    cosmos.base.v1beta1.Coin register_credential_schema_fee = 4;
+    cosmos.base.v1beta1.Coin update_credential_schema_fee = 5;
+    cosmos.base.v1beta1.Coin register_credential_status_fee = 6;
+    cosmos.base.v1beta1.Coin update_credential_status_fee = 7;
 }
 
-// Schema Messages
+// Credential Schema Messages
 
-message QuerySchemaRequest {
+message QueryCredentialSchemaRequest {
   string schemaId = 1;
 }
 
-message QuerySchemaResponse {
-  repeated Schema schema = 1;
+message QueryCredentialSchemaResponse {
+  repeated CredentialSchemaState credentialSchemas = 1;
 }
 
-message QuerySchemasRequest {
+message QueryCredentialSchemasRequest {
   cosmos.base.query.v1beta1.PageRequest pagination = 1;
 }
 
-message QuerySchemasResponse {
-  uint64 totalCount = 1;
-  repeated Schema schemaList = 2;
+message QueryCredentialSchemasResponse {
+  uint64 count = 1;
+  repeated CredentialSchemaState credentialSchemas = 2;
 }
 
-// Credential Messages
+// Credential Status Messages
 
-message QueryCredentialRequest {
+message QueryCredentialStatusRequest {
   string credId = 1;
 }
 
-message QueryCredentialResponse {
-  Credential credStatus = 1;
+message QueryCredentialStatusResponse {
+  CredentialStatusState credentialStatus = 1;
 }
 
-message QueryCredentialsRequest {
+message QueryCredentialStatusesRequest {
   cosmos.base.query.v1beta1.PageRequest pagination = 1;
 }
 
-message QueryCredentialsResponse {
-  uint64 totalCount = 1;
-  repeated Credential credentials = 2;
+message QueryCredentialStatusesResponse {
+  uint64 count = 1;
+  repeated CredentialStatusState credentialStatuses = 2;
 }
 
 // Did Document Messages
@@ -106,16 +107,15 @@ message QueryDidDocumentRequest {
 }
 
 message QueryDidDocumentResponse {
-  Did didDocument = 1;
-  Metadata didDocumentMetadata = 2;
+  DidDocument didDocument = 1;
+  DidDocumentMetadata didDocumentMetadata = 2;
 }
 
 message QueryDidDocumentsRequest {
-  bool count = 1;
-  cosmos.base.query.v1beta1.PageRequest pagination = 2;
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
 }
 
 message QueryDidDocumentsResponse {
-  uint64 totalDidCount = 1;
-  repeated QueryDidDocumentResponse didDocList = 2;
+  uint64 count = 1;
+  repeated DidDocumentState didDocuments = 2;
 }

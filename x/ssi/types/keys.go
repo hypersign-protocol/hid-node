@@ -35,11 +35,13 @@ const (
 // Fixed Fee Param Keys
 
 var (
-	ParamStoreKeyCreateDidFee = []byte("CreateDidFee")
-	ParamStoreKeyUpdateDidFee = []byte("UpdateDidFee")
-	ParamStoreKeyDeactivateDidFee = []byte("DeactivateDidFee")
-	ParamStoreKeyCreateSchemaFee = []byte("CreateSchemaFee")
+	ParamStoreKeyRegisterDidFee              = []byte("CreateDidFee")
+	ParamStoreKeyUpdateDidFee                = []byte("UpdateDidFee")
+	ParamStoreKeyDeactivateDidFee            = []byte("DeactivateDidFee")
+	ParamStoreKeyRegisterCredentialSchemaFee = []byte("RegisterCredentialSchemaFee")
+	ParamStoreKeyUpdateCredentialSchemaFee   = []byte("UpdateCredentialSchemaFee")
 	ParamStoreKeyRegisterCredentialStatusFee = []byte("RegisterCredentialStatusFee")
+	ParamStoreKeyUpdateCredentialStatusFee   = []byte("UpdateCredentialStatusFee")
 )
 
 func KeyPrefix(p string) []byte {

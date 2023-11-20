@@ -19,15 +19,19 @@ func isAuthzExecMsg(msg sdk.Msg) bool {
 // isSSIMsg checks if the message is of SSI type
 func isSSIMsg(msg sdk.Msg) bool {
 	switch msg.(type) {
-	case *ssitypes.MsgCreateDID:
+	case *ssitypes.MsgRegisterDID:
 		return true
 	case *ssitypes.MsgUpdateDID:
 		return true
 	case *ssitypes.MsgDeactivateDID:
 		return true
-	case *ssitypes.MsgCreateSchema:
+	case *ssitypes.MsgRegisterCredentialSchema:
+		return true
+	case *ssitypes.MsgUpdateCredentialSchema:
 		return true
 	case *ssitypes.MsgRegisterCredentialStatus:
+		return true
+	case *ssitypes.MsgUpdateCredentialStatus:
 		return true
 	default:
 		return false

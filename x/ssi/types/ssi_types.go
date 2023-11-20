@@ -5,11 +5,13 @@ import (
 	"strings"
 
 	proto "github.com/gogo/protobuf/proto"
+	"github.com/hypersign-protocol/hid-node/x/ssi/utils"
 )
 
 type (
 	SsiMsg interface {
 		proto.Message
+		GetId() string
 		GetSignBytes() []byte
 	}
 
@@ -34,33 +36,29 @@ type (
 		Controller          string
 		PublicKeyMultibase  string
 		BlockchainAccountId string
-		Signature           string
-		ClientSpec          *ClientSpec
+		Proof               *DocumentProof
 	}
 )
 
-func CreateExtendedVerificationMethod(vm *VerificationMethod, signInfo *SignInfo) *ExtendedVerificationMethod {
+func CreateExtendedVerificationMethod(vm *VerificationMethod, documentProof *DocumentProof) *ExtendedVerificationMethod {
+	if vm.Id != documentProof.VerificationMethod {
+		panic(fmt.Sprintf(
+			"unexpected behaviour: while creating ExtendedVerificationMethod the verification method Id of the VM object %v is different from verification method id of Proof %v",
+			vm.Id,
+			documentProof.VerificationMethod,
+		))
+	}
+
 	extendedVm := &ExtendedVerificationMethod{
 		Id:                  vm.Id,
 		Type:                vm.Type,
 		Controller:          vm.Controller,
 		PublicKeyMultibase:  vm.PublicKeyMultibase,
 		BlockchainAccountId: vm.BlockchainAccountId,
-		Signature:           signInfo.Signature,
-	}
-
-	if signInfo.ClientSpec != nil {
-		extendedVm.ClientSpec = signInfo.ClientSpec
+		Proof:               documentProof,
 	}
 
 	return extendedVm
-}
-
-// Struct catering to supported Client Spec's required inputs
-type ClientSpecOpts struct {
-	ClientSpecType string
-	SSIDoc         SsiMsg
-	SignerAddress  string
 }
 
 // Cosmos ADR SignDoc Struct Definitions
@@ -90,13 +88,6 @@ type (
 	}
 )
 
-// Handle Proof Struct of SSI Docs
-type SSIProofInterface interface {
-	GetProofValue() string
-	GetType() string
-	GetVerificationMethod() string
-}
-
 // CAIP-10 Blockchain Account Id
 type BlockchainId struct {
 	CAIP10Prefix      string
@@ -123,7 +114,7 @@ func NewBlockchainId(blockchainAccountId string) (*BlockchainId, error) {
 }
 
 func (bid *BlockchainId) ValidateSupportedCAIP10Prefix() error {
-	if !FindInSlice(SupportedCAIP10Prefixes, bid.CAIP10Prefix) {
+	if !utils.FindInSlice(SupportedCAIP10Prefixes, bid.CAIP10Prefix) {
 		return fmt.Errorf(
 			"unsupported CAIP-10 prefix: '%v', supported CAIP-10 prefixes are %v",
 			bid.CAIP10Prefix,
@@ -136,7 +127,7 @@ func (bid *BlockchainId) ValidateSupportedCAIP10Prefix() error {
 func (bid *BlockchainId) ValidateSupportChainId() error {
 	supportedChainIds := SupportedCAIP10PrefixChainIdsMap[bid.CAIP10Prefix]
 
-	if !FindInSlice(supportedChainIds, bid.ChainId) {
+	if !utils.FindInSlice(supportedChainIds, bid.ChainId) {
 		return fmt.Errorf(
 			"unsupported CAIP-10 chain-id: '%v', supported CAIP-10 chain-ids are %v",
 			bid.ChainId,

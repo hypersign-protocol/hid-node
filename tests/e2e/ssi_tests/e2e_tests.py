@@ -6,20 +6,21 @@ import time
 from utils import run_blockchain_command, generate_key_pair, secp256k1_pubkey_to_address, add_keyAgreeemnt_pubKeyMultibase
 from generate_doc import generate_did_document, generate_schema_document, generate_cred_status_document, generate_multi_vm_did
 from transactions import form_did_create_tx_multisig, form_did_update_tx_multisig, \
-      query_did, form_create_schema_tx, form_did_deactivate_tx_multisig, form_create_cred_status_tx
+      query_did, form_create_schema_tx, form_did_deactivate_tx_multisig, form_create_cred_status_tx, \
+      form_update_schema_tx, form_update_cred_status_tx
 from constants import DEFAULT_BLOCKCHAIN_ACCOUNT_NAME
 
 def bbs_signature_test():
     print("\n--1. PASS: Create a DID using BLS12381G2 Key Pair--\n")
 
-    kp_alice = generate_key_pair("bbs")
+    kp_alice = generate_key_pair("BbsBlsSignature2020")
     signers = []
-    did_doc_string = generate_did_document(kp_alice, "bbs")
+    did_doc_string = generate_did_document(kp_alice, "BbsBlsSignature2020")
     did_doc_alice = did_doc_string["id"]
     signPair_alice = {
         "kp": kp_alice,
         "verificationMethodId": did_doc_string["verificationMethod"][0]["id"],
-        "signing_algo": "bbs"
+        "signing_algo": "BbsBlsSignature2020"
     }
     signers.append(signPair_alice)
     create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
@@ -31,7 +32,7 @@ def bbs_signature_test():
         kp_alice, 
         did_doc_alice, 
         did_doc_string["verificationMethod"][0]["id"],
-        algo="bbs"
+        algo="BbsBlsSignature2020"
     )
     create_schema_cmd = form_create_schema_tx(
         schema_doc, 
@@ -47,19 +48,19 @@ def bbs_signature_test():
         kp_alice,
         did_doc_alice,
         did_doc_string["verificationMethod"][0]["id"],
-        algo="bbs"
+        algo="BbsBlsSignature2020"
     )
     register_cred_status_cmd = form_create_cred_status_tx(
         cred_doc,
         cred_proof,
         DEFAULT_BLOCKCHAIN_ACCOUNT_NAME
     )
-    cred_id = cred_doc["claim"]["id"]
+    cred_id = cred_doc["id"]
     run_blockchain_command(register_cred_status_cmd, f"Registering Credential status with Id: {cred_id}")
 
 
     print("\n--4. PASS: Update a DID using BLS12381G2 Key Pair--\n")
-    did_doc_string["context"] = ["http://example.com"]
+    did_doc_string["alsoKnownAs"] = ["blskeypairDid"]
     signers = []
     signers.append(signPair_alice)
     update_tx_cmd = form_did_update_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
@@ -72,10 +73,10 @@ def bbs_signature_test():
     run_blockchain_command(deactivate_tx_cmd, f"Deactivation of Org's DID with Id: {did_doc_alice}")
 
 def big_did_tx_test():
-    print("\n-- Executing a CreatDID Tx with the DID Document having 230 Verification Methods and only paying the param fee for CreateDID (4000uhid)--\n")
+    print("\n-- Executing a CreatDID Tx with the DID Document having 100 Verification Methods and only paying the param fee for CreateDID (4000uhid)--\n")
 
     keyPairs = []
-    n_vms = 230
+    n_vms = 100
     for i in range(0, n_vms):
         kp = generate_key_pair()
         keyPairs.append(kp)
@@ -88,12 +89,12 @@ def big_did_tx_test():
         signer = {
             "kp": keyPairs[i],
             "verificationMethodId": did_doc_string["verificationMethod"][i]["id"],
-            "signing_algo": "ed25519"
+            "signing_algo": "Ed25519Signature2020"
         }
         signers.append(signer)
     
     create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
-    create_tx_cmd = create_tx_cmd + " --gas 85687400"
+    create_tx_cmd = create_tx_cmd + " --gas 8568740000"
     run_blockchain_command(create_tx_cmd, f"Registering Alice's DID with Id: {did_doc_alice}")
     print("-- Test Completed --\n")
 
@@ -108,7 +109,7 @@ def ssi_fee_test():
     signPair_alice = {
         "kp": kp_alice,
         "verificationMethodId": did_doc_string["verificationMethod"][0]["id"],
-        "signing_algo": "ed25519"
+        "signing_algo": "Ed25519Signature2020"
     }
     signers.append(signPair_alice)
     create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
@@ -120,7 +121,7 @@ def ssi_fee_test():
     run_blockchain_command(create_tx_cmd, f"Registering Alice's DID with Id: {did_doc_alice}")
 
     print("--3. FAIL: Paying invalid fee for UpdateDID Tx--\n")
-    did_doc_string["context"] = ["someContext"]
+    did_doc_string["capabilityInvocation"] = [did_doc_string["verificationMethod"][0]["id"]]
     update_tx_cmd = form_did_update_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
     update_tx_cmd = update_tx_cmd.replace("--fees 1000uhid", "--fees 67043uhid")
     run_blockchain_command(update_tx_cmd, f"Updating Alice's DID with Id: {did_doc_alice}", True)
@@ -148,7 +149,33 @@ def ssi_fee_test():
     create_schema_cmd = create_schema_cmd.replace("--fees 4700uhid", "--fees 2000uhid")
     run_blockchain_command(create_schema_cmd, f"Registering Schema with Id: {schema_doc_id}")
 
-    print("--7. FAIL: Paying invalid fee for RegisterCredentialStatus Tx --\n")
+    print("--7. FAIL: Paying invalid fee for UpdateSchema Tx--\n")
+    updated_schema_doc = schema_doc
+    #Increment version in Schema id
+    schema_id_list = list(updated_schema_doc["id"])
+    schema_id_list[-3] = '4'
+    updated_schema_doc["id"] = "".join(schema_id_list)
+    updated_schema_doc_id = updated_schema_doc["id"]
+
+    _, schema_proof = generate_schema_document(
+        kp_alice, 
+        did_doc_alice, 
+        did_doc_string["verificationMethod"][0]["id"],
+        updated_schema=updated_schema_doc
+    )
+    update_schema_cmd = form_update_schema_tx(
+        updated_schema_doc,
+        schema_proof, 
+        DEFAULT_BLOCKCHAIN_ACCOUNT_NAME
+    )
+    update_schema_cmd = update_schema_cmd.replace("--fees 2000uhid", "--fees 4710uhid")
+    run_blockchain_command(update_schema_cmd, f"Updating Schema with Id: {updated_schema_doc_id}", True)
+
+    print("--8. PASS: Paying valid fee for UpdateSchema Tx--\n")
+    update_schema_cmd = update_schema_cmd.replace("--fees 4710uhid", "--fees 2000uhid")
+    run_blockchain_command(update_schema_cmd, f"Registering Schema with Id: {schema_doc_id}")
+
+    print("--9. FAIL: Paying invalid fee for RegisterCredentialStatus Tx --\n")
     cred_doc, cred_proof = generate_cred_status_document(
         kp_alice,
         did_doc_alice,
@@ -159,24 +186,45 @@ def ssi_fee_test():
         cred_proof,
         DEFAULT_BLOCKCHAIN_ACCOUNT_NAME
     )
-    cred_id = cred_doc["claim"]["id"]
+    cred_id = cred_doc["id"]
     register_cred_status_cmd = register_cred_status_cmd.replace("--fees 2000uhid", "--fees 3700uhid")
     run_blockchain_command(register_cred_status_cmd, f"Registering Credential status with Id: {cred_id}", True)
 
-    print("--8. PASS: Paying valid fee for RegisterCredentialStatus Tx --\n")
+    print("--10. PASS: Paying valid fee for RegisterCredentialStatus Tx --\n")
     register_cred_status_cmd = register_cred_status_cmd.replace("--fees 3700uhid", "--fees 2000uhid")
     run_blockchain_command(register_cred_status_cmd, f"Registering Credential status with Id: {cred_id}")
 
-    print("--9. FAIL: Paying invalid fee for DeactivateDID Tx--\n")
+    print("--11. FAIL: Paying invalid fee for UpdateCredentialStatus Tx --\n")
+    cred_doc["suspended"] = True
+    _, cred_proof = generate_cred_status_document(
+        kp_alice,
+        did_doc_alice,
+        did_doc_string["verificationMethod"][0]["id"],
+        updated_credstatus_doc=cred_doc
+    )
+    updated_cred_status_cmd = form_update_cred_status_tx(
+        cred_doc,
+        cred_proof,
+        DEFAULT_BLOCKCHAIN_ACCOUNT_NAME
+    )
+    cred_id = cred_doc["id"]
+    updated_cred_status_cmd = updated_cred_status_cmd.replace("--fees 2000uhid", "--fees 7300uhid")
+    run_blockchain_command(updated_cred_status_cmd, f"Updating Credential status with Id: {cred_id}", True)
+
+    print("--12. PASS: Paying valid fee for UpdateCredentialStatus Tx --\n")
+    updated_cred_status_cmd = updated_cred_status_cmd.replace("--fees 7300uhid", "--fees 2000uhid")
+    run_blockchain_command(updated_cred_status_cmd, f"Registering Credential status with Id: {cred_id}")
+
+    print("--13. FAIL: Paying invalid fee for DeactivateDID Tx--\n")
     deactivate_tx_cmd = form_did_deactivate_tx_multisig(did_doc_alice, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
     deactivate_tx_cmd = deactivate_tx_cmd.replace("--fees 1000uhid", "--fees 7543uhid")
     run_blockchain_command(deactivate_tx_cmd, f"Deactivating of Org's DID with Id: {did_doc_alice}", True)
 
-    print("--10. PASS: Paying valid fee for DeactivateDID Tx--\n")
+    print("--14. PASS: Paying valid fee for DeactivateDID Tx--\n")
     deactivate_tx_cmd = deactivate_tx_cmd.replace("--fees 7543uhid", "--fees 1000uhid")
     run_blockchain_command(deactivate_tx_cmd, f"Deactivating Alice's DID with Id: {did_doc_alice}")
 
-    print("--11. FAIL: Grouping two SSI (CreateDID) and a non-SSI messages (Token Transfer) in a single transaction")
+    print("--15. FAIL: Grouping two SSI (CreateDID) and a non-SSI messages (Token Transfer) in a single transaction")
     cmd = "hid-noded tx broadcast ./tests/e2e/ssi_tests/broadcast_txs/tx_broadcast.json --chain-id hidnode --broadcast-mode block --yes --output json"
     run_blockchain_command(cmd, "Grouping two SSI (CreateDID) and a non-SSI messages (Token Transfer) in a single transaction", True)
     
@@ -186,16 +234,16 @@ def ssi_fee_test():
 def key_agrement_test():
     print("\n--1. FAIL: Ed25519VerificationKey2020 based Verification Method ID being added to keyAgreement attribute--\n")
 
-    kp_alice = generate_key_pair("ed25519")
+    kp_alice = generate_key_pair("Ed25519Signature2020")
     signers = []
-    did_doc_string = generate_did_document(kp_alice, "ed25519")
+    did_doc_string = generate_did_document(kp_alice, "Ed25519Signature2020")
     did_doc_alice = did_doc_string["id"]
     ed25519Vm = did_doc_string["verificationMethod"][0]
     did_doc_string["keyAgreement"] = [ed25519Vm["id"]]
     signPair_alice = {
         "kp": kp_alice,
         "verificationMethodId": did_doc_string["verificationMethod"][0]["id"],
-        "signing_algo": "ed25519"
+        "signing_algo": "Ed25519Signature2020"
     }
     signers.append(signPair_alice)
     create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
@@ -203,9 +251,9 @@ def key_agrement_test():
 
     print("\n--2. FAIL: X25519KeyAgreementKey2020 based Verification Method ID being added to authentication attribute--\n")
 
-    kp_bob = generate_key_pair("ed25519")
+    kp_bob = generate_key_pair("Ed25519Signature2020")
     signers = []
-    did_doc_string = generate_did_document(kp_bob, "ed25519")
+    did_doc_string = generate_did_document(kp_bob, "Ed25519Signature2020")
     did_doc_alice = did_doc_string["id"]
     x25519Vm =  add_keyAgreeemnt_pubKeyMultibase(did_doc_string["verificationMethod"][0], "X25519KeyAgreementKey2020")
     did_doc_string["verificationMethod"] = [x25519Vm]
@@ -213,14 +261,14 @@ def key_agrement_test():
     signPair_bob = {
         "kp": kp_bob,
         "verificationMethodId": did_doc_string["verificationMethod"][0]["id"],
-        "signing_algo": "ed25519"
+        "signing_algo": "Ed25519Signature2020"
     }
     signers.append(signPair_bob)
     create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
     run_blockchain_command(create_tx_cmd, f"Registering Alice's DID with Id: {did_doc_alice}", True, True)
 
     print("\n--3. PASS: A DID Document is created with Ed25519VerificationKey2020 and X25519KeyAgreementKey2020 based VMs--\n")
-    did_doc_string = generate_did_document(kp_alice, "ed25519")
+    did_doc_string = generate_did_document(kp_alice, "Ed25519Signature2020")
     signers = []
     x25519Vm["controller"] = ed25519Vm["controller"]
     did_doc_string["verificationMethod"] = [ed25519Vm, x25519Vm]
@@ -232,12 +280,12 @@ def key_agrement_test():
 
     print("\n--4. FAIL: An attempt is made to update the DID Document by passing the signature of X25519KeyAgreementKey2020 based verification method")
     signers = []
-    did_doc_string["context"] = ["some_context"]
+    did_doc_string["alsoKnownAs"] = ["KeyAgreementDid"]
     did_doc_string["authentication"] = []
     signPair_x25519 = {
         "kp": kp_bob,
         "verificationMethodId": x25519Vm["id"],
-        "signing_algo": "ed25519"
+        "signing_algo": "Ed25519Signature2020"
     }
     signers.append(signPair_x25519)
     update_tx_cmd = form_did_update_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
@@ -245,7 +293,7 @@ def key_agrement_test():
 
     print("\n--5. PASS: An attempt is made to update the DID Document by passing the signature of Ed25519VerificationKey2020 based verification method")
     signers = []
-    did_doc_string["context"] = ["some_context"]
+    did_doc_string["alsoKnownAs"] = ["KeyAgreementDid"]
     signers.append(signPair_alice)
     signers.append(signPair_x25519)
     update_tx_cmd = form_did_update_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
@@ -266,24 +314,24 @@ def key_agrement_test():
 def unique_wallet_address_test():
     print("\n---1. FAIL: Alice Creates a DID Doc. Bob attempts to create a DID Document by adding one of Alice's VM.---\n")
 
-    kp_alice = generate_key_pair("recover-eth")
+    kp_alice = generate_key_pair("EcdsaSecp256k1RecoverySignature2020")
     signers = []
-    did_doc_string = generate_did_document(kp_alice, "recover-eth")
+    did_doc_string = generate_did_document(kp_alice, "EcdsaSecp256k1RecoverySignature2020")
     did_doc_alice = did_doc_string["id"]
     did_doc_alice_vm = did_doc_string["verificationMethod"][0]
     signPair_alice = {
         "kp": kp_alice,
         "verificationMethodId": did_doc_string["verificationMethod"][0]["id"],
-        "signing_algo": "recover-eth"
+        "signing_algo": "EcdsaSecp256k1RecoverySignature2020"
     }
     signers.append(signPair_alice)
     create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
     run_blockchain_command(create_tx_cmd, f"Registering Alice's DID with Id: {did_doc_alice}")
 
     # Create Bob's DID with Alice's VM
-    kp_bob = generate_key_pair("recover-eth")
+    kp_bob = generate_key_pair("EcdsaSecp256k1RecoverySignature2020")
     signers = []
-    did_doc_string = generate_did_document(kp_bob, "recover-eth")
+    did_doc_string = generate_did_document(kp_bob, "EcdsaSecp256k1RecoverySignature2020")
     did_doc_bob = did_doc_string["id"]
     did_doc_string["controller"] = [did_doc_alice]
     did_doc_string["verificationMethod"] = [did_doc_alice_vm]
@@ -293,15 +341,15 @@ def unique_wallet_address_test():
 
     print("\n---2. FAIL: Charlie creates a DID Document. After that, Charlie attempts to update its DID Document by adding one of Alice's VM for which valid signature is passed.---\n")
 
-    kp_charlie = generate_key_pair("recover-eth")
+    kp_charlie = generate_key_pair("EcdsaSecp256k1RecoverySignature2020")
     signers = []
-    did_doc_string_charlie = generate_did_document(kp_charlie, "recover-eth")
+    did_doc_string_charlie = generate_did_document(kp_charlie, "EcdsaSecp256k1RecoverySignature2020")
     did_doc_charlie_id = did_doc_string_charlie["id"]
     did_doc_charlie_vm = did_doc_string_charlie["verificationMethod"][0]
     signPair_charlie = {
         "kp": kp_charlie,
         "verificationMethodId": did_doc_string_charlie["verificationMethod"][0]["id"],
-        "signing_algo": "recover-eth"
+        "signing_algo": "EcdsaSecp256k1RecoverySignature2020"
     }
     signers.append(signPair_charlie)
     create_tx_cmd = form_did_create_tx_multisig(did_doc_string_charlie, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
@@ -331,15 +379,15 @@ def unique_wallet_address_test():
     print("\n---4. PASS: Charlie removes one of its Verification Methods. George creates a didDoc for himself. He then proceed to update his DID Document by adding the Verification method removed by Charlie---\n")
 
     # Create George's DIDDoc
-    kp_george = generate_key_pair("recover-eth")
+    kp_george = generate_key_pair("EcdsaSecp256k1RecoverySignature2020")
     signers = []
-    did_doc_string_george = generate_did_document(kp_george, "recover-eth")
+    did_doc_string_george = generate_did_document(kp_george, "EcdsaSecp256k1RecoverySignature2020")
     did_doc_george_id = did_doc_string_george["id"]
     did_doc_george_vm = did_doc_string_george["verificationMethod"][0]
     signPair_george = {
         "kp": kp_george,
         "verificationMethodId": did_doc_string_george["verificationMethod"][0]["id"],
-        "signing_algo": "recover-eth"
+        "signing_algo": "EcdsaSecp256k1RecoverySignature2020"
     }
     signers.append(signPair_george)
     create_tx_cmd = form_did_create_tx_multisig(did_doc_string_george, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
@@ -373,7 +421,7 @@ def create_did_test():
     signPair_alice = {
         "kp": kp_alice,
         "verificationMethodId": did_doc_string["verificationMethod"][0]["id"],
-        "signing_algo": "ed25519"
+        "signing_algo": "Ed25519Signature2020"
     }
     signers.append(signPair_alice)
     create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
@@ -387,7 +435,7 @@ def create_did_test():
     signPair_bob = {
         "kp": kp_bob,
         "verificationMethodId": did_doc_string["verificationMethod"][0]["id"],
-        "signing_algo": "ed25519"
+        "signing_algo": "Ed25519Signature2020"
     }
     signers.append(signPair_bob)
     create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
@@ -413,8 +461,8 @@ def create_did_test():
     run_blockchain_command(create_tx_cmd, f"Registering DID with Id: {did_doc_org}")
 
     #Alice creates a DID where the controller only has Alice's DID and the verfication method has two ETH wallets added. Signature of all hot wallets are passed
-    kp_hot_wallet_1 = generate_key_pair("recover-eth")
-    kp_hot_wallet_2 = generate_key_pair("recover-eth")
+    kp_hot_wallet_1 = generate_key_pair("EcdsaSecp256k1RecoverySignature2020")
+    kp_hot_wallet_2 = generate_key_pair("EcdsaSecp256k1RecoverySignature2020")
     kp_org = generate_key_pair()
 
     did_doc_string = generate_did_document(kp_org)
@@ -438,12 +486,12 @@ def create_did_test():
     signPair_hotWallet1 = {
         "kp": kp_hot_wallet_1,
         "verificationMethodId": did_doc_string["verificationMethod"][0]["id"],
-        "signing_algo": "recover-eth"
+        "signing_algo": "EcdsaSecp256k1RecoverySignature2020"
     }
     signPair_hotWallet2 = {
         "kp": kp_hot_wallet_2,
         "verificationMethodId": did_doc_string["verificationMethod"][1]["id"],
-        "signing_algo": "recover-eth"
+        "signing_algo": "EcdsaSecp256k1RecoverySignature2020"
     }
 
     print("4. FAIL: Alice has a registered DID Document where Alice is the controller. Alice tries to register an Org DID Document where Alice is the sole controller, and there are two verification Methods, of type EcdsaSecp256k1RecoveryMethod2020, and Alice is the controller for each one of them. Signature is provided by only one of the VMs.\n")
@@ -461,15 +509,15 @@ def create_did_test():
     
     # Alice creates a DID where they keep the VM of their friend Eve in the verificationMethod list of the document
     print("6. FAIL: Alice creates an Org DID where Alice is the controller, and she adds a verification method of her friend Eve. Only Alice sends the singature.\n")
-    kp_eve = generate_key_pair("ed25519")
-    did_doc_string = generate_did_document(kp_eve, algo="ed25519")
+    kp_eve = generate_key_pair("Ed25519Signature2020")
+    did_doc_string = generate_did_document(kp_eve, algo="Ed25519Signature2020")
     did_doc_eve = did_doc_string["id"]
     did_doc_eve_vms = did_doc_string["verificationMethod"]
     signers = []
     signPair_eve = {
         "kp": kp_eve,
         "verificationMethodId": did_doc_string["verificationMethod"][0]["id"],
-        "signing_algo": "ed25519"
+        "signing_algo": "Ed25519Signature2020"
     }
     signers.append(signPair_eve)
     create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
@@ -512,7 +560,7 @@ def create_did_test():
     signPair_alice = {
         "kp": kp_alice,
         "verificationMethodId": did_doc_string["verificationMethod"][0]["id"],
-        "signing_algo": "ed25519"
+        "signing_algo": "Ed25519Signature2020"
     }
     signers.append(signPair_alice)
     create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
@@ -535,7 +583,7 @@ def update_did_test():
     signPair_alice = {
         "kp": kp_alice,
         "verificationMethodId": did_doc_alice_vm["id"],
-        "signing_algo": "ed25519"
+        "signing_algo": "Ed25519Signature2020"
     }
     signers.append(signPair_alice)
     create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
@@ -550,7 +598,7 @@ def update_did_test():
     signPair_bob = {
         "kp": kp_bob,
         "verificationMethodId": did_doc_bob_vm["id"],
-        "signing_algo": "ed25519"
+        "signing_algo": "Ed25519Signature2020"
     }
     signers.append(signPair_bob)
     create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
@@ -570,7 +618,7 @@ def update_did_test():
 
     # Bob (who is not the controller) attempts to make changes in Org DID
     signers = []
-    did_doc_string["context"] = ["gmm", "gmm2"]
+    did_doc_string["capabilityDelegation"] = [did_doc_bob_vm["id"]]
     signers.append(signPair_bob)
     update_tx_cmd = form_did_update_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
     run_blockchain_command(update_tx_cmd, f"Bob (non-controller) attempts to update Org DID with Id: {did_doc_org}", True)
@@ -578,7 +626,8 @@ def update_did_test():
     # Alice (who is the controller) attempts to make changes in Org DID
     print("2. PASS: Alice creates an Org DID where alice is the controller, and Bob's VM is added to its VM List only. Alice attempts to update Org DID by sending her signature.\n")
     signers = []
-    did_doc_string["context"] = ["gmm", "gmm2"]
+    did_doc_string["alsoKnownAs"] = ["gm1", "gm2"]
+    did_doc_string["capabilityDelegation"] = [did_doc_bob_vm["id"]]
     signers.append(signPair_alice)
     update_tx_cmd = form_did_update_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
     run_blockchain_command(update_tx_cmd, f"Alice (controller) attempts to update Org DID with Id: {did_doc_org}")
@@ -594,7 +643,7 @@ def update_did_test():
     signPair_george = {
         "kp": kp_george,
         "verificationMethodId": did_doc_george_vm["id"],
-        "signing_algo": "ed25519"
+        "signing_algo": "Ed25519Signature2020"
     }
     signers.append(signPair_george)
     update_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
@@ -649,7 +698,7 @@ def update_did_test():
     run_blockchain_command(update_tx_cmd, f"Alice attempts update without any change Tx", True)
 
     # Register Alice's DID
-    print("9. PASS: Jenny creates herself a DID with empty Controller list. She then attempts to update the DIDDoc by changing the context field and passes her signature only.\n")
+    print("9. PASS: Jenny creates herself a DID with empty Controller list. She then attempts to update the DIDDoc by changing the alsoKnownAs field and passes her signature only.\n")
     kp_jenny = generate_key_pair()
     signers = []
     did_doc_string = generate_did_document(kp_jenny)
@@ -659,14 +708,14 @@ def update_did_test():
     signPair_jenny = {
         "kp": kp_jenny,
         "verificationMethodId": did_doc_jenny_vm["id"],
-        "signing_algo": "ed25519"
+        "signing_algo": "Ed25519Signature2020"
     }
     signers.append(signPair_jenny)
     create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
     run_blockchain_command(create_tx_cmd, f"Registering of Jenny's DID with Id: {did_doc_jenny}")
 
     signers = []
-    did_doc_string["context"] = ["yo"]
+    did_doc_string["capabilityDelegation"] = [did_doc_jenny_vm["id"]]
     signers.append(signPair_jenny)
     update_tx_cmd = form_did_update_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
     run_blockchain_command(update_tx_cmd, f"Jenny (controller) attempts to update Tx")
@@ -682,7 +731,7 @@ def update_did_test():
     signPair_jenny = {
         "kp": kp_jenny,
         "verificationMethodId": did_doc_jenny_vm["id"],
-        "signing_algo": "ed25519"
+        "signing_algo": "Ed25519Signature2020"
     }
     signers.append(signPair_jenny)
     create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
@@ -702,12 +751,12 @@ def update_did_test():
     signPair_jenny_1 = {
         "kp": kp_jenny,
         "verificationMethodId": did_doc_jenny_vm["id"],
-        "signing_algo": "ed25519"
+        "signing_algo": "Ed25519Signature2020"
     }
     signPair_jenny_2 = {
         "kp": kp_jenny_2,
         "verificationMethodId": new_vm_id,
-        "signing_algo": "ed25519"
+        "signing_algo": "Ed25519Signature2020"
     }
     signers.append(signPair_jenny_1)
     update_tx_cmd = form_did_update_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
@@ -747,7 +796,7 @@ def deactivate_did():
     signPair_alice = {
         "kp": kp_alice,
         "verificationMethodId": did_doc_alice_vm["id"],
-        "signing_algo": "ed25519"
+        "signing_algo": "Ed25519Signature2020"
     }
     signers.append(signPair_alice)
     create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
@@ -762,7 +811,7 @@ def deactivate_did():
     signPair_bob = {
         "kp": kp_bob,
         "verificationMethodId": did_doc_bob_vm["id"],
-        "signing_algo": "ed25519"
+        "signing_algo": "Ed25519Signature2020"
     }
     signers.append(signPair_bob)
     create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
@@ -798,7 +847,7 @@ def deactivate_did():
     signPair_mike = {
         "kp": kp_mike,
         "verificationMethodId": did_doc_mike_vm["id"],
-        "signing_algo": "ed25519"
+        "signing_algo": "Ed25519Signature2020"
     }
     signers.append(signPair_mike)
     create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
@@ -822,7 +871,7 @@ def deactivate_did():
     signPair_mike = {
         "kp": kp_mike,
         "verificationMethodId": did_doc_mike_vm["id"],
-        "signing_algo": "ed25519"
+        "signing_algo": "Ed25519Signature2020"
     }
     signers.append(signPair_mike)
     create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
@@ -837,7 +886,7 @@ def deactivate_did():
     # Attempt to update deactivated DID
     signers = []
     signers.append(signPair_mike)
-    did_doc_string["context"] = ["hii"]
+    did_doc_string["alsoKnownAs"] = ["selfCustody"]
     update_tx_cmd = form_did_update_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
     run_blockchain_command(update_tx_cmd, f"Bob (non-controller) attempts to update Org DID with Id: {did_doc_org}", True)
 
@@ -857,7 +906,7 @@ def schema_test():
     signPair_alice = {
         "kp": kp_alice,
         "verificationMethodId": did_doc_alice_vm["id"],
-        "signing_algo": "ed25519"
+        "signing_algo": "Ed25519Signature2020"
     }
     signers.append(signPair_alice)
     create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
@@ -894,7 +943,7 @@ def schema_test():
     signPair_bob = {
         "kp": kp_bob,
         "verificationMethodId": did_doc_bob_vm["id"],
-        "signing_algo": "ed25519"
+        "signing_algo": "Ed25519Signature2020"
     }
     signers.append(signPair_bob)
     create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
@@ -915,6 +964,27 @@ def schema_test():
     schema_doc_id = schema_doc["id"]
     run_blockchain_command(create_schema_cmd, f"Registering Schema with Id: {schema_doc_id}")
 
+    print("3. PASS: Bob updates a schema using one of her VMs\n")
+    updated_schema_doc = schema_doc
+    #Increment version in Schema id
+    schema_id_list = list(updated_schema_doc["id"])
+    schema_id_list[-3] = '4'
+    updated_schema_doc["id"] = "".join(schema_id_list)
+    updated_schema_doc_id = updated_schema_doc["id"]
+
+    _, schema_proof = generate_schema_document(
+        kp_bob,
+        did_doc_bob,
+        did_doc_bob_vm["id"],
+        updated_schema=updated_schema_doc
+    )
+    update_schema_cmd = form_update_schema_tx(
+        updated_schema_doc, 
+        schema_proof, 
+        DEFAULT_BLOCKCHAIN_ACCOUNT_NAME
+    )
+    run_blockchain_command(update_schema_cmd, f"Updating Schema with Id: {updated_schema_doc_id}")
+
     print("--- Test Completed ---\n")
 
 def credential_status_test():
@@ -931,7 +1001,7 @@ def credential_status_test():
     signPair_alice = {
         "kp": kp_alice,
         "verificationMethodId": did_doc_alice_vm["id"],
-        "signing_algo": "ed25519"
+        "signing_algo": "Ed25519Signature2020"
     }
     signers.append(signPair_alice)
     create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
@@ -954,7 +1024,7 @@ def credential_status_test():
         cred_proof,
         DEFAULT_BLOCKCHAIN_ACCOUNT_NAME
     )
-    cred_id = cred_doc["claim"]["id"]
+    cred_id = cred_doc["id"]
     run_blockchain_command(register_cred_status_cmd, f"Registering Credential status with Id: {cred_id}", True)
 
     print("2. PASS: Bob creates a DID with herself being the controller. He attempts to registers a credential status using one of his VMs\n")
@@ -968,7 +1038,7 @@ def credential_status_test():
     signPair_bob = {
         "kp": kp_bob,
         "verificationMethodId": did_doc_bob_vm["id"],
-        "signing_algo": "ed25519"
+        "signing_algo": "Ed25519Signature2020"
     }
     signers.append(signPair_bob)
     create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
@@ -986,14 +1056,116 @@ def credential_status_test():
         cred_proof,
         DEFAULT_BLOCKCHAIN_ACCOUNT_NAME
     )
-    cred_id = cred_doc["claim"]["id"]
+    cred_id = cred_doc["id"]
     run_blockchain_command(register_cred_status_cmd, f"Registering Credential status with Id: {cred_id}")
+
+    print("3. FAIL: Bob attempts to update credential status without any changes\n")
+    _, cred_proof = generate_cred_status_document(
+        kp_bob,
+        did_doc_bob,
+        did_doc_bob_vm["id"],
+        updated_credstatus_doc=cred_doc
+    )
+    register_cred_status_cmd = form_update_cred_status_tx(
+        cred_doc,
+        cred_proof,
+        DEFAULT_BLOCKCHAIN_ACCOUNT_NAME
+    )
+    cred_id = cred_doc["id"]
+    run_blockchain_command(register_cred_status_cmd, f"Updating Credential status with Id: {cred_id}", True)
+
+    print("4. PASS: Bob suspends the credential status using one of his VMs\n")
+    cred_doc["suspended"] = True
+
+    _, cred_proof = generate_cred_status_document(
+        kp_bob,
+        did_doc_bob,
+        did_doc_bob_vm["id"],
+        updated_credstatus_doc=cred_doc
+    )
+    register_cred_status_cmd = form_update_cred_status_tx(
+        cred_doc,
+        cred_proof,
+        DEFAULT_BLOCKCHAIN_ACCOUNT_NAME
+    )
+    cred_id = cred_doc["id"]
+    run_blockchain_command(register_cred_status_cmd, f"Updating Credential status with Id: {cred_id}")
+
+    print("5. PASS: Bob un-suspends the credential status using one of his VMs\n")
+    cred_doc["suspended"] = False
+
+    _, cred_proof = generate_cred_status_document(
+        kp_bob,
+        did_doc_bob,
+        did_doc_bob_vm["id"],
+        updated_credstatus_doc=cred_doc
+    )
+    register_cred_status_cmd = form_update_cred_status_tx(
+        cred_doc,
+        cred_proof,
+        DEFAULT_BLOCKCHAIN_ACCOUNT_NAME
+    )
+    cred_id = cred_doc["id"]
+    run_blockchain_command(register_cred_status_cmd, f"Updating Credential status with Id: {cred_id}")
+    
+    print("6. FAIL: Bob attempts to update the VC status document by changing the Credential Merkle Root Hash\n")
+    valid_cred_merkle_root_hash = cred_doc["credentialMerkleRootHash"] # for later re-assignment in next test case
+    cred_doc["credentialMerkleRootHash"] = "9de17abaffe74f4675c738f5d69c28a329aff8721cb0ed4808d8616e26280ed9"
+
+    _, cred_proof = generate_cred_status_document(
+        kp_bob,
+        did_doc_bob,
+        did_doc_bob_vm["id"],
+        updated_credstatus_doc=cred_doc
+    )
+    register_cred_status_cmd = form_update_cred_status_tx(
+        cred_doc,
+        cred_proof,
+        DEFAULT_BLOCKCHAIN_ACCOUNT_NAME
+    )
+    cred_id = cred_doc["id"]
+    run_blockchain_command(register_cred_status_cmd, f"Updating Credential status with Id: {cred_id}", True)
+    cred_doc["credentialMerkleRootHash"] = valid_cred_merkle_root_hash
+
+    print("7. PASS: Bob revokes the credential status using one of his VMs\n")
+    cred_doc["revoked"] = True
+
+    _, cred_proof = generate_cred_status_document(
+        kp_bob,
+        did_doc_bob,
+        did_doc_bob_vm["id"],
+        updated_credstatus_doc=cred_doc
+    )
+    register_cred_status_cmd = form_update_cred_status_tx(
+        cred_doc,
+        cred_proof,
+        DEFAULT_BLOCKCHAIN_ACCOUNT_NAME
+    )
+    cred_id = cred_doc["id"]
+    run_blockchain_command(register_cred_status_cmd, f"Updating Credential status with Id: {cred_id}")
+
+    print("8. FAIL: Bob attempts to un-revoke the credential status using one of his VMs\n")
+    cred_doc["revoked"] = False
+
+    _, cred_proof = generate_cred_status_document(
+        kp_bob,
+        did_doc_bob,
+        did_doc_bob_vm["id"],
+        updated_credstatus_doc=cred_doc
+    )
+    register_cred_status_cmd = form_update_cred_status_tx(
+        cred_doc,
+        cred_proof,
+        DEFAULT_BLOCKCHAIN_ACCOUNT_NAME
+    )
+    cred_id = cred_doc["id"]
+    run_blockchain_command(register_cred_status_cmd, f"Updating Credential status with Id: {cred_id}", True)
 
     print("--- Test Completed ---\n")
 
 def caip10_ethereum_support_test():
     print("\n--- CAIP-10 Test: Ethereum Chains ---\n")
-    kp_algo = "recover-eth"
+    kp_algo = "EcdsaSecp256k1RecoverySignature2020"
 
     # Invalid blockchain Account Ids
     invalid_blockchain_account_ids = [
@@ -1063,7 +1235,7 @@ def caip10_ethereum_support_test():
 def caip10_cosmos_support_test():
     print("\n--- CAIP-10 Test: Cosmos Chains ---\n")
 
-    kp_algo = "secp256k1"
+    kp_algo = "EcdsaSecp256k1Signature2019"
 
     # Invalid blockchain Account Ids
     invalid_blockchain_account_ids = [
@@ -1282,7 +1454,7 @@ def vm_type_test():
     signPair_alice = {
         "kp": kp_alice,
         "verificationMethodId": did_doc_string["verificationMethod"][0]["id"],
-        "signing_algo": "ed25519"
+        "signing_algo": "Ed25519Signature2020"
     }
     signers.append(signPair_alice)
     create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
@@ -1298,7 +1470,7 @@ def vm_type_test():
     signPair_alice = {
         "kp": kp_alice,
         "verificationMethodId": did_doc_string["verificationMethod"][0]["id"],
-        "signing_algo": "ed25519"
+        "signing_algo": "Ed25519Signature2020"
     }
     signers.append(signPair_alice)
     create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
@@ -1312,7 +1484,7 @@ def vm_type_test():
     signPair_alice = {
         "kp": kp_alice,
         "verificationMethodId": did_doc_string["verificationMethod"][0]["id"],
-        "signing_algo": "ed25519"
+        "signing_algo": "Ed25519Signature2020"
     }
     signers.append(signPair_alice)
     create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
@@ -1320,7 +1492,7 @@ def vm_type_test():
 
     # EcdsaSecp256k1VerificationKey2019
     print("4. PASS: Registering DID Document with a verification method of type EcdsaSecp256k1VerificationKey2019. Only publicKeyMultibase is passed.")
-    kp_algo = "secp256k1"
+    kp_algo = "EcdsaSecp256k1Signature2019"
     kp = generate_key_pair(algo=kp_algo)
     did_doc_string = generate_did_document(kp, kp_algo, is_uuid=True, bech32prefix="")
     did_doc_id = did_doc_string["id"]
@@ -1336,7 +1508,7 @@ def vm_type_test():
     run_blockchain_command(create_tx_cmd, f"Registering DID with Id: {did_doc_id}")
 
     print("5. PASS: Registering DID Document with a verification method of type EcdsaSecp256k1VerificationKey2019. Both publicKeyMultibase and blockchainAccountId are passed.")
-    kp_algo = "secp256k1"
+    kp_algo = "EcdsaSecp256k1Signature2019"
     kp = generate_key_pair(algo=kp_algo)
     did_doc_string = generate_did_document(kp, kp_algo)
     did_doc_id = did_doc_string["id"]
@@ -1351,7 +1523,7 @@ def vm_type_test():
     run_blockchain_command(create_tx_cmd, f"Registering DID with Id: {did_doc_id}")
 
     print("6. FAIL: Registering DID Document with a verification method of type EcdsaSecp256k1VerificationKey2019. Only blockchainAccountId is passed.")
-    kp_algo = "secp256k1"
+    kp_algo = "EcdsaSecp256k1Signature2019"
     kp = generate_key_pair(algo=kp_algo)
     did_doc_string = generate_did_document(kp, kp_algo)
     did_doc_id = did_doc_string["id"]
@@ -1368,7 +1540,7 @@ def vm_type_test():
 
     # EcdsaSecp256k1RecoveryMethod2020
     print("7. FAIL: Registering DID Document with a verification method of type EcdsaSecp256k1RecoveryMethod2020. Only publicKeyMultibase is passed.")
-    kp_algo = "recover-eth"
+    kp_algo = "EcdsaSecp256k1RecoverySignature2020"
     kp = generate_key_pair(algo=kp_algo)
     did_doc_string = generate_did_document(kp, kp_algo)
     did_doc_id = did_doc_string["id"]
@@ -1385,7 +1557,7 @@ def vm_type_test():
     run_blockchain_command(create_tx_cmd, f"Registering DID with Id: {did_doc_id}", True, True)
 
     print("8. FAIL: Registering DID Document with a verification method of type EcdsaSecp256k1RecoveryMethod2020. Both publicKeyMultibase and blockchainAccountId is passed.")
-    kp_algo = "recover-eth"
+    kp_algo = "EcdsaSecp256k1RecoverySignature2020"
     kp = generate_key_pair(algo=kp_algo)
     did_doc_string = generate_did_document(kp, kp_algo)
     did_doc_id = did_doc_string["id"]
@@ -1401,7 +1573,7 @@ def vm_type_test():
     run_blockchain_command(create_tx_cmd, f"Registering DID with Id: {did_doc_id}", True, True)
 
     print("9. PASS: Registering DID Document with a verification method of type EcdsaSecp256k1RecoveryMethod2020. Only blockchainAccountId is passed.")
-    kp_algo = "recover-eth"
+    kp_algo = "EcdsaSecp256k1RecoverySignature2020"
     kp = generate_key_pair(algo=kp_algo)
     did_doc_string = generate_did_document(kp, kp_algo)
     did_doc_id = did_doc_string["id"]
@@ -1422,7 +1594,7 @@ def method_specific_id_test():
 
     print("1. PASS: Registering a DID Document where the user provides a blockchain address in MSI that they own")
 
-    kp_algo = "secp256k1"
+    kp_algo = "EcdsaSecp256k1Signature2019"
     kp_alice = generate_key_pair(algo=kp_algo)
     signers = []
     did_doc_string = generate_did_document(kp_alice, algo=kp_algo)
@@ -1439,7 +1611,7 @@ def method_specific_id_test():
 
     print("2. FAIL: Registering a DID Document where the user provides a blockchain address in MSI that they don't own")
     
-    kp_algo = "secp256k1"
+    kp_algo = "EcdsaSecp256k1Signature2019"
     kp_bob = generate_key_pair(algo=kp_algo)
     signers = []
     did_doc_string = generate_did_document(kp_bob, algo=kp_algo)
@@ -1453,7 +1625,7 @@ def method_specific_id_test():
 
     print("3. PASS: Registering a DID Document where the user provides a multibase encoded public key in MSI that they own")
 
-    kp_algo = "ed25519"
+    kp_algo = "Ed25519Signature2020"
     kp_alice = generate_key_pair(algo=kp_algo)
     signers = []
     did_doc_string = generate_did_document(kp_alice, algo=kp_algo)
@@ -1470,7 +1642,7 @@ def method_specific_id_test():
 
     print("4. PASS: Registering a DID Document where the user provides a multibase encoded public key in MSI that they don't own")
     
-    kp_algo = "ed25519"
+    kp_algo = "Ed25519Signature2020"
     kp_bob = generate_key_pair(algo=kp_algo)
     signers = []
     did_doc_string = generate_did_document(kp_bob, algo=kp_algo)
@@ -1503,7 +1675,7 @@ def method_specific_id_test():
 
     print("6. PASS: Alice tries to update their DID Document by removing the Verification Method associated with the method specific id (CAIP-10 Blockchain Address)")
 
-    kp_algo = "secp256k1"
+    kp_algo = "EcdsaSecp256k1Signature2019"
     kp_alice = generate_key_pair(algo=kp_algo)
     signers = []
     did_doc_string = generate_did_document(kp_alice, algo=kp_algo)
@@ -1524,7 +1696,7 @@ def method_specific_id_test():
 
     print("7. PASS: Alice tries to update their DID Document by removing the Verification Method associated with the method specific id (Multibase Encoded PublicKey)")
 
-    kp_algo = "ed25519"
+    kp_algo = "Ed25519Signature2020"
     kp_alice = generate_key_pair(algo=kp_algo)
     signers = []
     did_doc_string = generate_did_document(kp_alice, algo=kp_algo)
@@ -1544,3 +1716,65 @@ def method_specific_id_test():
     run_blockchain_command(update_tx_cmd, f"Removal of Verification Method associated with method specific id")
 
     print("--- Test Completed ---\n")
+
+def bjj_signature_test():
+    print("\n--1. PASS: Create a DID using BabyJubJub Key Pair--\n")
+
+    kp_alice = generate_key_pair("BabyJubJubSignature2023")
+    signers = []
+    did_doc_string = generate_did_document(kp_alice, "BabyJubJubSignature2023")
+    did_doc_alice = did_doc_string["id"]
+    signPair_alice = {
+        "kp": kp_alice,
+        "verificationMethodId": did_doc_string["verificationMethod"][0]["id"],
+        "signing_algo": "BabyJubJubSignature2023"
+    }
+    signers.append(signPair_alice)
+    create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
+    run_blockchain_command(create_tx_cmd, f"Registering Alice's DID with Id: {did_doc_alice}")
+
+    print("\n--2. PASS: Create a Schema using BabyJubJub Key Pair--\n")
+
+    schema_doc, schema_proof = generate_schema_document(
+        kp_alice, 
+        did_doc_alice, 
+        did_doc_string["verificationMethod"][0]["id"],
+        algo="BabyJubJubSignature2023"
+    )
+    create_schema_cmd = form_create_schema_tx(
+        schema_doc, 
+        schema_proof, 
+        DEFAULT_BLOCKCHAIN_ACCOUNT_NAME
+    )
+    schema_doc_id = schema_doc["id"]
+    run_blockchain_command(create_schema_cmd, f"Registering Schema with Id: {schema_doc_id}")
+
+    print("\n--3. PASS: Create a Credential Status using BabyJubJub Key Pair--\n")
+
+    cred_doc, cred_proof = generate_cred_status_document(
+        kp_alice,
+        did_doc_alice,
+        did_doc_string["verificationMethod"][0]["id"],
+        algo="BabyJubJubSignature2023"
+    )
+    register_cred_status_cmd = form_create_cred_status_tx(
+        cred_doc,
+        cred_proof,
+        DEFAULT_BLOCKCHAIN_ACCOUNT_NAME
+    )
+    cred_id = cred_doc["id"]
+    run_blockchain_command(register_cred_status_cmd, f"Registering Credential status with Id: {cred_id}")
+
+
+    print("\n--4. PASS: Update a DID using BabyJubJub Key Pair--\n")
+    did_doc_string["alsoKnownAs"] = ["http://example.com"]
+    signers = []
+    signers.append(signPair_alice)
+    update_tx_cmd = form_did_update_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
+    run_blockchain_command(update_tx_cmd, f"Bob (non-controller) attempts to update Org DID with Id: {did_doc_alice}")
+
+    print("\n--5. PASS: Deactivate a DID using BabyJubJub Key Pair--\n")
+    signers = []
+    signers.append(signPair_alice)
+    deactivate_tx_cmd = form_did_deactivate_tx_multisig(did_doc_alice, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
+    run_blockchain_command(deactivate_tx_cmd, f"Deactivation of Org's DID with Id: {did_doc_alice}")
