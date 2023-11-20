@@ -16,7 +16,7 @@ type (
 		cdc        codec.BinaryCodec
 		storeKey   sdk.StoreKey
 		memKey     sdk.StoreKey
-		paramstore paramtypes.Subspace
+		paramSpace paramtypes.Subspace
 	}
 )
 
@@ -30,7 +30,7 @@ func NewKeeper(
 		cdc:        cdc,
 		storeKey:   storeKey,
 		memKey:     memKey,
-		paramstore: ps,
+		paramSpace: ps,
 	}
 }
 

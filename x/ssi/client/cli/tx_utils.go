@@ -2,43 +2,93 @@ package cli
 
 import (
 	"crypto/ed25519"
+	"crypto/sha256"
 	"encoding/base64"
+	"encoding/hex"
 	"fmt"
+	"math/big"
 
+	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/types/bech32"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
+	"github.com/multiformats/go-multibase"
 	secp256k1 "github.com/tendermint/tendermint/crypto/secp256k1"
+	"golang.org/x/crypto/ripemd160" // nolint: staticcheck
+	"golang.org/x/crypto/sha3"
 
-	"github.com/spf13/cobra"
+	etheraccounts "github.com/ethereum/go-ethereum/accounts"
+	etherhexutil "github.com/ethereum/go-ethereum/common/hexutil"
+	ethercrypto "github.com/ethereum/go-ethereum/crypto"
+
+	bbs "github.com/hyperledger/aries-framework-go/component/kmscrypto/crypto/primitive/bbs12381g2pub"
+
+	"github.com/iden3/go-iden3-crypto/babyjub"
 )
 
-// Extract Verification Method Ids and their respective signatures from Arguments
-// NOTE: Only Verificaiton Method Ids, Signatures and Signing Algorithms are supposed to be passed,
-// and the sequence of arguments are to be preserved.
-func extractDIDSigningElements(cmdArgs []string) ([]DIDSigningElements, error) {
-	// Since, a trio of VM Id, Siganature and Signing Algorithm are expected, an error should be thrown
-	// if the number of argumens isn't a multiple of 3
-	nArgs := len(cmdArgs)
-	if nArgs%3 != 0 {
-		return nil, fmt.Errorf("unexpected number of arguments recieved")
+// GetBbsBlsSignature2020 signs a message and returns a BBS signature
+func GetBbsBlsSignature2020(privateKey string, message []byte) (string, error) {
+	privKeyBytes, err := base64.StdEncoding.DecodeString(privateKey)
+	if err != nil {
+		panic(err)
 	}
 
-	var didSigningElementsList []DIDSigningElements
+	bbsObj := bbs.New()
 
-	for i := 0; i < nArgs; i += 3 {
-		didSigningElementsList = append(
-			didSigningElementsList,
-			DIDSigningElements{
-				VerificationMethodId: cmdArgs[i],
-				SignKey:              cmdArgs[i+1],
-				SignAlgo:             cmdArgs[i+2],
-			},
-		)
+	signatureBytes, err := bbsObj.Sign([][]byte{message}, privKeyBytes)
+	if err != nil {
+		panic(err)
 	}
 
-	return didSigningElementsList, nil
+	return base64.StdEncoding.EncodeToString(signatureBytes), nil
 }
 
-func GetSecp256k1Signature(privateKey string, message []byte) (string, error) {
+// Get BabyJubJub Signature
+func GetBabyJubJubSignature2023(privateKey string, message []byte) (string, error) {
+	// Decode private key from hex
+	privateKeyBytes, err := hex.DecodeString(privateKey)
+	if err != nil {
+		panic(err)
+	}
+	var privateKeyBytes32 [32]byte
+	copy(privateKeyBytes32[:], privateKeyBytes)
+
+	var privKeyObj babyjub.PrivateKey = privateKeyBytes32
+
+	// SHA-224 the message and convert it to BigInt
+	msgHash := sha3.Sum224(message)
+	msgBigInt := new(big.Int).SetBytes(msgHash[:])
+
+	// Get Signature
+	signatureObj := privKeyObj.SignPoseidon(msgBigInt)
+	signatureHex := signatureObj.Compress().String()
+
+	return signatureHex, nil
+}
+
+func GetEcdsaSecp256k1RecoverySignature2020(privateKey string, message []byte) (string, error) {
+	// Decode key into bytes
+	privKeyBytes, err := hex.DecodeString(privateKey)
+	if err != nil {
+		panic(err)
+	}
+	privKeyObject, err := ethercrypto.ToECDSA(privKeyBytes)
+	if err != nil {
+		panic(err)
+	}
+
+	// Hash the message
+	msgHash := etheraccounts.TextHash(message)
+
+	// Sign Message
+	sigBytes, err := ethercrypto.Sign(msgHash, privKeyObject)
+	if err != nil {
+		panic(err)
+	}
+
+	return etherhexutil.Encode(sigBytes), nil
+}
+
+func GetEcdsaSecp256k1Signature2019(privateKey string, message []byte) (string, error) {
 	// Decode key into bytes
 	privKeyBytes, err := base64.StdEncoding.DecodeString(privateKey)
 	if err != nil {
@@ -56,7 +106,7 @@ func GetSecp256k1Signature(privateKey string, message []byte) (string, error) {
 	return base64.StdEncoding.EncodeToString(signature), nil
 }
 
-func GetEd25519Signature(privateKey string, message []byte) (string, error) {
+func GetEd25519Signature2020(privateKey string, message []byte) (string, error) {
 	// Decode key into bytes
 	privKeyBytes, err := base64.StdEncoding.DecodeString(privateKey)
 	if err != nil {
@@ -66,39 +116,55 @@ func GetEd25519Signature(privateKey string, message []byte) (string, error) {
 	// Sign Message
 	signatureBytes := ed25519.Sign(privKeyBytes, message)
 
-	return base64.StdEncoding.EncodeToString(signatureBytes), nil
+	return multibase.Encode(multibase.Base58BTC, signatureBytes)
 }
 
-func getSignatures(cmd *cobra.Command, message []byte, cmdArgs []string) ([]*types.SignInfo, error) {
-	var signInfoList []*types.SignInfo
+func getDocumentProofs(ctx client.Context, proofStrings []string) ([]*types.DocumentProof, error) {
+	var documentProofs []*types.DocumentProof
 
-	didSigningElementsList, err := extractDIDSigningElements(cmdArgs)
-	if err != nil {
-		return nil, err
-	}
-
-	for i := 0; i < len(didSigningElementsList); i++ {
-		// Get the VM Ids
-		signInfoList = append(signInfoList, &types.SignInfo{
-			VerificationMethodId: didSigningElementsList[i].VerificationMethodId,
-		})
-
-		// Sign based on the Signing Algorithm
-		switch didSigningElementsList[i].SignAlgo {
-		case "ed25519":
-			signInfoList[i].Signature, err = GetEd25519Signature(didSigningElementsList[i].SignKey, message)
-			if err != nil {
-				return nil, err
-			}
-		case "secp256k1":
-			signInfoList[i].Signature, err = GetSecp256k1Signature(didSigningElementsList[i].SignKey, message)
-			if err != nil {
-				return nil, err
-			}
-		default:
-			return nil, fmt.Errorf("unsupported signing algorithm %s, supported signing algorithms: ['ed25519','secp256k1']", didSigningElementsList[i].SignAlgo)
+	for i := 0; i < len(proofStrings); i++ {
+		var documentProof types.DocumentProof
+		err := ctx.Codec.UnmarshalJSON([]byte(proofStrings[i]), &documentProof)
+		if err != nil {
+			return nil, fmt.Errorf("unable to process the proof: %v", proofStrings[i])
 		}
+
+		// Get the VM Ids
+		documentProofs = append(documentProofs, &documentProof)
 	}
 
-	return signInfoList, nil
+	return documentProofs, nil
+}
+
+// validateDidAliasSignerAddress checks if the signer address provided in the --from flag matches
+// the address extracted from the publicKeyMultibase
+func validateDidAliasSignerAddress(fromSignerAddress, publicKeyMultibase string) error {
+	// Decode public key
+	_, publicKeyBytes, err := multibase.Decode(publicKeyMultibase)
+	if err != nil {
+		return err
+	}
+
+	// Throw error if the length of secp256k1 publicKey is not 33
+	if len(publicKeyBytes) != 33 {
+		return fmt.Errorf("invalid secp256k1 public key length %v", len(publicKeyBytes))
+	}
+
+	// Hash pubKeyBytes as: RIPEMD160(SHA256(public_key_bytes))
+	pubKeySha256Hash := sha256.Sum256(publicKeyBytes)
+	ripemd160hash := ripemd160.New()
+	ripemd160hash.Write(pubKeySha256Hash[:])
+	addressBytes := ripemd160hash.Sum(nil)
+
+	// Convert addressBytes to bech32 encoded address
+	convertedAddress, err := bech32.ConvertAndEncode("hid", addressBytes)
+	if err != nil {
+		return err
+	}
+
+	if fromSignerAddress != convertedAddress {
+		return fmt.Errorf("transaction signer address is not the author of DID Document alias")
+	}
+
+	return nil
 }

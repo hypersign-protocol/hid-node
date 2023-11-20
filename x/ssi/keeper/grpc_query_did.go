@@ -5,6 +5,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/query"
 
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
@@ -12,7 +13,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (k Keeper) QueryDidDocuments(goCtx context.Context, req *types.QueryDidDocumentsRequest) (*types.QueryDidDocumentsResponse, error) {
+func (k Keeper) DidDocuments(goCtx context.Context, req *types.QueryDidDocumentsRequest) (*types.QueryDidDocumentsResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -20,20 +21,14 @@ func (k Keeper) QueryDidDocuments(goCtx context.Context, req *types.QueryDidDocu
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidKey))
 
-	var didResolveList []*types.QueryDidDocumentResponse
+	var didDocuments []*types.DidDocumentState
 	_, err := query.Paginate(store, req.Pagination, func(key []byte, value []byte) error {
-		var (
-			didResolve types.QueryDidDocumentResponse
-			didDoc     types.DidDocumentState
-		)
-		if err := k.cdc.Unmarshal(value, &didDoc); err != nil {
-			return err
+		didDoc, err := k.getDidDocumentState(&ctx, string(key))
+		if err != nil {
+			return sdkerrors.Wrap(types.ErrDidDocNotFound, err.Error())
 		}
 
-		didResolve.DidDocument = didDoc.DidDocument
-		didResolve.DidDocumentMetadata = didDoc.DidDocumentMetadata
-
-		didResolveList = append(didResolveList, &didResolve)
+		didDocuments = append(didDocuments, didDoc)
 		return nil
 	})
 
@@ -42,15 +37,12 @@ func (k Keeper) QueryDidDocuments(goCtx context.Context, req *types.QueryDidDocu
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	var didDocCount uint64 = k.GetDidCount(ctx)
-	if req.Count {
-		return &types.QueryDidDocumentsResponse{TotalDidCount: didDocCount}, nil
-	}
-	return &types.QueryDidDocumentsResponse{TotalDidCount: didDocCount, DidDocList: didResolveList}, nil
+	var didDocCount uint64 = k.getDidDocumentCount(ctx)
+
+	return &types.QueryDidDocumentsResponse{DidDocuments: didDocuments, Count: didDocCount}, nil
 }
 
-// Ref: https://w3c-ccg.github.io/did-resolution/#resolving-algorithm
-func (k Keeper) QueryDidDocument(goCtx context.Context, req *types.QueryDidDocumentRequest) (*types.QueryDidDocumentResponse, error) {
+func (k Keeper) DidDocumentByID(goCtx context.Context, req *types.QueryDidDocumentRequest) (*types.QueryDidDocumentResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -58,9 +50,9 @@ func (k Keeper) QueryDidDocument(goCtx context.Context, req *types.QueryDidDocum
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// Check if DID Document exists
-	didDoc, err := k.GetDidDocumentState(&ctx, req.DidId)
+	didDoc, err := k.getDidDocumentState(&ctx, req.DidId)
 	if err != nil {
-		return nil, err
+		return nil, sdkerrors.Wrap(types.ErrDidDocNotFound, err.Error())
 	}
 
 	return &types.QueryDidDocumentResponse{

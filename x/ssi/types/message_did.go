@@ -1,80 +1,56 @@
 package types
 
 import (
+	"encoding/hex"
+	"strings"
+	"time"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/tendermint/tendermint/crypto/tmhash"
 )
 
-// Returns a list of controllers present in the Did document along with
-// their verification methods.
-func (msg *Did) GetSigners() []Signer {
-	nControllers := len(msg.Controller)
-
-	if nControllers > 0 {
-		signers := make([]Signer, nControllers)
-		for i, controller := range msg.Controller {
-			if controller == msg.Id {
-				signers[i] = Signer{
-					Signer:               controller,
-					Authentication:       msg.Authentication,
-					AssertionMethod:      msg.AssertionMethod,
-					KeyAgreement:         msg.KeyAgreement,
-					CapabilityInvocation: msg.CapabilityInvocation,
-					CapabilityDelegation: msg.CapabilityDelegation,
-					VerificationMethod:   msg.VerificationMethod,
-				}
-			} else {
-				signers[i] = Signer{
-					Signer: controller,
-				}
-			}
-		}
-		return signers
-	}
-
-	return []Signer{}
-}
-
-func (msg *Did) GetSignBytes() []byte {
+func (msg *DidDocument) GetSignBytes() []byte {
 	return ModuleCdc.MustMarshal(msg)
 }
 
 // MsgCreateDID Type Methods
+const TypeMsgCreateDID = "register_did"
 
-const TypeMsgCreateDID = "create_did"
+var _ sdk.Msg = &MsgRegisterDID{}
 
-var _ sdk.Msg = &MsgCreateDID{}
-
-func NewMsgCreateDID(did string, didDocString *Did) *MsgCreateDID {
-	return &MsgCreateDID{
-		DidDocString: didDocString,
+func NewMsgCreateDID(didDoc *DidDocument, documentProofs []*DocumentProof, txAuthor string) *MsgRegisterDID {
+	return &MsgRegisterDID{
+		DidDocument:       didDoc,
+		DidDocumentProofs: documentProofs,
+		TxAuthor:          txAuthor,
 	}
 }
 
-func (msg *MsgCreateDID) Route() string {
+func (msg *MsgRegisterDID) Route() string {
 	return RouterKey
 }
 
-func (msg *MsgCreateDID) Type() string {
+func (msg *MsgRegisterDID) Type() string {
 	return TypeMsgCreateDID
 }
 
-func (msg *MsgCreateDID) GetSigners() []sdk.AccAddress {
-	creator, err := sdk.AccAddressFromBech32(msg.Creator)
+func (msg *MsgRegisterDID) GetSigners() []sdk.AccAddress {
+	creator, err := sdk.AccAddressFromBech32(msg.TxAuthor)
 	if err != nil {
 		panic(err)
 	}
 	return []sdk.AccAddress{creator}
 }
 
-func (msg *MsgCreateDID) GetSignBytes() []byte {
+func (msg *MsgRegisterDID) GetSignBytes() []byte {
 	return ModuleCdc.MustMarshal(msg)
 }
 
-func (msg *MsgCreateDID) ValidateBasic() error {
-	did := msg.GetDidDocString().GetId()
-	if did == "" {
-		return ErrBadRequestIsRequired.Wrap("DID")
+func (msg *MsgRegisterDID) ValidateBasic() error {
+	didDoc := msg.DidDocument
+	if err := didDoc.ValidateDidDocument(); err != nil {
+		return err
 	}
 	return nil
 }
@@ -85,11 +61,17 @@ const TypeMsgUpdateDID = "update_did"
 
 var _ sdk.Msg = &MsgUpdateDID{}
 
-func NewMsgUpdateDID(creator string, didDocString *Did, signatures []*SignInfo) *MsgUpdateDID {
+func NewMsgUpdateDID(
+	didDoc *DidDocument,
+	documentProofs []*DocumentProof,
+	versionId string,
+	txAuthor string,
+) *MsgUpdateDID {
 	return &MsgUpdateDID{
-		Creator:      creator,
-		DidDocString: didDocString,
-		Signatures:   signatures,
+		DidDocument:       didDoc,
+		DidDocumentProofs: documentProofs,
+		VersionId:         versionId,
+		TxAuthor:          txAuthor,
 	}
 }
 
@@ -102,7 +84,7 @@ func (msg *MsgUpdateDID) Type() string {
 }
 
 func (msg *MsgUpdateDID) GetSigners() []sdk.AccAddress {
-	creator, err := sdk.AccAddressFromBech32(msg.Creator)
+	creator, err := sdk.AccAddressFromBech32(msg.TxAuthor)
 	if err != nil {
 		panic(err)
 	}
@@ -115,9 +97,9 @@ func (msg *MsgUpdateDID) GetSignBytes() []byte {
 }
 
 func (msg *MsgUpdateDID) ValidateBasic() error {
-	_, err := sdk.AccAddressFromBech32(msg.Creator)
-	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+	didDoc := msg.DidDocument
+	if err := didDoc.ValidateDidDocument(); err != nil {
+		return err
 	}
 	return nil
 }
@@ -128,12 +110,12 @@ const TypeMsgDeactivateDID = "deactivate_did"
 
 var _ sdk.Msg = &MsgDeactivateDID{}
 
-func NewMsgDeactivateDID(creator string, didId string, versionId string, signatures []*SignInfo) *MsgDeactivateDID {
+func NewMsgDeactivateDID(didId string, versionId string, documentProofs []*DocumentProof, txAuthor string) *MsgDeactivateDID {
 	return &MsgDeactivateDID{
-		Creator:    creator,
-		DidId:      didId,
-		VersionId:  versionId,
-		Signatures: signatures,
+		DidDocumentId:     didId,
+		VersionId:         versionId,
+		DidDocumentProofs: documentProofs,
+		TxAuthor:          txAuthor,
 	}
 }
 
@@ -146,7 +128,7 @@ func (msg *MsgDeactivateDID) Type() string {
 }
 
 func (msg *MsgDeactivateDID) GetSigners() []sdk.AccAddress {
-	creator, err := sdk.AccAddressFromBech32(msg.Creator)
+	creator, err := sdk.AccAddressFromBech32(msg.TxAuthor)
 	if err != nil {
 		panic(err)
 	}
@@ -159,9 +141,18 @@ func (msg *MsgDeactivateDID) GetSignBytes() []byte {
 }
 
 func (msg *MsgDeactivateDID) ValidateBasic() error {
-	_, err := sdk.AccAddressFromBech32(msg.Creator)
+	_, err := sdk.AccAddressFromBech32(msg.TxAuthor)
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 	return nil
+}
+
+func CreateNewMetadata(ctx sdk.Context) DidDocumentMetadata {
+	return DidDocumentMetadata{
+		VersionId:   strings.ToUpper(hex.EncodeToString(tmhash.Sum([]byte(ctx.TxBytes())))),
+		Deactivated: false,
+		Created:     ctx.BlockTime().Format(time.RFC3339),
+		Updated:     ctx.BlockTime().Format(time.RFC3339),
+	}
 }

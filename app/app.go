@@ -290,8 +290,8 @@ func NewHidnodeApp(
 	keys := sdk.NewKVStoreKeys(
 		authtypes.StoreKey, banktypes.StoreKey, stakingtypes.StoreKey,
 		minttypes.StoreKey, distrtypes.StoreKey, slashingtypes.StoreKey,
-		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, 
-		upgradetypes.StoreKey, feegrant.StoreKey, evidencetypes.StoreKey, 
+		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey,
+		upgradetypes.StoreKey, feegrant.StoreKey, evidencetypes.StoreKey,
 		ibctransfertypes.StoreKey, capabilitytypes.StoreKey, authzkeeper.StoreKey,
 		ssimoduletypes.StoreKey, wasm.StoreKey,
 	)
@@ -310,22 +310,22 @@ func NewHidnodeApp(
 	}
 
 	app.ParamsKeeper = initParamsKeeper(
-		appCodec, 
-		cdc, 
-		keys[paramstypes.StoreKey], 
+		appCodec,
+		cdc,
+		keys[paramstypes.StoreKey],
 		tkeys[paramstypes.TStoreKey],
 	)
 
 	// set the BaseApp's parameter store
 	bApp.SetParamStore(
 		app.ParamsKeeper.
-		Subspace(baseapp.Paramspace).
-		WithKeyTable(paramskeeper.ConsensusParamsKeyTable()))
+			Subspace(baseapp.Paramspace).
+			WithKeyTable(paramskeeper.ConsensusParamsKeyTable()))
 
 	// add capability keeper and ScopeToModule for ibc module
 	app.CapabilityKeeper = capabilitykeeper.NewKeeper(
-		appCodec, 
-		keys[capabilitytypes.StoreKey], 
+		appCodec,
+		keys[capabilitytypes.StoreKey],
 		memKeys[capabilitytypes.MemStoreKey],
 	)
 
@@ -337,116 +337,101 @@ func NewHidnodeApp(
 
 	// Keepers
 	app.AccountKeeper = authkeeper.NewAccountKeeper(
-		appCodec, 
-		keys[authtypes.StoreKey], 
-		app.getSubspace(authtypes.ModuleName), 
-		authtypes.ProtoBaseAccount, 
+		appCodec,
+		keys[authtypes.StoreKey],
+		app.getSubspace(authtypes.ModuleName),
+		authtypes.ProtoBaseAccount,
 		maccPerms,
 	)
 
 	app.BankKeeper = bankkeeper.NewBaseKeeper(
-		appCodec, 
-		keys[banktypes.StoreKey], 
-		app.AccountKeeper, 
-		app.getSubspace(banktypes.ModuleName), 
+		appCodec,
+		keys[banktypes.StoreKey],
+		app.AccountKeeper,
+		app.getSubspace(banktypes.ModuleName),
 		app.ModuleAccountAddrs(),
 	)
-	
+
 	stakingKeeper := stakingkeeper.NewKeeper(
-		appCodec, 
-		keys[stakingtypes.StoreKey], 
-		app.AccountKeeper, 
-		app.BankKeeper, 
+		appCodec,
+		keys[stakingtypes.StoreKey],
+		app.AccountKeeper,
+		app.BankKeeper,
 		app.getSubspace(stakingtypes.ModuleName),
 	)
 
 	app.MintKeeper = mintkeeper.NewKeeper(
-		appCodec, keys[minttypes.StoreKey], 
-		app.getSubspace(minttypes.ModuleName), 
+		appCodec, keys[minttypes.StoreKey],
+		app.getSubspace(minttypes.ModuleName),
 		&stakingKeeper,
-		app.AccountKeeper, 
-		app.BankKeeper, 
+		app.AccountKeeper,
+		app.BankKeeper,
 		authtypes.FeeCollectorName,
 	)
 
 	app.DistrKeeper = distrkeeper.NewKeeper(
-		appCodec, 
-		keys[distrtypes.StoreKey], 
-		app.getSubspace(distrtypes.ModuleName), 
-		app.AccountKeeper, 
+		appCodec,
+		keys[distrtypes.StoreKey],
+		app.getSubspace(distrtypes.ModuleName),
+		app.AccountKeeper,
 		app.BankKeeper,
-		&stakingKeeper, 
-		authtypes.FeeCollectorName, 
+		&stakingKeeper,
+		authtypes.FeeCollectorName,
 		app.ModuleAccountAddrs(),
 	)
 
 	app.SlashingKeeper = slashingkeeper.NewKeeper(
-		appCodec, 
-		keys[slashingtypes.StoreKey], 
-		&stakingKeeper, 
+		appCodec,
+		keys[slashingtypes.StoreKey],
+		&stakingKeeper,
 		app.getSubspace(slashingtypes.ModuleName),
 	)
 
 	app.CrisisKeeper = crisiskeeper.NewKeeper(
-		app.getSubspace(crisistypes.ModuleName), 
-		invCheckPeriod, 
-		app.BankKeeper, 
+		app.getSubspace(crisistypes.ModuleName),
+		invCheckPeriod,
+		app.BankKeeper,
 		authtypes.FeeCollectorName,
 	)
 
 	app.FeeGrantKeeper = feegrantkeeper.NewKeeper(
-		appCodec, 
-		keys[feegrant.StoreKey], 
+		appCodec,
+		keys[feegrant.StoreKey],
 		app.AccountKeeper,
 	)
-	
+
 	app.UpgradeKeeper = upgradekeeper.NewKeeper(
-		skipUpgradeHeights, 
-		keys[upgradetypes.StoreKey], 
-		appCodec, 
-		homePath, 
+		skipUpgradeHeights,
+		keys[upgradetypes.StoreKey],
+		appCodec,
+		homePath,
 		app.BaseApp,
 	)
 
-	app.UpgradeKeeper.SetUpgradeHandler("v011", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-		ctx.Logger().Info("IBC upgrade to v3")
-		return fromVM, nil
-	})
-
-	app.UpgradeKeeper.SetUpgradeHandler("v013", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-		ctx.Logger().Info("v0.1.3 upgrade")
-		return fromVM, nil
-	})
-
-	app.UpgradeKeeper.SetUpgradeHandler("v014", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-		ctx.Logger().Info("v0.1.4 upgrade")
-		return fromVM, nil
-	})
-
-	app.UpgradeKeeper.SetUpgradeHandler("v015", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-		ctx.Logger().Info("v0.1.5 upgrade")
+	app.UpgradeKeeper.SetUpgradeHandler("v018", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+		ctx.Logger().Info("v0.1.8 upgrade")
 		return fromVM, nil
 	})
 
 	// register the staking hooks
 	// NOTE: stakingKeeper above is passed by reference, so that it will contain these hooks
 	app.StakingKeeper = *stakingKeeper.SetHooks(
-		stakingtypes.NewMultiStakingHooks(app.DistrKeeper.Hooks(), 
-		app.SlashingKeeper.Hooks()),
+		stakingtypes.NewMultiStakingHooks(app.DistrKeeper.Hooks(),
+			app.SlashingKeeper.Hooks()),
 	)
 
 	// Create IBC Keeper
 	app.IBCKeeper = ibckeeper.NewKeeper(
-		appCodec, keys[ibchost.StoreKey], 
-		app.getSubspace(ibchost.ModuleName), 
-		app.StakingKeeper, 
-		app.UpgradeKeeper, 
+		appCodec, keys[ibchost.StoreKey],
+		app.getSubspace(ibchost.ModuleName),
+		app.StakingKeeper,
+		app.UpgradeKeeper,
 		scopedIBCKeeper,
 	)
 
 	authzKeeper := authzkeeper.NewKeeper(
-		keys[authzkeeper.StoreKey], 
-		appCodec, 
+		keys[authzkeeper.StoreKey],
+		appCodec,
 		app.MsgServiceRouter(),
 	)
 	app.AuthzKeeper = authzKeeper
@@ -489,9 +474,9 @@ func NewHidnodeApp(
 	)
 
 	ssiModule := ssimodule.NewAppModule(
-		appCodec, 
-		app.SsiKeeper, 
-		app.AccountKeeper, 
+		appCodec,
+		app.SsiKeeper,
+		app.AccountKeeper,
 		app.BankKeeper,
 	)
 
@@ -529,23 +514,23 @@ func NewHidnodeApp(
 	// The gov proposal types can be individually enabled (x/wasm)
 	if len(enabledProposals) != 0 {
 		govRouter.AddRoute(
-			wasm.RouterKey, 
+			wasm.RouterKey,
 			wasm.NewWasmProposalHandler(
-				app.WasmKeeper, 
+				app.WasmKeeper,
 				enabledProposals,
 			))
 	}
 
 	app.GovKeeper = govkeeper.NewKeeper(
-		appCodec, 
-		keys[govtypes.StoreKey], 
-		app.getSubspace(govtypes.ModuleName), 
-		app.AccountKeeper, 
+		appCodec,
+		keys[govtypes.StoreKey],
+		app.getSubspace(govtypes.ModuleName),
+		app.AccountKeeper,
 		app.BankKeeper,
-		&stakingKeeper, 
+		&stakingKeeper,
 		govRouter,
 	)
-	
+
 	// Create static IBC router, add transfer route, then set and seal it
 	ibcRouter := ibcporttypes.NewRouter()
 	ibcRouter.
@@ -680,6 +665,7 @@ func NewHidnodeApp(
 				SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
 				SigGasConsumer:  ante.DefaultSigVerificationGasConsumer,
 			},
+			SsiKeeper:         app.SsiKeeper,
 			IBCKeeper:         app.IBCKeeper,
 			WasmConfig:        &wasmConfig,
 			TXCounterStoreKey: keys[wasm.StoreKey],
@@ -872,8 +858,8 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(crisistypes.ModuleName)
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
-	paramsKeeper.Subspace(ssimoduletypes.ModuleName)
 	paramsKeeper.Subspace(wasm.ModuleName)
+	paramsKeeper.Subspace(ssimoduletypes.ModuleName).WithKeyTable(ssimoduletypes.ParamKeyTable())
 
 	return paramsKeeper
 }

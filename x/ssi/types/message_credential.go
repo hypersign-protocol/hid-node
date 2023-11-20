@@ -9,10 +9,50 @@ const TypeMsgRegisterCredentialStatus = "register_credential_status"
 
 var _ sdk.Msg = &MsgRegisterCredentialStatus{}
 
-func NewMsgRegisterCredentialStatus(creator string, credentialStatus *CredentialStatus) *MsgRegisterCredentialStatus {
+func (msg *MsgUpdateCredentialStatus) Route() string {
+	return RouterKey
+}
+
+func (msg *MsgUpdateCredentialStatus) Type() string {
+	return TypeMsgRegisterCredentialSchema
+}
+
+func (msg *MsgUpdateCredentialStatus) GetSigners() []sdk.AccAddress {
+	creator, err := sdk.AccAddressFromBech32(msg.TxAuthor)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{creator}
+}
+
+func (msg *MsgUpdateCredentialStatus) GetSignBytes() []byte {
+	bz := ModuleCdc.MustMarshalJSON(msg)
+	return sdk.MustSortJSON(bz)
+}
+
+func (msg *MsgUpdateCredentialStatus) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.TxAuthor)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid transaction author's address (%s)", err)
+	}
+	return nil
+}
+
+// Update Credential Status
+
+const TypeMsgUpdateCredentialStatus = "update_credential_status"
+
+var _ sdk.Msg = &MsgRegisterCredentialStatus{}
+
+func NewMsgRegisterCredentialStatus(
+	credentialStatusDocument *CredentialStatusDocument,
+	credentialStatusProof *DocumentProof,
+	txAuthor string,
+) *MsgRegisterCredentialStatus {
 	return &MsgRegisterCredentialStatus{
-		Creator:          creator,
-		CredentialStatus: credentialStatus,
+		CredentialStatusDocument: credentialStatusDocument,
+		CredentialStatusProof:    credentialStatusProof,
+		TxAuthor:                 txAuthor,
 	}
 }
 
@@ -21,11 +61,11 @@ func (msg *MsgRegisterCredentialStatus) Route() string {
 }
 
 func (msg *MsgRegisterCredentialStatus) Type() string {
-	return TypeMsgCreateSchema
+	return TypeMsgRegisterCredentialSchema
 }
 
 func (msg *MsgRegisterCredentialStatus) GetSigners() []sdk.AccAddress {
-	creator, err := sdk.AccAddressFromBech32(msg.Creator)
+	creator, err := sdk.AccAddressFromBech32(msg.TxAuthor)
 	if err != nil {
 		panic(err)
 	}
@@ -37,14 +77,14 @@ func (msg *MsgRegisterCredentialStatus) GetSignBytes() []byte {
 	return sdk.MustSortJSON(bz)
 }
 
-func (msg *CredentialStatus) GetSignBytes() []byte {
+func (msg *CredentialStatusDocument) GetSignBytes() []byte {
 	return ModuleCdc.MustMarshal(msg)
 }
 
 func (msg *MsgRegisterCredentialStatus) ValidateBasic() error {
-	_, err := sdk.AccAddressFromBech32(msg.Creator)
+	_, err := sdk.AccAddressFromBech32(msg.TxAuthor)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid transaction author's address (%s)", err)
 	}
 	return nil
 }

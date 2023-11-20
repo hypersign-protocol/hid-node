@@ -8,27 +8,34 @@ import (
 )
 
 func RegisterCodec(cdc *codec.LegacyAmino) {
-	cdc.RegisterConcrete(&MsgCreateDID{}, "ssi/CreateDID", nil)
+	cdc.RegisterConcrete(&MsgRegisterDID{}, "ssi/RegisterDID", nil)
 	cdc.RegisterConcrete(&MsgUpdateDID{}, "ssi/UpdateDID", nil)
-	cdc.RegisterConcrete(&MsgCreateSchema{}, "ssi/CreateSchema", nil)
+	cdc.RegisterConcrete(&MsgRegisterCredentialSchema{}, "ssi/RegisterCredentialSchema", nil)
 	cdc.RegisterConcrete(&MsgDeactivateDID{}, "ssi/DeactivateDID", nil)
-	// this line is used by starport scaffolding # 2
+	cdc.RegisterConcrete(&MsgRegisterCredentialStatus{}, "ssi/RegisterCredentialStatus", nil)
 }
 
 func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
-	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgCreateDID{},
+	registry.RegisterImplementations(
+		(*sdk.Msg)(nil),
+		&MsgRegisterDID{},
 	)
-	registry.RegisterImplementations((*sdk.Msg)(nil),
+	registry.RegisterImplementations(
+		(*sdk.Msg)(nil),
 		&MsgUpdateDID{},
 	)
-	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgCreateSchema{},
+	registry.RegisterImplementations(
+		(*sdk.Msg)(nil),
+		&MsgRegisterCredentialSchema{},
 	)
-	registry.RegisterImplementations((*sdk.Msg)(nil),
+	registry.RegisterImplementations(
+		(*sdk.Msg)(nil),
 		&MsgDeactivateDID{},
 	)
-	// this line is used by starport scaffolding # 3
+	registry.RegisterImplementations(
+		(*sdk.Msg)(nil),
+		&MsgRegisterCredentialStatus{},
+	)
 
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
 }

@@ -4,9 +4,6 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
-
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 )
 
 func documentIdentifier(docType string) string {
@@ -86,22 +83,19 @@ func IsValidID(Id string, namespace string, docType string) error {
 		}
 	}
 
-	// Check if method-specific-id string is alphanumeric and 
+	// Check if method-specific-id string is alphanumeric and
 	// has the minimum required character length of 32
 	isProperMethodSpecificId, err := regexp.MatchString(
-		"^[a-zA-Z0-9]{32,}$", 
+		"^[a-zA-Z0-9]{32,}$",
 		docElements[docMethodSpecificId],
 	)
 	if err != nil {
 		return fmt.Errorf("error in parsing regular expression for method-specific-id: %s", err.Error())
 	}
 	if !isProperMethodSpecificId {
-		return sdkerrors.Wrap(
-			types.ErrInvalidMethodSpecificId, 
-			fmt.Sprintf(
-				"method-specific-id should be an alphanumeric string with minimum 32 characters, recieved: %s",
-				docElements[docMethodSpecificId],
-			),
+		return fmt.Errorf(
+			"method-specific-id should be an alphanumeric string with minimum 32 characters, recieved: %s",
+			docElements[docMethodSpecificId],
 		)
 	}
 
@@ -114,13 +108,4 @@ func IsValidID(Id string, namespace string, docType string) error {
 	}
 
 	return nil
-}
-
-func HasAtleastOneTrueSigner(s []types.ValidDid) types.ValidDid {
-	for _, v := range s {
-		if v.IsValid {
-			return v
-		}
-	}
-	return types.ValidDid{}
 }

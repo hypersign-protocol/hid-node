@@ -31,3 +31,7 @@ dist/
 # Misc
 .cache/
 __pycache__
+artifacts
+node_modules
+package-lock.json
+generated-ts

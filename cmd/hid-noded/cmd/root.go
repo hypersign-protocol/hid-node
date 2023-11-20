@@ -118,6 +118,7 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 	)
 
 	rootCmd.AddCommand(server.RosettaCommand(encodingConfig.InterfaceRegistry, encodingConfig.Codec))
+	rootCmd.AddCommand(generateSSICmd())
 }
 
 func addModuleInitFlags(startCmd *cobra.Command) {

@@ -27,25 +27,24 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-type MsgCreateDID struct {
-	DidDocString *Did        `protobuf:"bytes,1,opt,name=didDocString,proto3" json:"didDocString,omitempty"`
-	Signatures   []*SignInfo `protobuf:"bytes,2,rep,name=signatures,proto3" json:"signatures,omitempty"`
-	Creator      string      `protobuf:"bytes,3,opt,name=creator,proto3" json:"creator,omitempty"`
-	ClientSpec   string      `protobuf:"bytes,4,opt,name=clientSpec,proto3" json:"clientSpec,omitempty"`
+type MsgRegisterDID struct {
+	DidDocument       *DidDocument     `protobuf:"bytes,1,opt,name=didDocument,proto3" json:"didDocument,omitempty"`
+	DidDocumentProofs []*DocumentProof `protobuf:"bytes,2,rep,name=didDocumentProofs,proto3" json:"didDocumentProofs,omitempty"`
+	TxAuthor          string           `protobuf:"bytes,3,opt,name=txAuthor,proto3" json:"txAuthor,omitempty"`
 }
 
-func (m *MsgCreateDID) Reset()         { *m = MsgCreateDID{} }
-func (m *MsgCreateDID) String() string { return proto.CompactTextString(m) }
-func (*MsgCreateDID) ProtoMessage()    {}
-func (*MsgCreateDID) Descriptor() ([]byte, []int) {
+func (m *MsgRegisterDID) Reset()         { *m = MsgRegisterDID{} }
+func (m *MsgRegisterDID) String() string { return proto.CompactTextString(m) }
+func (*MsgRegisterDID) ProtoMessage()    {}
+func (*MsgRegisterDID) Descriptor() ([]byte, []int) {
 	return fileDescriptor_73a1aa6c7279248b, []int{0}
 }
-func (m *MsgCreateDID) XXX_Unmarshal(b []byte) error {
+func (m *MsgRegisterDID) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgCreateDID) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgRegisterDID) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgCreateDID.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgRegisterDID.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -55,62 +54,54 @@ func (m *MsgCreateDID) XXX_Marshal(b []byte, deterministic bool) ([]byte, error)
 		return b[:n], nil
 	}
 }
-func (m *MsgCreateDID) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgCreateDID.Merge(m, src)
+func (m *MsgRegisterDID) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgRegisterDID.Merge(m, src)
 }
-func (m *MsgCreateDID) XXX_Size() int {
+func (m *MsgRegisterDID) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgCreateDID) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgCreateDID.DiscardUnknown(m)
+func (m *MsgRegisterDID) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgRegisterDID.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgCreateDID proto.InternalMessageInfo
+var xxx_messageInfo_MsgRegisterDID proto.InternalMessageInfo
 
-func (m *MsgCreateDID) GetDidDocString() *Did {
+func (m *MsgRegisterDID) GetDidDocument() *DidDocument {
 	if m != nil {
-		return m.DidDocString
+		return m.DidDocument
 	}
 	return nil
 }
 
-func (m *MsgCreateDID) GetSignatures() []*SignInfo {
+func (m *MsgRegisterDID) GetDidDocumentProofs() []*DocumentProof {
 	if m != nil {
-		return m.Signatures
+		return m.DidDocumentProofs
 	}
 	return nil
 }
 
-func (m *MsgCreateDID) GetCreator() string {
+func (m *MsgRegisterDID) GetTxAuthor() string {
 	if m != nil {
-		return m.Creator
+		return m.TxAuthor
 	}
 	return ""
 }
 
-func (m *MsgCreateDID) GetClientSpec() string {
-	if m != nil {
-		return m.ClientSpec
-	}
-	return ""
+type MsgRegisterDIDResponse struct {
 }
 
-type MsgCreateDIDResponse struct {
-	Id uint64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-}
-
-func (m *MsgCreateDIDResponse) Reset()         { *m = MsgCreateDIDResponse{} }
-func (m *MsgCreateDIDResponse) String() string { return proto.CompactTextString(m) }
-func (*MsgCreateDIDResponse) ProtoMessage()    {}
-func (*MsgCreateDIDResponse) Descriptor() ([]byte, []int) {
+func (m *MsgRegisterDIDResponse) Reset()         { *m = MsgRegisterDIDResponse{} }
+func (m *MsgRegisterDIDResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgRegisterDIDResponse) ProtoMessage()    {}
+func (*MsgRegisterDIDResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_73a1aa6c7279248b, []int{1}
 }
-func (m *MsgCreateDIDResponse) XXX_Unmarshal(b []byte) error {
+func (m *MsgRegisterDIDResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgCreateDIDResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgRegisterDIDResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgCreateDIDResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgRegisterDIDResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -120,31 +111,23 @@ func (m *MsgCreateDIDResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte
 		return b[:n], nil
 	}
 }
-func (m *MsgCreateDIDResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgCreateDIDResponse.Merge(m, src)
+func (m *MsgRegisterDIDResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgRegisterDIDResponse.Merge(m, src)
 }
-func (m *MsgCreateDIDResponse) XXX_Size() int {
+func (m *MsgRegisterDIDResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgCreateDIDResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgCreateDIDResponse.DiscardUnknown(m)
+func (m *MsgRegisterDIDResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgRegisterDIDResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgCreateDIDResponse proto.InternalMessageInfo
-
-func (m *MsgCreateDIDResponse) GetId() uint64 {
-	if m != nil {
-		return m.Id
-	}
-	return 0
-}
+var xxx_messageInfo_MsgRegisterDIDResponse proto.InternalMessageInfo
 
 type MsgUpdateDID struct {
-	DidDocString *Did        `protobuf:"bytes,1,opt,name=didDocString,proto3" json:"didDocString,omitempty"`
-	VersionId    string      `protobuf:"bytes,2,opt,name=version_id,json=versionId,proto3" json:"version_id,omitempty"`
-	Signatures   []*SignInfo `protobuf:"bytes,3,rep,name=signatures,proto3" json:"signatures,omitempty"`
-	Creator      string      `protobuf:"bytes,4,opt,name=creator,proto3" json:"creator,omitempty"`
-	ClientSpec   string      `protobuf:"bytes,5,opt,name=clientSpec,proto3" json:"clientSpec,omitempty"`
+	DidDocument       *DidDocument     `protobuf:"bytes,1,opt,name=didDocument,proto3" json:"didDocument,omitempty"`
+	DidDocumentProofs []*DocumentProof `protobuf:"bytes,2,rep,name=didDocumentProofs,proto3" json:"didDocumentProofs,omitempty"`
+	VersionId         string           `protobuf:"bytes,3,opt,name=versionId,proto3" json:"versionId,omitempty"`
+	TxAuthor          string           `protobuf:"bytes,4,opt,name=txAuthor,proto3" json:"txAuthor,omitempty"`
 }
 
 func (m *MsgUpdateDID) Reset()         { *m = MsgUpdateDID{} }
@@ -180,9 +163,16 @@ func (m *MsgUpdateDID) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgUpdateDID proto.InternalMessageInfo
 
-func (m *MsgUpdateDID) GetDidDocString() *Did {
+func (m *MsgUpdateDID) GetDidDocument() *DidDocument {
 	if m != nil {
-		return m.DidDocString
+		return m.DidDocument
+	}
+	return nil
+}
+
+func (m *MsgUpdateDID) GetDidDocumentProofs() []*DocumentProof {
+	if m != nil {
+		return m.DidDocumentProofs
 	}
 	return nil
 }
@@ -194,29 +184,14 @@ func (m *MsgUpdateDID) GetVersionId() string {
 	return ""
 }
 
-func (m *MsgUpdateDID) GetSignatures() []*SignInfo {
+func (m *MsgUpdateDID) GetTxAuthor() string {
 	if m != nil {
-		return m.Signatures
-	}
-	return nil
-}
-
-func (m *MsgUpdateDID) GetCreator() string {
-	if m != nil {
-		return m.Creator
-	}
-	return ""
-}
-
-func (m *MsgUpdateDID) GetClientSpec() string {
-	if m != nil {
-		return m.ClientSpec
+		return m.TxAuthor
 	}
 	return ""
 }
 
 type MsgUpdateDIDResponse struct {
-	UpdateId string `protobuf:"bytes,1,opt,name=updateId,proto3" json:"updateId,omitempty"`
 }
 
 func (m *MsgUpdateDIDResponse) Reset()         { *m = MsgUpdateDIDResponse{} }
@@ -252,138 +227,18 @@ func (m *MsgUpdateDIDResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgUpdateDIDResponse proto.InternalMessageInfo
 
-func (m *MsgUpdateDIDResponse) GetUpdateId() string {
-	if m != nil {
-		return m.UpdateId
-	}
-	return ""
-}
-
-type MsgCreateSchema struct {
-	Creator     string          `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	SchemaDoc   *SchemaDocument `protobuf:"bytes,2,opt,name=schemaDoc,proto3" json:"schemaDoc,omitempty"`
-	SchemaProof *SchemaProof    `protobuf:"bytes,3,opt,name=schemaProof,proto3" json:"schemaProof,omitempty"`
-	ClientSpec  string          `protobuf:"bytes,4,opt,name=clientSpec,proto3" json:"clientSpec,omitempty"`
-}
-
-func (m *MsgCreateSchema) Reset()         { *m = MsgCreateSchema{} }
-func (m *MsgCreateSchema) String() string { return proto.CompactTextString(m) }
-func (*MsgCreateSchema) ProtoMessage()    {}
-func (*MsgCreateSchema) Descriptor() ([]byte, []int) {
-	return fileDescriptor_73a1aa6c7279248b, []int{4}
-}
-func (m *MsgCreateSchema) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *MsgCreateSchema) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_MsgCreateSchema.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *MsgCreateSchema) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgCreateSchema.Merge(m, src)
-}
-func (m *MsgCreateSchema) XXX_Size() int {
-	return m.Size()
-}
-func (m *MsgCreateSchema) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgCreateSchema.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_MsgCreateSchema proto.InternalMessageInfo
-
-func (m *MsgCreateSchema) GetCreator() string {
-	if m != nil {
-		return m.Creator
-	}
-	return ""
-}
-
-func (m *MsgCreateSchema) GetSchemaDoc() *SchemaDocument {
-	if m != nil {
-		return m.SchemaDoc
-	}
-	return nil
-}
-
-func (m *MsgCreateSchema) GetSchemaProof() *SchemaProof {
-	if m != nil {
-		return m.SchemaProof
-	}
-	return nil
-}
-
-func (m *MsgCreateSchema) GetClientSpec() string {
-	if m != nil {
-		return m.ClientSpec
-	}
-	return ""
-}
-
-type MsgCreateSchemaResponse struct {
-	Id uint64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-}
-
-func (m *MsgCreateSchemaResponse) Reset()         { *m = MsgCreateSchemaResponse{} }
-func (m *MsgCreateSchemaResponse) String() string { return proto.CompactTextString(m) }
-func (*MsgCreateSchemaResponse) ProtoMessage()    {}
-func (*MsgCreateSchemaResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_73a1aa6c7279248b, []int{5}
-}
-func (m *MsgCreateSchemaResponse) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *MsgCreateSchemaResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_MsgCreateSchemaResponse.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *MsgCreateSchemaResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgCreateSchemaResponse.Merge(m, src)
-}
-func (m *MsgCreateSchemaResponse) XXX_Size() int {
-	return m.Size()
-}
-func (m *MsgCreateSchemaResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgCreateSchemaResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_MsgCreateSchemaResponse proto.InternalMessageInfo
-
-func (m *MsgCreateSchemaResponse) GetId() uint64 {
-	if m != nil {
-		return m.Id
-	}
-	return 0
-}
-
 type MsgDeactivateDID struct {
-	Creator    string      `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	DidId      string      `protobuf:"bytes,2,opt,name=didId,proto3" json:"didId,omitempty"`
-	VersionId  string      `protobuf:"bytes,3,opt,name=version_id,json=versionId,proto3" json:"version_id,omitempty"`
-	Signatures []*SignInfo `protobuf:"bytes,4,rep,name=signatures,proto3" json:"signatures,omitempty"`
-	ClientSpec string      `protobuf:"bytes,5,opt,name=clientSpec,proto3" json:"clientSpec,omitempty"`
+	DidDocumentId     string           `protobuf:"bytes,1,opt,name=didDocumentId,proto3" json:"didDocumentId,omitempty"`
+	DidDocumentProofs []*DocumentProof `protobuf:"bytes,2,rep,name=didDocumentProofs,proto3" json:"didDocumentProofs,omitempty"`
+	VersionId         string           `protobuf:"bytes,3,opt,name=versionId,proto3" json:"versionId,omitempty"`
+	TxAuthor          string           `protobuf:"bytes,4,opt,name=txAuthor,proto3" json:"txAuthor,omitempty"`
 }
 
 func (m *MsgDeactivateDID) Reset()         { *m = MsgDeactivateDID{} }
 func (m *MsgDeactivateDID) String() string { return proto.CompactTextString(m) }
 func (*MsgDeactivateDID) ProtoMessage()    {}
 func (*MsgDeactivateDID) Descriptor() ([]byte, []int) {
-	return fileDescriptor_73a1aa6c7279248b, []int{6}
+	return fileDescriptor_73a1aa6c7279248b, []int{4}
 }
 func (m *MsgDeactivateDID) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -412,18 +267,18 @@ func (m *MsgDeactivateDID) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgDeactivateDID proto.InternalMessageInfo
 
-func (m *MsgDeactivateDID) GetCreator() string {
+func (m *MsgDeactivateDID) GetDidDocumentId() string {
 	if m != nil {
-		return m.Creator
+		return m.DidDocumentId
 	}
 	return ""
 }
 
-func (m *MsgDeactivateDID) GetDidId() string {
+func (m *MsgDeactivateDID) GetDidDocumentProofs() []*DocumentProof {
 	if m != nil {
-		return m.DidId
+		return m.DidDocumentProofs
 	}
-	return ""
+	return nil
 }
 
 func (m *MsgDeactivateDID) GetVersionId() string {
@@ -433,29 +288,21 @@ func (m *MsgDeactivateDID) GetVersionId() string {
 	return ""
 }
 
-func (m *MsgDeactivateDID) GetSignatures() []*SignInfo {
+func (m *MsgDeactivateDID) GetTxAuthor() string {
 	if m != nil {
-		return m.Signatures
-	}
-	return nil
-}
-
-func (m *MsgDeactivateDID) GetClientSpec() string {
-	if m != nil {
-		return m.ClientSpec
+		return m.TxAuthor
 	}
 	return ""
 }
 
 type MsgDeactivateDIDResponse struct {
-	Id uint64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 }
 
 func (m *MsgDeactivateDIDResponse) Reset()         { *m = MsgDeactivateDIDResponse{} }
 func (m *MsgDeactivateDIDResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgDeactivateDIDResponse) ProtoMessage()    {}
 func (*MsgDeactivateDIDResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_73a1aa6c7279248b, []int{7}
+	return fileDescriptor_73a1aa6c7279248b, []int{5}
 }
 func (m *MsgDeactivateDIDResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -484,25 +331,209 @@ func (m *MsgDeactivateDIDResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgDeactivateDIDResponse proto.InternalMessageInfo
 
-func (m *MsgDeactivateDIDResponse) GetId() uint64 {
-	if m != nil {
-		return m.Id
-	}
-	return 0
+type MsgRegisterCredentialSchema struct {
+	CredentialSchemaDocument *CredentialSchemaDocument `protobuf:"bytes,1,opt,name=credentialSchemaDocument,proto3" json:"credentialSchemaDocument,omitempty"`
+	CredentialSchemaProof    *DocumentProof            `protobuf:"bytes,2,opt,name=credentialSchemaProof,proto3" json:"credentialSchemaProof,omitempty"`
+	TxAuthor                 string                    `protobuf:"bytes,3,opt,name=txAuthor,proto3" json:"txAuthor,omitempty"`
 }
 
+func (m *MsgRegisterCredentialSchema) Reset()         { *m = MsgRegisterCredentialSchema{} }
+func (m *MsgRegisterCredentialSchema) String() string { return proto.CompactTextString(m) }
+func (*MsgRegisterCredentialSchema) ProtoMessage()    {}
+func (*MsgRegisterCredentialSchema) Descriptor() ([]byte, []int) {
+	return fileDescriptor_73a1aa6c7279248b, []int{6}
+}
+func (m *MsgRegisterCredentialSchema) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgRegisterCredentialSchema) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgRegisterCredentialSchema.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgRegisterCredentialSchema) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgRegisterCredentialSchema.Merge(m, src)
+}
+func (m *MsgRegisterCredentialSchema) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgRegisterCredentialSchema) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgRegisterCredentialSchema.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgRegisterCredentialSchema proto.InternalMessageInfo
+
+func (m *MsgRegisterCredentialSchema) GetCredentialSchemaDocument() *CredentialSchemaDocument {
+	if m != nil {
+		return m.CredentialSchemaDocument
+	}
+	return nil
+}
+
+func (m *MsgRegisterCredentialSchema) GetCredentialSchemaProof() *DocumentProof {
+	if m != nil {
+		return m.CredentialSchemaProof
+	}
+	return nil
+}
+
+func (m *MsgRegisterCredentialSchema) GetTxAuthor() string {
+	if m != nil {
+		return m.TxAuthor
+	}
+	return ""
+}
+
+type MsgRegisterCredentialSchemaResponse struct {
+}
+
+func (m *MsgRegisterCredentialSchemaResponse) Reset()         { *m = MsgRegisterCredentialSchemaResponse{} }
+func (m *MsgRegisterCredentialSchemaResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgRegisterCredentialSchemaResponse) ProtoMessage()    {}
+func (*MsgRegisterCredentialSchemaResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_73a1aa6c7279248b, []int{7}
+}
+func (m *MsgRegisterCredentialSchemaResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgRegisterCredentialSchemaResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgRegisterCredentialSchemaResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgRegisterCredentialSchemaResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgRegisterCredentialSchemaResponse.Merge(m, src)
+}
+func (m *MsgRegisterCredentialSchemaResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgRegisterCredentialSchemaResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgRegisterCredentialSchemaResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgRegisterCredentialSchemaResponse proto.InternalMessageInfo
+
+type MsgUpdateCredentialSchema struct {
+	CredentialSchemaDocument *CredentialSchemaDocument `protobuf:"bytes,1,opt,name=credentialSchemaDocument,proto3" json:"credentialSchemaDocument,omitempty"`
+	CredentialSchemaProof    *DocumentProof            `protobuf:"bytes,2,opt,name=credentialSchemaProof,proto3" json:"credentialSchemaProof,omitempty"`
+	TxAuthor                 string                    `protobuf:"bytes,3,opt,name=txAuthor,proto3" json:"txAuthor,omitempty"`
+}
+
+func (m *MsgUpdateCredentialSchema) Reset()         { *m = MsgUpdateCredentialSchema{} }
+func (m *MsgUpdateCredentialSchema) String() string { return proto.CompactTextString(m) }
+func (*MsgUpdateCredentialSchema) ProtoMessage()    {}
+func (*MsgUpdateCredentialSchema) Descriptor() ([]byte, []int) {
+	return fileDescriptor_73a1aa6c7279248b, []int{8}
+}
+func (m *MsgUpdateCredentialSchema) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgUpdateCredentialSchema) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgUpdateCredentialSchema.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgUpdateCredentialSchema) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgUpdateCredentialSchema.Merge(m, src)
+}
+func (m *MsgUpdateCredentialSchema) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgUpdateCredentialSchema) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgUpdateCredentialSchema.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgUpdateCredentialSchema proto.InternalMessageInfo
+
+func (m *MsgUpdateCredentialSchema) GetCredentialSchemaDocument() *CredentialSchemaDocument {
+	if m != nil {
+		return m.CredentialSchemaDocument
+	}
+	return nil
+}
+
+func (m *MsgUpdateCredentialSchema) GetCredentialSchemaProof() *DocumentProof {
+	if m != nil {
+		return m.CredentialSchemaProof
+	}
+	return nil
+}
+
+func (m *MsgUpdateCredentialSchema) GetTxAuthor() string {
+	if m != nil {
+		return m.TxAuthor
+	}
+	return ""
+}
+
+type MsgUpdateCredentialSchemaResponse struct {
+}
+
+func (m *MsgUpdateCredentialSchemaResponse) Reset()         { *m = MsgUpdateCredentialSchemaResponse{} }
+func (m *MsgUpdateCredentialSchemaResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgUpdateCredentialSchemaResponse) ProtoMessage()    {}
+func (*MsgUpdateCredentialSchemaResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_73a1aa6c7279248b, []int{9}
+}
+func (m *MsgUpdateCredentialSchemaResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgUpdateCredentialSchemaResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgUpdateCredentialSchemaResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgUpdateCredentialSchemaResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgUpdateCredentialSchemaResponse.Merge(m, src)
+}
+func (m *MsgUpdateCredentialSchemaResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgUpdateCredentialSchemaResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgUpdateCredentialSchemaResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgUpdateCredentialSchemaResponse proto.InternalMessageInfo
+
 type MsgRegisterCredentialStatus struct {
-	Creator          string            `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	CredentialStatus *CredentialStatus `protobuf:"bytes,2,opt,name=credentialStatus,proto3" json:"credentialStatus,omitempty"`
-	Proof            *CredentialProof  `protobuf:"bytes,3,opt,name=proof,proto3" json:"proof,omitempty"`
-	ClientSpec       string            `protobuf:"bytes,4,opt,name=clientSpec,proto3" json:"clientSpec,omitempty"`
+	CredentialStatusDocument *CredentialStatusDocument `protobuf:"bytes,1,opt,name=credentialStatusDocument,proto3" json:"credentialStatusDocument,omitempty"`
+	CredentialStatusProof    *DocumentProof            `protobuf:"bytes,2,opt,name=credentialStatusProof,proto3" json:"credentialStatusProof,omitempty"`
+	TxAuthor                 string                    `protobuf:"bytes,3,opt,name=txAuthor,proto3" json:"txAuthor,omitempty"`
 }
 
 func (m *MsgRegisterCredentialStatus) Reset()         { *m = MsgRegisterCredentialStatus{} }
 func (m *MsgRegisterCredentialStatus) String() string { return proto.CompactTextString(m) }
 func (*MsgRegisterCredentialStatus) ProtoMessage()    {}
 func (*MsgRegisterCredentialStatus) Descriptor() ([]byte, []int) {
-	return fileDescriptor_73a1aa6c7279248b, []int{8}
+	return fileDescriptor_73a1aa6c7279248b, []int{10}
 }
 func (m *MsgRegisterCredentialStatus) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -531,43 +562,35 @@ func (m *MsgRegisterCredentialStatus) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgRegisterCredentialStatus proto.InternalMessageInfo
 
-func (m *MsgRegisterCredentialStatus) GetCreator() string {
+func (m *MsgRegisterCredentialStatus) GetCredentialStatusDocument() *CredentialStatusDocument {
 	if m != nil {
-		return m.Creator
-	}
-	return ""
-}
-
-func (m *MsgRegisterCredentialStatus) GetCredentialStatus() *CredentialStatus {
-	if m != nil {
-		return m.CredentialStatus
+		return m.CredentialStatusDocument
 	}
 	return nil
 }
 
-func (m *MsgRegisterCredentialStatus) GetProof() *CredentialProof {
+func (m *MsgRegisterCredentialStatus) GetCredentialStatusProof() *DocumentProof {
 	if m != nil {
-		return m.Proof
+		return m.CredentialStatusProof
 	}
 	return nil
 }
 
-func (m *MsgRegisterCredentialStatus) GetClientSpec() string {
+func (m *MsgRegisterCredentialStatus) GetTxAuthor() string {
 	if m != nil {
-		return m.ClientSpec
+		return m.TxAuthor
 	}
 	return ""
 }
 
 type MsgRegisterCredentialStatusResponse struct {
-	Id uint64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 }
 
 func (m *MsgRegisterCredentialStatusResponse) Reset()         { *m = MsgRegisterCredentialStatusResponse{} }
 func (m *MsgRegisterCredentialStatusResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgRegisterCredentialStatusResponse) ProtoMessage()    {}
 func (*MsgRegisterCredentialStatusResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_73a1aa6c7279248b, []int{9}
+	return fileDescriptor_73a1aa6c7279248b, []int{11}
 }
 func (m *MsgRegisterCredentialStatusResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -596,71 +619,162 @@ func (m *MsgRegisterCredentialStatusResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgRegisterCredentialStatusResponse proto.InternalMessageInfo
 
-func (m *MsgRegisterCredentialStatusResponse) GetId() uint64 {
-	if m != nil {
-		return m.Id
-	}
-	return 0
+type MsgUpdateCredentialStatus struct {
+	CredentialStatusDocument *CredentialStatusDocument `protobuf:"bytes,1,opt,name=credentialStatusDocument,proto3" json:"credentialStatusDocument,omitempty"`
+	CredentialStatusProof    *DocumentProof            `protobuf:"bytes,2,opt,name=credentialStatusProof,proto3" json:"credentialStatusProof,omitempty"`
+	TxAuthor                 string                    `protobuf:"bytes,3,opt,name=txAuthor,proto3" json:"txAuthor,omitempty"`
 }
 
+func (m *MsgUpdateCredentialStatus) Reset()         { *m = MsgUpdateCredentialStatus{} }
+func (m *MsgUpdateCredentialStatus) String() string { return proto.CompactTextString(m) }
+func (*MsgUpdateCredentialStatus) ProtoMessage()    {}
+func (*MsgUpdateCredentialStatus) Descriptor() ([]byte, []int) {
+	return fileDescriptor_73a1aa6c7279248b, []int{12}
+}
+func (m *MsgUpdateCredentialStatus) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgUpdateCredentialStatus) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgUpdateCredentialStatus.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgUpdateCredentialStatus) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgUpdateCredentialStatus.Merge(m, src)
+}
+func (m *MsgUpdateCredentialStatus) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgUpdateCredentialStatus) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgUpdateCredentialStatus.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgUpdateCredentialStatus proto.InternalMessageInfo
+
+func (m *MsgUpdateCredentialStatus) GetCredentialStatusDocument() *CredentialStatusDocument {
+	if m != nil {
+		return m.CredentialStatusDocument
+	}
+	return nil
+}
+
+func (m *MsgUpdateCredentialStatus) GetCredentialStatusProof() *DocumentProof {
+	if m != nil {
+		return m.CredentialStatusProof
+	}
+	return nil
+}
+
+func (m *MsgUpdateCredentialStatus) GetTxAuthor() string {
+	if m != nil {
+		return m.TxAuthor
+	}
+	return ""
+}
+
+type MsgUpdateCredentialStatusResponse struct {
+}
+
+func (m *MsgUpdateCredentialStatusResponse) Reset()         { *m = MsgUpdateCredentialStatusResponse{} }
+func (m *MsgUpdateCredentialStatusResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgUpdateCredentialStatusResponse) ProtoMessage()    {}
+func (*MsgUpdateCredentialStatusResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_73a1aa6c7279248b, []int{13}
+}
+func (m *MsgUpdateCredentialStatusResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgUpdateCredentialStatusResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgUpdateCredentialStatusResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgUpdateCredentialStatusResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgUpdateCredentialStatusResponse.Merge(m, src)
+}
+func (m *MsgUpdateCredentialStatusResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgUpdateCredentialStatusResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgUpdateCredentialStatusResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgUpdateCredentialStatusResponse proto.InternalMessageInfo
+
 func init() {
-	proto.RegisterType((*MsgCreateDID)(nil), "hypersignprotocol.hidnode.ssi.MsgCreateDID")
-	proto.RegisterType((*MsgCreateDIDResponse)(nil), "hypersignprotocol.hidnode.ssi.MsgCreateDIDResponse")
-	proto.RegisterType((*MsgUpdateDID)(nil), "hypersignprotocol.hidnode.ssi.MsgUpdateDID")
-	proto.RegisterType((*MsgUpdateDIDResponse)(nil), "hypersignprotocol.hidnode.ssi.MsgUpdateDIDResponse")
-	proto.RegisterType((*MsgCreateSchema)(nil), "hypersignprotocol.hidnode.ssi.MsgCreateSchema")
-	proto.RegisterType((*MsgCreateSchemaResponse)(nil), "hypersignprotocol.hidnode.ssi.MsgCreateSchemaResponse")
-	proto.RegisterType((*MsgDeactivateDID)(nil), "hypersignprotocol.hidnode.ssi.MsgDeactivateDID")
-	proto.RegisterType((*MsgDeactivateDIDResponse)(nil), "hypersignprotocol.hidnode.ssi.MsgDeactivateDIDResponse")
-	proto.RegisterType((*MsgRegisterCredentialStatus)(nil), "hypersignprotocol.hidnode.ssi.MsgRegisterCredentialStatus")
-	proto.RegisterType((*MsgRegisterCredentialStatusResponse)(nil), "hypersignprotocol.hidnode.ssi.MsgRegisterCredentialStatusResponse")
+	proto.RegisterType((*MsgRegisterDID)(nil), "hypersign.ssi.v1.MsgRegisterDID")
+	proto.RegisterType((*MsgRegisterDIDResponse)(nil), "hypersign.ssi.v1.MsgRegisterDIDResponse")
+	proto.RegisterType((*MsgUpdateDID)(nil), "hypersign.ssi.v1.MsgUpdateDID")
+	proto.RegisterType((*MsgUpdateDIDResponse)(nil), "hypersign.ssi.v1.MsgUpdateDIDResponse")
+	proto.RegisterType((*MsgDeactivateDID)(nil), "hypersign.ssi.v1.MsgDeactivateDID")
+	proto.RegisterType((*MsgDeactivateDIDResponse)(nil), "hypersign.ssi.v1.MsgDeactivateDIDResponse")
+	proto.RegisterType((*MsgRegisterCredentialSchema)(nil), "hypersign.ssi.v1.MsgRegisterCredentialSchema")
+	proto.RegisterType((*MsgRegisterCredentialSchemaResponse)(nil), "hypersign.ssi.v1.MsgRegisterCredentialSchemaResponse")
+	proto.RegisterType((*MsgUpdateCredentialSchema)(nil), "hypersign.ssi.v1.MsgUpdateCredentialSchema")
+	proto.RegisterType((*MsgUpdateCredentialSchemaResponse)(nil), "hypersign.ssi.v1.MsgUpdateCredentialSchemaResponse")
+	proto.RegisterType((*MsgRegisterCredentialStatus)(nil), "hypersign.ssi.v1.MsgRegisterCredentialStatus")
+	proto.RegisterType((*MsgRegisterCredentialStatusResponse)(nil), "hypersign.ssi.v1.MsgRegisterCredentialStatusResponse")
+	proto.RegisterType((*MsgUpdateCredentialStatus)(nil), "hypersign.ssi.v1.MsgUpdateCredentialStatus")
+	proto.RegisterType((*MsgUpdateCredentialStatusResponse)(nil), "hypersign.ssi.v1.MsgUpdateCredentialStatusResponse")
 }
 
 func init() { proto.RegisterFile("ssi/v1/tx.proto", fileDescriptor_73a1aa6c7279248b) }
 
 var fileDescriptor_73a1aa6c7279248b = []byte{
-	// 649 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x56, 0xd1, 0x6b, 0xd3, 0x5e,
-	0x14, 0xde, 0x6d, 0xbb, 0xdf, 0xcf, 0x9c, 0x4e, 0x37, 0xe2, 0x60, 0x21, 0xb2, 0x30, 0x2a, 0xe8,
-	0x9c, 0x2c, 0xc1, 0x0c, 0x15, 0x7c, 0xdc, 0x82, 0x52, 0x5c, 0x41, 0x52, 0x7c, 0xd1, 0x07, 0xc9,
-	0x72, 0xef, 0xd2, 0x0b, 0x6d, 0x6e, 0xc8, 0xbd, 0x2d, 0xeb, 0x7f, 0xe1, 0xb3, 0x7f, 0x91, 0xf8,
-	0xb4, 0x47, 0x7d, 0x93, 0x16, 0xfc, 0x07, 0x7c, 0x11, 0x9f, 0xa4, 0x49, 0x9a, 0xa6, 0x29, 0x69,
-	0xda, 0xb1, 0xc7, 0x73, 0xee, 0xf9, 0xce, 0x39, 0xdf, 0xc7, 0x97, 0x43, 0x60, 0x9b, 0x73, 0x6a,
-	0x0c, 0x9e, 0x19, 0xe2, 0x4a, 0x0f, 0x42, 0x26, 0x98, 0xbc, 0xdf, 0x19, 0x06, 0x24, 0xe4, 0xd4,
-	0xf3, 0xa3, 0xd8, 0x65, 0x5d, 0xbd, 0x43, 0xb1, 0xcf, 0x30, 0xd1, 0x39, 0xa7, 0xea, 0xfd, 0xa4,
-	0x9e, 0xbb, 0x1d, 0xd2, 0x73, 0x62, 0x8c, 0xba, 0x93, 0x24, 0x31, 0xc5, 0x49, 0x66, 0x2f, 0xc9,
-	0xb8, 0x21, 0xc1, 0xc4, 0x17, 0xd4, 0xe9, 0xc6, 0x0f, 0x8d, 0x1f, 0x08, 0xb6, 0x5a, 0xdc, 0x3b,
-	0x0b, 0x89, 0x23, 0x88, 0xd5, 0xb4, 0xe4, 0xd7, 0xb0, 0x85, 0x29, 0xb6, 0x98, 0xdb, 0x16, 0x21,
-	0xf5, 0x3d, 0x05, 0x1d, 0xa0, 0xc3, 0xba, 0xd9, 0xd0, 0x97, 0xae, 0xa1, 0x5b, 0x14, 0xdb, 0x73,
-	0x38, 0xf9, 0x0d, 0xc0, 0xa4, 0xda, 0x11, 0xfd, 0x90, 0x70, 0xa5, 0x72, 0x50, 0x3d, 0xac, 0x9b,
-	0x8f, 0x4b, 0xba, 0xb4, 0xa9, 0xe7, 0x37, 0xfd, 0x4b, 0x66, 0x67, 0xa0, 0xb2, 0x02, 0xff, 0xbb,
-	0x93, 0xed, 0x58, 0xa8, 0x54, 0x0f, 0xd0, 0xa1, 0x64, 0x4f, 0x43, 0x59, 0x03, 0x70, 0xbb, 0x94,
-	0xf8, 0xa2, 0x1d, 0x10, 0x57, 0xa9, 0x45, 0x8f, 0x99, 0x4c, 0xe3, 0x11, 0xec, 0x66, 0xa9, 0xd9,
-	0x84, 0x07, 0xcc, 0xe7, 0x44, 0xbe, 0x07, 0x15, 0x8a, 0x23, 0x62, 0x35, 0xbb, 0x42, 0x71, 0xe3,
-	0x4f, 0xac, 0xc1, 0xfb, 0x00, 0xdf, 0xb2, 0x06, 0xfb, 0x00, 0x83, 0x09, 0x80, 0xf9, 0x9f, 0x28,
-	0x56, 0x2a, 0xd1, 0x82, 0x52, 0x92, 0x69, 0xe2, 0x9c, 0x44, 0xd5, 0x5b, 0x91, 0xa8, 0xb6, 0x4c,
-	0xa2, 0xcd, 0x05, 0x89, 0xcc, 0x48, 0xa2, 0x94, 0x79, 0x2a, 0x91, 0x0a, 0x77, 0xfa, 0x51, 0xb2,
-	0x19, 0x0b, 0x25, 0xd9, 0x69, 0xdc, 0xf8, 0x85, 0x60, 0x3b, 0xd5, 0xb5, 0x1d, 0xf9, 0x2e, 0xbb,
-	0x01, 0x9a, 0xdf, 0xe0, 0x2d, 0x48, 0xb1, 0x37, 0x2d, 0xe6, 0x46, 0x12, 0xd4, 0xcd, 0xe3, 0x32,
-	0x8e, 0xd3, 0xfa, 0x7e, 0x8f, 0xf8, 0xc2, 0x9e, 0xe1, 0xe5, 0x73, 0xa8, 0xc7, 0xc1, 0xbb, 0x90,
-	0xb1, 0xcb, 0xc8, 0x0f, 0x75, 0xf3, 0x68, 0xa5, 0x76, 0x11, 0xc2, 0xce, 0xc2, 0x4b, 0xfd, 0xf3,
-	0x04, 0xf6, 0x72, 0x3c, 0x0b, 0x2d, 0xf4, 0x0d, 0xc1, 0x4e, 0x8b, 0x7b, 0x16, 0x71, 0x5c, 0x41,
-	0x07, 0x89, 0x8d, 0x8a, 0x45, 0xd9, 0x85, 0x4d, 0x4c, 0x71, 0x73, 0xea, 0x89, 0x38, 0xc8, 0xd9,
-	0xa5, 0xba, 0xdc, 0x2e, 0xb5, 0x9b, 0xdb, 0xa5, 0xcc, 0x14, 0x47, 0xa0, 0xe4, 0xb9, 0x14, 0x12,
-	0xff, 0x8b, 0xe0, 0x41, 0x8b, 0x7b, 0x36, 0xf1, 0x28, 0x17, 0x24, 0x3c, 0x4b, 0xef, 0x4b, 0x5b,
-	0x38, 0xa2, 0xcf, 0x97, 0x68, 0xf0, 0x11, 0x76, 0xdc, 0x5c, 0x75, 0xe2, 0x0f, 0xa3, 0x84, 0x54,
-	0x7e, 0x88, 0xbd, 0xd0, 0x48, 0xb6, 0x60, 0x33, 0xc8, 0x58, 0x44, 0x5f, 0xb9, 0x63, 0x6c, 0x93,
-	0x18, 0x5c, 0x6a, 0x90, 0xe7, 0xf0, 0x70, 0x09, 0xf7, 0x22, 0xcd, 0xcc, 0xdf, 0x35, 0xa8, 0xb6,
-	0xb8, 0x27, 0xf7, 0x40, 0x9a, 0xdd, 0xdd, 0xa7, 0x25, 0x2b, 0x66, 0x2f, 0x99, 0x7a, 0xb2, 0x46,
-	0x71, 0xba, 0x46, 0x0f, 0xa4, 0xd9, 0x89, 0x5b, 0x61, 0x5c, 0x5a, 0xbc, 0xca, 0xb8, 0xc5, 0x13,
-	0x32, 0x80, 0xad, 0xb9, 0x13, 0xa1, 0xaf, 0xba, 0x73, 0x5c, 0xaf, 0xbe, 0x58, 0xaf, 0x3e, 0x9d,
-	0x3b, 0x84, 0xbb, 0xf3, 0x9f, 0xa1, 0x51, 0xde, 0x68, 0x0e, 0xa0, 0xbe, 0x5c, 0x13, 0x90, 0x8e,
-	0xfe, 0x82, 0x40, 0x29, 0xfc, 0x12, 0x5e, 0x95, 0x77, 0x2d, 0xc2, 0xaa, 0xa7, 0x37, 0xc7, 0x4e,
-	0x97, 0x3b, 0x3d, 0xff, 0x3a, 0xd2, 0xd0, 0xf5, 0x48, 0x43, 0x3f, 0x47, 0x1a, 0xfa, 0x3c, 0xd6,
-	0x36, 0xae, 0xc7, 0xda, 0xc6, 0xf7, 0xb1, 0xb6, 0xf1, 0xc1, 0xf4, 0xa8, 0xe8, 0xf4, 0x2f, 0x74,
-	0x97, 0xf5, 0x8c, 0x74, 0xce, 0xf1, 0x74, 0x90, 0xd1, 0xa1, 0xf8, 0x78, 0x32, 0xc9, 0xb8, 0x32,
-	0x26, 0x7f, 0x11, 0x62, 0x18, 0x10, 0x7e, 0xf1, 0x5f, 0xf4, 0x7c, 0xf2, 0x2f, 0x00, 0x00, 0xff,
-	0xff, 0xf6, 0xb6, 0xab, 0x57, 0xb0, 0x08, 0x00, 0x00,
+	// 612 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe4, 0x96, 0x4f, 0x6f, 0xd3, 0x4c,
+	0x10, 0xc6, 0xb3, 0xcd, 0xab, 0xea, 0xcd, 0x84, 0x42, 0xb0, 0x20, 0x32, 0x06, 0x4c, 0x48, 0x01,
+	0x45, 0x45, 0xb1, 0xd5, 0x44, 0x9c, 0x11, 0x34, 0x97, 0x48, 0x44, 0x42, 0xae, 0x7a, 0x80, 0x4b,
+	0x95, 0xda, 0x5b, 0x67, 0xa5, 0xc6, 0x6b, 0x79, 0x37, 0x51, 0xca, 0x89, 0x8f, 0xc0, 0x81, 0x8f,
+	0xc3, 0x85, 0x1b, 0xc7, 0x1e, 0x7b, 0x44, 0xc9, 0x77, 0x40, 0x1c, 0x51, 0x36, 0xee, 0xc6, 0x76,
+	0xec, 0xfc, 0xe9, 0xa9, 0x82, 0xa3, 0x67, 0x9e, 0x67, 0x67, 0x7f, 0xe3, 0xf1, 0xae, 0xe1, 0x0e,
+	0x63, 0xc4, 0x1c, 0xee, 0x9b, 0x7c, 0x64, 0xf8, 0x01, 0xe5, 0x54, 0x29, 0xf5, 0xce, 0x7d, 0x1c,
+	0x30, 0xe2, 0x7a, 0x06, 0x63, 0xc4, 0x18, 0xee, 0x6b, 0x7a, 0x28, 0xb1, 0x03, 0xec, 0x60, 0x8f,
+	0x93, 0xee, 0xd9, 0x31, 0xb3, 0x7b, 0xb8, 0xdf, 0x9d, 0x39, 0xb4, 0x52, 0x98, 0x77, 0x88, 0x13,
+	0x46, 0xd2, 0x1c, 0xbc, 0xcb, 0x07, 0x2c, 0xcc, 0x2b, 0x61, 0xde, 0x0f, 0x28, 0x3d, 0x9d, 0xc5,
+	0xaa, 0xdf, 0x10, 0xdc, 0xee, 0x30, 0xd7, 0xc2, 0x2e, 0x61, 0x1c, 0x07, 0xad, 0x76, 0x4b, 0x79,
+	0x0d, 0x45, 0x87, 0x38, 0x2d, 0x6a, 0x0f, 0xfa, 0xd8, 0xe3, 0x2a, 0xaa, 0xa0, 0x5a, 0xb1, 0xf1,
+	0xd8, 0x48, 0x6e, 0xd0, 0x68, 0xcd, 0x45, 0x56, 0xd4, 0xa1, 0x74, 0xe0, 0x6e, 0xe4, 0xf1, 0xfd,
+	0xb4, 0x1a, 0x53, 0xb7, 0x2a, 0xf9, 0x5a, 0xb1, 0xf1, 0x24, 0x65, 0x99, 0xa8, 0xce, 0x5a, 0x74,
+	0x2a, 0x1a, 0xfc, 0xcf, 0x47, 0x6f, 0x06, 0xbc, 0x47, 0x03, 0x35, 0x5f, 0x41, 0xb5, 0x82, 0x25,
+	0x9f, 0xab, 0x2a, 0x94, 0xe3, 0xbb, 0xb7, 0x30, 0xf3, 0xa9, 0xc7, 0x70, 0xf5, 0x12, 0xc1, 0xad,
+	0x0e, 0x73, 0x8f, 0x7c, 0xa7, 0xcb, 0xf1, 0x4d, 0xc4, 0x7a, 0x04, 0x85, 0xe1, 0xd4, 0x42, 0xbd,
+	0xb6, 0x13, 0x72, 0xcd, 0x03, 0x31, 0xe8, 0xff, 0x12, 0xd0, 0x65, 0xb8, 0x17, 0x25, 0x93, 0xc8,
+	0xdf, 0x11, 0x94, 0x3a, 0xcc, 0x6d, 0xe1, 0xae, 0xcd, 0xc9, 0x30, 0xc4, 0x7e, 0x06, 0x3b, 0x91,
+	0xda, 0x6d, 0x47, 0x80, 0x17, 0xac, 0x78, 0xf0, 0xe6, 0xb0, 0x69, 0xa0, 0x26, 0x11, 0x24, 0xdf,
+	0x6f, 0x04, 0x0f, 0x23, 0x6f, 0xfb, 0x40, 0x8e, 0xf9, 0xa1, 0xf8, 0x2e, 0x94, 0x53, 0x50, 0xed,
+	0x44, 0x2c, 0xf1, 0xba, 0xf7, 0x16, 0x59, 0x0e, 0x32, 0x1c, 0x56, 0xe6, 0x5a, 0xca, 0x11, 0xdc,
+	0x4f, 0xe6, 0x04, 0xb7, 0xba, 0x25, 0x8a, 0xac, 0x6c, 0x58, 0xba, 0x7b, 0xe9, 0x9c, 0x3f, 0x87,
+	0xdd, 0x25, 0xe4, 0xb2, 0x43, 0xbf, 0x10, 0x3c, 0x90, 0xa3, 0xf1, 0x2f, 0xf5, 0x67, 0x17, 0x9e,
+	0x66, 0x72, 0xaf, 0x31, 0x3f, 0xe2, 0x94, 0x4c, 0xf4, 0x47, 0xc4, 0x36, 0xea, 0x4f, 0xcc, 0x61,
+	0x65, 0xae, 0x95, 0xe8, 0x8f, 0xc8, 0x5d, 0xbb, 0x3f, 0x73, 0xf7, 0xf5, 0xe6, 0x47, 0xf8, 0x57,
+	0xce, 0xcf, 0x5f, 0xdf, 0x9f, 0x8c, 0xf9, 0x89, 0x75, 0xa7, 0xf1, 0x75, 0x1b, 0xf2, 0x1d, 0xe6,
+	0x2a, 0x1f, 0xa0, 0x18, 0xbd, 0x2f, 0x2b, 0x8b, 0xfb, 0x89, 0xdf, 0x49, 0x5a, 0x6d, 0x95, 0xe2,
+	0xaa, 0x84, 0x72, 0x08, 0x85, 0xf9, 0x8d, 0xa5, 0xa7, 0xda, 0x64, 0x5e, 0x7b, 0xb1, 0x3c, 0x2f,
+	0x17, 0x3d, 0x86, 0x9d, 0xf8, 0x9d, 0x50, 0x4d, 0x35, 0xc6, 0x34, 0xda, 0xde, 0x6a, 0x8d, 0x2c,
+	0xf0, 0x19, 0x81, 0x9a, 0x79, 0x2a, 0xd7, 0x97, 0xc2, 0x27, 0xe5, 0xda, 0xab, 0x8d, 0xe4, 0x72,
+	0x0b, 0x9f, 0xa0, 0x9c, 0x71, 0xea, 0xbd, 0x5c, 0xd2, 0xa5, 0x85, 0xea, 0xcd, 0x0d, 0xc4, 0xab,
+	0xf0, 0x67, 0x1f, 0xcd, 0xda, 0xf8, 0x42, 0xbe, 0x3e, 0x7e, 0x6c, 0x34, 0x53, 0xf1, 0x67, 0xf5,
+	0xd7, 0xc4, 0x9f, 0x55, 0x6f, 0x6e, 0x20, 0xbe, 0xaa, 0xfd, 0xf6, 0xdd, 0x8f, 0xb1, 0x8e, 0x2e,
+	0xc6, 0x3a, 0xfa, 0x39, 0xd6, 0xd1, 0x97, 0x89, 0x9e, 0xbb, 0x98, 0xe8, 0xb9, 0xcb, 0x89, 0x9e,
+	0xfb, 0xd8, 0x70, 0x09, 0xef, 0x0d, 0x4e, 0x0c, 0x9b, 0xf6, 0x4d, 0xb9, 0x70, 0x5d, 0xfc, 0x78,
+	0xda, 0xf4, 0xcc, 0xec, 0x11, 0xa7, 0xee, 0x51, 0x07, 0x9b, 0x23, 0x73, 0xfa, 0x67, 0xca, 0xcf,
+	0x7d, 0xcc, 0x4e, 0xb6, 0x45, 0xba, 0xf9, 0x27, 0x00, 0x00, 0xff, 0xff, 0xbf, 0xe5, 0x50, 0x92,
+	0x22, 0x0b, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -675,11 +789,13 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type MsgClient interface {
-	CreateDID(ctx context.Context, in *MsgCreateDID, opts ...grpc.CallOption) (*MsgCreateDIDResponse, error)
+	RegisterDID(ctx context.Context, in *MsgRegisterDID, opts ...grpc.CallOption) (*MsgRegisterDIDResponse, error)
 	UpdateDID(ctx context.Context, in *MsgUpdateDID, opts ...grpc.CallOption) (*MsgUpdateDIDResponse, error)
-	CreateSchema(ctx context.Context, in *MsgCreateSchema, opts ...grpc.CallOption) (*MsgCreateSchemaResponse, error)
 	DeactivateDID(ctx context.Context, in *MsgDeactivateDID, opts ...grpc.CallOption) (*MsgDeactivateDIDResponse, error)
+	RegisterCredentialSchema(ctx context.Context, in *MsgRegisterCredentialSchema, opts ...grpc.CallOption) (*MsgRegisterCredentialSchemaResponse, error)
+	UpdateCredentialSchema(ctx context.Context, in *MsgUpdateCredentialSchema, opts ...grpc.CallOption) (*MsgUpdateCredentialSchemaResponse, error)
 	RegisterCredentialStatus(ctx context.Context, in *MsgRegisterCredentialStatus, opts ...grpc.CallOption) (*MsgRegisterCredentialStatusResponse, error)
+	UpdateCredentialStatus(ctx context.Context, in *MsgUpdateCredentialStatus, opts ...grpc.CallOption) (*MsgUpdateCredentialStatusResponse, error)
 }
 
 type msgClient struct {
@@ -690,9 +806,9 @@ func NewMsgClient(cc grpc1.ClientConn) MsgClient {
 	return &msgClient{cc}
 }
 
-func (c *msgClient) CreateDID(ctx context.Context, in *MsgCreateDID, opts ...grpc.CallOption) (*MsgCreateDIDResponse, error) {
-	out := new(MsgCreateDIDResponse)
-	err := c.cc.Invoke(ctx, "/hypersignprotocol.hidnode.ssi.Msg/CreateDID", in, out, opts...)
+func (c *msgClient) RegisterDID(ctx context.Context, in *MsgRegisterDID, opts ...grpc.CallOption) (*MsgRegisterDIDResponse, error) {
+	out := new(MsgRegisterDIDResponse)
+	err := c.cc.Invoke(ctx, "/hypersign.ssi.v1.Msg/RegisterDID", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -701,16 +817,7 @@ func (c *msgClient) CreateDID(ctx context.Context, in *MsgCreateDID, opts ...grp
 
 func (c *msgClient) UpdateDID(ctx context.Context, in *MsgUpdateDID, opts ...grpc.CallOption) (*MsgUpdateDIDResponse, error) {
 	out := new(MsgUpdateDIDResponse)
-	err := c.cc.Invoke(ctx, "/hypersignprotocol.hidnode.ssi.Msg/UpdateDID", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *msgClient) CreateSchema(ctx context.Context, in *MsgCreateSchema, opts ...grpc.CallOption) (*MsgCreateSchemaResponse, error) {
-	out := new(MsgCreateSchemaResponse)
-	err := c.cc.Invoke(ctx, "/hypersignprotocol.hidnode.ssi.Msg/CreateSchema", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/hypersign.ssi.v1.Msg/UpdateDID", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -719,7 +826,25 @@ func (c *msgClient) CreateSchema(ctx context.Context, in *MsgCreateSchema, opts 
 
 func (c *msgClient) DeactivateDID(ctx context.Context, in *MsgDeactivateDID, opts ...grpc.CallOption) (*MsgDeactivateDIDResponse, error) {
 	out := new(MsgDeactivateDIDResponse)
-	err := c.cc.Invoke(ctx, "/hypersignprotocol.hidnode.ssi.Msg/DeactivateDID", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/hypersign.ssi.v1.Msg/DeactivateDID", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) RegisterCredentialSchema(ctx context.Context, in *MsgRegisterCredentialSchema, opts ...grpc.CallOption) (*MsgRegisterCredentialSchemaResponse, error) {
+	out := new(MsgRegisterCredentialSchemaResponse)
+	err := c.cc.Invoke(ctx, "/hypersign.ssi.v1.Msg/RegisterCredentialSchema", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) UpdateCredentialSchema(ctx context.Context, in *MsgUpdateCredentialSchema, opts ...grpc.CallOption) (*MsgUpdateCredentialSchemaResponse, error) {
+	out := new(MsgUpdateCredentialSchemaResponse)
+	err := c.cc.Invoke(ctx, "/hypersign.ssi.v1.Msg/UpdateCredentialSchema", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -728,7 +853,16 @@ func (c *msgClient) DeactivateDID(ctx context.Context, in *MsgDeactivateDID, opt
 
 func (c *msgClient) RegisterCredentialStatus(ctx context.Context, in *MsgRegisterCredentialStatus, opts ...grpc.CallOption) (*MsgRegisterCredentialStatusResponse, error) {
 	out := new(MsgRegisterCredentialStatusResponse)
-	err := c.cc.Invoke(ctx, "/hypersignprotocol.hidnode.ssi.Msg/RegisterCredentialStatus", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/hypersign.ssi.v1.Msg/RegisterCredentialStatus", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) UpdateCredentialStatus(ctx context.Context, in *MsgUpdateCredentialStatus, opts ...grpc.CallOption) (*MsgUpdateCredentialStatusResponse, error) {
+	out := new(MsgUpdateCredentialStatusResponse)
+	err := c.cc.Invoke(ctx, "/hypersign.ssi.v1.Msg/UpdateCredentialStatus", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -737,51 +871,59 @@ func (c *msgClient) RegisterCredentialStatus(ctx context.Context, in *MsgRegiste
 
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
-	CreateDID(context.Context, *MsgCreateDID) (*MsgCreateDIDResponse, error)
+	RegisterDID(context.Context, *MsgRegisterDID) (*MsgRegisterDIDResponse, error)
 	UpdateDID(context.Context, *MsgUpdateDID) (*MsgUpdateDIDResponse, error)
-	CreateSchema(context.Context, *MsgCreateSchema) (*MsgCreateSchemaResponse, error)
 	DeactivateDID(context.Context, *MsgDeactivateDID) (*MsgDeactivateDIDResponse, error)
+	RegisterCredentialSchema(context.Context, *MsgRegisterCredentialSchema) (*MsgRegisterCredentialSchemaResponse, error)
+	UpdateCredentialSchema(context.Context, *MsgUpdateCredentialSchema) (*MsgUpdateCredentialSchemaResponse, error)
 	RegisterCredentialStatus(context.Context, *MsgRegisterCredentialStatus) (*MsgRegisterCredentialStatusResponse, error)
+	UpdateCredentialStatus(context.Context, *MsgUpdateCredentialStatus) (*MsgUpdateCredentialStatusResponse, error)
 }
 
 // UnimplementedMsgServer can be embedded to have forward compatible implementations.
 type UnimplementedMsgServer struct {
 }
 
-func (*UnimplementedMsgServer) CreateDID(ctx context.Context, req *MsgCreateDID) (*MsgCreateDIDResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CreateDID not implemented")
+func (*UnimplementedMsgServer) RegisterDID(ctx context.Context, req *MsgRegisterDID) (*MsgRegisterDIDResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RegisterDID not implemented")
 }
 func (*UnimplementedMsgServer) UpdateDID(ctx context.Context, req *MsgUpdateDID) (*MsgUpdateDIDResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateDID not implemented")
 }
-func (*UnimplementedMsgServer) CreateSchema(ctx context.Context, req *MsgCreateSchema) (*MsgCreateSchemaResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CreateSchema not implemented")
-}
 func (*UnimplementedMsgServer) DeactivateDID(ctx context.Context, req *MsgDeactivateDID) (*MsgDeactivateDIDResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeactivateDID not implemented")
 }
+func (*UnimplementedMsgServer) RegisterCredentialSchema(ctx context.Context, req *MsgRegisterCredentialSchema) (*MsgRegisterCredentialSchemaResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RegisterCredentialSchema not implemented")
+}
+func (*UnimplementedMsgServer) UpdateCredentialSchema(ctx context.Context, req *MsgUpdateCredentialSchema) (*MsgUpdateCredentialSchemaResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateCredentialSchema not implemented")
+}
 func (*UnimplementedMsgServer) RegisterCredentialStatus(ctx context.Context, req *MsgRegisterCredentialStatus) (*MsgRegisterCredentialStatusResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RegisterCredentialStatus not implemented")
+}
+func (*UnimplementedMsgServer) UpdateCredentialStatus(ctx context.Context, req *MsgUpdateCredentialStatus) (*MsgUpdateCredentialStatusResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateCredentialStatus not implemented")
 }
 
 func RegisterMsgServer(s grpc1.Server, srv MsgServer) {
 	s.RegisterService(&_Msg_serviceDesc, srv)
 }
 
-func _Msg_CreateDID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgCreateDID)
+func _Msg_RegisterDID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgRegisterDID)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MsgServer).CreateDID(ctx, in)
+		return srv.(MsgServer).RegisterDID(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/hypersignprotocol.hidnode.ssi.Msg/CreateDID",
+		FullMethod: "/hypersign.ssi.v1.Msg/RegisterDID",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).CreateDID(ctx, req.(*MsgCreateDID))
+		return srv.(MsgServer).RegisterDID(ctx, req.(*MsgRegisterDID))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -796,28 +938,10 @@ func _Msg_UpdateDID_Handler(srv interface{}, ctx context.Context, dec func(inter
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/hypersignprotocol.hidnode.ssi.Msg/UpdateDID",
+		FullMethod: "/hypersign.ssi.v1.Msg/UpdateDID",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(MsgServer).UpdateDID(ctx, req.(*MsgUpdateDID))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Msg_CreateSchema_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgCreateSchema)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MsgServer).CreateSchema(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/hypersignprotocol.hidnode.ssi.Msg/CreateSchema",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).CreateSchema(ctx, req.(*MsgCreateSchema))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -832,10 +956,46 @@ func _Msg_DeactivateDID_Handler(srv interface{}, ctx context.Context, dec func(i
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/hypersignprotocol.hidnode.ssi.Msg/DeactivateDID",
+		FullMethod: "/hypersign.ssi.v1.Msg/DeactivateDID",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(MsgServer).DeactivateDID(ctx, req.(*MsgDeactivateDID))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_RegisterCredentialSchema_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgRegisterCredentialSchema)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).RegisterCredentialSchema(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/hypersign.ssi.v1.Msg/RegisterCredentialSchema",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).RegisterCredentialSchema(ctx, req.(*MsgRegisterCredentialSchema))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_UpdateCredentialSchema_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgUpdateCredentialSchema)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).UpdateCredentialSchema(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/hypersign.ssi.v1.Msg/UpdateCredentialSchema",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).UpdateCredentialSchema(ctx, req.(*MsgUpdateCredentialSchema))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -850,7 +1010,7 @@ func _Msg_RegisterCredentialStatus_Handler(srv interface{}, ctx context.Context,
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/hypersignprotocol.hidnode.ssi.Msg/RegisterCredentialStatus",
+		FullMethod: "/hypersign.ssi.v1.Msg/RegisterCredentialStatus",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(MsgServer).RegisterCredentialStatus(ctx, req.(*MsgRegisterCredentialStatus))
@@ -858,36 +1018,62 @@ func _Msg_RegisterCredentialStatus_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Msg_UpdateCredentialStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgUpdateCredentialStatus)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).UpdateCredentialStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/hypersign.ssi.v1.Msg/UpdateCredentialStatus",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).UpdateCredentialStatus(ctx, req.(*MsgUpdateCredentialStatus))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _Msg_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "hypersignprotocol.hidnode.ssi.Msg",
+	ServiceName: "hypersign.ssi.v1.Msg",
 	HandlerType: (*MsgServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "CreateDID",
-			Handler:    _Msg_CreateDID_Handler,
+			MethodName: "RegisterDID",
+			Handler:    _Msg_RegisterDID_Handler,
 		},
 		{
 			MethodName: "UpdateDID",
 			Handler:    _Msg_UpdateDID_Handler,
 		},
 		{
-			MethodName: "CreateSchema",
-			Handler:    _Msg_CreateSchema_Handler,
-		},
-		{
 			MethodName: "DeactivateDID",
 			Handler:    _Msg_DeactivateDID_Handler,
 		},
 		{
+			MethodName: "RegisterCredentialSchema",
+			Handler:    _Msg_RegisterCredentialSchema_Handler,
+		},
+		{
+			MethodName: "UpdateCredentialSchema",
+			Handler:    _Msg_UpdateCredentialSchema_Handler,
+		},
+		{
 			MethodName: "RegisterCredentialStatus",
 			Handler:    _Msg_RegisterCredentialStatus_Handler,
+		},
+		{
+			MethodName: "UpdateCredentialStatus",
+			Handler:    _Msg_UpdateCredentialStatus_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "ssi/v1/tx.proto",
 }
 
-func (m *MsgCreateDID) Marshal() (dAtA []byte, err error) {
+func (m *MsgRegisterDID) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -897,34 +1083,27 @@ func (m *MsgCreateDID) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgCreateDID) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgRegisterDID) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgCreateDID) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgRegisterDID) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.ClientSpec) > 0 {
-		i -= len(m.ClientSpec)
-		copy(dAtA[i:], m.ClientSpec)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.ClientSpec)))
-		i--
-		dAtA[i] = 0x22
-	}
-	if len(m.Creator) > 0 {
-		i -= len(m.Creator)
-		copy(dAtA[i:], m.Creator)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
+	if len(m.TxAuthor) > 0 {
+		i -= len(m.TxAuthor)
+		copy(dAtA[i:], m.TxAuthor)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.TxAuthor)))
 		i--
 		dAtA[i] = 0x1a
 	}
-	if len(m.Signatures) > 0 {
-		for iNdEx := len(m.Signatures) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.DidDocumentProofs) > 0 {
+		for iNdEx := len(m.DidDocumentProofs) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.Signatures[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.DidDocumentProofs[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -935,9 +1114,9 @@ func (m *MsgCreateDID) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			dAtA[i] = 0x12
 		}
 	}
-	if m.DidDocString != nil {
+	if m.DidDocument != nil {
 		{
-			size, err := m.DidDocString.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.DidDocument.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -950,7 +1129,7 @@ func (m *MsgCreateDID) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgCreateDIDResponse) Marshal() (dAtA []byte, err error) {
+func (m *MsgRegisterDIDResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -960,21 +1139,16 @@ func (m *MsgCreateDIDResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgCreateDIDResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgRegisterDIDResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgCreateDIDResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgRegisterDIDResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.Id != 0 {
-		i = encodeVarintTx(dAtA, i, uint64(m.Id))
-		i--
-		dAtA[i] = 0x8
-	}
 	return len(dAtA) - i, nil
 }
 
@@ -998,24 +1172,24 @@ func (m *MsgUpdateDID) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.ClientSpec) > 0 {
-		i -= len(m.ClientSpec)
-		copy(dAtA[i:], m.ClientSpec)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.ClientSpec)))
-		i--
-		dAtA[i] = 0x2a
-	}
-	if len(m.Creator) > 0 {
-		i -= len(m.Creator)
-		copy(dAtA[i:], m.Creator)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
+	if len(m.TxAuthor) > 0 {
+		i -= len(m.TxAuthor)
+		copy(dAtA[i:], m.TxAuthor)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.TxAuthor)))
 		i--
 		dAtA[i] = 0x22
 	}
-	if len(m.Signatures) > 0 {
-		for iNdEx := len(m.Signatures) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.VersionId) > 0 {
+		i -= len(m.VersionId)
+		copy(dAtA[i:], m.VersionId)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.VersionId)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.DidDocumentProofs) > 0 {
+		for iNdEx := len(m.DidDocumentProofs) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.Signatures[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.DidDocumentProofs[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -1023,19 +1197,12 @@ func (m *MsgUpdateDID) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 				i = encodeVarintTx(dAtA, i, uint64(size))
 			}
 			i--
-			dAtA[i] = 0x1a
+			dAtA[i] = 0x12
 		}
 	}
-	if len(m.VersionId) > 0 {
-		i -= len(m.VersionId)
-		copy(dAtA[i:], m.VersionId)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.VersionId)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if m.DidDocString != nil {
+	if m.DidDocument != nil {
 		{
-			size, err := m.DidDocString.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.DidDocument.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -1068,102 +1235,6 @@ func (m *MsgUpdateDIDResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.UpdateId) > 0 {
-		i -= len(m.UpdateId)
-		copy(dAtA[i:], m.UpdateId)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.UpdateId)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *MsgCreateSchema) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *MsgCreateSchema) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *MsgCreateSchema) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.ClientSpec) > 0 {
-		i -= len(m.ClientSpec)
-		copy(dAtA[i:], m.ClientSpec)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.ClientSpec)))
-		i--
-		dAtA[i] = 0x22
-	}
-	if m.SchemaProof != nil {
-		{
-			size, err := m.SchemaProof.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintTx(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x1a
-	}
-	if m.SchemaDoc != nil {
-		{
-			size, err := m.SchemaDoc.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintTx(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x12
-	}
-	if len(m.Creator) > 0 {
-		i -= len(m.Creator)
-		copy(dAtA[i:], m.Creator)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *MsgCreateSchemaResponse) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *MsgCreateSchemaResponse) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *MsgCreateSchemaResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.Id != 0 {
-		i = encodeVarintTx(dAtA, i, uint64(m.Id))
-		i--
-		dAtA[i] = 0x8
-	}
 	return len(dAtA) - i, nil
 }
 
@@ -1187,26 +1258,12 @@ func (m *MsgDeactivateDID) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.ClientSpec) > 0 {
-		i -= len(m.ClientSpec)
-		copy(dAtA[i:], m.ClientSpec)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.ClientSpec)))
+	if len(m.TxAuthor) > 0 {
+		i -= len(m.TxAuthor)
+		copy(dAtA[i:], m.TxAuthor)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.TxAuthor)))
 		i--
-		dAtA[i] = 0x2a
-	}
-	if len(m.Signatures) > 0 {
-		for iNdEx := len(m.Signatures) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.Signatures[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintTx(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0x22
-		}
+		dAtA[i] = 0x22
 	}
 	if len(m.VersionId) > 0 {
 		i -= len(m.VersionId)
@@ -1215,17 +1272,24 @@ func (m *MsgDeactivateDID) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x1a
 	}
-	if len(m.DidId) > 0 {
-		i -= len(m.DidId)
-		copy(dAtA[i:], m.DidId)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.DidId)))
-		i--
-		dAtA[i] = 0x12
+	if len(m.DidDocumentProofs) > 0 {
+		for iNdEx := len(m.DidDocumentProofs) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.DidDocumentProofs[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintTx(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x12
+		}
 	}
-	if len(m.Creator) > 0 {
-		i -= len(m.Creator)
-		copy(dAtA[i:], m.Creator)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
+	if len(m.DidDocumentId) > 0 {
+		i -= len(m.DidDocumentId)
+		copy(dAtA[i:], m.DidDocumentId)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.DidDocumentId)))
 		i--
 		dAtA[i] = 0xa
 	}
@@ -1252,11 +1316,160 @@ func (m *MsgDeactivateDIDResponse) MarshalToSizedBuffer(dAtA []byte) (int, error
 	_ = i
 	var l int
 	_ = l
-	if m.Id != 0 {
-		i = encodeVarintTx(dAtA, i, uint64(m.Id))
-		i--
-		dAtA[i] = 0x8
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgRegisterCredentialSchema) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
 	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgRegisterCredentialSchema) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgRegisterCredentialSchema) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.TxAuthor) > 0 {
+		i -= len(m.TxAuthor)
+		copy(dAtA[i:], m.TxAuthor)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.TxAuthor)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if m.CredentialSchemaProof != nil {
+		{
+			size, err := m.CredentialSchemaProof.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintTx(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x12
+	}
+	if m.CredentialSchemaDocument != nil {
+		{
+			size, err := m.CredentialSchemaDocument.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintTx(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgRegisterCredentialSchemaResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgRegisterCredentialSchemaResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgRegisterCredentialSchemaResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgUpdateCredentialSchema) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgUpdateCredentialSchema) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgUpdateCredentialSchema) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.TxAuthor) > 0 {
+		i -= len(m.TxAuthor)
+		copy(dAtA[i:], m.TxAuthor)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.TxAuthor)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if m.CredentialSchemaProof != nil {
+		{
+			size, err := m.CredentialSchemaProof.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintTx(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x12
+	}
+	if m.CredentialSchemaDocument != nil {
+		{
+			size, err := m.CredentialSchemaDocument.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintTx(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgUpdateCredentialSchemaResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgUpdateCredentialSchemaResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgUpdateCredentialSchemaResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
 	return len(dAtA) - i, nil
 }
 
@@ -1280,28 +1493,16 @@ func (m *MsgRegisterCredentialStatus) MarshalToSizedBuffer(dAtA []byte) (int, er
 	_ = i
 	var l int
 	_ = l
-	if len(m.ClientSpec) > 0 {
-		i -= len(m.ClientSpec)
-		copy(dAtA[i:], m.ClientSpec)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.ClientSpec)))
-		i--
-		dAtA[i] = 0x22
-	}
-	if m.Proof != nil {
-		{
-			size, err := m.Proof.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintTx(dAtA, i, uint64(size))
-		}
+	if len(m.TxAuthor) > 0 {
+		i -= len(m.TxAuthor)
+		copy(dAtA[i:], m.TxAuthor)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.TxAuthor)))
 		i--
 		dAtA[i] = 0x1a
 	}
-	if m.CredentialStatus != nil {
+	if m.CredentialStatusProof != nil {
 		{
-			size, err := m.CredentialStatus.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.CredentialStatusProof.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -1311,10 +1512,15 @@ func (m *MsgRegisterCredentialStatus) MarshalToSizedBuffer(dAtA []byte) (int, er
 		i--
 		dAtA[i] = 0x12
 	}
-	if len(m.Creator) > 0 {
-		i -= len(m.Creator)
-		copy(dAtA[i:], m.Creator)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
+	if m.CredentialStatusDocument != nil {
+		{
+			size, err := m.CredentialStatusDocument.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintTx(dAtA, i, uint64(size))
+		}
 		i--
 		dAtA[i] = 0xa
 	}
@@ -1341,11 +1547,83 @@ func (m *MsgRegisterCredentialStatusResponse) MarshalToSizedBuffer(dAtA []byte) 
 	_ = i
 	var l int
 	_ = l
-	if m.Id != 0 {
-		i = encodeVarintTx(dAtA, i, uint64(m.Id))
-		i--
-		dAtA[i] = 0x8
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgUpdateCredentialStatus) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
 	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgUpdateCredentialStatus) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgUpdateCredentialStatus) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.TxAuthor) > 0 {
+		i -= len(m.TxAuthor)
+		copy(dAtA[i:], m.TxAuthor)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.TxAuthor)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if m.CredentialStatusProof != nil {
+		{
+			size, err := m.CredentialStatusProof.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintTx(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x12
+	}
+	if m.CredentialStatusDocument != nil {
+		{
+			size, err := m.CredentialStatusDocument.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintTx(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgUpdateCredentialStatusResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgUpdateCredentialStatusResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgUpdateCredentialStatusResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
 	return len(dAtA) - i, nil
 }
 
@@ -1360,42 +1638,35 @@ func encodeVarintTx(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-func (m *MsgCreateDID) Size() (n int) {
+func (m *MsgRegisterDID) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.DidDocString != nil {
-		l = m.DidDocString.Size()
+	if m.DidDocument != nil {
+		l = m.DidDocument.Size()
 		n += 1 + l + sovTx(uint64(l))
 	}
-	if len(m.Signatures) > 0 {
-		for _, e := range m.Signatures {
+	if len(m.DidDocumentProofs) > 0 {
+		for _, e := range m.DidDocumentProofs {
 			l = e.Size()
 			n += 1 + l + sovTx(uint64(l))
 		}
 	}
-	l = len(m.Creator)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
-	}
-	l = len(m.ClientSpec)
+	l = len(m.TxAuthor)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
 	return n
 }
 
-func (m *MsgCreateDIDResponse) Size() (n int) {
+func (m *MsgRegisterDIDResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.Id != 0 {
-		n += 1 + sovTx(uint64(m.Id))
-	}
 	return n
 }
 
@@ -1405,25 +1676,21 @@ func (m *MsgUpdateDID) Size() (n int) {
 	}
 	var l int
 	_ = l
-	if m.DidDocString != nil {
-		l = m.DidDocString.Size()
+	if m.DidDocument != nil {
+		l = m.DidDocument.Size()
 		n += 1 + l + sovTx(uint64(l))
+	}
+	if len(m.DidDocumentProofs) > 0 {
+		for _, e := range m.DidDocumentProofs {
+			l = e.Size()
+			n += 1 + l + sovTx(uint64(l))
+		}
 	}
 	l = len(m.VersionId)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
-	if len(m.Signatures) > 0 {
-		for _, e := range m.Signatures {
-			l = e.Size()
-			n += 1 + l + sovTx(uint64(l))
-		}
-	}
-	l = len(m.Creator)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
-	}
-	l = len(m.ClientSpec)
+	l = len(m.TxAuthor)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
@@ -1436,47 +1703,6 @@ func (m *MsgUpdateDIDResponse) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.UpdateId)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
-	}
-	return n
-}
-
-func (m *MsgCreateSchema) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.Creator)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
-	}
-	if m.SchemaDoc != nil {
-		l = m.SchemaDoc.Size()
-		n += 1 + l + sovTx(uint64(l))
-	}
-	if m.SchemaProof != nil {
-		l = m.SchemaProof.Size()
-		n += 1 + l + sovTx(uint64(l))
-	}
-	l = len(m.ClientSpec)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
-	}
-	return n
-}
-
-func (m *MsgCreateSchemaResponse) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.Id != 0 {
-		n += 1 + sovTx(uint64(m.Id))
-	}
 	return n
 }
 
@@ -1486,25 +1712,21 @@ func (m *MsgDeactivateDID) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.Creator)
+	l = len(m.DidDocumentId)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
-	l = len(m.DidId)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
+	if len(m.DidDocumentProofs) > 0 {
+		for _, e := range m.DidDocumentProofs {
+			l = e.Size()
+			n += 1 + l + sovTx(uint64(l))
+		}
 	}
 	l = len(m.VersionId)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
-	if len(m.Signatures) > 0 {
-		for _, e := range m.Signatures {
-			l = e.Size()
-			n += 1 + l + sovTx(uint64(l))
-		}
-	}
-	l = len(m.ClientSpec)
+	l = len(m.TxAuthor)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
@@ -1517,9 +1739,66 @@ func (m *MsgDeactivateDIDResponse) Size() (n int) {
 	}
 	var l int
 	_ = l
-	if m.Id != 0 {
-		n += 1 + sovTx(uint64(m.Id))
+	return n
+}
+
+func (m *MsgRegisterCredentialSchema) Size() (n int) {
+	if m == nil {
+		return 0
 	}
+	var l int
+	_ = l
+	if m.CredentialSchemaDocument != nil {
+		l = m.CredentialSchemaDocument.Size()
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.CredentialSchemaProof != nil {
+		l = m.CredentialSchemaProof.Size()
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.TxAuthor)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
+func (m *MsgRegisterCredentialSchemaResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *MsgUpdateCredentialSchema) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.CredentialSchemaDocument != nil {
+		l = m.CredentialSchemaDocument.Size()
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.CredentialSchemaProof != nil {
+		l = m.CredentialSchemaProof.Size()
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.TxAuthor)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
+func (m *MsgUpdateCredentialSchemaResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
 	return n
 }
 
@@ -1529,19 +1808,15 @@ func (m *MsgRegisterCredentialStatus) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.Creator)
-	if l > 0 {
+	if m.CredentialStatusDocument != nil {
+		l = m.CredentialStatusDocument.Size()
 		n += 1 + l + sovTx(uint64(l))
 	}
-	if m.CredentialStatus != nil {
-		l = m.CredentialStatus.Size()
+	if m.CredentialStatusProof != nil {
+		l = m.CredentialStatusProof.Size()
 		n += 1 + l + sovTx(uint64(l))
 	}
-	if m.Proof != nil {
-		l = m.Proof.Size()
-		n += 1 + l + sovTx(uint64(l))
-	}
-	l = len(m.ClientSpec)
+	l = len(m.TxAuthor)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
@@ -1554,9 +1829,36 @@ func (m *MsgRegisterCredentialStatusResponse) Size() (n int) {
 	}
 	var l int
 	_ = l
-	if m.Id != 0 {
-		n += 1 + sovTx(uint64(m.Id))
+	return n
+}
+
+func (m *MsgUpdateCredentialStatus) Size() (n int) {
+	if m == nil {
+		return 0
 	}
+	var l int
+	_ = l
+	if m.CredentialStatusDocument != nil {
+		l = m.CredentialStatusDocument.Size()
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.CredentialStatusProof != nil {
+		l = m.CredentialStatusProof.Size()
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.TxAuthor)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
+func (m *MsgUpdateCredentialStatusResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
 	return n
 }
 
@@ -1566,7 +1868,7 @@ func sovTx(x uint64) (n int) {
 func sozTx(x uint64) (n int) {
 	return sovTx(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-func (m *MsgCreateDID) Unmarshal(dAtA []byte) error {
+func (m *MsgRegisterDID) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1589,15 +1891,15 @@ func (m *MsgCreateDID) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgCreateDID: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgRegisterDID: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgCreateDID: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgRegisterDID: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DidDocString", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field DidDocument", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1624,16 +1926,16 @@ func (m *MsgCreateDID) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.DidDocString == nil {
-				m.DidDocString = &Did{}
+			if m.DidDocument == nil {
+				m.DidDocument = &DidDocument{}
 			}
-			if err := m.DidDocString.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.DidDocument.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Signatures", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field DidDocumentProofs", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1660,14 +1962,14 @@ func (m *MsgCreateDID) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Signatures = append(m.Signatures, &SignInfo{})
-			if err := m.Signatures[len(m.Signatures)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.DidDocumentProofs = append(m.DidDocumentProofs, &DocumentProof{})
+			if err := m.DidDocumentProofs[len(m.DidDocumentProofs)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field TxAuthor", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -1695,39 +1997,7 @@ func (m *MsgCreateDID) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Creator = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ClientSpec", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.ClientSpec = string(dAtA[iNdEx:postIndex])
+			m.TxAuthor = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -1750,7 +2020,7 @@ func (m *MsgCreateDID) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgCreateDIDResponse) Unmarshal(dAtA []byte) error {
+func (m *MsgRegisterDIDResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1773,31 +2043,12 @@ func (m *MsgCreateDIDResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgCreateDIDResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgRegisterDIDResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgCreateDIDResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgRegisterDIDResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
-		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
-			}
-			m.Id = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Id |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTx(dAtA[iNdEx:])
@@ -1850,7 +2101,7 @@ func (m *MsgUpdateDID) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DidDocString", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field DidDocument", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1877,14 +2128,48 @@ func (m *MsgUpdateDID) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.DidDocString == nil {
-				m.DidDocString = &Did{}
+			if m.DidDocument == nil {
+				m.DidDocument = &DidDocument{}
 			}
-			if err := m.DidDocString.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.DidDocument.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
 		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DidDocumentProofs", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.DidDocumentProofs = append(m.DidDocumentProofs, &DocumentProof{})
+			if err := m.DidDocumentProofs[len(m.DidDocumentProofs)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field VersionId", wireType)
 			}
@@ -1916,43 +2201,9 @@ func (m *MsgUpdateDID) Unmarshal(dAtA []byte) error {
 			}
 			m.VersionId = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Signatures", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Signatures = append(m.Signatures, &SignInfo{})
-			if err := m.Signatures[len(m.Signatures)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field TxAuthor", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -1980,39 +2231,7 @@ func (m *MsgUpdateDID) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Creator = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 5:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ClientSpec", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.ClientSpec = string(dAtA[iNdEx:postIndex])
+			m.TxAuthor = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -2064,293 +2283,6 @@ func (m *MsgUpdateDIDResponse) Unmarshal(dAtA []byte) error {
 			return fmt.Errorf("proto: MsgUpdateDIDResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field UpdateId", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.UpdateId = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipTx(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *MsgCreateSchema) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowTx
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: MsgCreateSchema: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgCreateSchema: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Creator = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field SchemaDoc", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.SchemaDoc == nil {
-				m.SchemaDoc = &SchemaDocument{}
-			}
-			if err := m.SchemaDoc.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field SchemaProof", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.SchemaProof == nil {
-				m.SchemaProof = &SchemaProof{}
-			}
-			if err := m.SchemaProof.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ClientSpec", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.ClientSpec = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipTx(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *MsgCreateSchemaResponse) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowTx
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: MsgCreateSchemaResponse: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgCreateSchemaResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
-			}
-			m.Id = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Id |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTx(dAtA[iNdEx:])
@@ -2403,7 +2335,7 @@ func (m *MsgDeactivateDID) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field DidDocumentId", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -2431,13 +2363,13 @@ func (m *MsgDeactivateDID) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Creator = string(dAtA[iNdEx:postIndex])
+			m.DidDocumentId = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DidId", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field DidDocumentProofs", wireType)
 			}
-			var stringLen uint64
+			var msglen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowTx
@@ -2447,23 +2379,25 @@ func (m *MsgDeactivateDID) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
+			if msglen < 0 {
 				return ErrInvalidLengthTx
 			}
-			postIndex := iNdEx + intStringLen
+			postIndex := iNdEx + msglen
 			if postIndex < 0 {
 				return ErrInvalidLengthTx
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.DidId = string(dAtA[iNdEx:postIndex])
+			m.DidDocumentProofs = append(m.DidDocumentProofs, &DocumentProof{})
+			if err := m.DidDocumentProofs[len(m.DidDocumentProofs)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
@@ -2499,41 +2433,7 @@ func (m *MsgDeactivateDID) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Signatures", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Signatures = append(m.Signatures, &SignInfo{})
-			if err := m.Signatures[len(m.Signatures)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 5:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ClientSpec", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field TxAuthor", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -2561,7 +2461,7 @@ func (m *MsgDeactivateDID) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.ClientSpec = string(dAtA[iNdEx:postIndex])
+			m.TxAuthor = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -2613,11 +2513,61 @@ func (m *MsgDeactivateDIDResponse) Unmarshal(dAtA []byte) error {
 			return fmt.Errorf("proto: MsgDeactivateDIDResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
-		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
 			}
-			m.Id = 0
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgRegisterCredentialSchema) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgRegisterCredentialSchema: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgRegisterCredentialSchema: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CredentialSchemaDocument", wireType)
+			}
+			var msglen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowTx
@@ -2627,11 +2577,350 @@ func (m *MsgDeactivateDIDResponse) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Id |= uint64(b&0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.CredentialSchemaDocument == nil {
+				m.CredentialSchemaDocument = &CredentialSchemaDocument{}
+			}
+			if err := m.CredentialSchemaDocument.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CredentialSchemaProof", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.CredentialSchemaProof == nil {
+				m.CredentialSchemaProof = &DocumentProof{}
+			}
+			if err := m.CredentialSchemaProof.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TxAuthor", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.TxAuthor = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgRegisterCredentialSchemaResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgRegisterCredentialSchemaResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgRegisterCredentialSchemaResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgUpdateCredentialSchema) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgUpdateCredentialSchema: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgUpdateCredentialSchema: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CredentialSchemaDocument", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.CredentialSchemaDocument == nil {
+				m.CredentialSchemaDocument = &CredentialSchemaDocument{}
+			}
+			if err := m.CredentialSchemaDocument.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CredentialSchemaProof", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.CredentialSchemaProof == nil {
+				m.CredentialSchemaProof = &DocumentProof{}
+			}
+			if err := m.CredentialSchemaProof.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TxAuthor", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.TxAuthor = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgUpdateCredentialSchemaResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgUpdateCredentialSchemaResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgUpdateCredentialSchemaResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTx(dAtA[iNdEx:])
@@ -2684,39 +2973,7 @@ func (m *MsgRegisterCredentialStatus) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Creator = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field CredentialStatus", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field CredentialStatusDocument", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -2743,52 +3000,52 @@ func (m *MsgRegisterCredentialStatus) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.CredentialStatus == nil {
-				m.CredentialStatus = &CredentialStatus{}
+			if m.CredentialStatusDocument == nil {
+				m.CredentialStatusDocument = &CredentialStatusDocument{}
 			}
-			if err := m.CredentialStatus.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.CredentialStatusDocument.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CredentialStatusProof", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.CredentialStatusProof == nil {
+				m.CredentialStatusProof = &DocumentProof{}
+			}
+			if err := m.CredentialStatusProof.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Proof", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Proof == nil {
-				m.Proof = &CredentialProof{}
-			}
-			if err := m.Proof.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ClientSpec", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field TxAuthor", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -2816,7 +3073,7 @@ func (m *MsgRegisterCredentialStatus) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.ClientSpec = string(dAtA[iNdEx:postIndex])
+			m.TxAuthor = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -2868,11 +3125,61 @@ func (m *MsgRegisterCredentialStatusResponse) Unmarshal(dAtA []byte) error {
 			return fmt.Errorf("proto: MsgRegisterCredentialStatusResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
-		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
 			}
-			m.Id = 0
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgUpdateCredentialStatus) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgUpdateCredentialStatus: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgUpdateCredentialStatus: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CredentialStatusDocument", wireType)
+			}
+			var msglen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowTx
@@ -2882,11 +3189,146 @@ func (m *MsgRegisterCredentialStatusResponse) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Id |= uint64(b&0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.CredentialStatusDocument == nil {
+				m.CredentialStatusDocument = &CredentialStatusDocument{}
+			}
+			if err := m.CredentialStatusDocument.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CredentialStatusProof", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.CredentialStatusProof == nil {
+				m.CredentialStatusProof = &DocumentProof{}
+			}
+			if err := m.CredentialStatusProof.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TxAuthor", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.TxAuthor = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgUpdateCredentialStatusResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgUpdateCredentialStatusResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgUpdateCredentialStatusResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTx(dAtA[iNdEx:])
