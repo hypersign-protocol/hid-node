@@ -7,6 +7,7 @@ BINARY=hid-noded
 ${BINARY} &> /dev/null
 
 CHAINID=hidnode
+CHAIN_NAMESAPCE=devnet
 
 RET_VAL=$?
 if [ ${RET_VAL} -ne 0 ]; then
@@ -40,7 +41,7 @@ cat $HOME/.hid-node/config/genesis.json | jq '.app_state["gov"]["deposit_params"
 cat $HOME/.hid-node/config/genesis.json | jq '.app_state["gov"]["voting_params"]["voting_period"]="50s"' > $HOME/.hid-node/config/tmp_genesis.json && mv $HOME/.hid-node/config/tmp_genesis.json $HOME/.hid-node/config/genesis.json
 
 # update ssi genesis
-cat $HOME/.hid-node/config/genesis.json | jq '.app_state["ssi"]["chainNamespace"]="devnet"' > $HOME/.hid-node/config/tmp_genesis.json && mv $HOME/.hid-node/config/tmp_genesis.json $HOME/.hid-node/config/genesis.json
+cat $HOME/.hid-node/config/genesis.json | jq '.app_state["ssi"]["chainNamespace"]="'$CHAIN_NAMESAPCE'"' > $HOME/.hid-node/config/tmp_genesis.json && mv $HOME/.hid-node/config/tmp_genesis.json $HOME/.hid-node/config/genesis.json
 
 # update mint genesis
 cat $HOME/.hid-node/config/genesis.json | jq '.app_state["mint"]["params"]["mint_denom"]="uhid"' > $HOME/.hid-node/config/tmp_genesis.json && mv $HOME/.hid-node/config/tmp_genesis.json $HOME/.hid-node/config/genesis.json
@@ -55,7 +56,6 @@ sed -i -E '112s/enable = false/enable = true/' $HOME/.hid-node/config/app.toml
 sed -i -E '115s/swagger = false/swagger = true/' $HOME/.hid-node/config/app.toml
 sed -i -E '133s/enabled-unsafe-cors = false/enabled-unsafe-cors = true/' $HOME/.hid-node/config/app.toml
 
-
 # change config.toml values
 sed -i -E 's|allow_duplicate_ip = false|allow_duplicate_ip = true|g' $HOME/.hid-node/config/config.toml
 sed -i -E 's|addr_book_strict = true|addr_book_strict = false|g' $HOME/.hid-node/config/config.toml
@@ -67,6 +67,6 @@ echo -e "\nPlease note the important chain configurations below:"
 
 echo -e "\nRPC server address: http://localhost:26657"
 echo -e "API server address: http://localhost:1317"
-echo -e "DID Namespace: devnet"
+echo -e "DID Namespace: $CHAIN_NAMESAPCE"
 
 echo -e "\nEnter the command 'hid-noded start' to start a single node blockchain."
