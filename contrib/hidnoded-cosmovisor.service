@@ -1,5 +1,5 @@
 [Unit]
-Description=Hypersign Identity Network - Jagrat Chain
+Description=Hypersign Identity Network
 Requires=network-online.target
 After=network-online.target
 

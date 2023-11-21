@@ -111,7 +111,7 @@ def generate_did_document(key_pair, algo="Ed25519Signature2020", bech32prefix="h
     elif algo == "EcdsaSecp256k1Signature2019":
 
         if bech32prefix == "hid":
-            verification_method["blockchainAccountId"] = "cosmos:jagrat:" + \
+            verification_method["blockchainAccountId"] = "cosmos:prajna:" + \
                 secp256k1_pubkey_to_address(key_pair["pub_key_base_64"], bech32prefix)
             did_id = "did:hid:devnet:" + verification_method["blockchainAccountId"]
         elif bech32prefix == "osmo":

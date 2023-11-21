@@ -29,7 +29,7 @@ func generateDidDoc(didNamespace string, publicKeyMultibase string, userAddress 
 				Type:                types.EcdsaSecp256k1VerificationKey2019,
 				Controller:          didId,
 				PublicKeyMultibase:  publicKeyMultibase,
-				BlockchainAccountId: types.CosmosCAIP10Prefix + ":jagrat:" + userAddress,
+				BlockchainAccountId: types.CosmosCAIP10Prefix + ":prajna:" + userAddress,
 			},
 		},
 	}
