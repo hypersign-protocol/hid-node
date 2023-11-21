@@ -2,13 +2,13 @@ package app
 
 import (
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
-	"github.com/cosmos/ibc-go/v3/modules/core/keeper"
+	"github.com/cosmos/ibc-go/v4/modules/core/keeper"
 
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	wasmTypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	ibcante "github.com/cosmos/ibc-go/v3/modules/core/ante"
+	ibcante "github.com/cosmos/ibc-go/v4/modules/core/ante"
 	ssiante "github.com/hypersign-protocol/hid-node/x/ssi/ante"
 )
 
