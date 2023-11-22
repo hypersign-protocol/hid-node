@@ -39,10 +39,10 @@ func (k Keeper) getDidDocumentCount(ctx sdk.Context) uint64 {
 func setDidDocumentCount(k Keeper, ctx sdk.Context, count uint64) {
 	storePrefix := []byte(types.DidCountKey)
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), storePrefix)
-	
+
 	val := make([]byte, 8)
 	binary.BigEndian.PutUint64(val, count)
-	
+
 	store.Set(storePrefix, val)
 }
 

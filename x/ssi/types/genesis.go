@@ -9,7 +9,7 @@ import (
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
 		ChainNamespace: "",
-		Params: DefaultParams(),
+		Params:         DefaultParams(),
 	}
 }
 

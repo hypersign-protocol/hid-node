@@ -1,8 +1,8 @@
 package app
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 const (

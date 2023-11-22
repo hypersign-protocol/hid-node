@@ -432,7 +432,7 @@ func signSchemaDocCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			
+
 			// Unmarshal Proof Object
 			var credSchemaDocProof types.DocumentProof
 			err = clientCtx.Codec.UnmarshalJSON([]byte(argProofObjectWithoutSignature), &credSchemaDocProof)

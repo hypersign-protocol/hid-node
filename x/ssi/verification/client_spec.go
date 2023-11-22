@@ -60,7 +60,7 @@ func getDocBytesByClientSpec(ssiMsg types.SsiMsg, extendedVm *types.ExtendedVeri
 			return ssiMsg.GetSignBytes(), nil
 		}
 
-		return ldcontext.NormalizeByVerificationMethodType(ssiMsg, extendedVm.Type, extendedVm.Proof)		
+		return ldcontext.NormalizeByVerificationMethodType(ssiMsg, extendedVm.Type, extendedVm.Proof)
 	case types.CLIENT_SPEC_TYPE_COSMOS_ADR036:
 		signerAddress, err := getBlockchainAddress(extendedVm.BlockchainAccountId)
 		if err != nil {
@@ -77,7 +77,7 @@ func getDocBytesByClientSpec(ssiMsg types.SsiMsg, extendedVm *types.ExtendedVeri
 		}
 
 		return getCosmosADR036SignDocBytes(canonizedDidDocHash, signerAddress)
-		
+
 	case types.CLIENT_SPEC_TYPE_ETH_PERSONAL_SIGN:
 		if extendedVm.Proof.Type == types.BabyJubJubSignature2023 {
 			return getPersonalSignSpecDocBytes(ssiMsg)
@@ -96,7 +96,7 @@ func getDocBytesByClientSpec(ssiMsg types.SsiMsg, extendedVm *types.ExtendedVeri
 		}{
 			DidId:        ssiMsg.GetId(),
 			DidDocDigest: hex.EncodeToString(canonizedDidDocHash),
-		})		
+		})
 	default:
 		return nil, fmt.Errorf("unsupported clientSpecType %v", extendedVm.Proof.ClientSpecType)
 	}

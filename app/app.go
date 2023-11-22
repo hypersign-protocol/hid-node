@@ -83,9 +83,9 @@ import (
 	ibcclientclient "github.com/cosmos/ibc-go/v4/modules/core/02-client/client"
 	ibcclienttypes "github.com/cosmos/ibc-go/v4/modules/core/02-client/types"
 	ibcporttypes "github.com/cosmos/ibc-go/v4/modules/core/05-port/types"
+	porttypes "github.com/cosmos/ibc-go/v4/modules/core/05-port/types"
 	ibchost "github.com/cosmos/ibc-go/v4/modules/core/24-host"
 	ibckeeper "github.com/cosmos/ibc-go/v4/modules/core/keeper"
-	porttypes "github.com/cosmos/ibc-go/v4/modules/core/05-port/types"
 
 	ibcfee "github.com/cosmos/ibc-go/v4/modules/apps/29-fee"
 	ibcfeekeeper "github.com/cosmos/ibc-go/v4/modules/apps/29-fee/keeper"
@@ -474,7 +474,7 @@ func NewHidnodeApp(
 		scopedTransferKeeper,
 	)
 	transferModule := transfer.NewAppModule(app.TransferKeeper)
-	
+
 	// Create Transfer Stack
 	var transferStack porttypes.IBCModule
 	transferStack = transfer.NewIBCModule(app.TransferKeeper)
