@@ -152,11 +152,11 @@ func BJJSignature2021Normalize(ssiMsg types.SsiMsg) ([]byte, error) {
 		jsonLDString = string(jsonLDBytes)
 	}
 
-	// Merkelize the SSI Document
-	// Internally the canonization of document occurs before it is constructed into a merkleTree
+	// The following canonization is done in order to check whether the canonized string
+	// is empty or not
 	_, err := normalizeDocument(ssiMsg, ld.AlgorithmURDNA2015)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	mz, err := merklize.MerklizeJSONLD(context.Background(), strings.NewReader(jsonLDString))
