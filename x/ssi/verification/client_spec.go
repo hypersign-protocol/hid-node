@@ -47,11 +47,6 @@ func getCosmosADR036SignDocBytes(ssiDocBytes []byte, signerAddress string) ([]by
 	return updatedSignDocBytes, nil
 }
 
-// More info on the `personal_sign` here: https://docs.metamask.io/guide/signing-data.html#personal-sign
-func getPersonalSignSpecDocBytes(ssiMsg types.SsiMsg) ([]byte, error) {
-	return json.Marshal(ssiMsg)
-}
-
 // Get the updated marshaled SSI document for the respective ClientSpec
 func getDocBytesByClientSpec(ssiMsg types.SsiMsg, extendedVm *types.ExtendedVerificationMethod) ([]byte, error) {
 	switch extendedVm.Proof.ClientSpecType {
