@@ -19,13 +19,13 @@ enum VerificationMethodTypes {
     X25519KeyAgreementKey2020 = 3;
     X25519KeyAgreementKeyEIP5630 = 4;
     Bls12381G2Key2020 = 5;
-    BabyJubJubVerificationKey2023 = 6;
+    BabyJubJubKey2021 = 6;
 }
 
 enum ProofTypes {
     Ed25519Signature2020 = 0;
     EcdsaSecp256k1Signature2019 = 1;
     EcdsaSecp256k1RecoverySignature2020 = 2;
-    BabyJubJubSignature2023 = 3;
+    BJJSignature2021 = 3;
     BbsBlsSignature2020 = 4;
 }

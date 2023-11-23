@@ -13,47 +13,7 @@ SECP256K1_VER_KEY_2019_CONTEXT = "https://ns.did.ai/suites/secp256k1-2019/v1"
 BBS_CONTEXT = "https://ns.did.ai/suites/bls12381-2020/v1"
 CREDENTIAL_STATUS_CONTEXT = "https://raw.githubusercontent.com/hypersign-protocol/hypersign-contexts/main/CredentialStatus.jsonld"
 CREDENTIAL_SCHEMA_CONTEXT = "https://raw.githubusercontent.com/hypersign-protocol/hypersign-contexts/main/CredentialSchema.jsonld"
-
-def generate_multi_vm_did(key_pairs, algo="ed25519", is_uuid=False):
-    base_document = {
-        "context" : [
-            "https://www.w3.org/ns/did/v1"
-        ],
-        "id": "",
-        "controller": [],
-        "verificationMethod": [],
-        "authentication": [],
-    }
-
-    did_id = generate_document_id("did", key_pairs[0], algo, is_uuid)
-
-    # Form the DID Document
-    vm_type = "Ed25519VerificationKey2020"
-
-    verification_methods = []
-
-    for i in range(0, len(key_pairs)):
-        verification_method = {
-            "id": "",
-            "type": "",
-            "controller": "",
-            "blockchainAccountId": "",
-            "publicKeyMultibase": ""
-        }
-        verification_method["publicKeyMultibase"] = key_pairs[i]["pub_key_multibase"]
-        verification_method["controller"] = did_id
-        verification_method["type"] = vm_type
-        verification_method["id"] = did_id + "#k" + str(i)
-
-        verification_methods.append(verification_method)
-
-    base_document["id"] = did_id
-    base_document["controller"] = [did_id]
-    base_document["verificationMethod"] = verification_methods
-    base_document["authentication"] = []
-    base_document["assertionMethod"] = []
-
-    return base_document
+BJJ_CONTEXT = "https://raw.githubusercontent.com/hypersign-protocol/hypersign-contexts/main/BabyJubJubKey2021.jsonld"
 
 def generate_did_document(key_pair, algo="Ed25519Signature2020", bech32prefix="hid", is_uuid=False):
     base_document = {
@@ -73,6 +33,8 @@ def generate_did_document(key_pair, algo="Ed25519Signature2020", bech32prefix="h
         base_document["context"].append(SECP256K1_VER_KEY_2019_CONTEXT)
     if algo == "BbsBlsSignature2020":
         base_document["context"].append(BBS_CONTEXT)
+    if algo == "BJJSignature2021":
+        base_document["context"].append(BJJ_CONTEXT)
     did_id = generate_document_id("did", key_pair, algo, is_uuid)
     
     # Form the DID Document
@@ -85,8 +47,8 @@ def generate_did_document(key_pair, algo="Ed25519Signature2020", bech32prefix="h
         vm_type = "EcdsaSecp256k1RecoveryMethod2020"
     elif algo == "BbsBlsSignature2020":
         vm_type = "Bls12381G2Key2020"
-    elif algo == "BabyJubJubSignature2023":
-        vm_type = "BabyJubJubVerificationKey2023"
+    elif algo == "BJJSignature2021":
+        vm_type = "BabyJubJubKey2021"
     else:
         raise Exception("unknown signing algorithm: " + algo)
 
@@ -111,7 +73,7 @@ def generate_did_document(key_pair, algo="Ed25519Signature2020", bech32prefix="h
     elif algo == "EcdsaSecp256k1Signature2019":
 
         if bech32prefix == "hid":
-            verification_method["blockchainAccountId"] = "cosmos:prajna:" + \
+            verification_method["blockchainAccountId"] = "cosmos:jagrat:" + \
                 secp256k1_pubkey_to_address(key_pair["pub_key_base_64"], bech32prefix)
             did_id = "did:hid:devnet:" + verification_method["blockchainAccountId"]
         elif bech32prefix == "osmo":
@@ -167,8 +129,8 @@ def generate_schema_document(key_pair, schema_author, vm, signature=None, algo="
     elif algo == "BbsBlsSignature2020":
         proof_type = "BbsBlsSignature2020"
         base_schema_doc["@context"].append(BBS_CONTEXT)
-    elif algo == "BabyJubJubSignature2023":
-        proof_type = "BabyJubJubSignature2023"
+    elif algo == "BJJSignature2021":
+        proof_type = "BJJSignature2021"
     else:
         raise Exception("Invalid signing algo: " + algo)
 
@@ -219,8 +181,8 @@ def generate_cred_status_document(key_pair, cred_author, vm, signature=None, alg
     elif algo == "BbsBlsSignature2020":
         proof_type = "BbsBlsSignature2020"
         base_cred_status_doc["@context"].append(BBS_CONTEXT)
-    elif algo == "BabyJubJubSignature2023":
-        proof_type = "BabyJubJubSignature2023"
+    elif algo == "BJJSignature2021":
+        proof_type = "BJJSignature2021"
     else:
         raise Exception("Invalid signing algo: " + algo)
 

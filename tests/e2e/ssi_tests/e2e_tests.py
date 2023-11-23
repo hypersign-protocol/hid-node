@@ -4,7 +4,7 @@ sys.path.insert(1, os.getcwd())
 import time
 
 from utils import run_blockchain_command, generate_key_pair, secp256k1_pubkey_to_address, add_keyAgreeemnt_pubKeyMultibase
-from generate_doc import generate_did_document, generate_schema_document, generate_cred_status_document, generate_multi_vm_did
+from generate_doc import generate_did_document, generate_schema_document, generate_cred_status_document
 from transactions import form_did_create_tx_multisig, form_did_update_tx_multisig, \
       query_did, form_create_schema_tx, form_did_deactivate_tx_multisig, form_create_cred_status_tx, \
       form_update_schema_tx, form_update_cred_status_tx
@@ -71,165 +71,6 @@ def bbs_signature_test():
     signers.append(signPair_alice)
     deactivate_tx_cmd = form_did_deactivate_tx_multisig(did_doc_alice, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
     run_blockchain_command(deactivate_tx_cmd, f"Deactivation of Org's DID with Id: {did_doc_alice}")
-
-def big_did_tx_test():
-    print("\n-- Executing a CreatDID Tx with the DID Document having 100 Verification Methods and only paying the param fee for CreateDID (4000uhid)--\n")
-
-    keyPairs = []
-    n_vms = 100
-    for i in range(0, n_vms):
-        kp = generate_key_pair()
-        keyPairs.append(kp)
-    
-    signers = []
-    did_doc_string = generate_multi_vm_did(keyPairs)
-    did_doc_alice = did_doc_string["id"]
-
-    for i in range(0, n_vms):
-        signer = {
-            "kp": keyPairs[i],
-            "verificationMethodId": did_doc_string["verificationMethod"][i]["id"],
-            "signing_algo": "Ed25519Signature2020"
-        }
-        signers.append(signer)
-    
-    create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
-    create_tx_cmd = create_tx_cmd + " --gas 8568740000"
-    run_blockchain_command(create_tx_cmd, f"Registering Alice's DID with Id: {did_doc_alice}")
-    print("-- Test Completed --\n")
-
-def ssi_fee_test():
-    print("\n--- Fixed Fee SSI Tx Test ---\n")
-
-    print("--1. FAIL: Paying invalid fee for CreateDID Tx--\n")
-    kp_alice = generate_key_pair()
-    signers = []
-    did_doc_string = generate_did_document(kp_alice)
-    did_doc_alice = did_doc_string["id"]
-    signPair_alice = {
-        "kp": kp_alice,
-        "verificationMethodId": did_doc_string["verificationMethod"][0]["id"],
-        "signing_algo": "Ed25519Signature2020"
-    }
-    signers.append(signPair_alice)
-    create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
-    create_tx_cmd = create_tx_cmd.replace("--fees 4000uhid", "--fees 7043uhid")
-    run_blockchain_command(create_tx_cmd, f"Registering Alice's DID with Id: {did_doc_alice}", True)
-
-    print("--2. PASS: Paying valid fee for CreateDID Tx--\n")
-    create_tx_cmd = create_tx_cmd.replace("--fees 7043uhid", "--fees 4000uhid")
-    run_blockchain_command(create_tx_cmd, f"Registering Alice's DID with Id: {did_doc_alice}")
-
-    print("--3. FAIL: Paying invalid fee for UpdateDID Tx--\n")
-    did_doc_string["capabilityInvocation"] = [did_doc_string["verificationMethod"][0]["id"]]
-    update_tx_cmd = form_did_update_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
-    update_tx_cmd = update_tx_cmd.replace("--fees 1000uhid", "--fees 67043uhid")
-    run_blockchain_command(update_tx_cmd, f"Updating Alice's DID with Id: {did_doc_alice}", True)
-
-    print("--4. PASS: Paying valid fee for UpdateDID Tx--\n")
-    update_tx_cmd = update_tx_cmd.replace("--fees 67043uhid", "--fees 1000uhid")
-    run_blockchain_command(update_tx_cmd, f"Updating Alice's DID with Id: {did_doc_alice}")
-
-    print("--5. FAIL: Paying invalid fee for CreateSchema Tx--\n")
-    schema_doc, schema_proof = generate_schema_document(
-        kp_alice, 
-        did_doc_alice, 
-        did_doc_string["verificationMethod"][0]["id"]
-    )
-    create_schema_cmd = form_create_schema_tx(
-        schema_doc, 
-        schema_proof, 
-        DEFAULT_BLOCKCHAIN_ACCOUNT_NAME
-    )
-    create_schema_cmd = create_schema_cmd.replace("--fees 2000uhid", "--fees 4700uhid")
-    schema_doc_id = schema_doc["id"]
-    run_blockchain_command(create_schema_cmd, f"Registering Schema with Id: {schema_doc_id}", True)
-
-    print("--6. PASS: Paying valid fee for CreateSchema Tx--\n")
-    create_schema_cmd = create_schema_cmd.replace("--fees 4700uhid", "--fees 2000uhid")
-    run_blockchain_command(create_schema_cmd, f"Registering Schema with Id: {schema_doc_id}")
-
-    print("--7. FAIL: Paying invalid fee for UpdateSchema Tx--\n")
-    updated_schema_doc = schema_doc
-    #Increment version in Schema id
-    schema_id_list = list(updated_schema_doc["id"])
-    schema_id_list[-3] = '4'
-    updated_schema_doc["id"] = "".join(schema_id_list)
-    updated_schema_doc_id = updated_schema_doc["id"]
-
-    _, schema_proof = generate_schema_document(
-        kp_alice, 
-        did_doc_alice, 
-        did_doc_string["verificationMethod"][0]["id"],
-        updated_schema=updated_schema_doc
-    )
-    update_schema_cmd = form_update_schema_tx(
-        updated_schema_doc,
-        schema_proof, 
-        DEFAULT_BLOCKCHAIN_ACCOUNT_NAME
-    )
-    update_schema_cmd = update_schema_cmd.replace("--fees 2000uhid", "--fees 4710uhid")
-    run_blockchain_command(update_schema_cmd, f"Updating Schema with Id: {updated_schema_doc_id}", True)
-
-    print("--8. PASS: Paying valid fee for UpdateSchema Tx--\n")
-    update_schema_cmd = update_schema_cmd.replace("--fees 4710uhid", "--fees 2000uhid")
-    run_blockchain_command(update_schema_cmd, f"Registering Schema with Id: {schema_doc_id}")
-
-    print("--9. FAIL: Paying invalid fee for RegisterCredentialStatus Tx --\n")
-    cred_doc, cred_proof = generate_cred_status_document(
-        kp_alice,
-        did_doc_alice,
-        did_doc_string["verificationMethod"][0]["id"]
-    )
-    register_cred_status_cmd = form_create_cred_status_tx(
-        cred_doc,
-        cred_proof,
-        DEFAULT_BLOCKCHAIN_ACCOUNT_NAME
-    )
-    cred_id = cred_doc["id"]
-    register_cred_status_cmd = register_cred_status_cmd.replace("--fees 2000uhid", "--fees 3700uhid")
-    run_blockchain_command(register_cred_status_cmd, f"Registering Credential status with Id: {cred_id}", True)
-
-    print("--10. PASS: Paying valid fee for RegisterCredentialStatus Tx --\n")
-    register_cred_status_cmd = register_cred_status_cmd.replace("--fees 3700uhid", "--fees 2000uhid")
-    run_blockchain_command(register_cred_status_cmd, f"Registering Credential status with Id: {cred_id}")
-
-    print("--11. FAIL: Paying invalid fee for UpdateCredentialStatus Tx --\n")
-    cred_doc["suspended"] = True
-    _, cred_proof = generate_cred_status_document(
-        kp_alice,
-        did_doc_alice,
-        did_doc_string["verificationMethod"][0]["id"],
-        updated_credstatus_doc=cred_doc
-    )
-    updated_cred_status_cmd = form_update_cred_status_tx(
-        cred_doc,
-        cred_proof,
-        DEFAULT_BLOCKCHAIN_ACCOUNT_NAME
-    )
-    cred_id = cred_doc["id"]
-    updated_cred_status_cmd = updated_cred_status_cmd.replace("--fees 2000uhid", "--fees 7300uhid")
-    run_blockchain_command(updated_cred_status_cmd, f"Updating Credential status with Id: {cred_id}", True)
-
-    print("--12. PASS: Paying valid fee for UpdateCredentialStatus Tx --\n")
-    updated_cred_status_cmd = updated_cred_status_cmd.replace("--fees 7300uhid", "--fees 2000uhid")
-    run_blockchain_command(updated_cred_status_cmd, f"Registering Credential status with Id: {cred_id}")
-
-    print("--13. FAIL: Paying invalid fee for DeactivateDID Tx--\n")
-    deactivate_tx_cmd = form_did_deactivate_tx_multisig(did_doc_alice, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
-    deactivate_tx_cmd = deactivate_tx_cmd.replace("--fees 1000uhid", "--fees 7543uhid")
-    run_blockchain_command(deactivate_tx_cmd, f"Deactivating of Org's DID with Id: {did_doc_alice}", True)
-
-    print("--14. PASS: Paying valid fee for DeactivateDID Tx--\n")
-    deactivate_tx_cmd = deactivate_tx_cmd.replace("--fees 7543uhid", "--fees 1000uhid")
-    run_blockchain_command(deactivate_tx_cmd, f"Deactivating Alice's DID with Id: {did_doc_alice}")
-
-    print("--15. FAIL: Grouping two SSI (CreateDID) and a non-SSI messages (Token Transfer) in a single transaction")
-    cmd = "hid-noded tx broadcast ./tests/e2e/ssi_tests/broadcast_txs/tx_broadcast.json --chain-id hidnode --broadcast-mode block --yes --output json"
-    run_blockchain_command(cmd, "Grouping two SSI (CreateDID) and a non-SSI messages (Token Transfer) in a single transaction", True)
-    
-    print("--- Fixed Fee SSI Tx Test Completed ---\n")
-
 
 def key_agrement_test():
     print("\n--1. FAIL: Ed25519VerificationKey2020 based Verification Method ID being added to keyAgreement attribute--\n")
@@ -1720,26 +1561,26 @@ def method_specific_id_test():
 def bjj_signature_test():
     print("\n--1. PASS: Create a DID using BabyJubJub Key Pair--\n")
 
-    kp_alice = generate_key_pair("BabyJubJubSignature2023")
+    kp_alice = generate_key_pair("BJJSignature2021")
     signers = []
-    did_doc_string = generate_did_document(kp_alice, "BabyJubJubSignature2023")
+    did_doc_string = generate_did_document(kp_alice, "BJJSignature2021")
     did_doc_alice = did_doc_string["id"]
     signPair_alice = {
         "kp": kp_alice,
         "verificationMethodId": did_doc_string["verificationMethod"][0]["id"],
-        "signing_algo": "BabyJubJubSignature2023"
+        "signing_algo": "BJJSignature2021"
     }
     signers.append(signPair_alice)
     create_tx_cmd = form_did_create_tx_multisig(did_doc_string, signers, DEFAULT_BLOCKCHAIN_ACCOUNT_NAME)
     run_blockchain_command(create_tx_cmd, f"Registering Alice's DID with Id: {did_doc_alice}")
-
+    
     print("\n--2. PASS: Create a Schema using BabyJubJub Key Pair--\n")
 
     schema_doc, schema_proof = generate_schema_document(
         kp_alice, 
         did_doc_alice, 
         did_doc_string["verificationMethod"][0]["id"],
-        algo="BabyJubJubSignature2023"
+        algo="BJJSignature2021"
     )
     create_schema_cmd = form_create_schema_tx(
         schema_doc, 
@@ -1755,7 +1596,7 @@ def bjj_signature_test():
         kp_alice,
         did_doc_alice,
         did_doc_string["verificationMethod"][0]["id"],
-        algo="BabyJubJubSignature2023"
+        algo="BJJSignature2021"
     )
     register_cred_status_cmd = form_create_cred_status_tx(
         cred_doc,
@@ -1764,7 +1605,6 @@ def bjj_signature_test():
     )
     cred_id = cred_doc["id"]
     run_blockchain_command(register_cred_status_cmd, f"Registering Credential status with Id: {cred_id}")
-
 
     print("\n--4. PASS: Update a DID using BabyJubJub Key Pair--\n")
     did_doc_string["alsoKnownAs"] = ["http://example.com"]

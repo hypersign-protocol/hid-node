@@ -3,11 +3,8 @@ package verification
 import (
 	"crypto/ed25519"
 	"encoding/base64"
-	"encoding/hex"
 	"fmt"
 	"math/big"
-
-	"golang.org/x/crypto/sha3"
 
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 	"github.com/multiformats/go-multibase"
@@ -69,54 +66,53 @@ func verify(extendedVm *types.ExtendedVerificationMethod, ssiMsg types.SsiMsg) e
 		return verifyX25519KeyAgreementKeyEIP5630(extendedVm)
 	case types.Bls12381G2Key2020:
 		return verifyBbsBlsSignature2020(extendedVm, docBytes)
-	case types.BabyJubJubVerificationKey2023:
-		return verifyBabyJubJubSignature2023(extendedVm, docBytes)
+	case types.BabyJubJubKey2021:
+		return verifyBJJSignature2021(extendedVm, docBytes)
 	default:
 		return fmt.Errorf("unsupported verification method: %s", extendedVm.Type)
 	}
 }
 
-// verifyBabyJubJubSignature2023 verifies the verification key for verification method type BabyJubJubSignature2023
-func verifyBabyJubJubSignature2023(extendedVm *types.ExtendedVerificationMethod, documentBytes []byte) error {
+// verifyBJJSignature2021 verifies the verification key for verification method type BJJSignature2021
+func verifyBJJSignature2021(extendedVm *types.ExtendedVerificationMethod, documentBytes []byte) error {
 	// Process siganture
-	signatureBytes, err := hex.DecodeString(extendedVm.Proof.ProofValue)
+	_, signatureBytes, err := multibase.Decode(extendedVm.Proof.ProofValue)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	signatureCompObj := new(babyjub.SignatureComp)
 	err = signatureCompObj.Scan(signatureBytes)
 	if err != nil {
-		panic(err)
+		return err
 	}
 	signatureObj, err := signatureCompObj.Decompress()
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	// Process Public Key
 	_, publicKeyBytes, err := multibase.Decode(extendedVm.PublicKeyMultibase)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	publicKeyCompObj := new(babyjub.PublicKeyComp)
 	err = publicKeyCompObj.Scan(publicKeyBytes)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	publicKeyObj, err := publicKeyCompObj.Decompress()
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	// Process documentBytes
-	msgHash := sha3.Sum224(documentBytes)
-	msgBigInt := new(big.Int).SetBytes(msgHash[:])
+	documentBigInt := new(big.Int).SetBytes(documentBytes)
 
 	// Verify Signature using Poseidon Hash
-	if !publicKeyObj.VerifyPoseidon(msgBigInt, signatureObj) {
+	if !publicKeyObj.VerifyPoseidon(documentBigInt, signatureObj) {
 		return fmt.Errorf("signature could not be verified for verificationMethodId: %v", extendedVm.Id)
 	}
 

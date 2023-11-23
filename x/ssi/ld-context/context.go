@@ -9,6 +9,7 @@ const Secp256k12019Context string = "https://ns.did.ai/suites/secp256k1-2019/v1"
 const X25519KeyAgreementKeyEIP5630Context string = "https://raw.githubusercontent.com/hypersign-protocol/hypersign-contexts/main/X25519KeyAgreementKeyEIP5630.jsonld"
 const CredentialStatusContext string = "https://raw.githubusercontent.com/hypersign-protocol/hypersign-contexts/main/CredentialStatus.jsonld"
 const CredentialSchemaContext string = "https://raw.githubusercontent.com/hypersign-protocol/hypersign-contexts/main/CredentialSchema.jsonld"
+const BabyJubJubKey2021Context string = "https://raw.githubusercontent.com/hypersign-protocol/hypersign-contexts/main/BabyJubJubKey2021.jsonld"
 
 // As hid-node is not supposed to perform any GET request, the complete Context body of their
 // respective Context urls has been maintained below.
@@ -720,6 +721,28 @@ var ContextUrlMap map[string]contextObject = map[string]contextObject{
 		"required": map[string]interface{}{
 			"@id":        "hypersign-vocab:required",
 			"@container": "@set",
+		},
+	},
+	BabyJubJubKey2021Context: {
+		"id":              "@id",
+		"type":            "@type",
+		"@protected":      true,
+		"hypersign-vocab": "urn:uuid:13fe9318-bb82-4d95-8bf5-8e7fdf8b2026#",
+		"BabyJubJubKey2021": map[string]interface{}{
+			"@id": "hypersign-vocab:BabyJubJubKey2021",
+			"@context": map[string]interface{}{
+				"@protected": true,
+				"id":         "@id",
+				"type":       "@type",
+				"controller": map[string]interface{}{
+					"@id":   "https://w3id.org/security#controller",
+					"@type": "@id",
+				},
+				"publicKeyMultibase": map[string]interface{}{
+					"@id":   "https://w3id.org/security#publicKeyMultibase",
+					"@type": "https://w3id.org/security#multibase",
+				},
+			},
 		},
 	},
 }

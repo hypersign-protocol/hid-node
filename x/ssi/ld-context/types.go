@@ -188,3 +188,79 @@ func NewJsonLdCredentialSchema(credSchema *types.CredentialSchemaDocument) *Json
 
 	return jsonLdDoc
 }
+
+// It is a similar to `Did` struct, with the exception that the `context` attribute is of type
+// `contextObject` instead of `[]string`, which is meant for accomodating Context JSON body
+// having arbritrary attributes. It should be used for performing Canonization. T
+type JsonLdDidDocumentWithoutVM struct {
+	Context         []contextObject                        `json:"@context,omitempty"`
+	Id              string                                 `json:"id,omitempty"`
+	Controller      []string                               `json:"controller,omitempty"`
+	AlsoKnownAs     []string                               `json:"alsoKnownAs,omitempty"`
+	Authentication  []*verificationMethodWithoutController `json:"authentication,omitempty"`
+	AssertionMethod []*verificationMethodWithoutController `json:"assertionMethod,omitempty"`
+}
+
+func (doc *JsonLdDidDocumentWithoutVM) GetContext() []contextObject {
+	return doc.Context
+}
+
+// NewJsonLdDidDocument returns a new JsonLdDid struct from input Did
+func NewJsonLdDidDocumentWithoutVM(didDoc *types.DidDocument) *JsonLdDidDocumentWithoutVM {
+	if len(didDoc.Context) == 0 {
+		panic("atleast one context url must be provided for DID Document for Canonization")
+	}
+
+	var jsonLdDoc *JsonLdDidDocumentWithoutVM = &JsonLdDidDocumentWithoutVM{}
+
+	for _, url := range didDoc.Context {
+		contextObj, ok := ContextUrlMap[url]
+		if !ok {
+			panic(fmt.Sprintf("invalid or unsupported context url: %v", url))
+		}
+		jsonLdDoc.Context = append(jsonLdDoc.Context, contextObj)
+	}
+
+	jsonLdDoc.Id = didDoc.Id
+	jsonLdDoc.Controller = didDoc.Controller
+	jsonLdDoc.AlsoKnownAs = didDoc.AlsoKnownAs
+
+	// Replace verification method ids with their corresponding Verification Method object
+	var vmMap map[string]*verificationMethodWithoutController = map[string]*verificationMethodWithoutController{}
+
+	for _, vm := range didDoc.VerificationMethod {
+		vmMap[vm.Id] = newVerificationMethodWithoutController(vm)
+	}
+
+	// If Authentication and AssertionMethod are empty, then populate the
+	// verification methods in AssertionMethod
+	if len(didDoc.Authentication) == 0 && len(didDoc.AssertionMethod) == 0 {
+		for _, vm := range vmMap {
+			jsonLdDoc.AssertionMethod = append(jsonLdDoc.AssertionMethod, vm)
+		}
+	} else {
+		for _, vmId := range didDoc.Authentication {
+			jsonLdDoc.Authentication = append(jsonLdDoc.Authentication, vmMap[vmId])
+		}
+		for _, vmId := range didDoc.AssertionMethod {
+			jsonLdDoc.AssertionMethod = append(jsonLdDoc.AssertionMethod, vmMap[vmId])
+		}
+	}
+
+	return jsonLdDoc
+}
+
+type verificationMethodWithoutController struct {
+	Id                 string `json:"id,omitempty"`
+	Type               string `json:"type,omitempty"`
+	PublicKeyMultibase string `json:"publicKeyMultibase,omitempty"`
+}
+
+func newVerificationMethodWithoutController(vm *types.VerificationMethod) *verificationMethodWithoutController {
+	var vmWithoutController *verificationMethodWithoutController = &verificationMethodWithoutController{
+		Id:                 vm.Id,
+		Type:               vm.Type,
+		PublicKeyMultibase: vm.PublicKeyMultibase,
+	}
+	return vmWithoutController
+}
