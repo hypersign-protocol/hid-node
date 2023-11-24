@@ -104,15 +104,19 @@ def generate_schema_document(key_pair, schema_author, vm, signature=None, algo="
         "type": "https://schema.org/Person",
         "modelVersion": "v1.0",
         "id": "",
-        "name": "Person",
+        "name": "SomeCredentialSchema",
         "author": "",
         "authored": "2022-08-16T10:22:12Z",
         "schema": {
             "schema":"https://json-schema.org/draft-07/schema#",
             "description":"Person Schema",
             "type":"object",
-            "properties":"{givenName:{type:string},gender:{type:string},email:{type:text},address:{type:text}}",
-            "required":["givenName","address"],
+            "properties":"{\"fullName\":{\"type\":\"string\"},\"companyName\":{\"type\":\"string\"},\"center\":{\"type\":\"string\"},\"invoiceNumber\":{\"type\":\"string\"}}",
+            "required": [
+                "fullName",
+                "center",
+                "invoiceNumber"
+            ],
         }
     }
     

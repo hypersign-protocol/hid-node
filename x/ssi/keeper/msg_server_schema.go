@@ -2,7 +2,9 @@ package keeper
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"regexp"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -47,6 +49,16 @@ func storeCredentialSchema(
 		return sdkerrors.Wrap(types.ErrSchemaExists, fmt.Sprintf("Schema ID:  %s", schemaID))
 	}
 
+	// Check if the `name` attribute of schema is in PascalCase
+	if !isStringInPascalCase(schemaDoc.Name) {
+		return sdkerrors.Wrapf(types.ErrInvalidCredentialSchema, "name must always be in PascalCase: %v", schemaDoc.Name)
+	}
+
+	// Check if `properties` field is a valid JSON document
+	if !isValidJSONDocument(schemaDoc.Schema.Properties) {
+		return sdkerrors.Wrapf(types.ErrInvalidCredentialSchema, "properties must be a valid JSON document: %v", schemaDoc.Schema.Properties)
+	}
+
 	// Signature check
 	if err := k.VerifyDocumentProof(ctx, schemaDoc, schemaProof); err != nil {
 		return sdkerrors.Wrap(types.ErrInvalidClientSpecType, err.Error())
@@ -81,4 +93,17 @@ func (k msgServer) UpdateCredentialSchema(goCtx context.Context, msg *types.MsgU
 	}
 
 	return &types.MsgUpdateCredentialSchemaResponse{}, nil
+}
+
+// isStringInPascalCase checks if an input string is in Pascal case or not
+func isStringInPascalCase(s string) bool {
+	pascalCaseRegex := regexp.MustCompile(`^[A-Z][a-zA-Z0-9]*$`)
+
+	return pascalCaseRegex.MatchString(s)
+}
+
+// isValidJSONDocument checks if the input string is a valid JSON string
+func isValidJSONDocument(s string) bool {
+	var jsonStruct map[string]interface{}
+	return json.Unmarshal([]byte(s), &jsonStruct) == nil
 }

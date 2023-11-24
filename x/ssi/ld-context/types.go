@@ -191,7 +191,7 @@ func NewJsonLdCredentialSchema(credSchema *types.CredentialSchemaDocument) *Json
 
 // It is a similar to `Did` struct, with the exception that the `context` attribute is of type
 // `contextObject` instead of `[]string`, which is meant for accomodating Context JSON body
-// having arbritrary attributes. It should be used for performing Canonization. 
+// having arbritrary attributes. It should be used for performing Canonization.
 type JsonLdDidDocumentWithoutVM struct {
 	Context         []contextObject                       `json:"@context,omitempty"`
 	Id              string                                `json:"id,omitempty"`
@@ -269,4 +269,3 @@ func newVerificationMethodWithoutController(vm *types.VerificationMethod) verifi
 	}
 	return vmWithoutController
 }
-
