@@ -191,14 +191,14 @@ func NewJsonLdCredentialSchema(credSchema *types.CredentialSchemaDocument) *Json
 
 // It is a similar to `Did` struct, with the exception that the `context` attribute is of type
 // `contextObject` instead of `[]string`, which is meant for accomodating Context JSON body
-// having arbritrary attributes. It should be used for performing Canonization. T
+// having arbritrary attributes. It should be used for performing Canonization. 
 type JsonLdDidDocumentWithoutVM struct {
-	Context         []contextObject                        `json:"@context,omitempty"`
-	Id              string                                 `json:"id,omitempty"`
-	Controller      []string                               `json:"controller,omitempty"`
-	AlsoKnownAs     []string                               `json:"alsoKnownAs,omitempty"`
-	Authentication  []*verificationMethodWithoutController `json:"authentication,omitempty"`
-	AssertionMethod []*verificationMethodWithoutController `json:"assertionMethod,omitempty"`
+	Context         []contextObject                       `json:"@context,omitempty"`
+	Id              string                                `json:"id,omitempty"`
+	Controller      []string                              `json:"controller,omitempty"`
+	AlsoKnownAs     []string                              `json:"alsoKnownAs,omitempty"`
+	Authentication  []verificationMethodWithoutController `json:"authentication,omitempty"`
+	AssertionMethod []verificationMethodWithoutController `json:"assertionMethod,omitempty"`
 }
 
 func (doc *JsonLdDidDocumentWithoutVM) GetContext() []contextObject {
@@ -226,7 +226,7 @@ func NewJsonLdDidDocumentWithoutVM(didDoc *types.DidDocument) *JsonLdDidDocument
 	jsonLdDoc.AlsoKnownAs = didDoc.AlsoKnownAs
 
 	// Replace verification method ids with their corresponding Verification Method object
-	var vmMap map[string]*verificationMethodWithoutController = map[string]*verificationMethodWithoutController{}
+	var vmMap map[string]verificationMethodWithoutController = map[string]verificationMethodWithoutController{}
 
 	for _, vm := range didDoc.VerificationMethod {
 		vmMap[vm.Id] = newVerificationMethodWithoutController(vm)
@@ -236,17 +236,19 @@ func NewJsonLdDidDocumentWithoutVM(didDoc *types.DidDocument) *JsonLdDidDocument
 	// verification methods in AssertionMethod
 	if len(didDoc.Authentication) == 0 && len(didDoc.AssertionMethod) == 0 {
 		for _, vm := range vmMap {
-			vm.Id = vm.Id + "assertionMethod"
 			jsonLdDoc.AssertionMethod = append(jsonLdDoc.AssertionMethod, vm)
+			jsonLdDoc.AssertionMethod[len(jsonLdDoc.AssertionMethod)-1].Id = jsonLdDoc.AssertionMethod[len(jsonLdDoc.AssertionMethod)-1].Id + "assertionMethod"
 		}
 	} else {
 		for _, vmId := range didDoc.Authentication {
-			vmMap[vmId].Id = vmMap[vmId].Id + "authentication"
-			jsonLdDoc.Authentication = append(jsonLdDoc.Authentication, vmMap[vmId])
+			vmObj := vmMap[vmId]
+			jsonLdDoc.Authentication = append(jsonLdDoc.Authentication, vmObj)
+			jsonLdDoc.Authentication[len(jsonLdDoc.Authentication)-1].Id = jsonLdDoc.Authentication[len(jsonLdDoc.Authentication)-1].Id + "authentication"
 		}
 		for _, vmId := range didDoc.AssertionMethod {
-			vmMap[vmId].Id = vmMap[vmId].Id + "assertionMethod"
-			jsonLdDoc.AssertionMethod = append(jsonLdDoc.AssertionMethod, vmMap[vmId])
+			vmObj := vmMap[vmId]
+			jsonLdDoc.AssertionMethod = append(jsonLdDoc.AssertionMethod, vmObj)
+			jsonLdDoc.AssertionMethod[len(jsonLdDoc.AssertionMethod)-1].Id = jsonLdDoc.AssertionMethod[len(jsonLdDoc.AssertionMethod)-1].Id + "assertionMethod"
 		}
 	}
 
@@ -259,11 +261,12 @@ type verificationMethodWithoutController struct {
 	PublicKeyMultibase string `json:"publicKeyMultibase,omitempty"`
 }
 
-func newVerificationMethodWithoutController(vm *types.VerificationMethod) *verificationMethodWithoutController {
-	var vmWithoutController *verificationMethodWithoutController = &verificationMethodWithoutController{
+func newVerificationMethodWithoutController(vm *types.VerificationMethod) verificationMethodWithoutController {
+	var vmWithoutController verificationMethodWithoutController = verificationMethodWithoutController{
 		Id:                 vm.Id,
 		Type:               vm.Type,
 		PublicKeyMultibase: vm.PublicKeyMultibase,
 	}
 	return vmWithoutController
 }
+
