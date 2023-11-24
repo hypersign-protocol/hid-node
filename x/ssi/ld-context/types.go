@@ -236,13 +236,16 @@ func NewJsonLdDidDocumentWithoutVM(didDoc *types.DidDocument) *JsonLdDidDocument
 	// verification methods in AssertionMethod
 	if len(didDoc.Authentication) == 0 && len(didDoc.AssertionMethod) == 0 {
 		for _, vm := range vmMap {
+			vm.Id = vm.Id + "assertionMethod"
 			jsonLdDoc.AssertionMethod = append(jsonLdDoc.AssertionMethod, vm)
 		}
 	} else {
 		for _, vmId := range didDoc.Authentication {
+			vmMap[vmId].Id = vmMap[vmId].Id + "authentication"
 			jsonLdDoc.Authentication = append(jsonLdDoc.Authentication, vmMap[vmId])
 		}
 		for _, vmId := range didDoc.AssertionMethod {
+			vmMap[vmId].Id = vmMap[vmId].Id + "assertionMethod"
 			jsonLdDoc.AssertionMethod = append(jsonLdDoc.AssertionMethod, vmMap[vmId])
 		}
 	}
