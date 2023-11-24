@@ -55,8 +55,8 @@ func storeCredentialSchema(
 	}
 
 	// Check if `properties` field is a valid JSON document
-	if !isValidJSONDocument(schemaDoc.Schema.Properties) {
-		return sdkerrors.Wrapf(types.ErrInvalidCredentialSchema, "properties must be a valid JSON document: %v", schemaDoc.Schema.Properties)
+	if err := isValidJSONDocument(schemaDoc.Schema.Properties); err != nil {
+		return sdkerrors.Wrapf(types.ErrInvalidCredentialSchema, "invalid `property` provided: %v", err.Error())
 	}
 
 	// Signature check
@@ -102,8 +102,36 @@ func isStringInPascalCase(s string) bool {
 	return pascalCaseRegex.MatchString(s)
 }
 
-// isValidJSONDocument checks if the input string is a valid JSON string
-func isValidJSONDocument(s string) bool {
-	var jsonStruct map[string]interface{}
-	return json.Unmarshal([]byte(s), &jsonStruct) == nil
+// isValidJSONDocument checks if the schema property attribute is a valid JSON string
+// The `type` sub-attribute is a must for every attributes in property.
+// The `format` sub-attribute is acceptable, but optional
+func isValidJSONDocument(schemaProperty string) error {
+	var schemaPropertyDocument map[string]map[string]interface{}
+	if err := json.Unmarshal([]byte(schemaProperty), &schemaPropertyDocument); err != nil {
+		return err
+	}
+
+	for attributeName, attributeObj := range schemaPropertyDocument {
+		isTypeSubAttributePresent := false
+
+		for subAttributeName, _ := range attributeObj {
+			if subAttributeName == "type" {
+				isTypeSubAttributePresent = true
+			} else if subAttributeName == "format" {
+				continue
+			} else {
+				return fmt.Errorf(
+					"invalid sub-attribute %v of attribute %v. Only `type` and `format` sub-attributes are permitted",
+					subAttributeName,
+					attributeName,
+				)
+			}
+		}
+
+		if !isTypeSubAttributePresent {
+			return fmt.Errorf("%v attribute is missing the required sub-attribute `type`", attributeName)
+		}
+	}
+
+	return nil
 }
