@@ -537,6 +537,10 @@ paths:
                     credentialSchemaDocument:
                       type: object
                       properties:
+                        context:
+                          type: array
+                          items:
+                            type: string
                         type:
                           type: string
                         modelVersion:
@@ -685,6 +689,10 @@ paths:
                     credentialSchemaDocument:
                       type: object
                       properties:
+                        context:
+                          type: array
+                          items:
+                            type: string
                         type:
                           type: string
                         modelVersion:
@@ -24570,6 +24578,10 @@ definitions:
   hypersign.ssi.v1.CredentialSchemaDocument:
     type: object
     properties:
+      context:
+        type: array
+        items:
+          type: string
       type:
         type: string
       modelVersion:
@@ -24622,6 +24634,10 @@ definitions:
       credentialSchemaDocument:
         type: object
         properties:
+          context:
+            type: array
+            items:
+              type: string
           type:
             type: string
           modelVersion:
@@ -24918,6 +24934,10 @@ definitions:
             credentialSchemaDocument:
               type: object
               properties:
+                context:
+                  type: array
+                  items:
+                    type: string
                 type:
                   type: string
                 modelVersion:
@@ -24981,6 +25001,10 @@ definitions:
             credentialSchemaDocument:
               type: object
               properties:
+                context:
+                  type: array
+                  items:
+                    type: string
                 type:
                   type: string
                 modelVersion:

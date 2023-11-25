@@ -8,6 +8,7 @@ const BbsSignature2020Context string = "https://ns.did.ai/suites/bls12381-2020/v
 const Secp256k12019Context string = "https://ns.did.ai/suites/secp256k1-2019/v1"
 const X25519KeyAgreementKeyEIP5630Context string = "https://raw.githubusercontent.com/hypersign-protocol/hypersign-contexts/main/X25519KeyAgreementKeyEIP5630.jsonld"
 const CredentialStatusContext string = "https://raw.githubusercontent.com/hypersign-protocol/hypersign-contexts/main/CredentialStatus.jsonld"
+const CredentialSchemaContext string = "https://raw.githubusercontent.com/hypersign-protocol/hypersign-contexts/main/CredentialSchema.jsonld"
 
 // As hid-node is not supposed to perform any GET request, the complete Context body of their
 // respective Context urls has been maintained below.
@@ -674,6 +675,51 @@ var ContextUrlMap map[string]contextObject = map[string]contextObject{
 		"credentialMerkleRootHash": map[string]interface{}{
 			"@id":   "hypersign-vocab:credentialMerkleRootHash",
 			"@type": "xsd:string",
+		},
+	},
+	CredentialSchemaContext: {
+		"@version":        1.1,
+		"hypersign-vocab": "urn:uuid:13fe9318-bb82-4d95-8bf5-8e7fdf8b2026#",
+		"xsd":             "http://www.w3.org/2001/XMLSchema#",
+		"id":              "@id",
+		"type": map[string]interface{}{
+			"@id": "hypersign-vocab:type",
+		},
+		"modelVersion": map[string]interface{}{
+			"@id":   "hypersign-vocab:modelVersion",
+			"@type": "xsd:string",
+		},
+		"name": map[string]interface{}{
+			"@id":   "hypersign-vocab:name",
+			"@type": "xsd:string",
+		},
+		"author": map[string]interface{}{
+			"@id":   "hypersign-vocab:author",
+			"@type": "xsd:string",
+		},
+		"authored": map[string]interface{}{
+			"@id":   "hypersign-vocab:authored",
+			"@type": "xsd:dateTime",
+		},
+		"schema": map[string]interface{}{
+			"@id":   "hypersign-vocab:schema",
+			"@type": "xsd:string",
+		},
+		"additionalProperties": map[string]interface{}{
+			"@id":   "hypersign-vocab:additionalProperties",
+			"@type": "xsd:boolean",
+		},
+		"description": map[string]interface{}{
+			"@id":   "hypersign-vocab:description",
+			"@type": "xsd:string",
+		},
+		"properties": map[string]interface{}{
+			"@id":   "hypersign-vocab:properties",
+			"@type": "xsd:string",
+		},
+		"required": map[string]interface{}{
+			"@id":        "hypersign-vocab:required",
+			"@container": "@set",
 		},
 	},
 }

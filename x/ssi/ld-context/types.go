@@ -1,11 +1,9 @@
 package ldcontext
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
-	"github.com/piprate/json-gold/ld"
 )
 
 type contextObject map[string]interface{}
@@ -65,7 +63,7 @@ func NewJsonLdDidDocument(didDoc *types.DidDocument) *JsonLdDidDocument {
 	return jsonLdDoc
 }
 
-// It is a similar to `Did` struct, with the exception that the `context` attribute is of type
+// It is a similar to `CredentialStatusDocument` struct, with the exception that the `context` attribute is of type
 // `contextObject` instead of `[]string`, which is meant for accomodating Context JSON body
 // having arbritrary attributes. It should be used for performing Canonization.
 type JsonLdCredentialStatus struct {
@@ -147,44 +145,47 @@ func NewJsonLdDocumentProof(didDocProof *types.DocumentProof, didContexts []stri
 	return jsonLdDoc
 }
 
-// normalizeWithURDNA2015 performs RDF Canonization upon JsonLdDid using URDNA2015
-// algorithm and returns the canonized document in string
-func normalizeWithURDNA2015(jsonLdDocument JsonLdDocument) (string, error) {
-	return normalize(ld.AlgorithmURDNA2015, jsonLdDocument)
+// It is a similar to `CredentialSchemaDocument` struct, with the exception that the `context` attribute is of type
+// `contextObject` instead of `[]string`, which is meant for accomodating Context JSON body
+// having arbritrary attributes. It should be used for performing Canonization.
+type JsonLdCredentialSchema struct {
+	Context      []contextObject                 `json:"@context,omitempty"`
+	Type         string                          `json:"type,omitempty"`
+	ModelVersion string                          `json:"modelVersion,omitempty"`
+	Id           string                          `json:"id,omitempty"`
+	Name         string                          `json:"name,omitempty"`
+	Author       string                          `json:"author,omitempty"`
+	Authored     string                          `json:"authored,omitempty"`
+	Schema       *types.CredentialSchemaProperty `json:"schema,omitempty"`
 }
 
-func normalize(algorithm string, jsonLdDocument JsonLdDocument) (string, error) {
-	proc := ld.NewJsonLdProcessor()
-	options := ld.NewJsonLdOptions("")
-	options.Algorithm = algorithm // ld.AlgorithmURDNA2015
-	options.Format = "application/n-quads"
-
-	normalisedJsonLd, err := proc.Normalize(jsonLdDocToInterface(jsonLdDocument), options)
-	if err != nil {
-		return "", fmt.Errorf("unable to Normalize DID Document: %v", err.Error())
-	}
-
-	canonizedDocString := normalisedJsonLd.(string)
-	if canonizedDocString == "" {
-		return "", fmt.Errorf("normalization of JSON-LD document yielded empty RDF string")
-	}
-
-	return canonizedDocString, nil
+func (doc *JsonLdCredentialSchema) GetContext() []contextObject {
+	return doc.Context
 }
 
-// Convert JsonLdDid to interface
-func jsonLdDocToInterface(jsonLd any) interface{} {
-	var intf interface{}
-
-	jsonLdBytes, err := json.Marshal(jsonLd)
-	if err != nil {
-		panic(err)
+func NewJsonLdCredentialSchema(credSchema *types.CredentialSchemaDocument) *JsonLdCredentialSchema {
+	if len(credSchema.Context) == 0 {
+		panic("atleast one context url must be provided for DID Document for Canonization")
 	}
 
-	err = json.Unmarshal(jsonLdBytes, &intf)
-	if err != nil {
-		panic(err)
+	var jsonLdDoc *JsonLdCredentialSchema = &JsonLdCredentialSchema{}
+
+	for _, url := range credSchema.Context {
+		contextObj, ok := ContextUrlMap[url]
+		if !ok {
+			panic(fmt.Sprintf("invalid or unsupported context url: %v", url))
+		}
+		jsonLdDoc.Context = append(jsonLdDoc.Context, contextObj)
 	}
 
-	return intf
+	jsonLdDoc.Type = credSchema.Type
+	jsonLdDoc.ModelVersion = credSchema.ModelVersion
+	jsonLdDoc.Id = credSchema.Id
+	jsonLdDoc.Name = credSchema.Name
+	jsonLdDoc.Author = credSchema.Author
+	jsonLdDoc.Authored = credSchema.Authored
+	jsonLdDoc.Schema = credSchema.Schema
+
+	return jsonLdDoc
 }
+

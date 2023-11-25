@@ -12,6 +12,7 @@ SECP256K1_RECOVERY_CONTEXT = "https://ns.did.ai/suites/secp256k1-2020/v1"
 SECP256K1_VER_KEY_2019_CONTEXT = "https://ns.did.ai/suites/secp256k1-2019/v1"
 BBS_CONTEXT = "https://ns.did.ai/suites/bls12381-2020/v1"
 CREDENTIAL_STATUS_CONTEXT = "https://raw.githubusercontent.com/hypersign-protocol/hypersign-contexts/main/CredentialStatus.jsonld"
+CREDENTIAL_SCHEMA_CONTEXT = "https://raw.githubusercontent.com/hypersign-protocol/hypersign-contexts/main/CredentialSchema.jsonld"
 
 def generate_did_document(key_pair, algo="Ed25519Signature2020", bech32prefix="hid", is_uuid=False):
     base_document = {
@@ -96,6 +97,7 @@ def generate_did_document(key_pair, algo="Ed25519Signature2020", bech32prefix="h
     
 def generate_schema_document(key_pair, schema_author, vm, signature=None, algo="Ed25519Signature2020", updated_schema=None):
     base_schema_doc = {
+        "@context": [CREDENTIAL_SCHEMA_CONTEXT],
         "type": "https://schema.org/Person",
         "modelVersion": "v1.0",
         "id": "",
@@ -114,12 +116,16 @@ def generate_schema_document(key_pair, schema_author, vm, signature=None, algo="
     proof_type = ""
     if algo == "Ed25519Signature2020":
         proof_type = "Ed25519Signature2020"
+        base_schema_doc["@context"].append(ED25519_CONTEXT)
     elif algo == "EcdsaSecp256k1Signature2019":
         proof_type = "EcdsaSecp256k1Signature2019"
+        base_schema_doc["@context"].append(SECP256K1_VER_KEY_2019_CONTEXT)
     elif algo == "EcdsaSecp256k1RecoverySignature2020":
         proof_type = "EcdsaSecp256k1RecoverySignature2020"
+        base_schema_doc["@context"].append(SECP256K1_RECOVERY_CONTEXT)
     elif algo == "BbsBlsSignature2020":
         proof_type = "BbsBlsSignature2020"
+        base_schema_doc["@context"].append(BBS_CONTEXT)
     elif algo == "BabyJubJubSignature2023":
         proof_type = "BabyJubJubSignature2023"
     else:
@@ -141,12 +147,12 @@ def generate_schema_document(key_pair, schema_author, vm, signature=None, algo="
     # Form Signature
     if not updated_schema:
         if not signature:
-            signature = get_document_signature(base_schema_doc, "schema", key_pair, algo)
+            signature = get_document_signature(base_schema_doc, "schema", key_pair, algo, proofObj=base_schema_proof)
         base_schema_proof["proofValue"] = signature
         return base_schema_doc, base_schema_proof
     else:
         if not signature:
-            signature = get_document_signature(updated_schema, "schema", key_pair, algo)
+            signature = get_document_signature(updated_schema, "schema", key_pair, algo, proofObj=base_schema_proof)
         base_schema_proof["proofValue"] = signature
         return updated_schema, base_schema_proof
 

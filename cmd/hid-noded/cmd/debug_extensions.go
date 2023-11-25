@@ -413,13 +413,13 @@ func signDidDocCmd() *cobra.Command {
 
 func signSchemaDocCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "schema-doc [doc] [private-key] [signing-algo]",
+		Use:   "schema-doc [doc] [private-key] [proof-object-without-signature]",
 		Short: "Schema Document signature",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			argSchemaDoc := args[0]
 			argPrivateKey := args[1]
-			argSigningAlgo := args[2]
+			argProofObjectWithoutSignature := args[2]
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -432,38 +432,67 @@ func signSchemaDocCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			schemaDocBytes := schemaDoc.GetSignBytes()
+			
+			// Unmarshal Proof Object
+			var credSchemaDocProof types.DocumentProof
+			err = clientCtx.Codec.UnmarshalJSON([]byte(argProofObjectWithoutSignature), &credSchemaDocProof)
+			if err != nil {
+				return err
+			}
 
 			// Sign Schema Document
 			var signature string
-			switch argSigningAlgo {
+			switch credSchemaDocProof.Type {
 			case types.Ed25519Signature2020:
-				signature, err = hidnodecli.GetEd25519Signature2020(argPrivateKey, schemaDocBytes)
+				credSchemaDocBytes, err := ldcontext.Ed25519Signature2020Normalize(&schemaDoc, &credSchemaDocProof)
+				if err != nil {
+					return err
+				}
+
+				signature, err = hidnodecli.GetEd25519Signature2020(argPrivateKey, credSchemaDocBytes)
 				if err != nil {
 					return err
 				}
 			case types.EcdsaSecp256k1Signature2019:
-				signature, err = hidnodecli.GetEcdsaSecp256k1Signature2019(argPrivateKey, schemaDocBytes)
+				credSchemaDocBytes, err := ldcontext.EcdsaSecp256k1Signature2019Normalize(&schemaDoc, &credSchemaDocProof)
+				if err != nil {
+					return err
+				}
+
+				signature, err = hidnodecli.GetEcdsaSecp256k1Signature2019(argPrivateKey, credSchemaDocBytes)
 				if err != nil {
 					return err
 				}
 			case types.EcdsaSecp256k1RecoverySignature2020:
-				signature, err = hidnodecli.GetEcdsaSecp256k1RecoverySignature2020(argPrivateKey, schemaDocBytes)
+				credSchemaDocBytes, err := ldcontext.EcdsaSecp256k1RecoverySignature2020Normalize(&schemaDoc, &credSchemaDocProof)
+				if err != nil {
+					return err
+				}
+
+				signature, err = hidnodecli.GetEcdsaSecp256k1RecoverySignature2020(argPrivateKey, credSchemaDocBytes)
 				if err != nil {
 					return err
 				}
 			case types.BbsBlsSignature2020:
-				signature, err = hidnodecli.GetBbsBlsSignature2020(argPrivateKey, schemaDocBytes)
+				credSchemaDocBytes, err := ldcontext.BbsBlsSignature2020Normalize(&schemaDoc, &credSchemaDocProof)
+				if err != nil {
+					return err
+				}
+
+				signature, err = hidnodecli.GetBbsBlsSignature2020(argPrivateKey, credSchemaDocBytes)
 				if err != nil {
 					return err
 				}
 			case types.BabyJubJubSignature2023:
-				signature, err = hidnodecli.GetBabyJubJubSignature2023(argPrivateKey, schemaDocBytes)
+				signature, err = hidnodecli.GetBabyJubJubSignature2023(argPrivateKey, schemaDoc.GetSignBytes())
 				if err != nil {
 					return err
 				}
 			default:
-				panic("recieved unsupported signing-algo. Supported algorithms are: [Ed25519Signature2020, EcdsaSecp256k1Signature2019, EcdsaSecp256k1RecoverySignature2020, BbsBlsSignature2020, BabyJubJubSignature2023]")
+				panic(fmt.Sprintf(
+					"recieved unsupported signing-algo '%v'. Supported algorithms are: [Ed25519Signature2020, EcdsaSecp256k1Signature2019, EcdsaSecp256k1RecoverySignature2020, BbsBlsSignature2020, BabyJubJubSignature2023]",
+					credSchemaDocProof.Type,
+				))
 			}
 
 			_, err = fmt.Fprintln(cmd.OutOrStdout(), signature)
