@@ -114,7 +114,7 @@ func isValidJSONDocument(schemaProperty string) error {
 	for attributeName, attributeObj := range schemaPropertyDocument {
 		isTypeSubAttributePresent := false
 
-		for subAttributeName, _ := range attributeObj {
+		for subAttributeName := range attributeObj {
 			if subAttributeName == "type" {
 				isTypeSubAttributePresent = true
 			} else if subAttributeName == "format" {
