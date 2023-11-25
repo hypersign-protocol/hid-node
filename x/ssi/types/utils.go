@@ -8,7 +8,9 @@ import (
 // GetDidFromDidUrl returns didId from didURL.
 // TODO: need to handle query and path
 func GetElementsFromDidUrl(didUrl string) (string, string) {
-	didId, fragment, _ := strings.Cut(didUrl, "#")
+	didElements := strings.Split(didUrl, "#")
+	didId := didElements[0]
+	fragment := didElements[1]
 	return didId, fragment
 }
 
