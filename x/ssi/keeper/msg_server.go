@@ -185,7 +185,7 @@ func (k msgServer) getControllerVmFromState(ctx sdk.Context, verificationMethodI
 }
 
 // VerifyDocumentProof verifies the proof of a SSI Document
-func (k msgServer) VerifyDocumentProof(ctx sdk.Context, ssiMsg types.SsiMsg, inputDocProof types.SSIProofInterface) error {
+func (k msgServer) VerifyDocumentProof(ctx sdk.Context, ssiMsg types.SsiMsg, inputDocProof *types.DocumentProof) error {
 	// Get DID Document from State
 	docProofVmId := inputDocProof.GetVerificationMethod()
 	didId, _ := types.SplitDidUrl(docProofVmId)
@@ -225,13 +225,7 @@ func (k msgServer) VerifyDocumentProof(ctx sdk.Context, ssiMsg types.SsiMsg, inp
 		)
 	}
 
-	// Verify signature
-	documentProof := &types.DocumentProof{
-		VerificationMethod: inputDocProof.GetVerificationMethod(),
-		ProofValue:         inputDocProof.GetProofValue(),
-		ClientSpecType:     inputDocProof.GetClientSpecType(),
-	}
-	err = verification.VerifyDocumentProofSignature(ssiMsg, docVm, documentProof)
+	err = verification.VerifyDocumentProofSignature(ssiMsg, docVm, inputDocProof)
 	if err != nil {
 		return err
 	}

@@ -11,6 +11,7 @@ import (
 type (
 	SsiMsg interface {
 		proto.Message
+		GetId() string
 		GetSignBytes() []byte
 	}
 
@@ -86,14 +87,6 @@ type (
 		Sequence      string `json:"sequence"`
 	}
 )
-
-// Handle Proof Struct of SSI Docs
-type SSIProofInterface interface {
-	GetProofValue() string
-	GetType() string
-	GetVerificationMethod() string
-	GetClientSpecType() ClientSpecType
-}
 
 // CAIP-10 Blockchain Account Id
 type BlockchainId struct {

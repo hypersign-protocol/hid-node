@@ -123,8 +123,7 @@ def get_document_signature(doc: dict, doc_type: str, key_pair: dict, algo: str =
     else:
         raise Exception("Invalid value for doc_type param: " + doc_type)
     
-    if doc_type == "did":
-        print()
+    if doc_type == "did" or doc_type == "cred-status":
         cmd_string = f"hid-noded debug sign-ssi-doc {doc_cmd} '{json.dumps(doc)}' {private_key} '{json.dumps(proofObj)}'"
     else:
         cmd_string = f"hid-noded debug sign-ssi-doc {doc_cmd} '{json.dumps(doc)}' {private_key} {algo}"

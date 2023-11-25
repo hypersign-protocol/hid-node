@@ -28,6 +28,10 @@ paths:
                     credentialStatusDocument:
                       type: object
                       properties:
+                        context:
+                          type: array
+                          items:
+                            type: string
                         id:
                           type: string
                         revoked:
@@ -40,7 +44,7 @@ paths:
                           type: string
                         issuanceDate:
                           type: string
-                        merkleRootHash:
+                        credentialMerkleRootHash:
                           type: string
                     credentialStatusProof:
                       type: object
@@ -159,6 +163,10 @@ paths:
                   credentialStatusDocument:
                     type: object
                     properties:
+                      context:
+                        type: array
+                        items:
+                          type: string
                       id:
                         type: string
                       revoked:
@@ -171,7 +179,7 @@ paths:
                         type: string
                       issuanceDate:
                         type: string
-                      merkleRootHash:
+                      credentialMerkleRootHash:
                         type: string
                   credentialStatusProof:
                     type: object
@@ -24666,6 +24674,10 @@ definitions:
   hypersign.ssi.v1.CredentialStatusDocument:
     type: object
     properties:
+      context:
+        type: array
+        items:
+          type: string
       id:
         type: string
       revoked:
@@ -24678,7 +24690,7 @@ definitions:
         type: string
       issuanceDate:
         type: string
-      merkleRootHash:
+      credentialMerkleRootHash:
         type: string
   hypersign.ssi.v1.CredentialStatusState:
     type: object
@@ -24686,6 +24698,10 @@ definitions:
       credentialStatusDocument:
         type: object
         properties:
+          context:
+            type: array
+            items:
+              type: string
           id:
             type: string
           revoked:
@@ -24698,7 +24714,7 @@ definitions:
             type: string
           issuanceDate:
             type: string
-          merkleRootHash:
+          credentialMerkleRootHash:
             type: string
       credentialStatusProof:
         type: object
@@ -25023,6 +25039,10 @@ definitions:
           credentialStatusDocument:
             type: object
             properties:
+              context:
+                type: array
+                items:
+                  type: string
               id:
                 type: string
               revoked:
@@ -25035,7 +25055,7 @@ definitions:
                 type: string
               issuanceDate:
                 type: string
-              merkleRootHash:
+              credentialMerkleRootHash:
                 type: string
           credentialStatusProof:
             type: object
@@ -25071,6 +25091,10 @@ definitions:
             credentialStatusDocument:
               type: object
               properties:
+                context:
+                  type: array
+                  items:
+                    type: string
                 id:
                   type: string
                 revoked:
@@ -25083,7 +25107,7 @@ definitions:
                   type: string
                 issuanceDate:
                   type: string
-                merkleRootHash:
+                credentialMerkleRootHash:
                   type: string
             credentialStatusProof:
               type: object

@@ -11,6 +11,7 @@ DID_CONTEXT = "https://www.w3.org/ns/did/v1"
 SECP256K1_RECOVERY_CONTEXT = "https://ns.did.ai/suites/secp256k1-2020/v1"
 SECP256K1_VER_KEY_2019_CONTEXT = "https://ns.did.ai/suites/secp256k1-2019/v1"
 BBS_CONTEXT = "https://ns.did.ai/suites/bls12381-2020/v1"
+CREDENTIAL_STATUS_CONTEXT = "https://raw.githubusercontent.com/hypersign-protocol/hypersign-contexts/main/CredentialStatus.jsonld"
 
 def generate_did_document(key_pair, algo="Ed25519Signature2020", bech32prefix="hid", is_uuid=False):
     base_document = {
@@ -151,6 +152,7 @@ def generate_schema_document(key_pair, schema_author, vm, signature=None, algo="
 
 def generate_cred_status_document(key_pair, cred_author, vm, signature=None, algo="Ed25519Signature2020", updated_credstatus_doc=None):
     base_cred_status_doc = {
+        "@context": [CREDENTIAL_STATUS_CONTEXT],
         "id": "",
         "issuer": "did:hid:devnet:z3861habXtUFLNuu6J7m5p8VPsoBMduYbYeUxfx9CnWZR",
         "issuanceDate": "2022-08-16T09:37:12Z",
@@ -160,17 +162,21 @@ def generate_cred_status_document(key_pair, cred_author, vm, signature=None, alg
     proof_type = ""
     if algo == "Ed25519Signature2020":
         proof_type = "Ed25519Signature2020"
+        base_cred_status_doc["@context"].append(ED25519_CONTEXT)
     elif algo == "EcdsaSecp256k1Signature2019":
         proof_type = "EcdsaSecp256k1Signature2019"
+        base_cred_status_doc["@context"].append(SECP256K1_VER_KEY_2019_CONTEXT)
     elif algo == "EcdsaSecp256k1RecoverySignature2020":
         proof_type = "EcdsaSecp256k1RecoverySignature2020"
+        base_cred_status_doc["@context"].append(SECP256K1_RECOVERY_CONTEXT)
     elif algo == "BbsBlsSignature2020":
         proof_type = "BbsBlsSignature2020"
+        base_cred_status_doc["@context"].append(BBS_CONTEXT)
     elif algo == "BabyJubJubSignature2023":
         proof_type = "BabyJubJubSignature2023"
     else:
         raise Exception("Invalid signing algo: " + algo)
-    
+
     base_cred_status_proof = {
         "type": proof_type,
         "created": "2022-08-16T09:37:12Z",
@@ -187,11 +193,11 @@ def generate_cred_status_document(key_pair, cred_author, vm, signature=None, alg
     # Form Signature
     if not updated_credstatus_doc:
         if not signature:
-            signature = get_document_signature(base_cred_status_doc, "cred-status", key_pair, algo)
+            signature = get_document_signature(base_cred_status_doc, "cred-status", key_pair, algo, proofObj=base_cred_status_proof)
         base_cred_status_proof["proofValue"] = signature
         return base_cred_status_doc, base_cred_status_proof
     else:
         if not signature:
-            signature = get_document_signature(updated_credstatus_doc, "cred-status", key_pair, algo)
+            signature = get_document_signature(updated_credstatus_doc, "cred-status", key_pair, algo, proofObj=base_cred_status_proof)
         base_cred_status_proof["proofValue"] = signature
         return updated_credstatus_doc, base_cred_status_proof
