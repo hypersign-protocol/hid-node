@@ -7,7 +7,10 @@ import (
 
 // DefaultGenesis returns the default ssi genesis state
 func DefaultGenesis() *GenesisState {
-	return &GenesisState{}
+	return &GenesisState{
+		ChainNamespace: "",
+		Params:         DefaultParams(),
+	}
 }
 
 // Validate performs basic genesis state validation returning an error upon any

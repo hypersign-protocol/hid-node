@@ -1,74 +1,77 @@
 syntax = "proto3";
-package hypersignprotocol.hidnode.ssi;
-
-// this line is used by starport scaffolding # proto/tx/import
+package hypersign.ssi.v1;
 
 option go_package = "github.com/hypersign-protocol/hid-node/x/ssi/types";
 
-import "ssi/v1/schema.proto";
+import "ssi/v1/credential_schema.proto";
 import "ssi/v1/did.proto";
-import "ssi/v1/credential.proto";
+import "ssi/v1/credential_status.proto";
+import "ssi/v1/proof.proto";
 
-// Msg defines the Msg service.
 service Msg {
-  rpc CreateDID(MsgCreateDID) returns (MsgCreateDIDResponse);
+  rpc RegisterDID(MsgRegisterDID) returns (MsgRegisterDIDResponse);
   rpc UpdateDID(MsgUpdateDID) returns (MsgUpdateDIDResponse);
-  rpc CreateSchema(MsgCreateSchema) returns (MsgCreateSchemaResponse);
   rpc DeactivateDID(MsgDeactivateDID) returns (MsgDeactivateDIDResponse);
+  rpc RegisterCredentialSchema(MsgRegisterCredentialSchema) returns (MsgRegisterCredentialSchemaResponse);
+  rpc UpdateCredentialSchema(MsgUpdateCredentialSchema) returns (MsgUpdateCredentialSchemaResponse);
   rpc RegisterCredentialStatus(MsgRegisterCredentialStatus) returns (MsgRegisterCredentialStatusResponse);
-// this line is used by starport scaffolding # proto/tx/rpc
+  rpc UpdateCredentialStatus(MsgUpdateCredentialStatus) returns (MsgUpdateCredentialStatusResponse);
 }
 
-message MsgCreateDID {
-  Did didDocString = 1;
-  repeated SignInfo signatures = 2;
-  string creator = 3;
+message MsgRegisterDID {
+  DidDocument didDocument = 1;
+  repeated DocumentProof didDocumentProofs = 2;
+  string txAuthor = 3;
 }
 
-message MsgCreateDIDResponse {
-  uint64 id = 1;
-}
+message MsgRegisterDIDResponse {}
 
 message MsgUpdateDID {
-  Did didDocString = 1;
-  string version_id = 2;
-  repeated SignInfo signatures = 3;
-  string creator = 4;
+  DidDocument didDocument = 1;
+  repeated DocumentProof didDocumentProofs = 2;
+  string versionId = 3;
+  string txAuthor = 4;
 }
 
-message MsgUpdateDIDResponse {
-  string updateId = 1;
-}
-
-message MsgCreateSchema {
-  string creator = 1;
-  SchemaDocument schemaDoc = 2;
-  SchemaProof schemaProof = 3;
-}
-
-message MsgCreateSchemaResponse {
-  uint64 id = 1;
-}
+message MsgUpdateDIDResponse {}
 
 message MsgDeactivateDID {
-  string creator = 1;
-  string didId = 2;
-  string version_id = 3;
-  repeated SignInfo signatures = 4;
+  string didDocumentId = 1;
+  repeated DocumentProof didDocumentProofs = 2;
+  string versionId = 3;
+  string txAuthor = 4;
 }
 
-message MsgDeactivateDIDResponse {
-  uint64 id = 1;
+message MsgDeactivateDIDResponse {}
+
+message MsgRegisterCredentialSchema {
+  CredentialSchemaDocument credentialSchemaDocument = 1;
+  DocumentProof credentialSchemaProof = 2;
+  string txAuthor = 3;
 }
+
+message MsgRegisterCredentialSchemaResponse {}
+
+message MsgUpdateCredentialSchema {
+  CredentialSchemaDocument credentialSchemaDocument = 1;
+  DocumentProof credentialSchemaProof = 2;
+  string txAuthor = 3;
+}
+
+message MsgUpdateCredentialSchemaResponse {}
 
 message MsgRegisterCredentialStatus {
-  string creator = 1;
-  CredentialStatus credentialStatus = 2;
-  CredentialProof proof = 3;
+  CredentialStatusDocument credentialStatusDocument = 1;
+  DocumentProof credentialStatusProof = 2;
+  string txAuthor = 3;
 }
 
-message MsgRegisterCredentialStatusResponse {
-  uint64 id = 1;
+message MsgRegisterCredentialStatusResponse {}
+
+message MsgUpdateCredentialStatus {
+  CredentialStatusDocument credentialStatusDocument = 1;
+  DocumentProof credentialStatusProof = 2;
+  string txAuthor = 3;
 }
 
-// this line is used by starport scaffolding # proto/tx/message
+message MsgUpdateCredentialStatusResponse {}

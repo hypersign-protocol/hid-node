@@ -1,12 +1,14 @@
 syntax = "proto3";
-package hypersignprotocol.hidnode.ssi;
+package hypersign.ssi.v1;
 
 option go_package = "github.com/hypersign-protocol/hid-node/x/ssi/types";
 
-message Did {
-  repeated string context = 1;
+import "gogoproto/gogo.proto";
+
+message DidDocument {
+  repeated string context = 1 [json_name = "@context", (gogoproto.jsontag) = "@context"];
   string id = 2;
-  repeated string controller = 3; // DID Controller Spec: https://www.w3.org/TR/did-core/#did-controller
+  repeated string controller = 3;
   repeated string alsoKnownAs = 4;
   repeated VerificationMethod verificationMethod = 5;
   repeated string authentication = 6;
@@ -17,7 +19,7 @@ message Did {
   repeated Service service = 11;
 }
 
-message Metadata {
+message DidDocumentMetadata {
   string created = 1;
   string updated = 2;
   bool deactivated = 3;
@@ -28,7 +30,8 @@ message VerificationMethod {
   string id = 1;
   string type = 2;
   string controller = 3;
-  string publicKeyMultibase = 4;
+  string publicKeyMultibase = 4; // If value is provided, `blockchainAccountId` must be empty
+  string blockchainAccountId = 5; // If value is provided, `publicKeyMultibase` must be empty
 }
 
 message Service {
@@ -37,12 +40,7 @@ message Service {
   string serviceEndpoint = 3;
 }
 
-message SignInfo {
-  string verification_method_id = 1;
-  string signature = 2;
-}
-
 message DidDocumentState {
-  Did didDocument = 1;
-  Metadata didDocumentMetadata = 2;
+  DidDocument didDocument = 1;
+  DidDocumentMetadata didDocumentMetadata = 2;
 }

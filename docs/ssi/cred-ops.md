@@ -31,6 +31,11 @@ Following are the VC statuses supported by `hid-node`:
 - **Revoked**
 - **Expired**
 
+## Supported Digital Signature Algorithms
+
+- **ed25519**
+- **secp256k1**
+
 ## Supported Hash Algorithm
 
 Following are the supported hash algorithms for the attribute `credentialHash`:
