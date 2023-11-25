@@ -5,45 +5,85 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-const TypeMsgCreateSchema = "create_schema"
+const TypeMsgRegisterCredentialSchema = "register_credential_schema"
 
-var _ sdk.Msg = &MsgCreateSchema{}
+var _ sdk.Msg = &MsgRegisterCredentialSchema{}
 
-func NewMsgCreateSchema(creator string, schemaDoc *SchemaDocument, schemaProof *SchemaProof) *MsgCreateSchema {
-	return &MsgCreateSchema{
-		Creator:     creator,
-		SchemaDoc:   schemaDoc,
-		SchemaProof: schemaProof,
+func NewMsgRegisterSchema(
+	schemaDoc *CredentialSchemaDocument,
+	schemaProof *DocumentProof,
+	clientSpecType ClientSpecType,
+	txAuthor string,
+) *MsgRegisterCredentialSchema {
+	return &MsgRegisterCredentialSchema{
+		CredentialSchemaDocument: schemaDoc,
+		CredentialSchemaProof:    schemaProof,
+		TxAuthor:                 txAuthor,
 	}
 }
 
-func (msg *MsgCreateSchema) Route() string {
+func (msg *MsgRegisterCredentialSchema) Route() string {
 	return RouterKey
 }
 
-func (msg *MsgCreateSchema) Type() string {
-	return TypeMsgCreateSchema
+func (msg *MsgRegisterCredentialSchema) Type() string {
+	return TypeMsgRegisterCredentialSchema
 }
 
-func (msg *MsgCreateSchema) GetSigners() []sdk.AccAddress {
-	creator, err := sdk.AccAddressFromBech32(msg.Creator)
+func (msg *MsgRegisterCredentialSchema) GetSigners() []sdk.AccAddress {
+	creator, err := sdk.AccAddressFromBech32(msg.TxAuthor)
 	if err != nil {
 		panic(err)
 	}
 	return []sdk.AccAddress{creator}
 }
 
-func (msg *MsgCreateSchema) GetSignBytes() []byte {
+func (msg *MsgRegisterCredentialSchema) GetSignBytes() []byte {
 	bz := ModuleCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(bz)
 }
 
-func (msg *SchemaDocument) GetSignBytes() []byte {
+func (msg *CredentialSchemaDocument) GetSignBytes() []byte {
 	return ModuleCdc.MustMarshal(msg)
 }
 
-func (msg *MsgCreateSchema) ValidateBasic() error {
-	_, err := sdk.AccAddressFromBech32(msg.Creator)
+func (msg *MsgRegisterCredentialSchema) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.TxAuthor)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+	}
+	return nil
+}
+
+// Update Credential Schema
+
+const TypeMsgUpdateCredentialSchema = "update_credential_schema"
+
+var _ sdk.Msg = &MsgUpdateCredentialSchema{}
+
+func (msg *MsgUpdateCredentialSchema) Route() string {
+	return RouterKey
+}
+
+func (msg *MsgUpdateCredentialSchema) Type() string {
+	return TypeMsgUpdateCredentialSchema
+}
+
+func (msg *MsgUpdateCredentialSchema) GetSigners() []sdk.AccAddress {
+	creator, err := sdk.AccAddressFromBech32(msg.TxAuthor)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{creator}
+}
+
+func (msg *MsgUpdateCredentialSchema) GetSignBytes() []byte {
+	bz := ModuleCdc.MustMarshalJSON(msg)
+	return sdk.MustSortJSON(bz)
+}
+
+func (msg *MsgUpdateCredentialSchema) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.TxAuthor)
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}

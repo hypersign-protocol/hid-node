@@ -11,6 +11,31 @@ import (
 
 var _ = strconv.Itoa(0)
 
+func cmdListFees() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "list-fees",
+		Short: "List fee for all SSI based transactions",
+		Args:  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			queryClient := types.NewQueryClient(clientCtx)
+
+			res, err := queryClient.QuerySSIFee(cmd.Context(), &types.QuerySSIFeeRequest{})
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintProto(res)
+		},
+	}
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
+}
+
 func CmdGetSchema() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "schema [schema-id]",
@@ -26,9 +51,9 @@ func CmdGetSchema() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			params := &types.QuerySchemaRequest{SchemaId: argSchemaId}
+			params := &types.QueryCredentialSchemaRequest{SchemaId: argSchemaId}
 
-			res, err := queryClient.QuerySchema(cmd.Context(), params)
+			res, err := queryClient.CredentialSchemaByID(cmd.Context(), params)
 			if err != nil {
 				return err
 			}
@@ -59,7 +84,7 @@ func CmdResolveDID() *cobra.Command {
 
 			params := &types.QueryDidDocumentRequest{DidId: argDidDocId}
 
-			res, err := queryClient.QueryDidDocument(cmd.Context(), params)
+			res, err := queryClient.DidDocumentByID(cmd.Context(), params)
 			if err != nil {
 				return err
 			}
@@ -88,9 +113,9 @@ func CmdGetCredentialStatus() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			params := &types.QueryCredentialRequest{CredId: argCredId}
+			params := &types.QueryCredentialStatusRequest{CredId: argCredId}
 
-			res, err := queryClient.QueryCredential(cmd.Context(), params)
+			res, err := queryClient.CredentialStatusByID(cmd.Context(), params)
 			if err != nil {
 				return err
 			}

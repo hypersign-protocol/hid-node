@@ -1,4 +1,4 @@
-FROM golang:1.18
+FROM golang:1.20
 
 # Set up dependencies
 ENV PACKAGES curl make git libc-dev bash gcc python3 jq

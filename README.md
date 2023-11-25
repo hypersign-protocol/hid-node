@@ -21,51 +21,48 @@ The Hypersign Identity Network is a permissionless blockchain network to manage 
 
 Following are the prerequisites that needs to be installed:
 
-- Golang (Installation Guide: https://go.dev/doc/install) (version: 1.18+)
+- Golang (Installation Guide: https://go.dev/doc/install) (version: 1.20)
 - make
+- jq
 
 ## Get started
 
-### Local
+### Local Binary
 
-Clone the repository and install the binary:
+1. Clone this repository and install the binary:
+   ```sh
+   git clone https://github.com/hypersign-protocol/hid-node.git
+   cd hid-node
+   make install
+   ```
 
-```sh
-git clone https://github.com/hypersign-protocol/hid-node.git
-cd hid-node
-make install
-```
+> The binary `hid-noded` is usually generated in `$HOME/go/bin` directory. Run `hid-noded --help` to explore its functionalities
 
-The binary `hid-noded` will be generated in `$GO_PATH/bin` directory. To explore its functionalities, type `hid-noded --help` in a seperate terminal window.
+2. Run the following script to setup a single-node blockchain. Please note that the following script requires `jq` to be installed.
+   ```sh
+   bash ./scripts/localnet-single-node/setup.sh
+   ```
 
-#### Running the Blockchain
-
-To start a single-node blockchain, run the following command to initialize the node:
-
-```sh
-sh ./scripts/localnet-single-node/setup.sh
-```
-
-> Note: The above script requires `jq` to be installed.
-
-Run the hid-node:
-
-```sh
-hid-noded start --home ~/.hid-node
-```
+3. Start `hid-noded`:
+   ```sh
+   hid-noded start
+   ```
 
 ### Docker
 
-To run a single node `hid-node` docker container, run the following:
+To run a single node `hid-node` docker container, follow the below steps:
 
 1. Pull the image:
    ```sh
    docker pull ghcr.io/hypersign-protocol/hid-node:latest
    ```
 
-2. Open a separate terminal window. Run the node:
+2. Run the following:
    ```sh
-   docker run -it ghcr.io/hypersign-protocol/hid-node start
+   docker run --rm -d \
+	-p 26657:26657 -p 1317:1317 -p 26656:26656 -p 9090:9090 \
+	--name hid-node-container \
+	ghcr.io/hypersign-protocol/hid-node start
    ```
 
 ## Documentation
@@ -76,3 +73,5 @@ To run a single node `hid-node` docker container, run the following:
 | Credential Schema | https://docs.hypersign.id/self-sovereign-identity-ssi/schema |
 | Verifiable Credential Status | https://docs.hypersign.id/self-sovereign-identity-ssi/verifiable-credential-vc/credential-revocation-registry |
 
+
+Please contact [support@hypermine.in](mailto:support@hypermine.in) for consulting and integration

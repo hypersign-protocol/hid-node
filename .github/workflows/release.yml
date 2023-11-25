@@ -12,7 +12,7 @@ permissions:
 jobs:
   release-binaries-github:
     name: Release Binaries to Github
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -22,7 +22,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
-          go-version: 1.18
+          go-version: 1.20
       
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v2
@@ -49,7 +49,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
-          go-version: 1.18
+          go-version: 1.20
       
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
