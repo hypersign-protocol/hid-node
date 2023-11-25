@@ -14,7 +14,6 @@ import (
 	"github.com/multiformats/go-multibase"
 	secp256k1 "github.com/tendermint/tendermint/crypto/secp256k1"
 	"golang.org/x/crypto/ripemd160" // nolint: staticcheck
-	"golang.org/x/crypto/sha3"
 
 	etheraccounts "github.com/ethereum/go-ethereum/accounts"
 	etherhexutil "github.com/ethereum/go-ethereum/common/hexutil"
@@ -43,7 +42,7 @@ func GetBbsBlsSignature2020(privateKey string, message []byte) (string, error) {
 }
 
 // Get BabyJubJub Signature
-func GetBabyJubJubSignature2023(privateKey string, message []byte) (string, error) {
+func GetBJJSignature2021(privateKey string, message []byte) (string, error) {
 	// Decode private key from hex
 	privateKeyBytes, err := hex.DecodeString(privateKey)
 	if err != nil {
@@ -54,15 +53,24 @@ func GetBabyJubJubSignature2023(privateKey string, message []byte) (string, erro
 
 	var privKeyObj babyjub.PrivateKey = privateKeyBytes32
 
-	// SHA-224 the message and convert it to BigInt
-	msgHash := sha3.Sum224(message)
-	msgBigInt := new(big.Int).SetBytes(msgHash[:])
+	msgBigInt := new(big.Int).SetBytes(message)
 
 	// Get Signature
 	signatureObj := privKeyObj.SignPoseidon(msgBigInt)
 	signatureHex := signatureObj.Compress().String()
 
-	return signatureHex, nil
+	// Convert Signature to multibase base58
+	signatureBytes, err := hex.DecodeString(signatureHex)
+	if err != nil {
+		return "", err
+	}
+
+	signature, err := multibase.Encode(multibase.Base58BTC, signatureBytes)
+	if err != nil {
+		return "", err
+	}
+
+	return signature, nil
 }
 
 func GetEcdsaSecp256k1RecoverySignature2020(privateKey string, message []byte) (string, error) {

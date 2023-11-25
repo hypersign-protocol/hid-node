@@ -47,28 +47,15 @@ func getCosmosADR036SignDocBytes(ssiDocBytes []byte, signerAddress string) ([]by
 	return updatedSignDocBytes, nil
 }
 
-// More info on the `personal_sign` here: https://docs.metamask.io/guide/signing-data.html#personal-sign
-func getPersonalSignSpecDocBytes(ssiMsg types.SsiMsg) ([]byte, error) {
-	return json.Marshal(ssiMsg)
-}
-
 // Get the updated marshaled SSI document for the respective ClientSpec
 func getDocBytesByClientSpec(ssiMsg types.SsiMsg, extendedVm *types.ExtendedVerificationMethod) ([]byte, error) {
 	switch extendedVm.Proof.ClientSpecType {
 	case types.CLIENT_SPEC_TYPE_NONE:
-		if extendedVm.Proof.Type == types.BabyJubJubSignature2023 {
-			return ssiMsg.GetSignBytes(), nil
-		}
-
-		return ldcontext.NormalizeByVerificationMethodType(ssiMsg, extendedVm.Type, extendedVm.Proof)
+		return ldcontext.NormalizeByProofType(ssiMsg, extendedVm.Proof)
 	case types.CLIENT_SPEC_TYPE_COSMOS_ADR036:
 		signerAddress, err := getBlockchainAddress(extendedVm.BlockchainAccountId)
 		if err != nil {
 			return nil, err
-		}
-
-		if extendedVm.Proof.Type == types.BabyJubJubSignature2023 {
-			return getCosmosADR036SignDocBytes(ssiMsg.GetSignBytes(), signerAddress)
 		}
 
 		canonizedDidDocHash, err := ldcontext.EcdsaSecp256k1Signature2019Normalize(ssiMsg, extendedVm.Proof)
@@ -79,10 +66,6 @@ func getDocBytesByClientSpec(ssiMsg types.SsiMsg, extendedVm *types.ExtendedVeri
 		return getCosmosADR036SignDocBytes(canonizedDidDocHash, signerAddress)
 
 	case types.CLIENT_SPEC_TYPE_ETH_PERSONAL_SIGN:
-		if extendedVm.Proof.Type == types.BabyJubJubSignature2023 {
-			return getPersonalSignSpecDocBytes(ssiMsg)
-		}
-
 		canonizedDidDocHash, err := ldcontext.EcdsaSecp256k1RecoverySignature2020Normalize(ssiMsg, extendedVm.Proof)
 		if err != nil {
 			return nil, err

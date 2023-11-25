@@ -11,13 +11,13 @@ const EcdsaSecp256k1RecoveryMethod2020 = "EcdsaSecp256k1RecoveryMethod2020"
 const X25519KeyAgreementKey2020 = "X25519KeyAgreementKey2020"
 const X25519KeyAgreementKeyEIP5630 = "X25519KeyAgreementKeyEIP5630" // TODO: Temporary spec name for KeyAgreement type from Metamask
 const Bls12381G2Key2020 = "Bls12381G2Key2020"
-const BabyJubJubVerificationKey2023 = "BabyJubJubVerificationKey2023"
+const BabyJubJubKey2021 = "BabyJubJubKey2021"
 
 // Supported Proof Types
 const Ed25519Signature2020 = "Ed25519Signature2020"
 const EcdsaSecp256k1Signature2019 = "EcdsaSecp256k1Signature2019"
 const EcdsaSecp256k1RecoverySignature2020 = "EcdsaSecp256k1RecoverySignature2020"
-const BabyJubJubSignature2023 = "BabyJubJubSignature2023"
+const BJJSignature2021 = "BJJSignature2021"
 const BbsBlsSignature2020 = "BbsBlsSignature2020"
 
 // Mapping between Verification Key and its corresponding Signature
@@ -27,7 +27,7 @@ var VerificationKeySignatureMap = map[string]string{
 	EcdsaSecp256k1RecoveryMethod2020:  EcdsaSecp256k1RecoverySignature2020,
 	X25519KeyAgreementKey2020:         "", // Authentication and Assertion are not allowed
 	X25519KeyAgreementKeyEIP5630:      "", // Authentication and Assertion are not allowed
-	BabyJubJubVerificationKey2023:     BabyJubJubSignature2023,
+	BabyJubJubKey2021:                 BJJSignature2021,
 	Bls12381G2Key2020:                 BbsBlsSignature2020,
 }
 
@@ -104,7 +104,7 @@ var SupportedCAIP10CosmosChainIds = []string{
 	"osmo-test-4",       // Osmosis Testnet
 	"elgafar-1",         // Stargaze Testnet
 	"test-core-1",       // Persistence Testnet
-	"prajna",            // Hypersign Identity Network - Prajna Testnet
+	"jagrat",            // Hypersign Identity Network - Jagrat Testnet
 }
 
 // Map between supported cosmos chain-id and their respective blockhchain address prefix
@@ -122,7 +122,7 @@ var CosmosCAIP10ChainIdBech32PrefixMap = map[string]string{
 	"osmo-test-4":       "osmo",
 	"elgafar-1":         "stars",
 	"test-core-1":       "persistence",
-	"prajna":            "hid",
+	"jagrat":            "hid",
 }
 
 // Map between support CAIP-10 prefix and list of chain-ids

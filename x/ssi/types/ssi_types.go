@@ -13,6 +13,7 @@ type (
 		proto.Message
 		GetId() string
 		GetSignBytes() []byte
+		GetContext() []string
 	}
 
 	Signer struct {
