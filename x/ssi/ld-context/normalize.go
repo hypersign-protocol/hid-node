@@ -106,7 +106,7 @@ func normalize(jsonLdDocument JsonLdDocument, algorithm string) (string, error) 
 }
 
 // Convert JsonLdDid to interface
-func jsonLdDocToInterface(jsonLd any) interface{} {
+func jsonLdDocToInterface(jsonLd interface{}) interface{} {
 	var intf interface{}
 
 	jsonLdBytes, err := json.Marshal(jsonLd)

@@ -54,7 +54,10 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 	}
 
 	// Check if the created date before issuance date
-	currentDate, _ := time.Parse(time.RFC3339, msgCredProof.Created)
+	currentDate, err := time.Parse(time.RFC3339, msgCredProof.Created)
+	if err != nil {
+		return nil, err
+	}
 	if currentDate.Before(issuanceDateParsed) {
 		return nil, sdkerrors.Wrapf(types.ErrInvalidDate, "proof attached has a creation date before issuance date")
 	}

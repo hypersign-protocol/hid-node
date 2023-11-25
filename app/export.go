@@ -150,6 +150,8 @@ func (app *HidnodeApp) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddr
 	iter := sdk.KVStoreReversePrefixIterator(store, stakingtypes.ValidatorsKey)
 	counter := int16(0)
 
+	defer iter.Close()
+
 	for ; iter.Valid(); iter.Next() {
 		addr := sdk.ValAddress(iter.Key()[1:])
 		validator, found := app.StakingKeeper.GetValidator(ctx, addr)
@@ -165,8 +167,6 @@ func (app *HidnodeApp) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddr
 		app.StakingKeeper.SetValidator(ctx, validator)
 		counter++
 	}
-
-	iter.Close()
 
 	if _, err := app.StakingKeeper.ApplyAndReturnValidatorSetUpdates(ctx); err != nil {
 		panic(err)

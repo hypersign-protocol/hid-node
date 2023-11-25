@@ -83,7 +83,6 @@ import (
 	ibcclientclient "github.com/cosmos/ibc-go/v4/modules/core/02-client/client"
 	ibcclienttypes "github.com/cosmos/ibc-go/v4/modules/core/02-client/types"
 	ibcporttypes "github.com/cosmos/ibc-go/v4/modules/core/05-port/types"
-	porttypes "github.com/cosmos/ibc-go/v4/modules/core/05-port/types"
 	ibchost "github.com/cosmos/ibc-go/v4/modules/core/24-host"
 	ibckeeper "github.com/cosmos/ibc-go/v4/modules/core/keeper"
 
@@ -476,7 +475,7 @@ func NewHidnodeApp(
 	transferModule := transfer.NewAppModule(app.TransferKeeper)
 
 	// Create Transfer Stack
-	var transferStack porttypes.IBCModule
+	var transferStack ibcporttypes.IBCModule
 	transferStack = transfer.NewIBCModule(app.TransferKeeper)
 	transferStack = ibcfee.NewIBCMiddleware(transferStack, app.IBCFeeKeeper)
 
@@ -533,7 +532,7 @@ func NewHidnodeApp(
 	)
 
 	// Create fee enabled wasm ibc Stack
-	var wasmStack porttypes.IBCModule
+	var wasmStack ibcporttypes.IBCModule
 	wasmStack = wasm.NewIBCHandler(app.WasmKeeper, app.IBCKeeper.ChannelKeeper, app.IBCFeeKeeper)
 	wasmStack = ibcfee.NewIBCMiddleware(wasmStack, app.IBCFeeKeeper)
 
