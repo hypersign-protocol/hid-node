@@ -15,6 +15,8 @@ if [ ${RET_VAL} -ne 0 ]; then
     exit 1
 fi
 
+CHAIN_NAMESAPCE=devnet
+
 # Setting up config files
 rm -rf /root/.hid-node/
 
@@ -41,7 +43,7 @@ cat /root/.hid-node/config/genesis.json | jq '.app_state["gov"]["deposit_params"
 cat /root/.hid-node/config/genesis.json | jq '.app_state["gov"]["voting_params"]["voting_period"]="500s"' > /root/.hid-node/config/tmp_genesis.json && mv /root/.hid-node/config/tmp_genesis.json /root/.hid-node/config/genesis.json
 
 # update ssi genesis
-cat /root/.hid-node/config/genesis.json | jq '.app_state["ssi"]["chain_namespace"]="devnet"' > /root/.hid-node/config/tmp_genesis.json && mv /root/.hid-node/config/tmp_genesis.json /root/.hid-node/config/genesis.json
+cat /root/.hid-node/config/genesis.json | jq '.app_state["ssi"]["chainNamespace"]="'$CHAIN_NAMESAPCE'"' > /root/.hid-node/config/tmp_genesis.json && mv /root/.hid-node/config/tmp_genesis.json /root/.hid-node/config/genesis.json
 
 # update mint genesis
 cat /root/.hid-node/config/genesis.json | jq '.app_state["mint"]["params"]["mint_denom"]="uhid"' > /root/.hid-node/config/tmp_genesis.json && mv /root/.hid-node/config/tmp_genesis.json /root/.hid-node/config/genesis.json

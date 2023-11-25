@@ -188,4 +188,3 @@ func NewJsonLdCredentialSchema(credSchema *types.CredentialSchemaDocument) *Json
 
 	return jsonLdDoc
 }
-

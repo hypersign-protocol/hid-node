@@ -1,5 +1,5 @@
 [Unit]
-Description= Jagrat Network node
+Description= Hypersign Identity Network
 Requires=network-online.target
 After=network-online.target
 

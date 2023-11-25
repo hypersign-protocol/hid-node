@@ -97,4 +97,3 @@ func TestGetEnabledProposals(t *testing.T) {
 		})
 	}
 }
-

@@ -8,7 +8,7 @@ import (
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 )
 
-// getCredentialSchemaCount gets the credential schema count from store 
+// getCredentialSchemaCount gets the credential schema count from store
 func (k Keeper) getCredentialSchemaCount(ctx sdk.Context) uint64 {
 	// Get the store using storeKey and SchemaCountKey (which is "Schema-count-")
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.SchemaCountKey))

@@ -41,7 +41,7 @@ cat $HOME/.hid-node/node1/config/genesis.json | jq '.app_state["gov"]["deposit_p
 cat $HOME/.hid-node/node1/config/genesis.json | jq '.app_state["mint"]["params"]["mint_denom"]="uhid"' > $HOME/.hid-node/node1/config/tmp_genesis.json && mv $HOME/.hid-node/node1/config/tmp_genesis.json $HOME/.hid-node/node1/config/genesis.json
 
 #update ssi genesis
-cat $HOME/.hid-node/node1/config/genesis.json | jq '.app_state["ssi"]["chain_namespace"]="devnet"' > $HOME/.hid-node/node1/config/tmp_genesis.json && mv $HOME/.hid-node/node1/config/tmp_genesis.json $HOME/.hid-node/node1/config/genesis.json
+cat $HOME/.hid-node/node1/config/genesis.json | jq '.app_state["ssi"]["chainNamespace"]="devnet"' > $HOME/.hid-node/node1/config/tmp_genesis.json && mv $HOME/.hid-node/node1/config/tmp_genesis.json $HOME/.hid-node/node1/config/genesis.json
 
 # change app.toml values
 
