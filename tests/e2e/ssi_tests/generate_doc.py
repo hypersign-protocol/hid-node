@@ -14,6 +14,47 @@ BBS_CONTEXT = "https://ns.did.ai/suites/bls12381-2020/v1"
 CREDENTIAL_STATUS_CONTEXT = "https://raw.githubusercontent.com/hypersign-protocol/hypersign-contexts/main/CredentialStatus.jsonld"
 CREDENTIAL_SCHEMA_CONTEXT = "https://raw.githubusercontent.com/hypersign-protocol/hypersign-contexts/main/CredentialSchema.jsonld"
 
+def generate_multi_vm_did(key_pairs, algo="ed25519", is_uuid=False):
+    base_document = {
+        "context" : [
+            "https://www.w3.org/ns/did/v1"
+        ],
+        "id": "",
+        "controller": [],
+        "verificationMethod": [],
+        "authentication": [],
+    }
+
+    did_id = generate_document_id("did", key_pairs[0], algo, is_uuid)
+
+    # Form the DID Document
+    vm_type = "Ed25519VerificationKey2020"
+
+    verification_methods = []
+
+    for i in range(0, len(key_pairs)):
+        verification_method = {
+            "id": "",
+            "type": "",
+            "controller": "",
+            "blockchainAccountId": "",
+            "publicKeyMultibase": ""
+        }
+        verification_method["publicKeyMultibase"] = key_pairs[i]["pub_key_multibase"]
+        verification_method["controller"] = did_id
+        verification_method["type"] = vm_type
+        verification_method["id"] = did_id + "#k" + str(i)
+
+        verification_methods.append(verification_method)
+
+    base_document["id"] = did_id
+    base_document["controller"] = [did_id]
+    base_document["verificationMethod"] = verification_methods
+    base_document["authentication"] = []
+    base_document["assertionMethod"] = []
+
+    return base_document
+
 def generate_did_document(key_pair, algo="Ed25519Signature2020", bech32prefix="hid", is_uuid=False):
     base_document = {
         "context" : [

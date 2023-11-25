@@ -6,6 +6,7 @@ package types
 import (
 	context "context"
 	fmt "fmt"
+	types "github.com/cosmos/cosmos-sdk/types"
 	query "github.com/cosmos/cosmos-sdk/types/query"
 	grpc1 "github.com/gogo/protobuf/grpc"
 	proto "github.com/gogo/protobuf/proto"
@@ -29,6 +30,134 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+type QuerySSIFeeRequest struct {
+}
+
+func (m *QuerySSIFeeRequest) Reset()         { *m = QuerySSIFeeRequest{} }
+func (m *QuerySSIFeeRequest) String() string { return proto.CompactTextString(m) }
+func (*QuerySSIFeeRequest) ProtoMessage()    {}
+func (*QuerySSIFeeRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_0f525f26163d85f3, []int{0}
+}
+func (m *QuerySSIFeeRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QuerySSIFeeRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QuerySSIFeeRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QuerySSIFeeRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QuerySSIFeeRequest.Merge(m, src)
+}
+func (m *QuerySSIFeeRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *QuerySSIFeeRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QuerySSIFeeRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QuerySSIFeeRequest proto.InternalMessageInfo
+
+type QuerySSIFeeResponse struct {
+	RegisterDidFee              *types.Coin `protobuf:"bytes,1,opt,name=register_did_fee,json=registerDidFee,proto3" json:"register_did_fee,omitempty"`
+	UpdateDidFee                *types.Coin `protobuf:"bytes,2,opt,name=update_did_fee,json=updateDidFee,proto3" json:"update_did_fee,omitempty"`
+	DeactivateDidFee            *types.Coin `protobuf:"bytes,3,opt,name=deactivate_did_fee,json=deactivateDidFee,proto3" json:"deactivate_did_fee,omitempty"`
+	RegisterCredentialSchemaFee *types.Coin `protobuf:"bytes,4,opt,name=register_credential_schema_fee,json=registerCredentialSchemaFee,proto3" json:"register_credential_schema_fee,omitempty"`
+	UpdateCredentialSchemaFee   *types.Coin `protobuf:"bytes,5,opt,name=update_credential_schema_fee,json=updateCredentialSchemaFee,proto3" json:"update_credential_schema_fee,omitempty"`
+	RegisterCredentialStatusFee *types.Coin `protobuf:"bytes,6,opt,name=register_credential_status_fee,json=registerCredentialStatusFee,proto3" json:"register_credential_status_fee,omitempty"`
+	UpdateCredentialStatusFee   *types.Coin `protobuf:"bytes,7,opt,name=update_credential_status_fee,json=updateCredentialStatusFee,proto3" json:"update_credential_status_fee,omitempty"`
+}
+
+func (m *QuerySSIFeeResponse) Reset()         { *m = QuerySSIFeeResponse{} }
+func (m *QuerySSIFeeResponse) String() string { return proto.CompactTextString(m) }
+func (*QuerySSIFeeResponse) ProtoMessage()    {}
+func (*QuerySSIFeeResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_0f525f26163d85f3, []int{1}
+}
+func (m *QuerySSIFeeResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QuerySSIFeeResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QuerySSIFeeResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QuerySSIFeeResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QuerySSIFeeResponse.Merge(m, src)
+}
+func (m *QuerySSIFeeResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *QuerySSIFeeResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QuerySSIFeeResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QuerySSIFeeResponse proto.InternalMessageInfo
+
+func (m *QuerySSIFeeResponse) GetRegisterDidFee() *types.Coin {
+	if m != nil {
+		return m.RegisterDidFee
+	}
+	return nil
+}
+
+func (m *QuerySSIFeeResponse) GetUpdateDidFee() *types.Coin {
+	if m != nil {
+		return m.UpdateDidFee
+	}
+	return nil
+}
+
+func (m *QuerySSIFeeResponse) GetDeactivateDidFee() *types.Coin {
+	if m != nil {
+		return m.DeactivateDidFee
+	}
+	return nil
+}
+
+func (m *QuerySSIFeeResponse) GetRegisterCredentialSchemaFee() *types.Coin {
+	if m != nil {
+		return m.RegisterCredentialSchemaFee
+	}
+	return nil
+}
+
+func (m *QuerySSIFeeResponse) GetUpdateCredentialSchemaFee() *types.Coin {
+	if m != nil {
+		return m.UpdateCredentialSchemaFee
+	}
+	return nil
+}
+
+func (m *QuerySSIFeeResponse) GetRegisterCredentialStatusFee() *types.Coin {
+	if m != nil {
+		return m.RegisterCredentialStatusFee
+	}
+	return nil
+}
+
+func (m *QuerySSIFeeResponse) GetUpdateCredentialStatusFee() *types.Coin {
+	if m != nil {
+		return m.UpdateCredentialStatusFee
+	}
+	return nil
+}
+
 type QueryCredentialSchemaRequest struct {
 	SchemaId string `protobuf:"bytes,1,opt,name=schemaId,proto3" json:"schemaId,omitempty"`
 }
@@ -37,7 +166,7 @@ func (m *QueryCredentialSchemaRequest) Reset()         { *m = QueryCredentialSch
 func (m *QueryCredentialSchemaRequest) String() string { return proto.CompactTextString(m) }
 func (*QueryCredentialSchemaRequest) ProtoMessage()    {}
 func (*QueryCredentialSchemaRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_0f525f26163d85f3, []int{0}
+	return fileDescriptor_0f525f26163d85f3, []int{2}
 }
 func (m *QueryCredentialSchemaRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -81,7 +210,7 @@ func (m *QueryCredentialSchemaResponse) Reset()         { *m = QueryCredentialSc
 func (m *QueryCredentialSchemaResponse) String() string { return proto.CompactTextString(m) }
 func (*QueryCredentialSchemaResponse) ProtoMessage()    {}
 func (*QueryCredentialSchemaResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_0f525f26163d85f3, []int{1}
+	return fileDescriptor_0f525f26163d85f3, []int{3}
 }
 func (m *QueryCredentialSchemaResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -125,7 +254,7 @@ func (m *QueryCredentialSchemasRequest) Reset()         { *m = QueryCredentialSc
 func (m *QueryCredentialSchemasRequest) String() string { return proto.CompactTextString(m) }
 func (*QueryCredentialSchemasRequest) ProtoMessage()    {}
 func (*QueryCredentialSchemasRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_0f525f26163d85f3, []int{2}
+	return fileDescriptor_0f525f26163d85f3, []int{4}
 }
 func (m *QueryCredentialSchemasRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -170,7 +299,7 @@ func (m *QueryCredentialSchemasResponse) Reset()         { *m = QueryCredentialS
 func (m *QueryCredentialSchemasResponse) String() string { return proto.CompactTextString(m) }
 func (*QueryCredentialSchemasResponse) ProtoMessage()    {}
 func (*QueryCredentialSchemasResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_0f525f26163d85f3, []int{3}
+	return fileDescriptor_0f525f26163d85f3, []int{5}
 }
 func (m *QueryCredentialSchemasResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -221,7 +350,7 @@ func (m *QueryCredentialStatusRequest) Reset()         { *m = QueryCredentialSta
 func (m *QueryCredentialStatusRequest) String() string { return proto.CompactTextString(m) }
 func (*QueryCredentialStatusRequest) ProtoMessage()    {}
 func (*QueryCredentialStatusRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_0f525f26163d85f3, []int{4}
+	return fileDescriptor_0f525f26163d85f3, []int{6}
 }
 func (m *QueryCredentialStatusRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -265,7 +394,7 @@ func (m *QueryCredentialStatusResponse) Reset()         { *m = QueryCredentialSt
 func (m *QueryCredentialStatusResponse) String() string { return proto.CompactTextString(m) }
 func (*QueryCredentialStatusResponse) ProtoMessage()    {}
 func (*QueryCredentialStatusResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_0f525f26163d85f3, []int{5}
+	return fileDescriptor_0f525f26163d85f3, []int{7}
 }
 func (m *QueryCredentialStatusResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -309,7 +438,7 @@ func (m *QueryCredentialStatusesRequest) Reset()         { *m = QueryCredentialS
 func (m *QueryCredentialStatusesRequest) String() string { return proto.CompactTextString(m) }
 func (*QueryCredentialStatusesRequest) ProtoMessage()    {}
 func (*QueryCredentialStatusesRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_0f525f26163d85f3, []int{6}
+	return fileDescriptor_0f525f26163d85f3, []int{8}
 }
 func (m *QueryCredentialStatusesRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -354,7 +483,7 @@ func (m *QueryCredentialStatusesResponse) Reset()         { *m = QueryCredential
 func (m *QueryCredentialStatusesResponse) String() string { return proto.CompactTextString(m) }
 func (*QueryCredentialStatusesResponse) ProtoMessage()    {}
 func (*QueryCredentialStatusesResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_0f525f26163d85f3, []int{7}
+	return fileDescriptor_0f525f26163d85f3, []int{9}
 }
 func (m *QueryCredentialStatusesResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -405,7 +534,7 @@ func (m *QueryDidDocumentRequest) Reset()         { *m = QueryDidDocumentRequest
 func (m *QueryDidDocumentRequest) String() string { return proto.CompactTextString(m) }
 func (*QueryDidDocumentRequest) ProtoMessage()    {}
 func (*QueryDidDocumentRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_0f525f26163d85f3, []int{8}
+	return fileDescriptor_0f525f26163d85f3, []int{10}
 }
 func (m *QueryDidDocumentRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -450,7 +579,7 @@ func (m *QueryDidDocumentResponse) Reset()         { *m = QueryDidDocumentRespon
 func (m *QueryDidDocumentResponse) String() string { return proto.CompactTextString(m) }
 func (*QueryDidDocumentResponse) ProtoMessage()    {}
 func (*QueryDidDocumentResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_0f525f26163d85f3, []int{9}
+	return fileDescriptor_0f525f26163d85f3, []int{11}
 }
 func (m *QueryDidDocumentResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -501,7 +630,7 @@ func (m *QueryDidDocumentsRequest) Reset()         { *m = QueryDidDocumentsReque
 func (m *QueryDidDocumentsRequest) String() string { return proto.CompactTextString(m) }
 func (*QueryDidDocumentsRequest) ProtoMessage()    {}
 func (*QueryDidDocumentsRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_0f525f26163d85f3, []int{10}
+	return fileDescriptor_0f525f26163d85f3, []int{12}
 }
 func (m *QueryDidDocumentsRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -546,7 +675,7 @@ func (m *QueryDidDocumentsResponse) Reset()         { *m = QueryDidDocumentsResp
 func (m *QueryDidDocumentsResponse) String() string { return proto.CompactTextString(m) }
 func (*QueryDidDocumentsResponse) ProtoMessage()    {}
 func (*QueryDidDocumentsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_0f525f26163d85f3, []int{11}
+	return fileDescriptor_0f525f26163d85f3, []int{13}
 }
 func (m *QueryDidDocumentsResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -590,6 +719,8 @@ func (m *QueryDidDocumentsResponse) GetDidDocuments() []*DidDocumentState {
 }
 
 func init() {
+	proto.RegisterType((*QuerySSIFeeRequest)(nil), "hypersign.ssi.v1.QuerySSIFeeRequest")
+	proto.RegisterType((*QuerySSIFeeResponse)(nil), "hypersign.ssi.v1.QuerySSIFeeResponse")
 	proto.RegisterType((*QueryCredentialSchemaRequest)(nil), "hypersign.ssi.v1.QueryCredentialSchemaRequest")
 	proto.RegisterType((*QueryCredentialSchemaResponse)(nil), "hypersign.ssi.v1.QueryCredentialSchemaResponse")
 	proto.RegisterType((*QueryCredentialSchemasRequest)(nil), "hypersign.ssi.v1.QueryCredentialSchemasRequest")
@@ -607,54 +738,66 @@ func init() {
 func init() { proto.RegisterFile("ssi/v1/query.proto", fileDescriptor_0f525f26163d85f3) }
 
 var fileDescriptor_0f525f26163d85f3 = []byte{
-	// 749 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x55, 0xc1, 0x6b, 0x13, 0x4f,
-	0x14, 0xee, 0xf4, 0xf7, 0x6b, 0xa9, 0xaf, 0x05, 0xdb, 0xb1, 0x68, 0x0c, 0xed, 0x5a, 0x56, 0x5a,
-	0x6b, 0x6b, 0x77, 0x9a, 0x04, 0x05, 0xf5, 0x20, 0xd4, 0x52, 0x28, 0x28, 0x68, 0x8a, 0x14, 0xbc,
-	0xc8, 0x64, 0x77, 0xd8, 0x2c, 0x34, 0x3b, 0x69, 0x66, 0x12, 0x0c, 0xa5, 0x17, 0x3d, 0x0b, 0x05,
-	0xbd, 0x7a, 0xf5, 0xe6, 0x45, 0xfa, 0x47, 0x78, 0x2c, 0x78, 0xf1, 0x28, 0xad, 0x7f, 0x88, 0x64,
-	0x76, 0x36, 0xd9, 0x66, 0x93, 0xed, 0x88, 0x3d, 0xce, 0xbe, 0xf7, 0x7d, 0xef, 0x7b, 0xef, 0x9b,
-	0x7d, 0x03, 0x58, 0x88, 0x80, 0xb4, 0x0a, 0x64, 0xbf, 0xc9, 0x1a, 0x6d, 0xa7, 0xde, 0xe0, 0x92,
-	0xe3, 0xe9, 0x6a, 0xbb, 0xce, 0x1a, 0x22, 0xf0, 0x43, 0x47, 0x88, 0xc0, 0x69, 0x15, 0xf2, 0x73,
-	0x3e, 0xe7, 0xfe, 0x1e, 0x23, 0xb4, 0x1e, 0x10, 0x1a, 0x86, 0x5c, 0x52, 0x19, 0xf0, 0x50, 0x44,
-	0xf9, 0xf9, 0x15, 0x97, 0x8b, 0x1a, 0x17, 0xa4, 0x42, 0x05, 0x8b, 0x88, 0x48, 0xab, 0x50, 0x61,
-	0x92, 0x16, 0x48, 0x9d, 0xfa, 0x41, 0xa8, 0x92, 0x75, 0xae, 0xa5, 0xeb, 0xb9, 0x0d, 0xe6, 0xb1,
-	0x50, 0x06, 0x74, 0xef, 0x8d, 0x70, 0xab, 0xac, 0x46, 0x75, 0x7c, 0x5a, 0xc7, 0xbd, 0xc0, 0xcb,
-	0x40, 0x48, 0x2a, 0x9b, 0xba, 0xba, 0xfd, 0x08, 0xe6, 0x5e, 0x76, 0x6a, 0x3e, 0xed, 0xc6, 0x77,
-	0x14, 0x61, 0x99, 0xed, 0x37, 0x99, 0x90, 0x38, 0x0f, 0x13, 0x51, 0x85, 0x6d, 0x2f, 0x87, 0x16,
-	0xd0, 0xf2, 0x95, 0x72, 0xf7, 0x6c, 0xb7, 0x60, 0x7e, 0x08, 0x56, 0xd4, 0x79, 0x28, 0x18, 0x7e,
-	0x05, 0x33, 0x6e, 0x5f, 0x4c, 0xe4, 0xd0, 0xc2, 0x7f, 0xcb, 0x93, 0xc5, 0x3b, 0x4e, 0xff, 0x98,
-	0x9c, 0x7e, 0x9a, 0x1d, 0x49, 0x25, 0x2b, 0xa7, 0x19, 0x6c, 0x7f, 0x48, 0x5d, 0x11, 0x8b, 0xde,
-	0x02, 0xe8, 0x8d, 0x4e, 0xc9, 0x9e, 0x2c, 0x2e, 0x39, 0xd1, 0x9c, 0x9d, 0xce, 0x9c, 0x9d, 0xc8,
-	0x30, 0x3d, 0x67, 0xe7, 0x05, 0xf5, 0x99, 0xc6, 0x96, 0x13, 0x48, 0xfb, 0x03, 0x02, 0x6b, 0x58,
-	0x25, 0xdd, 0xe2, 0x2c, 0x8c, 0xb9, 0xbc, 0x19, 0x4a, 0x55, 0xe5, 0xff, 0x72, 0x74, 0x18, 0xdc,
-	0xf8, 0xe8, 0x3f, 0x37, 0xfe, 0x20, 0x6d, 0x96, 0xf2, 0x32, 0xee, 0xfb, 0x3a, 0x8c, 0x77, 0x40,
-	0x5d, 0xab, 0xf4, 0xc9, 0x96, 0xe9, 0x81, 0x69, 0x9c, 0xee, 0x62, 0x07, 0xa6, 0xdd, 0xbe, 0x98,
-	0x1e, 0x5b, 0xb6, 0x5c, 0x95, 0x19, 0xc9, 0x4d, 0x11, 0xd8, 0xd5, 0xf4, 0xf0, 0x54, 0x80, 0x5d,
-	0xba, 0x4f, 0x47, 0x08, 0x6e, 0x0d, 0x2d, 0x95, 0x69, 0xd4, 0x2e, 0x60, 0x37, 0x85, 0x31, 0x72,
-	0x2a, 0xd1, 0xfa, 0x00, 0x0a, 0x9b, 0xc0, 0x0d, 0xa5, 0x68, 0x33, 0xf0, 0x36, 0xb9, 0xdb, 0xac,
-	0xb1, 0x50, 0xc6, 0x5d, 0xcf, 0xc2, 0x98, 0x17, 0xf4, 0x4c, 0x8a, 0x0e, 0xf6, 0x31, 0x82, 0x5c,
-	0x1a, 0xa1, 0xc5, 0x3f, 0x81, 0x49, 0xaf, 0xf7, 0x59, 0x4f, 0x6a, 0x3e, 0xad, 0x2f, 0x89, 0x4d,
-	0x22, 0xf0, 0x2e, 0x5c, 0x4b, 0x1c, 0x9f, 0x33, 0x49, 0x3d, 0x2a, 0x69, 0x6e, 0x54, 0x11, 0x2d,
-	0x66, 0x12, 0xc5, 0xc9, 0xe5, 0x41, 0x0c, 0x76, 0x25, 0xad, 0xfa, 0xd2, 0xed, 0x6d, 0xc3, 0xcd,
-	0x01, 0x35, 0x32, 0x7d, 0xdd, 0x82, 0xa9, 0x84, 0xda, 0xd8, 0x51, 0x3b, 0xb3, 0xd1, 0xc8, 0xcc,
-	0x73, 0xb8, 0xe2, 0xfb, 0x09, 0x18, 0x53, 0xb5, 0xf1, 0x37, 0x04, 0xb3, 0xfd, 0x3f, 0xea, 0x46,
-	0x7b, 0x7b, 0x13, 0x3b, 0x69, 0xd2, 0xac, 0x8d, 0x9a, 0x27, 0xc6, 0xf9, 0x51, 0x87, 0xf6, 0xc3,
-	0x77, 0x3f, 0x7e, 0x7f, 0x1c, 0x2d, 0xe1, 0x02, 0xe9, 0x02, 0xd7, 0xd4, 0xf2, 0x76, 0xf9, 0x1e,
-	0xa9, 0x06, 0x5e, 0xc8, 0x3d, 0x46, 0x3a, 0x6b, 0x3e, 0x5a, 0xcc, 0xe4, 0x20, 0x5e, 0xd0, 0x87,
-	0xf8, 0x0b, 0x82, 0x99, 0xd4, 0xee, 0xc2, 0xa6, 0x0a, 0x62, 0x23, 0xf3, 0xeb, 0xe6, 0x00, 0xad,
-	0xd9, 0x51, 0x9a, 0x97, 0xf1, 0x92, 0x99, 0x66, 0xfc, 0x19, 0xc1, 0xd5, 0x84, 0x15, 0x6a, 0xb0,
-	0x77, 0x87, 0x54, 0x4d, 0xff, 0x52, 0xf9, 0x15, 0x93, 0x54, 0x2d, 0xad, 0xa4, 0xa4, 0xad, 0xe1,
-	0xd5, 0x8b, 0xa4, 0x79, 0x81, 0x47, 0x0e, 0xd4, 0xcf, 0x79, 0x88, 0x3f, 0x21, 0x98, 0x4a, 0x5e,
-	0x3f, 0x6c, 0x50, 0xb1, 0x3b, 0xbe, 0x55, 0xa3, 0x5c, 0x2d, 0x6f, 0x55, 0xc9, 0x5b, 0xc4, 0xb7,
-	0x0d, 0xe4, 0xe1, 0xe3, 0xf3, 0x97, 0x52, 0x2d, 0x1f, 0xd3, 0x4b, 0x99, 0x7c, 0x39, 0x4c, 0x2e,
-	0xe5, 0xb9, 0x17, 0xc3, 0x7e, 0xac, 0x64, 0xde, 0xc7, 0xa5, 0x8b, 0x64, 0xf6, 0x76, 0x23, 0x39,
-	0x88, 0x9e, 0xa3, 0x43, 0xfc, 0x15, 0x01, 0x4e, 0xaf, 0x6a, 0xbc, 0x6e, 0x28, 0xa2, 0xfb, 0x80,
-	0xe4, 0x0b, 0x7f, 0x81, 0xd0, 0xc2, 0x8b, 0x4a, 0xf8, 0x3d, 0xbc, 0x62, 0x2e, 0x7c, 0xe3, 0xd9,
-	0xf7, 0x53, 0x0b, 0x9d, 0x9c, 0x5a, 0xe8, 0xd7, 0xa9, 0x85, 0x8e, 0xce, 0xac, 0x91, 0x93, 0x33,
-	0x6b, 0xe4, 0xe7, 0x99, 0x35, 0xf2, 0xba, 0xe8, 0x07, 0xb2, 0xda, 0xac, 0x38, 0x2e, 0xaf, 0x0d,
-	0xe1, 0x5b, 0x53, 0x84, 0x6f, 0x15, 0xa5, 0x6c, 0xd7, 0x99, 0xa8, 0x8c, 0xab, 0x70, 0xe9, 0x4f,
-	0x00, 0x00, 0x00, 0xff, 0xff, 0x43, 0xb0, 0xd8, 0x41, 0x3d, 0x0a, 0x00, 0x00,
+	// 940 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x96, 0x41, 0x6f, 0xe3, 0x44,
+	0x14, 0xc7, 0xeb, 0x6e, 0x53, 0xd8, 0x97, 0x6a, 0xc9, 0xce, 0x46, 0xd0, 0x9a, 0xae, 0x59, 0x19,
+	0xba, 0x84, 0x94, 0xda, 0x4d, 0x22, 0x90, 0x80, 0xc3, 0x4a, 0xdb, 0x28, 0xa8, 0x12, 0x48, 0x90,
+	0x08, 0xad, 0xb4, 0x07, 0x2a, 0xc7, 0x33, 0x75, 0x46, 0x6a, 0x3c, 0xd9, 0xcc, 0x24, 0xda, 0xa8,
+	0xea, 0x85, 0x33, 0x48, 0x2b, 0xe0, 0xca, 0x95, 0x1b, 0x17, 0xb4, 0x1f, 0x82, 0xe3, 0x4a, 0x5c,
+	0x38, 0x70, 0x40, 0x2d, 0x1f, 0x04, 0x65, 0x3c, 0x76, 0x9c, 0x38, 0x8e, 0xbd, 0x6c, 0x8f, 0xf6,
+	0xcc, 0xff, 0xff, 0x7e, 0xef, 0xbd, 0x99, 0x67, 0x03, 0xe2, 0x9c, 0xda, 0xe3, 0x9a, 0xfd, 0x64,
+	0x44, 0x86, 0x13, 0x6b, 0x30, 0x64, 0x82, 0xa1, 0x52, 0x6f, 0x32, 0x20, 0x43, 0x4e, 0x3d, 0xdf,
+	0xe2, 0x9c, 0x5a, 0xe3, 0x9a, 0xbe, 0xeb, 0x31, 0xe6, 0x9d, 0x11, 0xdb, 0x19, 0x50, 0xdb, 0xf1,
+	0x7d, 0x26, 0x1c, 0x41, 0x99, 0xcf, 0x83, 0xfd, 0x7a, 0xd5, 0x65, 0xbc, 0xcf, 0xb8, 0xdd, 0x75,
+	0x38, 0x09, 0x8c, 0xec, 0x71, 0xad, 0x4b, 0x84, 0x53, 0xb3, 0x07, 0x8e, 0x47, 0x7d, 0xb9, 0x59,
+	0xed, 0x35, 0x54, 0x3c, 0x77, 0x48, 0x30, 0xf1, 0x05, 0x75, 0xce, 0x4e, 0xb8, 0xdb, 0x23, 0x7d,
+	0x47, 0xad, 0x97, 0xd4, 0x3a, 0xa6, 0x38, 0x54, 0xc4, 0xdd, 0x43, 0x5f, 0x97, 0xd1, 0x55, 0x8e,
+	0xc2, 0x11, 0x23, 0x45, 0x67, 0x96, 0x01, 0x7d, 0x3d, 0x65, 0xea, 0x74, 0x8e, 0x5b, 0x84, 0xb4,
+	0xc9, 0x93, 0x11, 0xe1, 0xc2, 0xfc, 0x7b, 0x03, 0xee, 0xcc, 0xbd, 0xe6, 0x03, 0xe6, 0x73, 0x82,
+	0x8e, 0xa0, 0x34, 0x24, 0x1e, 0xe5, 0x82, 0x0c, 0x4f, 0x30, 0xc5, 0x27, 0xa7, 0x84, 0x6c, 0x6b,
+	0xf7, 0xb4, 0x4a, 0xb1, 0xbe, 0x63, 0x05, 0x20, 0xd6, 0x14, 0xc4, 0x52, 0x20, 0xd6, 0x11, 0xa3,
+	0x7e, 0xfb, 0x56, 0x28, 0x69, 0x52, 0xdc, 0x22, 0x04, 0x3d, 0x80, 0x5b, 0xa3, 0x01, 0x76, 0x04,
+	0x89, 0x2c, 0xd6, 0xb3, 0x2c, 0xb6, 0x02, 0x81, 0x32, 0xf8, 0x1c, 0x10, 0x26, 0x8e, 0x2b, 0xe8,
+	0x38, 0x6e, 0x72, 0x23, 0xcb, 0xa4, 0x34, 0x13, 0x29, 0xa3, 0x6f, 0xc1, 0x88, 0xd2, 0x49, 0x94,
+	0x5c, 0x9a, 0x6e, 0x64, 0x99, 0xbe, 0x1d, 0x1a, 0x1c, 0x45, 0xfa, 0x8e, 0x94, 0x4f, 0xfd, 0x1f,
+	0xc3, 0xae, 0xca, 0x74, 0xb9, 0x7b, 0x21, 0xcb, 0x7d, 0x27, 0x90, 0x2f, 0xf3, 0x4e, 0x63, 0x97,
+	0xcd, 0x95, 0xee, 0x9b, 0xff, 0x87, 0x5d, 0xca, 0xd3, 0xd9, 0x67, 0xee, 0xaf, 0xbd, 0x3c, 0x7b,
+	0xe8, 0x6d, 0x7e, 0x0a, 0xbb, 0xf2, 0x74, 0x2d, 0xe6, 0xa5, 0x8e, 0x1f, 0xd2, 0xe1, 0xf5, 0xa0,
+	0x4a, 0xc7, 0x58, 0x1e, 0xaf, 0x9b, 0xed, 0xe8, 0xd9, 0x1c, 0xc3, 0xdd, 0x14, 0xad, 0x3a, 0xa3,
+	0xdf, 0xc0, 0x6d, 0x77, 0x61, 0x8d, 0x6f, 0x6b, 0xf7, 0x6e, 0x54, 0x8a, 0xf5, 0xf7, 0xad, 0xc5,
+	0xbb, 0x6b, 0x2d, 0xda, 0x4c, 0x21, 0x49, 0x3b, 0xe9, 0x60, 0x7a, 0x29, 0x71, 0x79, 0x08, 0xdd,
+	0x02, 0x98, 0xdd, 0x67, 0x75, 0x2b, 0xee, 0xcf, 0x95, 0x27, 0x98, 0x22, 0x61, 0x91, 0xbe, 0x72,
+	0xbc, 0xf0, 0xbe, 0xb5, 0x63, 0x4a, 0xf3, 0x07, 0x0d, 0x8c, 0xb4, 0x48, 0x2a, 0xc5, 0x32, 0x14,
+	0x5c, 0x36, 0xf2, 0x85, 0x8c, 0xb2, 0xd1, 0x0e, 0x1e, 0x96, 0x27, 0xbe, 0xfe, 0xca, 0x89, 0x7f,
+	0x9c, 0x6c, 0x96, 0x6c, 0x64, 0x98, 0xf7, 0x9b, 0xb0, 0x39, 0x15, 0x45, 0xad, 0x52, 0x4f, 0xa6,
+	0x48, 0x16, 0x4c, 0xe9, 0x54, 0x16, 0x1d, 0x28, 0xb9, 0x0b, 0x6b, 0xaa, 0x6c, 0xab, 0x71, 0xe5,
+	0xce, 0x00, 0x37, 0x61, 0x60, 0xf6, 0x92, 0xc5, 0x93, 0x0b, 0xe4, 0xda, 0xfb, 0xf4, 0x4c, 0x83,
+	0x77, 0x52, 0x43, 0xad, 0x6c, 0xd4, 0x23, 0x40, 0x6e, 0x42, 0x93, 0xab, 0x53, 0xb1, 0xd4, 0x97,
+	0x58, 0x98, 0x36, 0xbc, 0x25, 0x89, 0x9a, 0x14, 0x37, 0x99, 0x3b, 0xea, 0x13, 0x5f, 0x84, 0x59,
+	0x97, 0xa1, 0x80, 0xe9, 0xac, 0x49, 0xc1, 0x83, 0xf9, 0x5c, 0x83, 0xed, 0xa4, 0x42, 0xc1, 0x3f,
+	0x80, 0x22, 0x9e, 0xbd, 0x56, 0x95, 0xba, 0x9b, 0xe4, 0x8b, 0x6b, 0xe3, 0x0a, 0xf4, 0x08, 0xee,
+	0xc4, 0x1e, 0xbf, 0x24, 0xc2, 0xc1, 0x8e, 0x70, 0xd4, 0xb4, 0xdf, 0x5b, 0x69, 0x14, 0x6e, 0x6e,
+	0x2f, 0x73, 0x30, 0xbb, 0x49, 0xea, 0x6b, 0x6f, 0xef, 0x04, 0x76, 0x96, 0xc4, 0x58, 0xd9, 0xd7,
+	0x16, 0x6c, 0xc5, 0x68, 0xc3, 0x8e, 0x9a, 0x2b, 0x13, 0x0d, 0x9a, 0x39, 0xa7, 0xab, 0xff, 0x78,
+	0x13, 0x0a, 0x32, 0x36, 0xfa, 0x5d, 0x83, 0xf2, 0xe2, 0x45, 0x7d, 0x38, 0x39, 0x6e, 0x22, 0x2b,
+	0x69, 0xba, 0x6a, 0xa2, 0xea, 0x76, 0xee, 0xfd, 0x41, 0x86, 0xe6, 0x27, 0xdf, 0xfd, 0xf9, 0xef,
+	0x4f, 0xeb, 0x0d, 0x54, 0xb3, 0x23, 0xe1, 0x81, 0xfc, 0x63, 0x70, 0xd9, 0x99, 0xdd, 0xa3, 0xd8,
+	0x67, 0x98, 0xd8, 0xd3, 0x7f, 0x8b, 0x60, 0x30, 0xdb, 0xe7, 0xe1, 0x80, 0xbe, 0x40, 0xbf, 0x6a,
+	0x70, 0x3b, 0x31, 0xbb, 0x50, 0x5e, 0x82, 0xb0, 0x91, 0xfa, 0x61, 0x7e, 0x81, 0x62, 0xb6, 0x24,
+	0x73, 0x05, 0xdd, 0xcf, 0xc7, 0x8c, 0x7e, 0xd1, 0xe0, 0x8d, 0x58, 0x2b, 0x64, 0x61, 0x3f, 0x48,
+	0x89, 0x9a, 0xbc, 0x52, 0x7a, 0x35, 0xcf, 0x56, 0x85, 0xd6, 0x90, 0x68, 0x07, 0x68, 0x3f, 0x0b,
+	0x0d, 0x53, 0x6c, 0x9f, 0xcb, 0xcb, 0x79, 0x81, 0x7e, 0xd6, 0x60, 0x2b, 0x7e, 0xfc, 0x50, 0x8e,
+	0x88, 0x51, 0xf9, 0xf6, 0x73, 0xed, 0x55, 0x78, 0xfb, 0x12, 0x6f, 0x0f, 0xbd, 0x9b, 0x03, 0x0f,
+	0x3d, 0x9f, 0x3f, 0x94, 0x72, 0xf8, 0xe4, 0x3d, 0x94, 0xf1, 0x2f, 0x47, 0x9e, 0x43, 0x39, 0xf7,
+	0xc5, 0x30, 0x3f, 0x93, 0x98, 0x1f, 0xa1, 0x46, 0x16, 0xe6, 0x6c, 0x36, 0xda, 0xe7, 0xc1, 0xe7,
+	0xe8, 0x02, 0xfd, 0xa6, 0x01, 0x4a, 0x8e, 0x6a, 0x74, 0x98, 0x13, 0x22, 0xfa, 0x80, 0xe8, 0xb5,
+	0x97, 0x50, 0x28, 0xf0, 0xba, 0x04, 0xff, 0x10, 0x55, 0xf3, 0x83, 0xa3, 0xef, 0x35, 0x28, 0xc6,
+	0xfe, 0xc1, 0xd1, 0x7b, 0x29, 0x61, 0xe7, 0xfe, 0xdc, 0xf5, 0xbd, 0x8c, 0x5d, 0x0a, 0xe8, 0x50,
+	0x02, 0x55, 0x51, 0x25, 0x0b, 0xe8, 0x94, 0x3e, 0x25, 0xf8, 0x94, 0x90, 0x87, 0x5f, 0xfc, 0x71,
+	0x69, 0x68, 0x2f, 0x2e, 0x0d, 0xed, 0x9f, 0x4b, 0x43, 0x7b, 0x76, 0x65, 0xac, 0xbd, 0xb8, 0x32,
+	0xd6, 0xfe, 0xba, 0x32, 0xd6, 0x1e, 0xd7, 0x3d, 0x2a, 0x7a, 0xa3, 0xae, 0xe5, 0xb2, 0x7e, 0x8a,
+	0xdb, 0x81, 0xb4, 0x7b, 0x2a, 0x0d, 0xc5, 0x64, 0x40, 0x78, 0x77, 0x53, 0x2e, 0x37, 0xfe, 0x0b,
+	0x00, 0x00, 0xff, 0xff, 0xf4, 0x7f, 0xd1, 0x4e, 0x61, 0x0d, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -681,6 +824,8 @@ type QueryClient interface {
 	CredentialStatusByID(ctx context.Context, in *QueryCredentialStatusRequest, opts ...grpc.CallOption) (*QueryCredentialStatusResponse, error)
 	// Get all the registed Credential Statuses
 	CredentialStatuses(ctx context.Context, in *QueryCredentialStatusesRequest, opts ...grpc.CallOption) (*QueryCredentialStatusesResponse, error)
+	// Get the list of fixed fees for every x/ssi module transactions
+	QuerySSIFee(ctx context.Context, in *QuerySSIFeeRequest, opts ...grpc.CallOption) (*QuerySSIFeeResponse, error)
 }
 
 type queryClient struct {
@@ -745,6 +890,15 @@ func (c *queryClient) CredentialStatuses(ctx context.Context, in *QueryCredentia
 	return out, nil
 }
 
+func (c *queryClient) QuerySSIFee(ctx context.Context, in *QuerySSIFeeRequest, opts ...grpc.CallOption) (*QuerySSIFeeResponse, error) {
+	out := new(QuerySSIFeeResponse)
+	err := c.cc.Invoke(ctx, "/hypersign.ssi.v1.Query/QuerySSIFee", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // QueryServer is the server API for Query service.
 type QueryServer interface {
 	// Get the Schema Document for a specified schema id
@@ -759,6 +913,8 @@ type QueryServer interface {
 	CredentialStatusByID(context.Context, *QueryCredentialStatusRequest) (*QueryCredentialStatusResponse, error)
 	// Get all the registed Credential Statuses
 	CredentialStatuses(context.Context, *QueryCredentialStatusesRequest) (*QueryCredentialStatusesResponse, error)
+	// Get the list of fixed fees for every x/ssi module transactions
+	QuerySSIFee(context.Context, *QuerySSIFeeRequest) (*QuerySSIFeeResponse, error)
 }
 
 // UnimplementedQueryServer can be embedded to have forward compatible implementations.
@@ -782,6 +938,9 @@ func (*UnimplementedQueryServer) CredentialStatusByID(ctx context.Context, req *
 }
 func (*UnimplementedQueryServer) CredentialStatuses(ctx context.Context, req *QueryCredentialStatusesRequest) (*QueryCredentialStatusesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CredentialStatuses not implemented")
+}
+func (*UnimplementedQueryServer) QuerySSIFee(ctx context.Context, req *QuerySSIFeeRequest) (*QuerySSIFeeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method QuerySSIFee not implemented")
 }
 
 func RegisterQueryServer(s grpc1.Server, srv QueryServer) {
@@ -896,6 +1055,24 @@ func _Query_CredentialStatuses_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Query_QuerySSIFee_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QuerySSIFeeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).QuerySSIFee(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/hypersign.ssi.v1.Query/QuerySSIFee",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).QuerySSIFee(ctx, req.(*QuerySSIFeeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _Query_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "hypersign.ssi.v1.Query",
 	HandlerType: (*QueryServer)(nil),
@@ -924,9 +1101,143 @@ var _Query_serviceDesc = grpc.ServiceDesc{
 			MethodName: "CredentialStatuses",
 			Handler:    _Query_CredentialStatuses_Handler,
 		},
+		{
+			MethodName: "QuerySSIFee",
+			Handler:    _Query_QuerySSIFee_Handler,
+		},
 	},
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "ssi/v1/query.proto",
+}
+
+func (m *QuerySSIFeeRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QuerySSIFeeRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QuerySSIFeeRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
+func (m *QuerySSIFeeResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QuerySSIFeeResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QuerySSIFeeResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.UpdateCredentialStatusFee != nil {
+		{
+			size, err := m.UpdateCredentialStatusFee.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintQuery(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x3a
+	}
+	if m.RegisterCredentialStatusFee != nil {
+		{
+			size, err := m.RegisterCredentialStatusFee.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintQuery(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x32
+	}
+	if m.UpdateCredentialSchemaFee != nil {
+		{
+			size, err := m.UpdateCredentialSchemaFee.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintQuery(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x2a
+	}
+	if m.RegisterCredentialSchemaFee != nil {
+		{
+			size, err := m.RegisterCredentialSchemaFee.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintQuery(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x22
+	}
+	if m.DeactivateDidFee != nil {
+		{
+			size, err := m.DeactivateDidFee.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintQuery(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x1a
+	}
+	if m.UpdateDidFee != nil {
+		{
+			size, err := m.UpdateDidFee.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintQuery(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x12
+	}
+	if m.RegisterDidFee != nil {
+		{
+			size, err := m.RegisterDidFee.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintQuery(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *QueryCredentialSchemaRequest) Marshal() (dAtA []byte, err error) {
@@ -1380,6 +1691,52 @@ func encodeVarintQuery(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
+func (m *QuerySSIFeeRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *QuerySSIFeeResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.RegisterDidFee != nil {
+		l = m.RegisterDidFee.Size()
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	if m.UpdateDidFee != nil {
+		l = m.UpdateDidFee.Size()
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	if m.DeactivateDidFee != nil {
+		l = m.DeactivateDidFee.Size()
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	if m.RegisterCredentialSchemaFee != nil {
+		l = m.RegisterCredentialSchemaFee.Size()
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	if m.UpdateCredentialSchemaFee != nil {
+		l = m.UpdateCredentialSchemaFee.Size()
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	if m.RegisterCredentialStatusFee != nil {
+		l = m.RegisterCredentialStatusFee.Size()
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	if m.UpdateCredentialStatusFee != nil {
+		l = m.UpdateCredentialStatusFee.Size()
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	return n
+}
+
 func (m *QueryCredentialSchemaRequest) Size() (n int) {
 	if m == nil {
 		return 0
@@ -1562,6 +1919,358 @@ func sovQuery(x uint64) (n int) {
 }
 func sozQuery(x uint64) (n int) {
 	return sovQuery(uint64((x << 1) ^ uint64((int64(x) >> 63))))
+}
+func (m *QuerySSIFeeRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QuerySSIFeeRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QuerySSIFeeRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QuerySSIFeeResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QuerySSIFeeResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QuerySSIFeeResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RegisterDidFee", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.RegisterDidFee == nil {
+				m.RegisterDidFee = &types.Coin{}
+			}
+			if err := m.RegisterDidFee.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UpdateDidFee", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.UpdateDidFee == nil {
+				m.UpdateDidFee = &types.Coin{}
+			}
+			if err := m.UpdateDidFee.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DeactivateDidFee", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.DeactivateDidFee == nil {
+				m.DeactivateDidFee = &types.Coin{}
+			}
+			if err := m.DeactivateDidFee.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RegisterCredentialSchemaFee", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.RegisterCredentialSchemaFee == nil {
+				m.RegisterCredentialSchemaFee = &types.Coin{}
+			}
+			if err := m.RegisterCredentialSchemaFee.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UpdateCredentialSchemaFee", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.UpdateCredentialSchemaFee == nil {
+				m.UpdateCredentialSchemaFee = &types.Coin{}
+			}
+			if err := m.UpdateCredentialSchemaFee.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RegisterCredentialStatusFee", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.RegisterCredentialStatusFee == nil {
+				m.RegisterCredentialStatusFee = &types.Coin{}
+			}
+			if err := m.RegisterCredentialStatusFee.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UpdateCredentialStatusFee", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.UpdateCredentialStatusFee == nil {
+				m.UpdateCredentialStatusFee = &types.Coin{}
+			}
+			if err := m.UpdateCredentialStatusFee.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
 }
 func (m *QueryCredentialSchemaRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)

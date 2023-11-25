@@ -5,6 +5,7 @@ import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 import "ssi/v1/credential_schema.proto";
 import "ssi/v1/did.proto";
+import "cosmos/base/v1beta1/coin.proto";
 import "ssi/v1/credential_status.proto";
 
 option go_package = "github.com/hypersign-protocol/hid-node/x/ssi/types";
@@ -40,6 +41,25 @@ service Query {
   rpc CredentialStatuses(QueryCredentialStatusesRequest) returns (QueryCredentialStatusesResponse) {
     option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/credential";
   }
+
+  // Get the list of fixed fees for every x/ssi module transactions
+  rpc QuerySSIFee(QuerySSIFeeRequest) returns (QuerySSIFeeResponse) {
+    option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/fixedfee";
+ }
+}
+
+// Fixed SSI Fee 
+
+message QuerySSIFeeRequest {}
+
+message QuerySSIFeeResponse {
+    cosmos.base.v1beta1.Coin register_did_fee = 1;
+    cosmos.base.v1beta1.Coin update_did_fee = 2;
+    cosmos.base.v1beta1.Coin deactivate_did_fee = 3;
+    cosmos.base.v1beta1.Coin register_credential_schema_fee = 4;
+    cosmos.base.v1beta1.Coin update_credential_schema_fee = 5;
+    cosmos.base.v1beta1.Coin register_credential_status_fee = 6;
+    cosmos.base.v1beta1.Coin update_credential_status_fee = 7;
 }
 
 // Credential Schema Messages
