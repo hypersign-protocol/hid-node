@@ -18,7 +18,10 @@ func DefaultGenesis() *GenesisState {
 func (gs GenesisState) Validate() error {
 	namespace := gs.ChainNamespace
 
-	regexPattern, _ := regexp.Compile("^[a-zA-Z0-9-]*$") // Matches string containing whitespaces and tabs
+	regexPattern, err := regexp.Compile("^[a-zA-Z0-9-]*$") // Matches string containing whitespaces and tabs
+	if err != nil {
+		return err
+	}
 	maxChainNamespaceLength := 10
 
 	if len(namespace) > maxChainNamespaceLength {

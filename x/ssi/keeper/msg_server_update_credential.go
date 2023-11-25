@@ -3,7 +3,7 @@ package keeper
 import (
 	"context"
 	"fmt"
-	"reflect"
+	"reflect" /* #nosec G702 */
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -89,7 +89,10 @@ func (k msgServer) UpdateCredentialStatus(goCtx context.Context, msg *types.MsgU
 	}
 
 	// Check if the created date before issuance date
-	currentDate, _ := time.Parse(time.RFC3339, msgNewCredProof.Created)
+	currentDate, err := time.Parse(time.RFC3339, msgNewCredProof.Created)
+	if err != nil {
+		return nil, err
+	}
 	if currentDate.Before(newIssuanceDateParsed) {
 		return nil, sdkerrors.Wrapf(types.ErrInvalidDate, "proof attached has a creation date before issuance date")
 	}

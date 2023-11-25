@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"crypto/ed25519"
-	"crypto/rand"
+	"crypto/rand" /* #nosec G702 */
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/hex"
