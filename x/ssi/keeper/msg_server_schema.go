@@ -2,7 +2,9 @@ package keeper
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"regexp"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -47,6 +49,16 @@ func storeCredentialSchema(
 		return sdkerrors.Wrap(types.ErrSchemaExists, fmt.Sprintf("Schema ID:  %s", schemaID))
 	}
 
+	// Check if the `name` attribute of schema is in PascalCase
+	if !isStringInPascalCase(schemaDoc.Name) {
+		return sdkerrors.Wrapf(types.ErrInvalidCredentialSchema, "name must always be in PascalCase: %v", schemaDoc.Name)
+	}
+
+	// Check if `properties` field is a valid JSON document
+	if err := isValidJSONDocument(schemaDoc.Schema.Properties); err != nil {
+		return sdkerrors.Wrapf(types.ErrInvalidCredentialSchema, "invalid `property` provided: %v", err.Error())
+	}
+
 	// Signature check
 	if err := k.VerifyDocumentProof(ctx, schemaDoc, schemaProof); err != nil {
 		return sdkerrors.Wrap(types.ErrInvalidClientSpecType, err.Error())
@@ -81,4 +93,45 @@ func (k msgServer) UpdateCredentialSchema(goCtx context.Context, msg *types.MsgU
 	}
 
 	return &types.MsgUpdateCredentialSchemaResponse{}, nil
+}
+
+// isStringInPascalCase checks if an input string is in Pascal case or not
+func isStringInPascalCase(s string) bool {
+	pascalCaseRegex := regexp.MustCompile(`^[A-Z][a-zA-Z0-9]*$`)
+
+	return pascalCaseRegex.MatchString(s)
+}
+
+// isValidJSONDocument checks if the schema property attribute is a valid JSON string
+// The `type` sub-attribute is a must for every attributes in property.
+// The `format` sub-attribute is acceptable, but optional
+func isValidJSONDocument(schemaProperty string) error {
+	var schemaPropertyDocument map[string]map[string]interface{}
+	if err := json.Unmarshal([]byte(schemaProperty), &schemaPropertyDocument); err != nil {
+		return err
+	}
+
+	for attributeName, attributeObj := range schemaPropertyDocument {
+		isTypeSubAttributePresent := false
+
+		for subAttributeName := range attributeObj {
+			if subAttributeName == "type" {
+				isTypeSubAttributePresent = true
+			} else if subAttributeName == "format" {
+				continue
+			} else {
+				return fmt.Errorf(
+					"invalid sub-attribute %v of attribute %v. Only `type` and `format` sub-attributes are permitted",
+					subAttributeName,
+					attributeName,
+				)
+			}
+		}
+
+		if !isTypeSubAttributePresent {
+			return fmt.Errorf("%v attribute is missing the required sub-attribute `type`", attributeName)
+		}
+	}
+
+	return nil
 }

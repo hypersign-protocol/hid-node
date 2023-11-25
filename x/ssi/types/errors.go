@@ -26,4 +26,5 @@ var (
 	ErrCredentialStatusExists          = sdkerrors.Register(ModuleName, 116, "credential status document already exists")
 	ErrInvalidCredentialStatusID       = sdkerrors.Register(ModuleName, 117, "invalid credential status Id")
 	ErrInvalidProof                    = sdkerrors.Register(ModuleName, 118, "invalid document proof")
+	ErrInvalidCredentialSchema         = sdkerrors.Register(ModuleName, 119, "invalid credential schema")
 )

@@ -2,6 +2,7 @@ import os
 import sys
 sys.path.insert(1, os.getcwd())
 import time
+import copy
 
 from utils import run_blockchain_command, generate_key_pair, secp256k1_pubkey_to_address, add_keyAgreeemnt_pubKeyMultibase
 from generate_doc import generate_did_document, generate_schema_document, generate_cred_status_document
@@ -805,8 +806,96 @@ def schema_test():
     schema_doc_id = schema_doc["id"]
     run_blockchain_command(create_schema_cmd, f"Registering Schema with Id: {schema_doc_id}")
 
-    print("3. PASS: Bob updates a schema using one of her VMs\n")
-    updated_schema_doc = schema_doc
+    print("3. FAIL: Bob creates a Schema where the name field is not in Pascal Case \n")
+    
+    invalid_schema_doc_1 = copy.deepcopy(schema_doc)
+    invalid_schema_doc_1["name"] = "Day Pass Credential"
+    schema_id_list = list(invalid_schema_doc_1["id"])
+    schema_id_list[-3] = '4'
+    invalid_schema_doc_1["id"] = "".join(schema_id_list)
+    invalid_schema_doc_1_id = invalid_schema_doc_1["id"]
+
+    _, schema_proof = generate_schema_document(
+        kp_bob,
+        did_doc_bob,
+        did_doc_bob_vm["id"],
+        updated_schema=invalid_schema_doc_1
+    )
+    update_schema_cmd = form_update_schema_tx(
+        invalid_schema_doc_1, 
+        schema_proof, 
+        DEFAULT_BLOCKCHAIN_ACCOUNT_NAME
+    )
+    run_blockchain_command(update_schema_cmd, f"Updating Schema with Id: {invalid_schema_doc_1_id}", True)
+
+    print("4. FAIL: Bob creates a Schema where the property field is some random string\n")
+    
+    invalid_schema_doc_2 = copy.deepcopy(schema_doc)
+    invalid_schema_doc_2["schema"]["properties"] = "somestring"
+    schema_id_list = list(invalid_schema_doc_2["id"])
+    schema_id_list[-3] = '4'
+    invalid_schema_doc_2["id"] = "".join(schema_id_list)
+    invalid_schema_doc_2_id = invalid_schema_doc_2["id"]
+
+    _, schema_proof = generate_schema_document(
+        kp_bob,
+        did_doc_bob,
+        did_doc_bob_vm["id"],
+        updated_schema=invalid_schema_doc_2
+    )
+    update_schema_cmd = form_update_schema_tx(
+        invalid_schema_doc_2, 
+        schema_proof, 
+        DEFAULT_BLOCKCHAIN_ACCOUNT_NAME
+    )
+    run_blockchain_command(update_schema_cmd, f"Updating Schema with Id: {invalid_schema_doc_2_id}", True)
+    
+    print("5. FAIL: Bob creates a Schema where the property field is a valid JSON, but one of the attributes has an invalid sub-attribute\n")
+    
+    invalid_schema_doc_3 = copy.deepcopy(schema_doc)
+    invalid_schema_doc_3["schema"]["properties"] = "{\"fullName\":{\"type\":\"string\",\"sda\":\"string\"},\"companyName\":{\"type\":\"string\"},\"center\":{\"type\":\"string\"},\"invoiceNumber\":{\"type\":\"string\"}}"
+    schema_id_list = list(invalid_schema_doc_3["id"])
+    schema_id_list[-3] = '4'
+    invalid_schema_doc_3["id"] = "".join(schema_id_list)
+    invalid_schema_doc_3_id = invalid_schema_doc_3["id"]
+
+    _, schema_proof = generate_schema_document(
+        kp_bob,
+        did_doc_bob,
+        did_doc_bob_vm["id"],
+        updated_schema=invalid_schema_doc_3
+    )
+    update_schema_cmd = form_update_schema_tx(
+        invalid_schema_doc_3, 
+        schema_proof, 
+        DEFAULT_BLOCKCHAIN_ACCOUNT_NAME
+    )
+    run_blockchain_command(update_schema_cmd, f"Updating Schema with Id: {invalid_schema_doc_3_id}", True)
+
+    print("6. FAIL: Bob creates a Schema where the property field is a valid JSON, but `type` sub-attribute is missing\n")
+    
+    invalid_schema_doc_4 = copy.deepcopy(schema_doc)
+    invalid_schema_doc_4["schema"]["properties"] = "{\"fullName\":{\"format\":\"string\"},\"companyName\":{\"type\":\"string\"},\"center\":{\"type\":\"string\"},\"invoiceNumber\":{\"type\":\"string\"}}"
+    schema_id_list = list(invalid_schema_doc_4["id"])
+    schema_id_list[-3] = '4'
+    invalid_schema_doc_4["id"] = "".join(schema_id_list)
+    invalid_schema_doc_4_id = invalid_schema_doc_4["id"]
+
+    _, schema_proof = generate_schema_document(
+        kp_bob,
+        did_doc_bob,
+        did_doc_bob_vm["id"],
+        updated_schema=invalid_schema_doc_4
+    )
+    update_schema_cmd = form_update_schema_tx(
+        invalid_schema_doc_4, 
+        schema_proof, 
+        DEFAULT_BLOCKCHAIN_ACCOUNT_NAME
+    )
+    run_blockchain_command(update_schema_cmd, f"Updating Schema with Id: {invalid_schema_doc_4_id}", True)
+    
+    print("7. PASS: Bob updates a schema using one of her VMs\n")
+    updated_schema_doc = copy.deepcopy(schema_doc)
     #Increment version in Schema id
     schema_id_list = list(updated_schema_doc["id"])
     schema_id_list[-3] = '4'
