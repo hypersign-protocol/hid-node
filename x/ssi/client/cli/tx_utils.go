@@ -8,11 +8,11 @@ import (
 	"fmt"
 	"math/big"
 
+	secp256k1 "github.com/cometbft/cometbft/crypto/secp256k1"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/types/bech32"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 	"github.com/multiformats/go-multibase"
-	secp256k1 "github.com/cometbft/cometbft/crypto/secp256k1"
 	"golang.org/x/crypto/ripemd160" // nolint: staticcheck
 
 	etheraccounts "github.com/ethereum/go-ethereum/accounts"

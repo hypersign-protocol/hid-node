@@ -8,11 +8,11 @@ import (
 
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	wasmTypes "github.com/CosmWasm/wasmd/x/wasm/types"
+	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	ibcante "github.com/cosmos/ibc-go/v7/modules/core/ante"
 	ssiante "github.com/hypersign-protocol/hid-node/x/ssi/ante"
-	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 )
 
 // HandlerOptions extend the SDK's AnteHandler options by requiring the IBC

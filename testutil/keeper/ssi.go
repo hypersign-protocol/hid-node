@@ -3,6 +3,9 @@ package keeper
 import (
 	"testing"
 
+	dbm "github.com/cometbft/cometbft-db"
+	"github.com/cometbft/cometbft/libs/log"
+	cmtproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/store"
@@ -12,9 +15,6 @@ import (
 	"github.com/hypersign-protocol/hid-node/x/ssi/keeper"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 	"github.com/stretchr/testify/require"
-	"github.com/cometbft/cometbft/libs/log"
-	cmtproto "github.com/cometbft/cometbft/proto/tendermint/types"
-	dbm "github.com/cometbft/cometbft-db"
 )
 
 func SsiKeeper(t testing.TB) (*keeper.Keeper, sdk.Context) {
