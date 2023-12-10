@@ -15,13 +15,14 @@ The Hypersign Identity Network is a permissionless blockchain network to manage 
 - Store/Update status of a Verifiable Credential
 - Stake `$HID` tokens
 - Submit Governance Proposals
-- Transfer `$HID` tokens within and across different Tendermint-based blockchains
+- Transfer `$HID` tokens within and across different Tendermint-based blockchains using IBC
+- Deploy CosmWasm Smart Contracts (Governance Based)
 
 ## Prerequisite
 
 Following are the prerequisites that needs to be installed:
 
-- Golang (Installation Guide: https://go.dev/doc/install) (version: 1.20)
+- Golang (Installation Guide: https://go.dev/doc/install) (version: 1.21)
 - make
 - jq
 
