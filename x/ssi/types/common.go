@@ -104,7 +104,7 @@ var SupportedCAIP10CosmosChainIds = []string{
 	"osmo-test-4",       // Osmosis Testnet
 	"elgafar-1",         // Stargaze Testnet
 	"test-core-1",       // Persistence Testnet
-	"jagrat",            // Hypersign Identity Network - Jagrat Testnet
+	"prajna",            // Hypersign Identity Network - Prajna Testnet
 }
 
 // Map between supported cosmos chain-id and their respective blockhchain address prefix
@@ -122,7 +122,7 @@ var CosmosCAIP10ChainIdBech32PrefixMap = map[string]string{
 	"osmo-test-4":       "osmo",
 	"elgafar-1":         "stars",
 	"test-core-1":       "persistence",
-	"jagrat":            "hid",
+	"prajna":            "hid",
 }
 
 // Map between support CAIP-10 prefix and list of chain-ids
