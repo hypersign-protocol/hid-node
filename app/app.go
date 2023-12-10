@@ -424,16 +424,6 @@ func NewHypersignApp(
 
 	app.FeeGrantKeeper = feegrantkeeper.NewKeeper(appCodec, keys[feegrant.StoreKey], app.AccountKeeper)
 
-	app.UpgradeKeeper.SetUpgradeHandler("v019", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-		ctx.Logger().Info("v0.1.9 upgrade")
-		return fromVM, nil
-	})
-
-	app.UpgradeKeeper.SetUpgradeHandler("v0110", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-		ctx.Logger().Info("v0.1.10 upgrade")
-		return fromVM, nil
-	})
-
 	// register the staking hooks
 	// NOTE: stakingKeeper above is passed by reference, so that it will contain these hooks
 	app.StakingKeeper.SetHooks(
