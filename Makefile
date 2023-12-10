@@ -82,35 +82,35 @@ docker-run:
 ###############################################################################
 ###                                  Release                                ###
 ###############################################################################
+GO_VERSION := $(shell cat go.mod | grep -E 'go [0-9].[0-9]+' | cut -d ' ' -f 2)
+GORELEASER_IMAGE := ghcr.io/goreleaser/goreleaser-cross:v$(GO_VERSION)
+COSMWASM_VERSION := $(shell go list -m github.com/CosmWasm/wasmvm | sed 's/.* //')
 
-release-darwin-arm64: go-version-check
-	@echo "Generating release files for darwin/arm64"
-	@mkdir -p release
-	@GOOS=darwin GOARCH=arm64 go build $(BUILD_FLAGS) ./cmd/hid-noded
-	@tar -czf release/hid_noded_$(VERSION)_darwin_arm64.tar.gz hid-noded
-	@sha256sum release/hid_noded_$(VERSION)_darwin_arm64.tar.gz >> release/release_darwin_arm64_checksum
-	@echo "Release files generated!"
+ifdef GITHUB_TOKEN
+release:
+	docker run \
+		--rm \
+		-e GITHUB_TOKEN=$(GITHUB_TOKEN) \
+		-e COSMWASM_VERSION=$(COSMWASM_VERSION) \
+		-v /var/run/docker.sock:/var/run/docker.sock \
+		-v `pwd`:/go/src/hid-noded \
+		-w /go/src/hid-noded \
+		$(GORELEASER_IMAGE) \
+		release \
+		--clean
+else
+release:
+	@echo "Error: GITHUB_TOKEN is not defined. Please define it before running 'make release'."
+endif
 
-release-darwin-amd64: go-version-check
-	@echo "Generating release files for darwin/amd64"
-	@mkdir -p release
-	@GOOS=darwin GOARCH=amd64 go build $(BUILD_FLAGS) ./cmd/hid-noded
-	@tar -czf release/hid_noded_$(VERSION)_darwin_amd64.tar.gz hid-noded
-	@sha256sum release/hid_noded_$(VERSION)_darwin_amd64.tar.gz >> release/release_darwin_amd64_checksum
-	@echo "Release files generated!"
-
-release-linux-arm64: go-version-check
-	@echo "Generating release files for linux/arm64"
-	@mkdir -p release
-	@GOOS=linux GOARCH=arm64 go build $(BUILD_FLAGS) ./cmd/hid-noded
-	@tar -czf release/hid_noded_$(VERSION)_linux_arm64.tar.gz hid-noded
-	@sha256sum release/hid_noded_$(VERSION)_linux_arm64.tar.gz >> release/release_linux_arm64_checksum
-	@echo "Release files generated!"
-
-release-linux-amd64: go-version-check
-	@echo "Generating release files for linux/amd64"
-	@mkdir -p release
-	@GOOS=linux GOARCH=amd64 go build $(BUILD_FLAGS) ./cmd/hid-noded
-	@tar -czf release/hid_noded_$(VERSION)_linux_amd64.tar.gz hid-noded
-	@sha256sum release/hid_noded_$(VERSION)_linux_amd64.tar.gz >> release/release_linux_amd64_checksum
-	@echo "Release files generated!"
+release-dry-run:
+	docker run \
+		--rm \
+		-e COSMWASM_VERSION=$(COSMWASM_VERSION) \
+		-v /var/run/docker.sock:/var/run/docker.sock \
+		-v `pwd`:/go/src/hid-noded \
+		-w /go/src/hid-noded \
+		$(GORELEASER_IMAGE) \
+		release \
+		--clean \
+		--skip=publish

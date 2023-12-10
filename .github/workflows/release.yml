@@ -15,33 +15,19 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
       
-      - name: Set up Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: 1.21
-      
-      - name: Generate Release Files (darwin/arm64)
-        run: make release-darwin-arm64
-      
-      - name: Generate Release Files (darwin/amd64)
-        run: make release-darwin-amd64
+      - name: Make release
+        run: |
+          make release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Generate Release Files (linux/arm64)
-        run: make release-linux-arm64
-
-      - name: Generate Release Files (linux/amd64)
-        run: make release-linux-amd64
-      
-      - name: Publish to Github
-        uses: softprops/action-gh-release@v1
-        with:
-          files: release/*
-          prerelease: false
-          generate_release_notes: true
+      - name: Clean release folder
+        run: |
+          sudo rm -rf dist
   
   publish-docker:
     name: Publish Docker Image (linux/amd64)
