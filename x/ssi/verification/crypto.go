@@ -345,7 +345,7 @@ func verifyEthereumBlockchainAccountId(extendedVm *types.ExtendedVerificationMet
 		return err
 	}
 
-	// Convert public key to b-encoded address
+	// Convert public key to hex-encoded address
 	recoveredBlockchainAddress := ethercrypto.PubkeyToAddress(*recoveredPublicKey).Hex()
 
 	// Match the recovered address against user provided address
