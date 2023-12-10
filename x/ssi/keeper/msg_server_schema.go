@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"regexp"
 
+	"cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 	"github.com/hypersign-protocol/hid-node/x/ssi/verification"
 )
@@ -33,35 +33,35 @@ func storeCredentialSchema(
 	// Get the Did Document of Schema's Author and check if Author's DID is deactivated
 	authorDidDocumentState, err := k.getDidDocumentState(&ctx, schemaDoc.GetAuthor())
 	if err != nil {
-		return sdkerrors.Wrap(err, fmt.Sprintf("unable to get author`s DID %s from store", schemaDoc.GetAuthor()))
+		return errors.Wrap(err, fmt.Sprintf("unable to get author`s DID %s from store", schemaDoc.GetAuthor()))
 	}
 	if authorDidDocumentState.DidDocumentMetadata.Deactivated {
-		return sdkerrors.Wrap(types.ErrDidDocDeactivated, fmt.Sprintf("%s is deactivated and cannot used be used to create schema", authorDidDocumentState.DidDocument.Id))
+		return errors.Wrap(types.ErrDidDocDeactivated, fmt.Sprintf("%s is deactivated and cannot used be used to create schema", authorDidDocumentState.DidDocument.Id))
 	}
 
 	// Check if Schema ID is valid
 	if err := verification.IsValidID(schemaID, chainNamespace, "schemaDocument"); err != nil {
-		return sdkerrors.Wrap(types.ErrInvalidSchemaID, err.Error())
+		return errors.Wrap(types.ErrInvalidSchemaID, err.Error())
 	}
 
 	// Check if Schema already exists
 	if k.hasCredentialSchema(ctx, schemaID) {
-		return sdkerrors.Wrap(types.ErrSchemaExists, fmt.Sprintf("Schema ID:  %s", schemaID))
+		return errors.Wrap(types.ErrSchemaExists, fmt.Sprintf("Schema ID:  %s", schemaID))
 	}
 
 	// Check if the `name` attribute of schema is in PascalCase
 	if !isStringInPascalCase(schemaDoc.Name) {
-		return sdkerrors.Wrapf(types.ErrInvalidCredentialSchema, "name must always be in PascalCase: %v", schemaDoc.Name)
+		return errors.Wrapf(types.ErrInvalidCredentialSchema, "name must always be in PascalCase: %v", schemaDoc.Name)
 	}
 
 	// Check if `properties` field is a valid JSON document
 	if err := isValidJSONDocument(schemaDoc.Schema.Properties); err != nil {
-		return sdkerrors.Wrapf(types.ErrInvalidCredentialSchema, "invalid `property` provided: %v", err.Error())
+		return errors.Wrapf(types.ErrInvalidCredentialSchema, "invalid `property` provided: %v", err.Error())
 	}
 
 	// Signature check
 	if err := k.VerifyDocumentProof(ctx, schemaDoc, schemaProof); err != nil {
-		return sdkerrors.Wrap(types.ErrInvalidClientSpecType, err.Error())
+		return errors.Wrap(types.ErrInvalidClientSpecType, err.Error())
 	}
 
 	var schema = types.CredentialSchemaState{

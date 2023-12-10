@@ -4,7 +4,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	"github.com/cosmos/ibc-go/v7/modules/core/keeper"
 
-	errorsmod "cosmossdk.io/errors"
+	"cosmossdk.io/errors"
 
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	wasmTypes "github.com/CosmWasm/wasmd/x/wasm/types"
@@ -29,22 +29,22 @@ type HandlerOptions struct {
 
 func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 	if options.AccountKeeper == nil {
-		return nil, errorsmod.Wrap(sdkerrors.ErrLogic, "account keeper is required for AnteHandler")
+		return nil, errors.Wrap(sdkerrors.ErrLogic, "account keeper is required for AnteHandler")
 	}
 	if options.BankKeeper == nil {
-		return nil, errorsmod.Wrap(sdkerrors.ErrLogic, "bank keeper is required for AnteHandler")
+		return nil, errors.Wrap(sdkerrors.ErrLogic, "bank keeper is required for AnteHandler")
 	}
 	if options.SignModeHandler == nil {
-		return nil, errorsmod.Wrap(sdkerrors.ErrLogic, "sign mode handler is required for ante builder")
+		return nil, errors.Wrap(sdkerrors.ErrLogic, "sign mode handler is required for ante builder")
 	}
 	if options.WasmConfig == nil {
-		return nil, errorsmod.Wrap(sdkerrors.ErrLogic, "wasm config is required for ante builder")
+		return nil, errors.Wrap(sdkerrors.ErrLogic, "wasm config is required for ante builder")
 	}
 	if options.TXCounterStoreKey == nil {
-		return nil, errorsmod.Wrap(sdkerrors.ErrLogic, "tx counter key is required for ante builder")
+		return nil, errors.Wrap(sdkerrors.ErrLogic, "tx counter key is required for ante builder")
 	}
 	if options.SsiKeeper == nil {
-		return nil, errorsmod.Wrap(sdkerrors.ErrLogic, "ssi keeper is required for ante builder")
+		return nil, errors.Wrap(sdkerrors.ErrLogic, "ssi keeper is required for ante builder")
 	}
 
 	sigGasConsumer := options.SigGasConsumer

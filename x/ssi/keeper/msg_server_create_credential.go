@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
@@ -24,7 +25,7 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 	// Check the format of Credential Status ID
 	err := verification.IsValidID(credId, chainNamespace, "credDocument")
 	if err != nil {
-		return nil, sdkerrors.Wrap(types.ErrInvalidCredentialStatusID, err.Error())
+		return nil, errors.Wrap(types.ErrInvalidCredentialStatusID, err.Error())
 	}
 
 	// Check if the credential already exist in the store
@@ -35,22 +36,22 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 	// Check if the DID of the issuer exists
 	issuerId := msgCredStatus.GetIssuer()
 	if !k.hasDidDocument(ctx, issuerId) {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("Issuer`s DID %s doesnt exists", issuerId))
+		return nil, errors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("Issuer`s DID %s doesnt exists", issuerId))
 	}
 
 	// Check if issuer's DID is deactivated
 	issuerDidDocument, err := k.getDidDocumentState(&ctx, issuerId)
 	if err != nil {
-		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, err.Error())
+		return nil, errors.Wrap(types.ErrInvalidDidDoc, err.Error())
 	}
 	if issuerDidDocument.DidDocumentMetadata.Deactivated {
-		return nil, sdkerrors.Wrap(types.ErrDidDocDeactivated, fmt.Sprintf("%s is deactivated and cannot used be used to register credential status", issuerDidDocument.DidDocument.Id))
+		return nil, errors.Wrap(types.ErrDidDocDeactivated, fmt.Sprintf("%s is deactivated and cannot used be used to register credential status", issuerDidDocument.DidDocument.Id))
 	}
 
 	issuanceDate := msgCredStatus.GetIssuanceDate()
 	issuanceDateParsed, err := time.Parse(time.RFC3339, issuanceDate)
 	if err != nil {
-		return nil, sdkerrors.Wrapf(types.ErrInvalidDate, fmt.Sprintf("invalid issuance date format: %s", issuanceDate))
+		return nil, errors.Wrapf(types.ErrInvalidDate, fmt.Sprintf("invalid issuance date format: %s", issuanceDate))
 	}
 
 	// Check if the created date before issuance date
@@ -59,12 +60,12 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 		return nil, err
 	}
 	if currentDate.Before(issuanceDateParsed) {
-		return nil, sdkerrors.Wrapf(types.ErrInvalidDate, "proof attached has a creation date before issuance date")
+		return nil, errors.Wrapf(types.ErrInvalidDate, "proof attached has a creation date before issuance date")
 	}
 
 	// Validate Merkle Root Hash
 	if err := verifyCredentialMerkleRootHash(msgCredStatus.GetCredentialMerkleRootHash()); err != nil {
-		return nil, sdkerrors.Wrapf(types.ErrInvalidCredentialMerkleRootHash, err.Error())
+		return nil, errors.Wrapf(types.ErrInvalidCredentialMerkleRootHash, err.Error())
 	}
 
 	// Validate Document Proof
@@ -75,7 +76,7 @@ func (k msgServer) RegisterCredentialStatus(goCtx context.Context, msg *types.Ms
 	// Verify Signature
 	err = k.VerifyDocumentProof(ctx, msgCredStatus, msgCredProof)
 	if err != nil {
-		return nil, sdkerrors.Wrapf(types.ErrInvalidSignature, err.Error())
+		return nil, errors.Wrapf(types.ErrInvalidSignature, err.Error())
 	}
 
 	cred := &types.CredentialStatusState{

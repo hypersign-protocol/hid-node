@@ -3,9 +3,9 @@ package keeper
 import (
 	"context"
 
+	"cosmossdk.io/errors"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/query"
 
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
@@ -25,7 +25,7 @@ func (k Keeper) DidDocuments(goCtx context.Context, req *types.QueryDidDocuments
 	_, err := query.Paginate(store, req.Pagination, func(key []byte, value []byte) error {
 		didDoc, err := k.getDidDocumentState(&ctx, string(key))
 		if err != nil {
-			return sdkerrors.Wrap(types.ErrDidDocNotFound, err.Error())
+			return errors.Wrap(types.ErrDidDocNotFound, err.Error())
 		}
 
 		didDocuments = append(didDocuments, didDoc)
@@ -52,7 +52,7 @@ func (k Keeper) DidDocumentByID(goCtx context.Context, req *types.QueryDidDocume
 	// Check if DID Document exists
 	didDoc, err := k.getDidDocumentState(&ctx, req.DidId)
 	if err != nil {
-		return nil, sdkerrors.Wrap(types.ErrDidDocNotFound, err.Error())
+		return nil, errors.Wrap(types.ErrDidDocNotFound, err.Error())
 	}
 
 	return &types.QueryDidDocumentResponse{
