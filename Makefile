@@ -78,3 +78,39 @@ docker-run:
 	-p 26657:26657 -p 1317:1317 -p 26656:26656 -p 9090:9090 \
 	--name hid-node-container \
 	$(DOCKER_IMAGE_NAME) start
+
+###############################################################################
+###                                  Release                                ###
+###############################################################################
+
+release-darwin-arm64: go-version-check
+	@echo "Generating release files for darwin/arm64"
+	@mkdir -p release
+	@GOOS=darwin GOARCH=arm64 go build $(BUILD_FLAGS) ./cmd/hid-noded
+	@tar -czf release/hid_noded_$(VERSION)_darwin_arm64.tar.gz hid-noded
+	@sha256sum release/hid_noded_$(VERSION)_darwin_arm64.tar.gz >> release/release_darwin_arm64_checksum
+	@echo "Release files generated!"
+
+release-darwin-amd64: go-version-check
+	@echo "Generating release files for darwin/amd64"
+	@mkdir -p release
+	@GOOS=darwin GOARCH=amd64 go build $(BUILD_FLAGS) ./cmd/hid-noded
+	@tar -czf release/hid_noded_$(VERSION)_darwin_amd64.tar.gz hid-noded
+	@sha256sum release/hid_noded_$(VERSION)_darwin_amd64.tar.gz >> release/release_darwin_amd64_checksum
+	@echo "Release files generated!"
+
+release-linux-arm64: go-version-check
+	@echo "Generating release files for linux/arm64"
+	@mkdir -p release
+	@GOOS=linux GOARCH=arm64 go build $(BUILD_FLAGS) ./cmd/hid-noded
+	@tar -czf release/hid_noded_$(VERSION)_linux_arm64.tar.gz hid-noded
+	@sha256sum release/hid_noded_$(VERSION)_linux_arm64.tar.gz >> release/release_linux_arm64_checksum
+	@echo "Release files generated!"
+
+release-linux-amd64: go-version-check
+	@echo "Generating release files for linux/amd64"
+	@mkdir -p release
+	@GOOS=linux GOARCH=amd64 go build $(BUILD_FLAGS) ./cmd/hid-noded
+	@tar -czf release/hid_noded_$(VERSION)_linux_amd64.tar.gz hid-noded
+	@sha256sum release/hid_noded_$(VERSION)_linux_amd64.tar.gz >> release/release_linux_amd64_checksum
+	@echo "Release files generated!"
