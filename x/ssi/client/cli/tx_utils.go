@@ -6,11 +6,13 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"fmt"
+	"math/big"
 
+	secp256k1 "github.com/cometbft/cometbft/crypto/secp256k1"
+	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/types/bech32"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 	"github.com/multiformats/go-multibase"
-	secp256k1 "github.com/tendermint/tendermint/crypto/secp256k1"
 	"golang.org/x/crypto/ripemd160" // nolint: staticcheck
 
 	etheraccounts "github.com/ethereum/go-ethereum/accounts"
@@ -19,38 +21,11 @@ import (
 
 	bbs "github.com/hyperledger/aries-framework-go/component/kmscrypto/crypto/primitive/bbs12381g2pub"
 
-	"github.com/spf13/cobra"
+	"github.com/iden3/go-iden3-crypto/babyjub"
 )
 
-// Extract Verification Method Ids and their respective signatures from Arguments
-// NOTE: Only Verificaiton Method Ids, Signatures and Signing Algorithms are supposed to be passed,
-// and the sequence of arguments are to be preserved.
-func extractDIDSigningElements(cmdArgs []string) ([]DIDSigningElements, error) {
-	// Since, a trio of VM Id, Siganature and Signing Algorithm are expected, an error should be thrown
-	// if the number of argumens isn't a multiple of 3
-	nArgs := len(cmdArgs)
-	if nArgs%3 != 0 {
-		return nil, fmt.Errorf("unexpected number of arguments recieved")
-	}
-
-	var didSigningElementsList []DIDSigningElements
-
-	for i := 0; i < nArgs; i += 3 {
-		didSigningElementsList = append(
-			didSigningElementsList,
-			DIDSigningElements{
-				VerificationMethodId: cmdArgs[i],
-				SignKey:              cmdArgs[i+1],
-				SignAlgo:             cmdArgs[i+2],
-			},
-		)
-	}
-
-	return didSigningElementsList, nil
-}
-
-// GetBBSSignature signs a message and returns a BBS signature
-func GetBBSSignature(privateKey string, message []byte) (string, error) {
+// GetBbsBlsSignature2020 signs a message and returns a BBS signature
+func GetBbsBlsSignature2020(privateKey string, message []byte) (string, error) {
 	privKeyBytes, err := base64.StdEncoding.DecodeString(privateKey)
 	if err != nil {
 		panic(err)
@@ -66,7 +41,39 @@ func GetBBSSignature(privateKey string, message []byte) (string, error) {
 	return base64.StdEncoding.EncodeToString(signatureBytes), nil
 }
 
-func GetEthRecoverySignature(privateKey string, message []byte) (string, error) {
+// Get BabyJubJub Signature
+func GetBJJSignature2021(privateKey string, message []byte) (string, error) {
+	// Decode private key from hex
+	privateKeyBytes, err := hex.DecodeString(privateKey)
+	if err != nil {
+		panic(err)
+	}
+	var privateKeyBytes32 [32]byte
+	copy(privateKeyBytes32[:], privateKeyBytes)
+
+	var privKeyObj babyjub.PrivateKey = privateKeyBytes32
+
+	msgBigInt := new(big.Int).SetBytes(message)
+
+	// Get Signature
+	signatureObj := privKeyObj.SignPoseidon(msgBigInt)
+	signatureHex := signatureObj.Compress().String()
+
+	// Convert Signature to multibase base58
+	signatureBytes, err := hex.DecodeString(signatureHex)
+	if err != nil {
+		return "", err
+	}
+
+	signature, err := multibase.Encode(multibase.Base58BTC, signatureBytes)
+	if err != nil {
+		return "", err
+	}
+
+	return signature, nil
+}
+
+func GetEcdsaSecp256k1RecoverySignature2020(privateKey string, message []byte) (string, error) {
 	// Decode key into bytes
 	privKeyBytes, err := hex.DecodeString(privateKey)
 	if err != nil {
@@ -89,7 +96,7 @@ func GetEthRecoverySignature(privateKey string, message []byte) (string, error) 
 	return etherhexutil.Encode(sigBytes), nil
 }
 
-func GetSecp256k1Signature(privateKey string, message []byte) (string, error) {
+func GetEcdsaSecp256k1Signature2019(privateKey string, message []byte) (string, error) {
 	// Decode key into bytes
 	privKeyBytes, err := base64.StdEncoding.DecodeString(privateKey)
 	if err != nil {
@@ -107,7 +114,7 @@ func GetSecp256k1Signature(privateKey string, message []byte) (string, error) {
 	return base64.StdEncoding.EncodeToString(signature), nil
 }
 
-func GetEd25519Signature(privateKey string, message []byte) (string, error) {
+func GetEd25519Signature2020(privateKey string, message []byte) (string, error) {
 	// Decode key into bytes
 	privKeyBytes, err := base64.StdEncoding.DecodeString(privateKey)
 	if err != nil {
@@ -117,51 +124,24 @@ func GetEd25519Signature(privateKey string, message []byte) (string, error) {
 	// Sign Message
 	signatureBytes := ed25519.Sign(privKeyBytes, message)
 
-	return base64.StdEncoding.EncodeToString(signatureBytes), nil
+	return multibase.Encode(multibase.Base58BTC, signatureBytes)
 }
 
-func getSignatures(cmd *cobra.Command, message []byte, cmdArgs []string) ([]*types.SignInfo, error) {
-	var signInfoList []*types.SignInfo
+func getDocumentProofs(ctx client.Context, proofStrings []string) ([]*types.DocumentProof, error) {
+	var documentProofs []*types.DocumentProof
 
-	didSigningElementsList, err := extractDIDSigningElements(cmdArgs)
-	if err != nil {
-		return nil, err
-	}
-
-	for i := 0; i < len(didSigningElementsList); i++ {
-		// Get the VM Ids
-		signInfoList = append(signInfoList, &types.SignInfo{
-			VerificationMethodId: didSigningElementsList[i].VerificationMethodId,
-		})
-
-		// Sign based on the Signing Algorithm
-		switch didSigningElementsList[i].SignAlgo {
-		case "ed25519":
-			signInfoList[i].Signature, err = GetEd25519Signature(didSigningElementsList[i].SignKey, message)
-			if err != nil {
-				return nil, err
-			}
-		case "secp256k1":
-			signInfoList[i].Signature, err = GetSecp256k1Signature(didSigningElementsList[i].SignKey, message)
-			if err != nil {
-				return nil, err
-			}
-		case "recover-eth":
-			signInfoList[i].Signature, err = GetEthRecoverySignature(didSigningElementsList[i].SignKey, message)
-			if err != nil {
-				return nil, err
-			}
-		case "bbs":
-			signInfoList[i].Signature, err = GetBBSSignature(didSigningElementsList[i].SignKey, message)
-			if err != nil {
-				return nil, err
-			}
-		default:
-			return nil, fmt.Errorf("unsupported signing algorithm %s, supported signing algorithms: ['ed25519', 'secp256k1', 'recover-eth', 'bbs']", didSigningElementsList[i].SignAlgo)
+	for i := 0; i < len(proofStrings); i++ {
+		var documentProof types.DocumentProof
+		err := ctx.Codec.UnmarshalJSON([]byte(proofStrings[i]), &documentProof)
+		if err != nil {
+			return nil, fmt.Errorf("unable to process the proof: %v", proofStrings[i])
 		}
+
+		// Get the VM Ids
+		documentProofs = append(documentProofs, &documentProof)
 	}
 
-	return signInfoList, nil
+	return documentProofs, nil
 }
 
 // validateDidAliasSignerAddress checks if the signer address provided in the --from flag matches

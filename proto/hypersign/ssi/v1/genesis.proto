@@ -1,0 +1,24 @@
+syntax = "proto3";
+package hypersign.ssi.v1;
+
+import "gogoproto/gogo.proto";
+import "cosmos/base/v1beta1/coin.proto";
+
+option go_package = "github.com/hypersign-protocol/hid-node/x/ssi/types";
+
+// GenesisState defines the ssi module's genesis state.
+message GenesisState {
+  string chainNamespace = 1;
+  Params params = 2;
+}
+
+// Param defines the ssi module's params.
+message Params {
+  cosmos.base.v1beta1.Coin register_did_fee = 1;
+  cosmos.base.v1beta1.Coin update_did_fee = 2;
+  cosmos.base.v1beta1.Coin deactivate_did_fee = 3;
+  cosmos.base.v1beta1.Coin register_credential_schema_fee = 4;
+  cosmos.base.v1beta1.Coin update_credential_schema_fee = 5;
+  cosmos.base.v1beta1.Coin register_credential_status_fee = 6;
+  cosmos.base.v1beta1.Coin update_credential_status_fee = 7;
+}

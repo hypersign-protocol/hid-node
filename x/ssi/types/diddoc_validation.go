@@ -187,6 +187,21 @@ func verificationKeyCheck(vm *VerificationMethod) error {
 				vm.Type,
 			)
 		}
+	case BabyJubJubKey2021:
+		if vm.GetBlockchainAccountId() != "" {
+			return fmt.Errorf(
+				"blockchainAccountId is currently not supported for verification method %s as it is of type %s",
+				vm.Id,
+				vm.Type,
+			)
+		}
+		if vm.GetPublicKeyMultibase() == "" {
+			return fmt.Errorf(
+				"publicKeyMultibase cannot be empty for verification method %s as it is of type %s",
+				vm.Id,
+				vm.Type,
+			)
+		}
 	default:
 		return fmt.Errorf("unsupported verification method type: %v. Supported verification method types are: %v", vm.Type, supportedVerificationMethodTypes)
 	}
@@ -312,7 +327,7 @@ func validateVerificationMethods(vms []*VerificationMethod) error {
 	return nil
 }
 
-func validateVmRelationships(didDoc *Did) error {
+func validateVmRelationships(didDoc *DidDocument) error {
 	// make verificationMethodType map between VM Id and VM type
 	vmTypeMap := map[string]string{}
 	for _, vm := range didDoc.VerificationMethod {
@@ -401,8 +416,28 @@ func validateBlockchainAccountId(blockchainAccountId string) error {
 	return nil
 }
 
+// isBabyJubJubKey2021PresentAlongWithOtherVMTypes checks if both BabyJubJubKey2021 and other VM Types are present at once
+func isBabyJubJubKey2021PresentAlongWithOtherVMTypes(verificationMethods []*VerificationMethod) error {
+	babyJubJubKey2021Count := 0
+	nonBabyJubJubKey2021Count := 0
+
+	for _, vm := range verificationMethods {
+		if vm.Type == BabyJubJubKey2021 {
+			babyJubJubKey2021Count += 1
+		} else {
+			nonBabyJubJubKey2021Count += 1
+		}
+	}
+
+	if babyJubJubKey2021Count > 0 && nonBabyJubJubKey2021Count > 0 {
+		return fmt.Errorf("BabyJubJubKey2021 should not be paired with other VM types in a single DID Document")
+	}
+
+	return nil
+}
+
 // ValidateDidDocument validates the DID Document
-func (didDoc *Did) ValidateDidDocument() error {
+func (didDoc *DidDocument) ValidateDidDocument() error {
 	// Id check
 	err := isValidDidDocId(didDoc.Id)
 	if err != nil {
@@ -432,6 +467,11 @@ func (didDoc *Did) ValidateDidDocument() error {
 	// Verification Method Relationships check
 	err = validateVmRelationships(didDoc)
 	if err != nil {
+		return err
+	}
+
+	// TODO: This is a temporary measure due to technical challenges in merklizing DID Document
+	if err := isBabyJubJubKey2021PresentAlongWithOtherVMTypes(didDoc.VerificationMethod); err != nil {
 		return err
 	}
 

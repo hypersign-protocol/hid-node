@@ -14,6 +14,14 @@ def run_command(cmd_string):
     
     return cmd_output, cmd_run.returncode
 
+def get_sequence():
+    add_cmd = "hid-noded keys show node1 -a --keyring-backend test"
+    address, _ = run_command(add_cmd)
+    cmd_string = "hid-noded q auth account " + address + " --output json"
+    cs, _ = run_command(cmd_string)
+    cs_dict = json.loads(cs)
+    return cs_dict["sequence"]
+
 def run_blockchain_command(cmd_string: str, transaction_name: str = None, expect_failure: bool = False, stateless_err: bool = False):
     if not expect_failure:
         try:
@@ -45,16 +53,18 @@ def run_blockchain_command(cmd_string: str, transaction_name: str = None, expect
             print(f"{transaction_name} : Error while executing transaction command\n")
             raise(e)
 
-def generate_key_pair(algo="ed25519"):
+def generate_key_pair(algo="Ed25519Signature2020"):
     cmd = ""
-    if algo == "ed25519":
-        cmd = "hid-noded debug ed25519 random"
-    elif algo == "secp256k1":
-        cmd = "hid-noded debug secp256k1 random"
-    elif algo == "recover-eth":
-        cmd = "hid-noded debug secp256k1 eth-hex-random"
-    elif algo == "bbs":
-        cmd = "hid-noded debug bbs random"
+    if algo == "Ed25519Signature2020":
+        cmd = "hid-noded ssi-tools ed25519 random"
+    elif algo == "EcdsaSecp256k1Signature2019":
+        cmd = "hid-noded ssi-tools secp256k1 random"
+    elif algo == "EcdsaSecp256k1RecoverySignature2020":
+        cmd = "hid-noded ssi-tools secp256k1 eth-hex-random"
+    elif algo == "BbsBlsSignature2020":
+        cmd = "hid-noded ssi-tools bbs random"
+    elif algo == "BJJSignature2021":
+        cmd = "hid-noded ssi-tools bjj random"
     else:
         raise Exception(algo + " is not a supported signing algorithm")
     result_str, _ = run_command(cmd)
@@ -74,7 +84,7 @@ def add_keyAgreeemnt_pubKeyMultibase(verification_method, type):
 
     return verification_method
 
-def generate_document_id(doc_type: str, kp: dict = None, algo: str = "ed25519", is_uuid: bool =False):
+def generate_document_id(doc_type: str, kp: dict = None, algo: str = "Ed25519Signature2020", is_uuid: bool =False):
     id = ""
     if not kp:
         kp = generate_key_pair(algo)
@@ -82,7 +92,7 @@ def generate_document_id(doc_type: str, kp: dict = None, algo: str = "ed25519", 
     if is_uuid:
         method_specific_id = str(uuid.uuid4())
     else:
-        if algo in ["recover-eth"]:
+        if algo in ["EcdsaSecp256k1RecoverySignature2020"]:
             method_specific_id = kp["ethereum_address"]
         else:
             method_specific_id = kp["pub_key_multibase"]
@@ -106,8 +116,8 @@ def is_blockchain_active(rpc_port):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         assert s.connect_ex(('localhost', rpc_port)) == 0, f"hid-noded is not running"
 
-def get_document_signature(doc: dict, doc_type: str, key_pair: dict, algo: str = "ed25519"):
-    if algo in ["recover-eth"]:
+def get_document_signature(doc: dict, doc_type: str, key_pair: dict, algo: str = "ed25519", proofObj = None):
+    if algo in ["EcdsaSecp256k1RecoverySignature2020", "BJJSignature2021"]:
         private_key = key_pair["priv_key_hex"]
     else:
         private_key = key_pair["priv_key_base_64"]
@@ -116,14 +126,19 @@ def get_document_signature(doc: dict, doc_type: str, key_pair: dict, algo: str =
         doc_cmd = "cred-status-doc"
     elif doc_type == "schema":
         doc_cmd = "schema-doc"
+    elif doc_type == "did":
+        doc_cmd = "did-doc"
     else:
         raise Exception("Invalid value for doc_type param: " + doc_type)
     
-    cmd_string = f"hid-noded debug sign-ssi-doc {doc_cmd} '{json.dumps(doc)}' {private_key} {algo}"
+    cmd_string = f"hid-noded ssi-tools sign-ssi-doc {doc_cmd} '{json.dumps(doc)}' {private_key} '{json.dumps(proofObj)}'"
     signature, _ = run_command(cmd_string)
+
+    if signature == "":
+        raise Exception(f"Signature came empty while running command: {cmd_string}")
     return signature
 
 def secp256k1_pubkey_to_address(pub_key, prefix):
-    cmd_string = f"hid-noded debug secp256k1 bech32-addr {pub_key} {prefix}"
+    cmd_string = f"hid-noded ssi-tools secp256k1 bech32-addr {pub_key} {prefix}"
     addr, _ = run_command(cmd_string)
     return addr

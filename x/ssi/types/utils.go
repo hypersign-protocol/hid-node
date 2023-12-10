@@ -8,7 +8,9 @@ import (
 // GetDidFromDidUrl returns didId from didURL.
 // TODO: need to handle query and path
 func GetElementsFromDidUrl(didUrl string) (string, string) {
-	didId, fragment, _ := strings.Cut(didUrl, "#")
+	didElements := strings.Split(didUrl, "#")
+	didId := didElements[0]
+	fragment := didElements[1]
 	return didId, fragment
 }
 
@@ -36,16 +38,6 @@ func GetUniqueElements(list []string) []string {
 	}
 
 	return uniqueList
-}
-
-// FindInSlice checks if an element is present in the list
-func FindInSlice(list []string, element string) bool {
-	for _, x := range list {
-		if x == element {
-			return true
-		}
-	}
-	return false
 }
 
 // checkDuplicateItems return a duplicate Id from the list, if found

@@ -11,15 +11,24 @@ const EcdsaSecp256k1RecoveryMethod2020 = "EcdsaSecp256k1RecoveryMethod2020"
 const X25519KeyAgreementKey2020 = "X25519KeyAgreementKey2020"
 const X25519KeyAgreementKeyEIP5630 = "X25519KeyAgreementKeyEIP5630" // TODO: Temporary spec name for KeyAgreement type from Metamask
 const Bls12381G2Key2020 = "Bls12381G2Key2020"
+const BabyJubJubKey2021 = "BabyJubJubKey2021"
+
+// Supported Proof Types
+const Ed25519Signature2020 = "Ed25519Signature2020"
+const EcdsaSecp256k1Signature2019 = "EcdsaSecp256k1Signature2019"
+const EcdsaSecp256k1RecoverySignature2020 = "EcdsaSecp256k1RecoverySignature2020"
+const BJJSignature2021 = "BJJSignature2021"
+const BbsBlsSignature2020 = "BbsBlsSignature2020"
 
 // Mapping between Verification Key and its corresponding Signature
 var VerificationKeySignatureMap = map[string]string{
-	Ed25519VerificationKey2020:        "Ed25519Signature2020",
-	EcdsaSecp256k1VerificationKey2019: "EcdsaSecp256k1Signature2019",
-	EcdsaSecp256k1RecoveryMethod2020:  "EcdsaSecp256k1RecoverySignature2020",
+	Ed25519VerificationKey2020:        Ed25519Signature2020,
+	EcdsaSecp256k1VerificationKey2019: EcdsaSecp256k1Signature2019,
+	EcdsaSecp256k1RecoveryMethod2020:  EcdsaSecp256k1RecoverySignature2020,
 	X25519KeyAgreementKey2020:         "", // Authentication and Assertion are not allowed
 	X25519KeyAgreementKeyEIP5630:      "", // Authentication and Assertion are not allowed
-	Bls12381G2Key2020:                 "BbsBlsSignature2020",
+	BabyJubJubKey2021:                 BJJSignature2021,
+	Bls12381G2Key2020:                 BbsBlsSignature2020,
 }
 
 var supportedVerificationMethodTypes []string = func() []string {

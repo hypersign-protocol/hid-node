@@ -4,6 +4,7 @@
 *.dll
 *.so
 *.dylib
+*.wasm
 
 # Test binary, built with `go test -c`
 *.test
@@ -31,3 +32,6 @@ dist/
 .cache/
 __pycache__
 artifacts
+node_modules
+package-lock.json
+generated-ts

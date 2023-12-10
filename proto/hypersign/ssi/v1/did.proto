@@ -1,0 +1,46 @@
+syntax = "proto3";
+package hypersign.ssi.v1;
+
+option go_package = "github.com/hypersign-protocol/hid-node/x/ssi/types";
+
+import "gogoproto/gogo.proto";
+
+message DidDocument {
+  repeated string context = 1 [json_name = "@context", (gogoproto.jsontag) = "@context"];
+  string id = 2;
+  repeated string controller = 3;
+  repeated string alsoKnownAs = 4;
+  repeated VerificationMethod verificationMethod = 5;
+  repeated string authentication = 6;
+  repeated string assertionMethod = 7;
+  repeated string keyAgreement = 8;
+  repeated string capabilityInvocation = 9;
+  repeated string capabilityDelegation = 10;
+  repeated Service service = 11;
+}
+
+message DidDocumentMetadata {
+  string created = 1;
+  string updated = 2;
+  bool deactivated = 3;
+  string versionId = 4;
+}
+
+message VerificationMethod {
+  string id = 1;
+  string type = 2;
+  string controller = 3;
+  string publicKeyMultibase = 4; // If value is provided, `blockchainAccountId` must be empty
+  string blockchainAccountId = 5; // If value is provided, `publicKeyMultibase` must be empty
+}
+
+message Service {
+  string id = 1;
+  string type = 2;
+  string serviceEndpoint = 3;
+}
+
+message DidDocumentState {
+  DidDocument didDocument = 1;
+  DidDocumentMetadata didDocumentMetadata = 2;
+}

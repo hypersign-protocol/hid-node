@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 	"github.com/hypersign-protocol/hid-node/x/ssi/verification"
@@ -17,25 +17,32 @@ func (k msgServer) DeactivateDID(goCtx context.Context, msg *types.MsgDeactivate
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// Get the RPC inputs
-	msgDidId := msg.DidId
-	msgSignatures := msg.Signatures
+	msgDidId := msg.DidDocumentId
+	msgDidDocumentProofs := msg.DidDocumentProofs
 
 	// Checks if the Did Document is already registered
-	if !k.HasDid(ctx, msgDidId) {
-		return nil, sdkerrors.Wrap(types.ErrDidDocNotFound, msgDidId)
+	if !k.hasDidDocument(ctx, msgDidId) {
+		return nil, errors.Wrap(types.ErrDidDocNotFound, msgDidId)
+	}
+
+	// Validate Document Proofs
+	for _, proof := range msgDidDocumentProofs {
+		if err := proof.Validate(); err != nil {
+			return nil, err
+		}
 	}
 
 	// Get the DID Document from state
-	didDocumentState, err := k.GetDidDocumentState(&ctx, msgDidId)
+	didDocumentState, err := k.getDidDocumentState(&ctx, msgDidId)
 	if err != nil {
-		return nil, sdkerrors.Wrap(types.ErrDidDocNotFound, err.Error())
+		return nil, errors.Wrap(types.ErrDidDocNotFound, err.Error())
 	}
 	didDocument := didDocumentState.DidDocument
 	didDocumentMetadata := didDocumentState.DidDocumentMetadata
 
 	// Check if Did Document is deactivated
 	if didDocumentMetadata.Deactivated {
-		return nil, sdkerrors.Wrapf(types.ErrDidDocDeactivated, "DID Document %s is already deactivated", msgDidId)
+		return nil, errors.Wrapf(types.ErrDidDocDeactivated, "DID Document %s is already deactivated", msgDidId)
 	}
 
 	// Check if the version id of existing Did Document matches with the current one
@@ -45,28 +52,28 @@ func (k msgServer) DeactivateDID(goCtx context.Context, msg *types.MsgDeactivate
 		errMsg := fmt.Sprintf(
 			"Expected %s with version %s. Got version %s",
 			didDocument.Id, existingDidDocVersionId, incomingDidDocVersionId)
-		return nil, sdkerrors.Wrap(types.ErrUnexpectedDidVersion, errMsg)
+		return nil, errors.Wrap(types.ErrUnexpectedDidVersion, errMsg)
 	}
 
 	// Gather controllers
 	controllers := getControllersForDeactivateDID(didDocument)
 	if err := k.checkControllerPresenceInState(ctx, controllers, didDocument.Id); err != nil {
-		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, err.Error())
+		return nil, errors.Wrap(types.ErrInvalidDidDoc, err.Error())
 	}
 
-	signMap := makeSignatureMap(msgSignatures)
+	signMap := makeSignatureMap(msgDidDocumentProofs)
 
 	// Get controller VM map
 	controllerMap, err := k.formAnyControllerVmListMap(ctx, controllers,
 		didDocument.VerificationMethod, signMap)
 	if err != nil {
-		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, err.Error())
+		return nil, errors.Wrap(types.ErrInvalidDidDoc, err.Error())
 	}
 
 	// Signature Verification
 	err = verification.VerifySignatureOfAnyController(didDocument, controllerMap)
 	if err != nil {
-		return nil, sdkerrors.Wrapf(types.ErrInvalidSignature, err.Error())
+		return nil, errors.Wrapf(types.ErrInvalidSignature, err.Error())
 	}
 
 	// Create updated metadata
@@ -81,22 +88,20 @@ func (k msgServer) DeactivateDID(goCtx context.Context, msg *types.MsgDeactivate
 	}
 
 	// Update the DID Document in Store
-	if err := k.UpdateDidDocumentInStore(ctx, updatedDidDocumentState); err != nil {
-		return nil, err
-	}
+	k.setDidDocumentInStore(ctx, &updatedDidDocumentState)
 
 	// Remove the BlockchainAccountId from BlockchainAddressStore
 	for _, vm := range didDocumentState.DidDocument.VerificationMethod {
 		if vm.BlockchainAccountId != "" {
-			k.RemoveBlockchainAddressInStore(&ctx, vm.BlockchainAccountId)
+			k.removeBlockchainAddressInStore(&ctx, vm.BlockchainAccountId)
 		}
 	}
 
-	return &types.MsgDeactivateDIDResponse{Id: 1}, nil
+	return &types.MsgDeactivateDIDResponse{}, nil
 }
 
 // getControllersForDeactivateDID returns a list of controllers required for Deactivate DID Operation
-func getControllersForDeactivateDID(didDocument *types.Did) []string {
+func getControllersForDeactivateDID(didDocument *types.DidDocument) []string {
 	var controllers []string = []string{}
 
 	// If the controller list is empty, DID Subject is assumed to be the sole controller of DID Document

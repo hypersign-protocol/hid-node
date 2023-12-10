@@ -1,0 +1,77 @@
+syntax = "proto3";
+package hypersign.ssi.v1;
+
+option go_package = "github.com/hypersign-protocol/hid-node/x/ssi/types";
+
+import "hypersign/ssi/v1/credential_schema.proto";
+import "hypersign/ssi/v1/did.proto";
+import "hypersign/ssi/v1/credential_status.proto";
+import "hypersign/ssi/v1/proof.proto";
+
+service Msg {
+  rpc RegisterDID(MsgRegisterDID) returns (MsgRegisterDIDResponse);
+  rpc UpdateDID(MsgUpdateDID) returns (MsgUpdateDIDResponse);
+  rpc DeactivateDID(MsgDeactivateDID) returns (MsgDeactivateDIDResponse);
+  rpc RegisterCredentialSchema(MsgRegisterCredentialSchema) returns (MsgRegisterCredentialSchemaResponse);
+  rpc UpdateCredentialSchema(MsgUpdateCredentialSchema) returns (MsgUpdateCredentialSchemaResponse);
+  rpc RegisterCredentialStatus(MsgRegisterCredentialStatus) returns (MsgRegisterCredentialStatusResponse);
+  rpc UpdateCredentialStatus(MsgUpdateCredentialStatus) returns (MsgUpdateCredentialStatusResponse);
+}
+
+message MsgRegisterDID {
+  DidDocument didDocument = 1;
+  repeated DocumentProof didDocumentProofs = 2;
+  string txAuthor = 3;
+}
+
+message MsgRegisterDIDResponse {}
+
+message MsgUpdateDID {
+  DidDocument didDocument = 1;
+  repeated DocumentProof didDocumentProofs = 2;
+  string versionId = 3;
+  string txAuthor = 4;
+}
+
+message MsgUpdateDIDResponse {}
+
+message MsgDeactivateDID {
+  string didDocumentId = 1;
+  repeated DocumentProof didDocumentProofs = 2;
+  string versionId = 3;
+  string txAuthor = 4;
+}
+
+message MsgDeactivateDIDResponse {}
+
+message MsgRegisterCredentialSchema {
+  CredentialSchemaDocument credentialSchemaDocument = 1;
+  DocumentProof credentialSchemaProof = 2;
+  string txAuthor = 3;
+}
+
+message MsgRegisterCredentialSchemaResponse {}
+
+message MsgUpdateCredentialSchema {
+  CredentialSchemaDocument credentialSchemaDocument = 1;
+  DocumentProof credentialSchemaProof = 2;
+  string txAuthor = 3;
+}
+
+message MsgUpdateCredentialSchemaResponse {}
+
+message MsgRegisterCredentialStatus {
+  CredentialStatusDocument credentialStatusDocument = 1;
+  DocumentProof credentialStatusProof = 2;
+  string txAuthor = 3;
+}
+
+message MsgRegisterCredentialStatusResponse {}
+
+message MsgUpdateCredentialStatus {
+  CredentialStatusDocument credentialStatusDocument = 1;
+  DocumentProof credentialStatusProof = 2;
+  string txAuthor = 3;
+}
+
+message MsgUpdateCredentialStatusResponse {}

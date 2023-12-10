@@ -19,7 +19,7 @@ func chainNamespaceValidation(docId string, validChainNamespace string) error {
 }
 
 // DidDocNamespaceValidation validates the namespace in Did Document
-func DidChainNamespaceValidation(didDoc *Did, validChainNamespace string) error {
+func DidChainNamespaceValidation(didDoc *DidDocument, validChainNamespace string) error {
 	// Subject ID check
 	if err := chainNamespaceValidation(didDoc.Id, validChainNamespace); err != nil {
 		return err

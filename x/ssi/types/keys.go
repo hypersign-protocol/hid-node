@@ -32,6 +32,18 @@ const (
 	BlockchainAccountIdStoreKey = "blockchainaddrstorekey"
 )
 
+// Fixed Fee Param Keys
+
+var (
+	ParamStoreKeyRegisterDidFee              = []byte("RegisterDidFee")
+	ParamStoreKeyUpdateDidFee                = []byte("UpdateDidFee")
+	ParamStoreKeyDeactivateDidFee            = []byte("DeactivateDidFee")
+	ParamStoreKeyRegisterCredentialSchemaFee = []byte("RegisterCredentialSchemaFee")
+	ParamStoreKeyUpdateCredentialSchemaFee   = []byte("UpdateCredentialSchemaFee")
+	ParamStoreKeyRegisterCredentialStatusFee = []byte("RegisterCredentialStatusFee")
+	ParamStoreKeyUpdateCredentialStatusFee   = []byte("UpdateCredentialStatusFee")
+)
+
 func KeyPrefix(p string) []byte {
 	return []byte(p)
 }

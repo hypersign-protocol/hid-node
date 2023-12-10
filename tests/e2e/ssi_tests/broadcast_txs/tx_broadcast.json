@@ -1,0 +1,126 @@
+{
+    "body": {
+        "messages": [
+            {
+                "@type": "/cosmos.bank.v1beta1.MsgSend",
+                "from_address": "hid1en0zyqxsevlkqdldcykydzxxqap2wx4ex5cgnl",
+                "to_address": "hid1gmhlnhj7zpr6dmdqagqhu2uww92vgj6f9wqrz2",
+                "amount": [
+                    {
+                        "denom": "uhid",
+                        "amount": "1000000"
+                    }
+                ]
+            },
+            {
+                "@type": "/hypersign.ssi.v1.MsgRegisterDID",
+                "didDocument": {
+                    "context": [
+                        "https://www.w3.org/ns/did/v1",
+                        "https://w3id.org/security/suites/ed25519-2020/v1"
+                    ],
+                    "id": "did:hid:devnet:z6MkiXuTZdYs3qUsA2mo6S1Brs84bf4ryKJn2gJojrYZSbPq",
+                    "controller": [
+                        "did:hid:devnet:z6MkiXuTZdYs3qUsA2mo6S1Brs84bf4ryKJn2gJojrYZSbPq"
+                    ],
+                    "alsoKnownAs": [],
+                    "verificationMethod": [
+                        {
+                            "id": "did:hid:devnet:z6MkiXuTZdYs3qUsA2mo6S1Brs84bf4ryKJn2gJojrYZSbPq#k1",
+                            "type": "Ed25519VerificationKey2020",
+                            "controller": "did:hid:devnet:z6MkiXuTZdYs3qUsA2mo6S1Brs84bf4ryKJn2gJojrYZSbPq",
+                            "publicKeyMultibase": "z6MkiXuTZdYs3qUsA2mo6S1Brs84bf4ryKJn2gJojrYZSbPq",
+                            "blockchainAccountId": ""
+                        }
+                    ],
+                    "authentication": [],
+                    "assertionMethod": [],
+                    "keyAgreement": [],
+                    "capabilityInvocation": [],
+                    "capabilityDelegation": [],
+                    "service": []
+                },
+                "didDocumentProofs": [
+                    {
+                        "type": "Ed25519Signature2020",
+                        "created": "2022-08-16T10:22:12Z",
+                        "verificationMethod": "did:hid:devnet:z6MkiXuTZdYs3qUsA2mo6S1Brs84bf4ryKJn2gJojrYZSbPq#k1",
+                        "proofPurpose": "assertionMethod",
+                        "proofValue": "ztxeXJyc8sZC8gNRwZoGv28Rs1vzP2V9Zt94qF6nwhzHSU3QM2ZHrkpTW4tZYo9RVEugXNGvADr4RFAZx2yYJNyJ",
+                        "clientSpecType": "CLIENT_SPEC_TYPE_NONE"
+                    }
+                ],
+                "txAuthor": "hid1en0zyqxsevlkqdldcykydzxxqap2wx4ex5cgnl"
+            },
+            {
+                "@type": "/hypersign.ssi.v1.MsgRegisterDID",
+                "didDocument": {
+                    "context": [
+                        "https://www.w3.org/ns/did/v1",
+                        "https://w3id.org/security/suites/ed25519-2020/v1"
+                    ],
+                    "id": "did:hid:devnet:z6MkqR457FGUq9JDm3eajLW3co1bERcrqdu3sJUzvJLbPFvS",
+                    "controller": [
+                        "did:hid:devnet:z6MkqR457FGUq9JDm3eajLW3co1bERcrqdu3sJUzvJLbPFvS"
+                    ],
+                    "alsoKnownAs": [],
+                    "verificationMethod": [
+                        {
+                            "id": "did:hid:devnet:z6MkqR457FGUq9JDm3eajLW3co1bERcrqdu3sJUzvJLbPFvS#k1",
+                            "type": "Ed25519VerificationKey2020",
+                            "controller": "did:hid:devnet:z6MkqR457FGUq9JDm3eajLW3co1bERcrqdu3sJUzvJLbPFvS",
+                            "publicKeyMultibase": "z6MkqR457FGUq9JDm3eajLW3co1bERcrqdu3sJUzvJLbPFvS",
+                            "blockchainAccountId": ""
+                        }
+                    ],
+                    "authentication": [],
+                    "assertionMethod": [],
+                    "keyAgreement": [],
+                    "capabilityInvocation": [],
+                    "capabilityDelegation": [],
+                    "service": []
+                },
+                "didDocumentProofs": [
+                    {
+                        "type": "Ed25519Signature2020",
+                        "created": "2022-08-16T10:22:12Z",
+                        "verificationMethod": "did:hid:devnet:z6MkqR457FGUq9JDm3eajLW3co1bERcrqdu3sJUzvJLbPFvS#k1",
+                        "proofPurpose": "assertionMethod",
+                        "proofValue": "ziupiWHX9n6jHY3euUKGe5d6VCgs6HjEykRKxYJTV9RdPEf4bGCHGqFHBgs1HX1AwjU4hsefL6bRkYPTxg1bybcp",
+                        "clientSpecType": "CLIENT_SPEC_TYPE_NONE"
+                    }
+                ],
+                "txAuthor": "hid1en0zyqxsevlkqdldcykydzxxqap2wx4ex5cgnl"
+            }
+        ],
+        "memo": "",
+        "timeout_height": "0",
+        "extension_options": [],
+        "non_critical_extension_options": []
+    },
+    "auth_info": {
+        "signer_infos": [
+            {
+                "public_key": {
+                    "@type": "/cosmos.crypto.secp256k1.PubKey",
+                    "key": "Auezxmnywgrzb6M2kxLjapQ/bI6autcBSBParclOq//r"
+                },
+                "mode_info": {
+                    "single": {
+                        "mode": "SIGN_MODE_DIRECT"
+                    }
+                },
+                "sequence": "106"
+            }
+        ],
+        "fee": {
+            "amount": [],
+            "gas_limit": "200000",
+            "payer": "",
+            "granter": ""
+        }
+    },
+    "signatures": [
+        "orwcPWyAWTueWl6g4VJEc92a7Lqo27JDoy7yOy0z2Z4rpDUaVLp4HeTLPZJ12fbjEDSGniHwStlcZ+NXryVx4g=="
+    ]
+}

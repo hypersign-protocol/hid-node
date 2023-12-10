@@ -3,10 +3,10 @@ package keeper
 import (
 	"context"
 	"fmt"
-	"reflect"
+	"reflect" /* #nosec G702 */
 
+	"cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 	"github.com/hypersign-protocol/hid-node/x/ssi/verification"
 )
@@ -17,40 +17,47 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// Get the RPC inputs
-	msgDidDocument := msg.DidDocString
-	msgSignatures := msg.Signatures
+	msgDidDocument := msg.DidDocument
+	msgDidDocumentProofs := msg.DidDocumentProofs
 
 	// Validate DID Document
 	if err := msgDidDocument.ValidateDidDocument(); err != nil {
-		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, err.Error())
+		return nil, errors.Wrap(types.ErrInvalidDidDoc, err.Error())
 	}
 
 	// Validate namespace in DID Document
 	chainNamespace := k.GetChainNamespace(&ctx)
 	if err := types.DidChainNamespaceValidation(msgDidDocument, chainNamespace); err != nil {
-		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, err.Error())
+		return nil, errors.Wrap(types.ErrInvalidDidDoc, err.Error())
 	}
 
 	// Checks if the Did Document is already registered
-	if !k.HasDid(ctx, msgDidDocument.Id) {
-		return nil, sdkerrors.Wrap(types.ErrDidDocNotFound, msgDidDocument.Id)
+	if !k.hasDidDocument(ctx, msgDidDocument.Id) {
+		return nil, errors.Wrap(types.ErrDidDocNotFound, msgDidDocument.Id)
+	}
+
+	// Verify Document Proofs
+	for _, proof := range msgDidDocumentProofs {
+		if err := proof.Validate(); err != nil {
+			return nil, err
+		}
 	}
 
 	// Fetch registered Did Document from state
-	existingDidDocumentState, err := k.GetDidDocumentState(&ctx, msgDidDocument.Id)
+	existingDidDocumentState, err := k.getDidDocumentState(&ctx, msgDidDocument.Id)
 	if err != nil {
-		return nil, sdkerrors.Wrap(types.ErrDidDocNotFound, err.Error())
+		return nil, errors.Wrap(types.ErrDidDocNotFound, err.Error())
 	}
 	existingDidDocument := existingDidDocumentState.DidDocument
 
 	// Check if the DID Document is already deactivated
 	if existingDidDocumentState.DidDocumentMetadata.Deactivated {
-		return nil, sdkerrors.Wrapf(types.ErrDidDocDeactivated, "cannot update didDocument %v as it is deactivated", existingDidDocument.Id)
+		return nil, errors.Wrapf(types.ErrDidDocDeactivated, "cannot update didDocument %v as it is deactivated", existingDidDocument.Id)
 	}
 
 	// Check if the incoming DID Document has any changes. If not, throw an error.
 	if reflect.DeepEqual(existingDidDocument, msgDidDocument) {
-		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, "incoming DID Document does not have any changes")
+		return nil, errors.Wrap(types.ErrInvalidDidDoc, "incoming DID Document does not have any changes")
 	}
 
 	// Check if the version id of existing Did Document matches with the current one
@@ -60,10 +67,10 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 		errMsg := fmt.Sprintf(
 			"Expected %s with version %s. Got version %s",
 			msgDidDocument.Id, existingDidDocVersionId, incomingDidDocVersionId)
-		return nil, sdkerrors.Wrap(types.ErrUnexpectedDidVersion, errMsg)
+		return nil, errors.Wrap(types.ErrUnexpectedDidVersion, errMsg)
 	}
 
-	signMap := makeSignatureMap(msgSignatures)
+	signMap := makeSignatureMap(msgDidDocumentProofs)
 
 	// Check if there is any change in controllers
 	var optionalVmMap map[string][]*types.ExtendedVerificationMethod
@@ -88,14 +95,14 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 	if reflect.DeepEqual(existingDidDocumentControllers, incomingDidDocumentControllers) {
 		commonController := existingDidDocumentControllers
 		if err := k.checkControllerPresenceInState(ctx, commonController, msgDidDocument.Id); err != nil {
-			return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, err.Error())
+			return nil, errors.Wrap(types.ErrInvalidDidDoc, err.Error())
 		}
 
 		// Check if verification Methods are similar
 		if reflect.DeepEqual(existingDidDocument.VerificationMethod, msgDidDocument.VerificationMethod) {
 			optionalVmMap, vmMapErr = k.formAnyControllerVmListMap(ctx, commonController, existingDidDocument.VerificationMethod, signMap)
 			if vmMapErr != nil {
-				return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, vmMapErr.Error())
+				return nil, errors.Wrap(types.ErrInvalidDidDoc, vmMapErr.Error())
 			}
 		} else {
 			// Get a list of Verification Methods having a populated `blockchainAccountId` field, which are being newly added
@@ -111,7 +118,7 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 
 			for _, vm := range updatedVms {
 				if _, signInfoProvided := signMap[vm.Id]; !signInfoProvided {
-					return nil, sdkerrors.Wrapf(
+					return nil, errors.Wrapf(
 						types.ErrInvalidSignature,
 						"signature must be provided for verification method id %v",
 						vm.Id,
@@ -127,17 +134,17 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 
 			optionalVmMap, vmMapErr = k.formAnyControllerVmListMap(ctx, commonController, existingDidDocument.VerificationMethod, signMap)
 			if err != vmMapErr {
-				return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, vmMapErr.Error())
+				return nil, errors.Wrap(types.ErrInvalidDidDoc, vmMapErr.Error())
 			}
 		}
 	} else {
 		// Look for any change in Controller array
 		mandatoryControllers, anyControllers := getControllersForUpdateDID(existingDidDocument, msgDidDocument)
 		if err := k.checkControllerPresenceInState(ctx, mandatoryControllers, msgDidDocument.Id); err != nil {
-			return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, err.Error())
+			return nil, errors.Wrap(types.ErrInvalidDidDoc, err.Error())
 		}
 		if err := k.checkControllerPresenceInState(ctx, anyControllers, msgDidDocument.Id); err != nil {
-			return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, err.Error())
+			return nil, errors.Wrap(types.ErrInvalidDidDoc, err.Error())
 		}
 
 		// Gather Verification Methods
@@ -145,22 +152,22 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 
 		requiredVmMap, vmMapErr = k.formMustControllerVmListMap(ctx, mandatoryControllers, updatedVms, signMap)
 		if vmMapErr != nil {
-			return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, vmMapErr.Error())
+			return nil, errors.Wrap(types.ErrInvalidDidDoc, vmMapErr.Error())
 		}
 
 		optionalVmMap, vmMapErr = k.formAnyControllerVmListMap(ctx, anyControllers, existingDidDocument.VerificationMethod, signMap)
 		if err != vmMapErr {
-			return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, vmMapErr.Error())
+			return nil, errors.Wrap(types.ErrInvalidDidDoc, vmMapErr.Error())
 		}
 	}
 
 	// Signature Verification
 	if err := verification.VerifySignatureOfEveryController(msgDidDocument, requiredVmMap); err != nil {
-		return nil, sdkerrors.Wrapf(types.ErrInvalidSignature, err.Error())
+		return nil, errors.Wrapf(types.ErrInvalidSignature, err.Error())
 	}
 
 	if err := verification.VerifySignatureOfAnyController(msgDidDocument, optionalVmMap); err != nil {
-		return nil, sdkerrors.Wrapf(types.ErrInvalidSignature, err.Error())
+		return nil, errors.Wrapf(types.ErrInvalidSignature, err.Error())
 	}
 
 	// Create the Metadata and assign `created` and `deactivated` to previous DIDDoc's metadata values
@@ -175,29 +182,27 @@ func (k msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 	}
 
 	// Update the DID Document in store
-	if err := k.UpdateDidDocumentInStore(ctx, didDocumentState); err != nil {
-		return nil, err
-	}
+	k.setDidDocumentInStore(ctx, &didDocumentState)
 
 	// Iterate through the removed Verification Methods having `blockchainAccountId` populated
 	// and remove them from store
 	for _, vm := range vmsToBeRemoved {
-		k.RemoveBlockchainAddressInStore(&ctx, vm.BlockchainAccountId)
+		k.removeBlockchainAddressInStore(&ctx, vm.BlockchainAccountId)
 	}
 
 	// Iterate through the added Verification Methods having `blockchainAccountId` populated
 	// and add them to store
 	for _, vm := range vmsToBeAdded {
-		k.SetBlockchainAddressInStore(&ctx, vm.BlockchainAccountId, vm.Controller)
+		k.setBlockchainAddressInStore(&ctx, vm.BlockchainAccountId, vm.Controller)
 	}
 
-	return &types.MsgUpdateDIDResponse{UpdateId: msgDidDocument.Id}, nil
+	return &types.MsgUpdateDIDResponse{}, nil
 }
 
 // getControllersForUpdateDID returns two lists of controllers. The first parameter is a list of controllers,
 // where every controller needs to be verified. The second parameter is a list of controllers, where atleast one
 // of the controllers require verification.
-func getControllersForUpdateDID(existingDidDoc *types.Did, incomingDidDoc *types.Did) ([]string, []string) {
+func getControllersForUpdateDID(existingDidDoc *types.DidDocument, incomingDidDoc *types.DidDocument) ([]string, []string) {
 	var mandatoryControllers []string = []string{}
 	var anyControllers []string = []string{}
 
@@ -272,7 +277,7 @@ func getVerificationMethodsForUpdateDID(existingVMs []*types.VerificationMethod,
 	for _, vm := range existingVMs {
 		// Skip X25519KeyAgreementKey2020 or X25519KeyAgreementKey2020 because these
 		// are not allowed for Authentication and Assertion purposes
-		if ((vm.Type == types.X25519KeyAgreementKey2020) || (vm.Type == types.X25519KeyAgreementKeyEIP5630)) {
+		if (vm.Type == types.X25519KeyAgreementKey2020) || (vm.Type == types.X25519KeyAgreementKeyEIP5630) {
 			continue
 		}
 		existingVmMap[vm.Id] = vm
@@ -285,7 +290,7 @@ func getVerificationMethodsForUpdateDID(existingVMs []*types.VerificationMethod,
 		// Check if VM is present in existing VM map.
 		// If it's not present, the VM is being added to existing Did Document.
 		// Add the VM to "required" group
-		if _, present := existingVmMap[vm.Id]; !present && ((vm.Type != types.X25519KeyAgreementKey2020) && (vm.Type != types.X25519KeyAgreementKeyEIP5630))  {
+		if _, present := existingVmMap[vm.Id]; !present && ((vm.Type != types.X25519KeyAgreementKey2020) && (vm.Type != types.X25519KeyAgreementKeyEIP5630)) {
 			updatedVms = append(
 				updatedVms,
 				vm,
@@ -315,7 +320,7 @@ func processBlockchainAccountIdForUpdateDID(k msgServer, ctx sdk.Context, existi
 		// Add the VM to "required" group
 		if _, present := existingVmMap[vm.Id]; !present {
 			if vm.BlockchainAccountId != "" {
-				if didIdBytes := k.GetBlockchainAddressFromStore(&ctx, vm.BlockchainAccountId); len(didIdBytes) != 0 {
+				if didIdBytes := k.getBlockchainAddressFromStore(&ctx, vm.BlockchainAccountId); len(didIdBytes) != 0 {
 					return nil, nil, fmt.Errorf(
 						"blockchainAccountId %v of verification method %v is already part of DID Document %v",
 						vm.BlockchainAccountId,

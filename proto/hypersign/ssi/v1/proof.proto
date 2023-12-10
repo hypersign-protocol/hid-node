@@ -1,0 +1,15 @@
+syntax = "proto3";
+package hypersign.ssi.v1;
+
+option go_package = "github.com/hypersign-protocol/hid-node/x/ssi/types";
+
+import "hypersign/ssi/v1/client_spec.proto";
+
+message DocumentProof {
+    string type = 1;
+    string created = 2;
+    string verificationMethod = 3;
+    string proofPurpose = 4;
+    string proofValue = 5;
+    ClientSpecType clientSpecType = 6; 
+}

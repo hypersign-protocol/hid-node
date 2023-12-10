@@ -1,0 +1,121 @@
+syntax = "proto3";
+package hypersign.ssi.v1;
+
+import "google/api/annotations.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
+import "hypersign/ssi/v1/credential_schema.proto";
+import "hypersign/ssi/v1/did.proto";
+import "cosmos/base/v1beta1/coin.proto";
+import "hypersign/ssi/v1/credential_status.proto";
+
+option go_package = "github.com/hypersign-protocol/hid-node/x/ssi/types";
+
+// Query defines the gRPC querier service.
+service Query {
+  // Get the Schema Document for a specified schema id
+	rpc CredentialSchemaByID(QueryCredentialSchemaRequest) returns (QueryCredentialSchemaResponse) {
+		option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/schema/{schemaId}";
+	}
+
+  // Get the count and list of registered Schemas
+	rpc CredentialSchemas(QueryCredentialSchemasRequest) returns (QueryCredentialSchemasResponse) {
+		option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/schema";
+	}
+
+  // Get the Did Document for a specified DID id
+	rpc DidDocumentByID(QueryDidDocumentRequest) returns (QueryDidDocumentResponse) {
+		option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/did/{didId}";
+	}
+
+  // Get the count and list of registered Did Documents
+  rpc DidDocuments(QueryDidDocumentsRequest) returns (QueryDidDocumentsResponse) {
+    option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/did";
+  }
+
+  // Get the Credential Status for a given credential id
+  rpc CredentialStatusByID(QueryCredentialStatusRequest) returns (QueryCredentialStatusResponse) {
+    option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/credential/{credId}";
+  }
+
+  // Get all the registed Credential Statuses
+  rpc CredentialStatuses(QueryCredentialStatusesRequest) returns (QueryCredentialStatusesResponse) {
+    option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/credential";
+  }
+
+  // Get the list of fixed fees for every x/ssi module transactions
+  rpc QuerySSIFee(QuerySSIFeeRequest) returns (QuerySSIFeeResponse) {
+    option (google.api.http).get = "/hypersign-protocol/hidnode/ssi/fixedfee";
+ }
+}
+
+// Fixed SSI Fee 
+
+message QuerySSIFeeRequest {}
+
+message QuerySSIFeeResponse {
+    cosmos.base.v1beta1.Coin register_did_fee = 1;
+    cosmos.base.v1beta1.Coin update_did_fee = 2;
+    cosmos.base.v1beta1.Coin deactivate_did_fee = 3;
+    cosmos.base.v1beta1.Coin register_credential_schema_fee = 4;
+    cosmos.base.v1beta1.Coin update_credential_schema_fee = 5;
+    cosmos.base.v1beta1.Coin register_credential_status_fee = 6;
+    cosmos.base.v1beta1.Coin update_credential_status_fee = 7;
+}
+
+// Credential Schema Messages
+
+message QueryCredentialSchemaRequest {
+  string schemaId = 1;
+}
+
+message QueryCredentialSchemaResponse {
+  repeated CredentialSchemaState credentialSchemas = 1;
+}
+
+message QueryCredentialSchemasRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryCredentialSchemasResponse {
+  uint64 count = 1;
+  repeated CredentialSchemaState credentialSchemas = 2;
+}
+
+// Credential Status Messages
+
+message QueryCredentialStatusRequest {
+  string credId = 1;
+}
+
+message QueryCredentialStatusResponse {
+  CredentialStatusState credentialStatus = 1;
+}
+
+message QueryCredentialStatusesRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryCredentialStatusesResponse {
+  uint64 count = 1;
+  repeated CredentialStatusState credentialStatuses = 2;
+}
+
+// Did Document Messages
+
+message QueryDidDocumentRequest {
+  string didId = 1;
+}
+
+message QueryDidDocumentResponse {
+  DidDocument didDocument = 1;
+  DidDocumentMetadata didDocumentMetadata = 2;
+}
+
+message QueryDidDocumentsRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryDidDocumentsResponse {
+  uint64 count = 1;
+  repeated DidDocumentState didDocuments = 2;
+}

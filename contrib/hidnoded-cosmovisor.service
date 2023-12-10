@@ -1,5 +1,5 @@
 [Unit]
-Description=Hypersign Identity Network - Jagrat Chain
+Description=Hypersign Identity Network
 Requires=network-online.target
 After=network-online.target
 
@@ -10,7 +10,6 @@ User=ubuntu
 Type=simple
 Restart=on-failure
 RestartSec=3
-MemoryDenyWriteExecute=yes
 LimitNOFILE=65535
 ExecStart=cosmovisor run start
 
