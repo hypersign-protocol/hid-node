@@ -26,15 +26,21 @@ func RegisterOpenAPIService(appName string, rtr *mux.Router) {
 
 // handler returns an http handler that servers OpenAPI console for an OpenAPI spec at specURL.
 func handler(title string) http.HandlerFunc {
-	t, _ := httptemplate.ParseFS(template, indexFile)
+	t, err := httptemplate.ParseFS(template, indexFile)
+	if err != nil {
+		panic(err)
+	}
 
 	return func(w http.ResponseWriter, req *http.Request) {
-		t.Execute(w, struct {
+		err := t.Execute(w, struct {
 			Title string
 			URL   string
 		}{
 			title,
 			apiFile,
 		})
+		if err != nil {
+			panic(err)
+		}
 	}
 }
