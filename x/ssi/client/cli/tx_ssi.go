@@ -110,7 +110,7 @@ func CmdRegisterDID() *cobra.Command {
 					return fmt.Errorf("unsupported keyring backend for DID Document Alias Signing: %v", keyringBackend)
 				}
 
-				kr, err := keyring.New("hid-node-app", keyringBackend, didAliasConfig.HidNodeConfigDir, nil)
+				kr, err := keyring.New("hid-node-app", keyringBackend, didAliasConfig.HidNodeConfigDir, nil, nil)
 				if err != nil {
 					return err
 				}

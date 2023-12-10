@@ -108,7 +108,7 @@ func showDidByAliasCmd() *cobra.Command {
 		Use:     "show-did-by-alias [alias-name]",
 		Args:    cobra.ExactArgs(1),
 		Example: exampleString,
-		Short:   "Retrieve the Did Document by a alias name",
+		Short:   "Retrieve the Did Document by an alias name",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			didAliasConfig, err := types.GetDidAliasConfig(cmd)
 			if err != nil {
@@ -189,7 +189,7 @@ func generateDidCmd() *cobra.Command {
 
 			switch keyringBackend {
 			case "test":
-				kr, err = keyring.New(appName, "test", didAliasConfig.HidNodeConfigDir, nil)
+				kr, err = keyring.New(appName, "test", didAliasConfig.HidNodeConfigDir, nil, nil)
 				if err != nil {
 					return err
 				}
@@ -198,10 +198,7 @@ func generateDidCmd() *cobra.Command {
 			}
 
 			// Handle both key name as well as key address
-			var userKeyInfo keyring.Info
-			var errAccountFetch error
-
-			userKeyInfo, errAccountFetch = kr.Key(account)
+			userKeyInfo, errAccountFetch := kr.Key(account)
 			if errAccountFetch != nil {
 				if accountAddr, err := sdk.AccAddressFromBech32(account); err != nil {
 					return err
@@ -213,14 +210,21 @@ func generateDidCmd() *cobra.Command {
 				}
 			}
 
-			pubKeyBytes := userKeyInfo.GetPubKey().Bytes()
-			pubKeyMultibase, err := multibase.Encode(multibase.Base58BTC, pubKeyBytes)
+			pubKey, err := userKeyInfo.GetPubKey()
+			if err != nil {
+				return err
+			}
+			pubKeyMultibase, err := multibase.Encode(multibase.Base58BTC, pubKey.Bytes())
+			if err != nil {
+				return err
+			}
+			userKeyInfoAddress, err := userKeyInfo.GetAddress()
 			if err != nil {
 				return err
 			}
 			userBlockchainAddress := sdk.MustBech32ifyAddressBytes(
-				app.AccountAddressPrefix,
-				userKeyInfo.GetAddress().Bytes(),
+				app.Bech32Prefix,
+				userKeyInfoAddress.Bytes(),
 			)
 
 			// Generate a DID document with both publicKeyMultibase and blockchainAccountId

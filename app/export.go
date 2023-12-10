@@ -2,9 +2,10 @@ package app
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -15,10 +16,7 @@ import (
 
 // ExportAppStateAndValidators exports the state of the application for a genesis
 // file.
-func (app *HidnodeApp) ExportAppStateAndValidators(
-	forZeroHeight bool, jailAllowedAddrs []string,
-) (servertypes.ExportedApp, error) {
-
+func (app *App) ExportAppStateAndValidators(forZeroHeight bool, jailAllowedAddrs, modulesToExport []string) (servertypes.ExportedApp, error) {
 	// as if they could withdraw from the start of the next block
 	ctx := app.NewContext(true, tmproto.Header{Height: app.LastBlockHeight()})
 
@@ -30,29 +28,26 @@ func (app *HidnodeApp) ExportAppStateAndValidators(
 		app.prepForZeroHeightGenesis(ctx, jailAllowedAddrs)
 	}
 
-	genState := app.mm.ExportGenesis(ctx, app.appCodec)
+	genState := app.mm.ExportGenesisForModules(ctx, app.appCodec, modulesToExport)
 	appState, err := json.MarshalIndent(genState, "", "  ")
 	if err != nil {
 		return servertypes.ExportedApp{}, err
 	}
 
 	validators, err := staking.WriteValidators(ctx, app.StakingKeeper)
-	if err != nil {
-		return servertypes.ExportedApp{}, err
-	}
 	return servertypes.ExportedApp{
 		AppState:        appState,
 		Validators:      validators,
 		Height:          height,
 		ConsensusParams: app.BaseApp.GetConsensusParams(ctx),
-	}, nil
+	}, err
 }
 
 // prepare for fresh start at zero height
 // NOTE zero height genesis is a temporary feature which will be deprecated
 //
-//	in favour of export at a block height
-func (app *HidnodeApp) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs []string) {
+//	in favor of export at a block height
+func (app *App) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs []string) {
 	applyAllowedAddrs := false
 
 	// check if there is a allowed address list
@@ -77,18 +72,21 @@ func (app *HidnodeApp) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddr
 
 	// withdraw all validator commission
 	app.StakingKeeper.IterateValidators(ctx, func(_ int64, val stakingtypes.ValidatorI) (stop bool) {
-		_, err := app.DistrKeeper.WithdrawValidatorCommission(ctx, val.GetOperator())
-		if err != nil {
-			panic(err)
-		}
+		_, _ = app.DistrKeeper.WithdrawValidatorCommission(ctx, val.GetOperator())
 		return false
 	})
 
 	// withdraw all delegator rewards
 	dels := app.StakingKeeper.GetAllDelegations(ctx)
 	for _, delegation := range dels {
-		_, err := app.DistrKeeper.WithdrawDelegationRewards(ctx, delegation.GetDelegatorAddr(), delegation.GetValidatorAddr())
+		valAddr, err := sdk.ValAddressFromBech32(delegation.ValidatorAddress)
 		if err != nil {
+			panic(err)
+		}
+
+		delAddr := sdk.MustAccAddressFromBech32(delegation.DelegatorAddress)
+
+		if _, err = app.DistrKeeper.WithdrawDelegationRewards(ctx, delAddr, valAddr); err != nil {
 			panic(err)
 		}
 	}
@@ -111,14 +109,29 @@ func (app *HidnodeApp) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddr
 		feePool.CommunityPool = feePool.CommunityPool.Add(scraps...)
 		app.DistrKeeper.SetFeePool(ctx, feePool)
 
-		app.DistrKeeper.Hooks().AfterValidatorCreated(ctx, val.GetOperator())
+		if err := app.DistrKeeper.Hooks().AfterValidatorCreated(ctx, val.GetOperator()); err != nil {
+			panic(err)
+		}
 		return false
 	})
 
 	// reinitialize all delegations
 	for _, del := range dels {
-		app.DistrKeeper.Hooks().BeforeDelegationCreated(ctx, del.GetDelegatorAddr(), del.GetValidatorAddr())
-		app.DistrKeeper.Hooks().AfterDelegationModified(ctx, del.GetDelegatorAddr(), del.GetValidatorAddr())
+		valAddr, err := sdk.ValAddressFromBech32(del.ValidatorAddress)
+		if err != nil {
+			panic(err)
+		}
+		delAddr := sdk.MustAccAddressFromBech32(del.DelegatorAddress)
+
+		if err := app.DistrKeeper.Hooks().BeforeDelegationCreated(ctx, delAddr, valAddr); err != nil {
+			// never called as BeforeDelegationCreated always returns nil
+			panic(fmt.Errorf("error while incrementing period: %w", err))
+		}
+
+		if err := app.DistrKeeper.Hooks().AfterDelegationModified(ctx, delAddr, valAddr); err != nil {
+			// never called as AfterDelegationModified always returns nil
+			panic(fmt.Errorf("error while creating a new delegation period record: %w", err))
+		}
 	}
 
 	// reset context height
@@ -146,14 +159,12 @@ func (app *HidnodeApp) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddr
 
 	// Iterate through validators by power descending, reset bond heights, and
 	// update bond intra-tx counters.
-	store := ctx.KVStore(app.keys[stakingtypes.StoreKey])
+	store := ctx.KVStore(app.GetKey(stakingtypes.StoreKey))
 	iter := sdk.KVStoreReversePrefixIterator(store, stakingtypes.ValidatorsKey)
 	counter := int16(0)
 
-	defer iter.Close()
-
 	for ; iter.Valid(); iter.Next() {
-		addr := sdk.ValAddress(iter.Key()[1:])
+		addr := sdk.ValAddress(stakingtypes.AddressFromValidatorsKey(iter.Key()))
 		validator, found := app.StakingKeeper.GetValidator(ctx, addr)
 		if !found {
 			panic("expected validator, not found")
@@ -168,8 +179,14 @@ func (app *HidnodeApp) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddr
 		counter++
 	}
 
-	if _, err := app.StakingKeeper.ApplyAndReturnValidatorSetUpdates(ctx); err != nil {
-		panic(err)
+	if err := iter.Close(); err != nil {
+		app.Logger().Error("error while closing the key-value store reverse prefix iterator: ", err)
+		return
+	}
+
+	_, err := app.StakingKeeper.ApplyAndReturnValidatorSetUpdates(ctx)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	/* Handle slashing state. */
