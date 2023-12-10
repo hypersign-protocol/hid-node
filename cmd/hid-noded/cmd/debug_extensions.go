@@ -10,6 +10,7 @@ import (
 	"fmt"
 
 	"github.com/btcsuite/btcutil/base58"
+	secp256k1 "github.com/cometbft/cometbft/crypto/secp256k1"
 	"github.com/cosmos/cosmos-sdk/client"
 	ethercrypto "github.com/ethereum/go-ethereum/crypto"
 	bbs "github.com/hyperledger/aries-framework-go/component/kmscrypto/crypto/primitive/bbs12381g2pub"
@@ -17,7 +18,6 @@ import (
 	"github.com/iden3/go-iden3-crypto/babyjub"
 	"github.com/multiformats/go-multibase"
 	"github.com/spf13/cobra"
-	secp256k1 "github.com/tendermint/tendermint/crypto/secp256k1"
 )
 
 func extendDebug(debugCmd *cobra.Command) *cobra.Command {
@@ -34,7 +34,7 @@ func extendDebug(debugCmd *cobra.Command) *cobra.Command {
 func bjjCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "bjj",
-		Short: "BabyJubJub debug commonds",
+		Short: "BabyJubJub commonds",
 	}
 
 	cmd.AddCommand(bjjRandomCmd())
@@ -45,7 +45,7 @@ func bjjCmd() *cobra.Command {
 func bbsCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "bbs",
-		Short: "bbs debug commands",
+		Short: "bbs commands",
 	}
 
 	cmd.AddCommand(
@@ -58,7 +58,7 @@ func bbsCmd() *cobra.Command {
 func secp256k1Cmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "secp256k1",
-		Short: "secp256k1 debug commands",
+		Short: "secp256k1 commands",
 	}
 
 	cmd.AddCommand(
@@ -274,7 +274,7 @@ func secp256k1EthRandomCmd() *cobra.Command {
 func ed25519Cmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "ed25519",
-		Short: "ed25519 debug commands",
+		Short: "ed25519 commands",
 	}
 
 	cmd.AddCommand(

@@ -12,14 +12,13 @@ GOOS = $(shell go env GOOS)
 GOARCH = $(shell go env GOARCH)
 
 SDK_VERSION := $(shell go list -m github.com/cosmos/cosmos-sdk | sed 's:.* ::')
-TM_VERSION := $(shell go list -m github.com/tendermint/tendermint | sed 's:.* ::')
+BFT_VERSION := $(shell go list -m github.com/cometbft/cometbft | sed 's:.* ::')
 
 ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=hid-node \
 	-X github.com/cosmos/cosmos-sdk/version.AppName=hid-node \
 	-X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
 	-X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
-	-X github.com/tendermint/tendermint/version.TMCoreSemVer=$(TM_VERSION) \
-	-X github.com/hypersign-protocol/hid-node/app.ProposalsEnabled=true # enable x/wasm based proposals
+	-X github.com/cometbft/cometbft/version.TMCoreSemVer=$(BFT_VERSION)
 
 BUILD_FLAGS := -ldflags '$(ldflags)'
 
@@ -33,8 +32,8 @@ export GO111MODULE=on
 all: proto-gen-go proto-gen-swagger build
 
 go-version-check:
-ifneq ($(GO_MINOR_VERSION),20)
-	@echo "ERROR: Go version 1.20 is required to build hid-noded binary"
+ifneq ($(GO_MINOR_VERSION),21)
+	@echo "ERROR: Go version 1.21 is required to build hid-noded binary"
 	exit 1
 endif
 
@@ -42,7 +41,7 @@ go.sum: go.mod
 		@echo "--> Ensure dependencies have not been modified"
 		@go mod verify
 
-install: go-version-check go.sum
+install: go.sum go-version-check
 	go install -mod=readonly $(BUILD_FLAGS) $(HIDNODE_CMD_DIR)	
 
 build: go-version-check
@@ -58,7 +57,7 @@ proto-gen-go:
 
 proto-gen-swagger:
 	@echo "Generating swagger docs"
-	./scripts/protoc-swagger-gen.sh
+	./scripts/protocgen-swagger.sh
 
 proto-gen-ts:
 	@echo "Generating typescript code from protobuf"

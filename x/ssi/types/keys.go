@@ -35,7 +35,7 @@ const (
 // Fixed Fee Param Keys
 
 var (
-	ParamStoreKeyRegisterDidFee              = []byte("CreateDidFee")
+	ParamStoreKeyRegisterDidFee              = []byte("RegisterDidFee")
 	ParamStoreKeyUpdateDidFee                = []byte("UpdateDidFee")
 	ParamStoreKeyDeactivateDidFee            = []byte("DeactivateDidFee")
 	ParamStoreKeyRegisterCredentialSchemaFee = []byte("RegisterCredentialSchemaFee")

@@ -3,9 +3,9 @@ package keeper
 import (
 	"context"
 
+	"cosmossdk.io/errors"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/query"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 	"google.golang.org/grpc/codes"
@@ -23,7 +23,7 @@ func (k Keeper) CredentialStatusByID(
 
 	cred, err := k.getCredentialStatusFromState(&ctx, req.CredId)
 	if err != nil {
-		return nil, sdkerrors.Wrap(types.ErrCredentialStatusNotFound, err.Error())
+		return nil, errors.Wrap(types.ErrCredentialStatusNotFound, err.Error())
 	}
 
 	return &types.QueryCredentialStatusResponse{CredentialStatus: cred}, nil

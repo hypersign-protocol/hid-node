@@ -1,6 +1,7 @@
 package types
 
 import (
+	"cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
@@ -33,7 +34,7 @@ func (msg *MsgUpdateCredentialStatus) GetSignBytes() []byte {
 func (msg *MsgUpdateCredentialStatus) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.TxAuthor)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid transaction author's address (%s)", err)
+		return errors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid transaction author's address (%s)", err)
 	}
 	return nil
 }
@@ -84,7 +85,7 @@ func (msg *CredentialStatusDocument) GetSignBytes() []byte {
 func (msg *MsgRegisterCredentialStatus) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.TxAuthor)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid transaction author's address (%s)", err)
+		return errors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid transaction author's address (%s)", err)
 	}
 	return nil
 }

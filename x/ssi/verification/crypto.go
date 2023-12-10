@@ -9,7 +9,7 @@ import (
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 	"github.com/multiformats/go-multibase"
 
-	secp256k1 "github.com/tendermint/tendermint/crypto/secp256k1"
+	secp256k1 "github.com/cometbft/cometbft/crypto/secp256k1"
 
 	// Ethereum based libraries
 	etheraccounts "github.com/ethereum/go-ethereum/accounts"

@@ -1,31 +1,31 @@
-#!/usr/bin/env bash
+#!/bin/bash
+
 set -eux pipefail
 
-# Get the path of the cosmos-sdk repo from go/pkg/mod
-cosmos_sdk_dir=$(go list -f '{{ .Dir }}' -m github.com/cosmos/cosmos-sdk)
-proto_dirs=$(find ./proto -path -prune -o -name '*.proto' -print0 | xargs -0 -n1 dirname | sort | uniq)
-proto_dirs=${proto_dirs/\.\/proto\/ssi\/client} # exclude proto/ssi/client from generating Go files as they are meant for external clients
+# Get protoc-gen-gocosmos
 
-for dir in $proto_dirs; do
-  # generate protobuf bind
-  protoc \
-  -I "proto" \
-  -I "third_party/proto" \
-  -I "$cosmos_sdk_dir/third_party/proto" \
-  -I "$cosmos_sdk_dir/proto" \
-  --gocosmos_out=plugins=interfacetype+grpc,\
-Mgoogle/protobuf/any.proto=github.com/cosmos/cosmos-sdk/codec/types:. \
-  $(find "${dir}" -name '*.proto')
+echo "Generating gogo proto code"
+cd proto
 
-  # generate grpc gateway
-  protoc \
-  -I "proto" \
-  -I "third_party/proto" \
-  -I "$cosmos_sdk_dir/third_party/proto" \
-  -I "$cosmos_sdk_dir/proto" \
-  --grpc-gateway_out=logtostderr=true,allow_colon_final_segments=true:. \
-  $(find "${dir}" -maxdepth 1 -name '*.proto')
+# Find all proto files
+proto_dirs=$(find ./hypersign -type f -path '*/client/*' -o -name '*.proto' -print0 | xargs -0 -n1 dirname | sort | uniq)
+
+echo $proto_dirs
+
+for proto_dir in $proto_dirs; do
+  proto_files=$(find "${proto_dir}" -maxdepth 1 -name '*.proto')
+  for f in $proto_files; do
+    if grep -q "option go_package" "$f"; then
+      buf generate --template buf.gen.gogo.yaml "$f"
+    fi
+  done
 done
 
-cp -r ./github.com/hypersign-protocol/hid-node/* ./
-rm -rf ./github.com
+# move proto files to the right places
+cd ..
+ls
+
+cp -r github.com/hypersign-protocol/hid-node/* ./
+rm -rf github.com
+
+go mod tidy

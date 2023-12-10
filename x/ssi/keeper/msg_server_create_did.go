@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 	"github.com/hypersign-protocol/hid-node/x/ssi/utils"
 	"github.com/hypersign-protocol/hid-node/x/ssi/verification"
@@ -22,23 +22,23 @@ func (k msgServer) RegisterDID(goCtx context.Context, msg *types.MsgRegisterDID)
 
 	// Validate DID Document
 	if err := msgDidDocument.ValidateDidDocument(); err != nil {
-		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, err.Error())
+		return nil, errors.Wrap(types.ErrInvalidDidDoc, err.Error())
 	}
 
 	// Validate namespace in DID Document
 	chainNamespace := k.GetChainNamespace(&ctx)
 	if err := types.DidChainNamespaceValidation(msgDidDocument, chainNamespace); err != nil {
-		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, err.Error())
+		return nil, errors.Wrap(types.ErrInvalidDidDoc, err.Error())
 	}
 
 	// Validate ownership of method specific id
 	if err := checkMethodSpecificIdOwnership(msgDidDocument.VerificationMethod, msgDidDocument.Id); err != nil {
-		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, err.Error())
+		return nil, errors.Wrap(types.ErrInvalidDidDoc, err.Error())
 	}
 
 	// Checks if the Did Document is already registered
 	if k.hasDidDocument(ctx, msgDidDocument.Id) {
-		return nil, sdkerrors.Wrap(types.ErrDidDocExists, msgDidDocument.Id)
+		return nil, errors.Wrap(types.ErrDidDocExists, msgDidDocument.Id)
 	}
 
 	// Validate Document Proofs
@@ -52,7 +52,7 @@ func (k msgServer) RegisterDID(goCtx context.Context, msg *types.MsgRegisterDID)
 	for _, vm := range msgDidDocument.VerificationMethod {
 		if vm.BlockchainAccountId != "" {
 			if existingDidDocId := k.getBlockchainAddressFromStore(&ctx, vm.BlockchainAccountId); len(existingDidDocId) != 0 {
-				return nil, sdkerrors.Wrapf(
+				return nil, errors.Wrapf(
 					types.ErrInvalidDidDoc,
 					"blockchainAccountId %v of verification method %v is already part of DID Document %v",
 					vm.BlockchainAccountId,
@@ -67,13 +67,13 @@ func (k msgServer) RegisterDID(goCtx context.Context, msg *types.MsgRegisterDID)
 	controllerList := getControllersForCreateDID(msgDidDocument)
 
 	if err := k.checkControllerPresenceInState(ctx, controllerList, msgDidDocument.Id); err != nil {
-		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, err.Error())
+		return nil, errors.Wrap(types.ErrInvalidDidDoc, err.Error())
 	}
 
 	// Collect necessary Verification Methods which are needed to be valid
 	requiredVMs, err := getVerificationMethodsForCreateDID(msgDidDocument)
 	if err != nil {
-		return nil, sdkerrors.Wrap(types.ErrVerificationMethodNotFound, err.Error())
+		return nil, errors.Wrap(types.ErrVerificationMethodNotFound, err.Error())
 	}
 
 	// Associate Signatures
@@ -81,13 +81,13 @@ func (k msgServer) RegisterDID(goCtx context.Context, msg *types.MsgRegisterDID)
 
 	requiredVmMap, err := k.formMustControllerVmListMap(ctx, controllerList, requiredVMs, signMap)
 	if err != nil {
-		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, err.Error())
+		return nil, errors.Wrap(types.ErrInvalidDidDoc, err.Error())
 	}
 
 	// Verify Signatures
 	err = verification.VerifySignatureOfEveryController(msgDidDocument, requiredVmMap)
 	if err != nil {
-		return nil, sdkerrors.Wrapf(types.ErrInvalidSignature, err.Error())
+		return nil, errors.Wrapf(types.ErrInvalidSignature, err.Error())
 	}
 
 	// Formt DID Document Metadata

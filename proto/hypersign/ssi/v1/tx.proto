@@ -3,10 +3,10 @@ package hypersign.ssi.v1;
 
 option go_package = "github.com/hypersign-protocol/hid-node/x/ssi/types";
 
-import "ssi/v1/credential_schema.proto";
-import "ssi/v1/did.proto";
-import "ssi/v1/credential_status.proto";
-import "ssi/v1/proof.proto";
+import "hypersign/ssi/v1/credential_schema.proto";
+import "hypersign/ssi/v1/did.proto";
+import "hypersign/ssi/v1/credential_status.proto";
+import "hypersign/ssi/v1/proof.proto";
 
 service Msg {
   rpc RegisterDID(MsgRegisterDID) returns (MsgRegisterDIDResponse);

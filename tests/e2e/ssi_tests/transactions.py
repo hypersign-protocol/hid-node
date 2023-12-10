@@ -1,21 +1,22 @@
 import os
 import sys
-
+import time
 sys.path.insert(1, os.getcwd())
 from utils import run_command
 
 import json
-from utils import run_command, get_document_signature
+from utils import run_command, get_document_signature, get_sequence
 
-COMMON_CREATE_DID_TX_COMMAND_FLAGS = "--chain-id hidnode --output json --broadcast-mode block --fees 4000uhid  --keyring-backend test --yes"
-COMMON_UPDATE_DID_TX_COMMAND_FLAGS = "--chain-id hidnode --output json --broadcast-mode block --fees 1000uhid  --keyring-backend test --yes"
-COMMON_DEACTIVATE_DID_COMMAND_FLAGS = "--chain-id hidnode --output json --broadcast-mode block --fees 1000uhid  --keyring-backend test --yes"
-COMMON_CREATE_SCHEMA_COMMAND_FLAGS = "--chain-id hidnode --output json --broadcast-mode block --fees 2000uhid  --keyring-backend test --yes"
-COMMON_UPDATE_SCHEMA_COMMAND_FLAGS = "--chain-id hidnode --output json --broadcast-mode block --fees 2000uhid  --keyring-backend test --yes"
-COMMON_REGISTER_CREDENTIAL_STATUS_COMMAND_FLAGS = "--chain-id hidnode --output json --broadcast-mode block --fees 2000uhid  --keyring-backend test --yes"
-COMMON_UPDATE_CREDENTIAL_STATUS_COMMAND_FLAGS = "--chain-id hidnode --output json --broadcast-mode block --fees 2000uhid  --keyring-backend test --yes"
+COMMON_CREATE_DID_TX_COMMAND_FLAGS = "--chain-id hidnode --output json --broadcast-mode sync --fees 4000uhid  --keyring-backend test --yes" + " --sequence " + get_sequence()
+COMMON_UPDATE_DID_TX_COMMAND_FLAGS = "--chain-id hidnode --output json --broadcast-mode sync --fees 1000uhid  --keyring-backend test --yes" + " --sequence " + get_sequence()
+COMMON_DEACTIVATE_DID_COMMAND_FLAGS = "--chain-id hidnode --output json --broadcast-mode sync --fees 1000uhid  --keyring-backend test --yes" + " --sequence " + get_sequence()
+COMMON_CREATE_SCHEMA_COMMAND_FLAGS = "--chain-id hidnode --output json --broadcast-mode sync --fees 2000uhid  --keyring-backend test --yes" + " --sequence " + get_sequence()
+COMMON_UPDATE_SCHEMA_COMMAND_FLAGS = "--chain-id hidnode --output json --broadcast-mode sync --fees 2000uhid  --keyring-backend test --yes" + " --sequence " + get_sequence()
+COMMON_REGISTER_CREDENTIAL_STATUS_COMMAND_FLAGS = "--chain-id hidnode --output json --broadcast-mode sync --fees 2000uhid  --keyring-backend test --yes" + " --sequence " + get_sequence()
+COMMON_UPDATE_CREDENTIAL_STATUS_COMMAND_FLAGS = "--chain-id hidnode --output json --broadcast-mode sync --fees 2000uhid  --keyring-backend test --yes" + " --sequence " + get_sequence()
 
 def form_did_create_tx_multisig(diddoc, signPairs, blockchain_account):
+    time.sleep(5)
     proofsStr = ""
     
     for signPair in signPairs:

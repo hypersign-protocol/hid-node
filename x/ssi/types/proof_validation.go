@@ -3,7 +3,7 @@ package types
 import (
 	"time"
 
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"cosmossdk.io/errors"
 	"github.com/hypersign-protocol/hid-node/x/ssi/utils"
 )
 
@@ -50,5 +50,5 @@ func (proof *DocumentProof) Validate() error {
 }
 
 func invalidProofErrorMsg(errMsg string, errMsgArgs ...interface{}) error {
-	return sdkerrors.Wrapf(ErrInvalidProof, errMsg, errMsgArgs...)
+	return errors.Wrapf(ErrInvalidProof, errMsg, errMsgArgs...)
 }

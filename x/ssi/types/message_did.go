@@ -5,9 +5,10 @@ import (
 	"strings"
 	"time"
 
+	"cosmossdk.io/errors"
+	"github.com/cometbft/cometbft/crypto/tmhash"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/tendermint/tendermint/crypto/tmhash"
 )
 
 func (msg *DidDocument) GetSignBytes() []byte {
@@ -143,7 +144,7 @@ func (msg *MsgDeactivateDID) GetSignBytes() []byte {
 func (msg *MsgDeactivateDID) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.TxAuthor)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+		return errors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 	return nil
 }

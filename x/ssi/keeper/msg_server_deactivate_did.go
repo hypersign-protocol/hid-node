@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 	"github.com/hypersign-protocol/hid-node/x/ssi/verification"
@@ -22,7 +22,7 @@ func (k msgServer) DeactivateDID(goCtx context.Context, msg *types.MsgDeactivate
 
 	// Checks if the Did Document is already registered
 	if !k.hasDidDocument(ctx, msgDidId) {
-		return nil, sdkerrors.Wrap(types.ErrDidDocNotFound, msgDidId)
+		return nil, errors.Wrap(types.ErrDidDocNotFound, msgDidId)
 	}
 
 	// Validate Document Proofs
@@ -35,14 +35,14 @@ func (k msgServer) DeactivateDID(goCtx context.Context, msg *types.MsgDeactivate
 	// Get the DID Document from state
 	didDocumentState, err := k.getDidDocumentState(&ctx, msgDidId)
 	if err != nil {
-		return nil, sdkerrors.Wrap(types.ErrDidDocNotFound, err.Error())
+		return nil, errors.Wrap(types.ErrDidDocNotFound, err.Error())
 	}
 	didDocument := didDocumentState.DidDocument
 	didDocumentMetadata := didDocumentState.DidDocumentMetadata
 
 	// Check if Did Document is deactivated
 	if didDocumentMetadata.Deactivated {
-		return nil, sdkerrors.Wrapf(types.ErrDidDocDeactivated, "DID Document %s is already deactivated", msgDidId)
+		return nil, errors.Wrapf(types.ErrDidDocDeactivated, "DID Document %s is already deactivated", msgDidId)
 	}
 
 	// Check if the version id of existing Did Document matches with the current one
@@ -52,13 +52,13 @@ func (k msgServer) DeactivateDID(goCtx context.Context, msg *types.MsgDeactivate
 		errMsg := fmt.Sprintf(
 			"Expected %s with version %s. Got version %s",
 			didDocument.Id, existingDidDocVersionId, incomingDidDocVersionId)
-		return nil, sdkerrors.Wrap(types.ErrUnexpectedDidVersion, errMsg)
+		return nil, errors.Wrap(types.ErrUnexpectedDidVersion, errMsg)
 	}
 
 	// Gather controllers
 	controllers := getControllersForDeactivateDID(didDocument)
 	if err := k.checkControllerPresenceInState(ctx, controllers, didDocument.Id); err != nil {
-		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, err.Error())
+		return nil, errors.Wrap(types.ErrInvalidDidDoc, err.Error())
 	}
 
 	signMap := makeSignatureMap(msgDidDocumentProofs)
@@ -67,13 +67,13 @@ func (k msgServer) DeactivateDID(goCtx context.Context, msg *types.MsgDeactivate
 	controllerMap, err := k.formAnyControllerVmListMap(ctx, controllers,
 		didDocument.VerificationMethod, signMap)
 	if err != nil {
-		return nil, sdkerrors.Wrap(types.ErrInvalidDidDoc, err.Error())
+		return nil, errors.Wrap(types.ErrInvalidDidDoc, err.Error())
 	}
 
 	// Signature Verification
 	err = verification.VerifySignatureOfAnyController(didDocument, controllerMap)
 	if err != nil {
-		return nil, sdkerrors.Wrapf(types.ErrInvalidSignature, err.Error())
+		return nil, errors.Wrapf(types.ErrInvalidSignature, err.Error())
 	}
 
 	// Create updated metadata

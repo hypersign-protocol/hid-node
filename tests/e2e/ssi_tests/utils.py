@@ -14,6 +14,14 @@ def run_command(cmd_string):
     
     return cmd_output, cmd_run.returncode
 
+def get_sequence():
+    add_cmd = "hid-noded keys show node1 -a --keyring-backend test"
+    address, _ = run_command(add_cmd)
+    cmd_string = "hid-noded q auth account " + address + " --output json"
+    cs, _ = run_command(cmd_string)
+    cs_dict = json.loads(cs)
+    return cs_dict["sequence"]
+
 def run_blockchain_command(cmd_string: str, transaction_name: str = None, expect_failure: bool = False, stateless_err: bool = False):
     if not expect_failure:
         try:
@@ -48,15 +56,15 @@ def run_blockchain_command(cmd_string: str, transaction_name: str = None, expect
 def generate_key_pair(algo="Ed25519Signature2020"):
     cmd = ""
     if algo == "Ed25519Signature2020":
-        cmd = "hid-noded debug ed25519 random"
+        cmd = "hid-noded ssi-tools ed25519 random"
     elif algo == "EcdsaSecp256k1Signature2019":
-        cmd = "hid-noded debug secp256k1 random"
+        cmd = "hid-noded ssi-tools secp256k1 random"
     elif algo == "EcdsaSecp256k1RecoverySignature2020":
-        cmd = "hid-noded debug secp256k1 eth-hex-random"
+        cmd = "hid-noded ssi-tools secp256k1 eth-hex-random"
     elif algo == "BbsBlsSignature2020":
-        cmd = "hid-noded debug bbs random"
+        cmd = "hid-noded ssi-tools bbs random"
     elif algo == "BJJSignature2021":
-        cmd = "hid-noded debug bjj random"
+        cmd = "hid-noded ssi-tools bjj random"
     else:
         raise Exception(algo + " is not a supported signing algorithm")
     result_str, _ = run_command(cmd)
@@ -123,7 +131,7 @@ def get_document_signature(doc: dict, doc_type: str, key_pair: dict, algo: str =
     else:
         raise Exception("Invalid value for doc_type param: " + doc_type)
     
-    cmd_string = f"hid-noded debug sign-ssi-doc {doc_cmd} '{json.dumps(doc)}' {private_key} '{json.dumps(proofObj)}'"
+    cmd_string = f"hid-noded ssi-tools sign-ssi-doc {doc_cmd} '{json.dumps(doc)}' {private_key} '{json.dumps(proofObj)}'"
     signature, _ = run_command(cmd_string)
 
     if signature == "":
@@ -131,6 +139,6 @@ def get_document_signature(doc: dict, doc_type: str, key_pair: dict, algo: str =
     return signature
 
 def secp256k1_pubkey_to_address(pub_key, prefix):
-    cmd_string = f"hid-noded debug secp256k1 bech32-addr {pub_key} {prefix}"
+    cmd_string = f"hid-noded ssi-tools secp256k1 bech32-addr {pub_key} {prefix}"
     addr, _ = run_command(cmd_string)
     return addr
