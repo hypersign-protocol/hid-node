@@ -21,6 +21,7 @@ const fromFlag = "from"
 const didAliasFlag = "did-alias"
 const keyringBackendFlag = "keyring-backend"
 const didNamespaceFlag = "did-namespace"
+const seperateAccFlag = "seperate-acc"
 
 func generateSSICmd() *cobra.Command {
 	cmd := &cobra.Command{
@@ -150,12 +151,23 @@ func generateDidCmd() *cobra.Command {
 		Example: exampleString1 + "\n" + exampleString2 + "\n" + exampleString3,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			// Get the flags
-			account, err := cmd.Flags().GetString(fromFlag)
+			var userAccount string
+			userAccount, err := cmd.Flags().GetString(fromFlag)
 			if err != nil {
 				return err
 			}
-			if account == "" {
-				return fmt.Errorf("no value provided for --from flag")
+
+			if userAccount == "" {
+				account, err := cmd.Flags().GetString(seperateAccFlag)
+				if err != nil {
+					return err
+				}
+
+				if account == "" {
+					return fmt.Errorf("no value provided for --from flag")
+				} else {
+					userAccount = account
+				}
 			}
 
 			didAlias, err := cmd.Flags().GetString(didAliasFlag)
@@ -189,7 +201,7 @@ func generateDidCmd() *cobra.Command {
 
 			switch keyringBackend {
 			case "test":
-				kr, err = keyring.New(appName, "test", didAliasConfig.HidNodeConfigDir, nil, nil)
+				kr, err = keyring.New(appName, "test", didAliasConfig.HidNodeConfigDir, nil, app.MakeEncodingConfig().Codec)
 				if err != nil {
 					return err
 				}
@@ -198,9 +210,9 @@ func generateDidCmd() *cobra.Command {
 			}
 
 			// Handle both key name as well as key address
-			userKeyInfo, errAccountFetch := kr.Key(account)
+			userKeyInfo, errAccountFetch := kr.Key(userAccount)
 			if errAccountFetch != nil {
-				if accountAddr, err := sdk.AccAddressFromBech32(account); err != nil {
+				if accountAddr, err := sdk.AccAddressFromBech32(userAccount); err != nil {
 					return err
 				} else {
 					userKeyInfo, errAccountFetch = kr.KeyByAddress(accountAddr)
@@ -223,7 +235,8 @@ func generateDidCmd() *cobra.Command {
 				return err
 			}
 			userBlockchainAddress := sdk.MustBech32ifyAddressBytes(
-				app.Bech32Prefix,
+				// REVERT
+				"osmo",
 				userKeyInfoAddress.Bytes(),
 			)
 
@@ -261,5 +274,6 @@ func generateDidCmd() *cobra.Command {
 	cmd.Flags().String(didAliasFlag, "", "alias of the generated DID Document which can be referred to while registering on-chain")
 	cmd.Flags().String(keyringBackendFlag, "", "supported keyring backend: (test)")
 	cmd.Flags().String(didNamespaceFlag, "", "namespace of DID Document Id")
+	cmd.Flags().String(seperateAccFlag, "", "optional flag to be removed later")
 	return cmd
 }

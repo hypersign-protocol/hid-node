@@ -124,6 +124,7 @@ import (
 	"github.com/hypersign-protocol/hid-node/x/ssi"
 	ssikeeper "github.com/hypersign-protocol/hid-node/x/ssi/keeper"
 	ssitypes "github.com/hypersign-protocol/hid-node/x/ssi/types"
+	wasmbinding "github.com/hypersign-protocol/hid-node/wasmbinding"
 )
 
 const appName = "HypersignApp"
@@ -543,6 +544,9 @@ func NewHypersignApp(
 	// The last arguments can contain custom message handlers, and custom query handlers,
 	// if we want to allow any custom callbacks
 	availableCapabilities := strings.Join(wasmapp.AllCapabilities(), ",")
+	// Add Custom Query Plugin
+	wasmOpts = append(wasmbinding.RegisterCustomPlugins(&app.SsiKeeper), wasmOpts...)
+	
 	app.WasmKeeper = wasmkeeper.NewKeeper(
 		appCodec,
 		keys[wasmtypes.StoreKey],

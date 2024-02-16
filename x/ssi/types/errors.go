@@ -27,4 +27,5 @@ var (
 	ErrInvalidCredentialStatusID       = errors.Register(ModuleName, 117, "invalid credential status Id")
 	ErrInvalidProof                    = errors.Register(ModuleName, 118, "invalid document proof")
 	ErrInvalidCredentialSchema         = errors.Register(ModuleName, 119, "invalid credential schema")
+	ErrUnsupportedWasmRequest          = errors.Register(ModuleName, 120, "unsupported wasm request")
 )

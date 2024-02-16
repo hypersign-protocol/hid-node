@@ -94,7 +94,7 @@ func (k Keeper) setBlockchainAddressInStore(ctx *sdk.Context, blockchainAccountI
 }
 
 // Get the BlockchainAccountId from Store
-func (k Keeper) getBlockchainAddressFromStore(ctx *sdk.Context, blockchainAccountId string) []byte {
+func (k Keeper) GetBlockchainAddressFromStore(ctx *sdk.Context, blockchainAccountId string) []byte {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.BlockchainAccountIdStoreKey))
 	return store.Get([]byte(blockchainAccountId))
 }

@@ -15,6 +15,7 @@ import (
 	ethercrypto "github.com/ethereum/go-ethereum/crypto"
 	bbs "github.com/hyperledger/aries-framework-go/component/kmscrypto/crypto/primitive/bbs12381g2pub"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
+	ssicli "github.com/hypersign-protocol/hid-node/x/ssi/client/cli"
 	"github.com/iden3/go-iden3-crypto/babyjub"
 	"github.com/multiformats/go-multibase"
 	"github.com/spf13/cobra"
@@ -331,7 +332,7 @@ func signDidDocCmd() *cobra.Command {
 			}
 
 			// Sign DID Document
-			signature, err := getDocumentSignature(&didDoc, &didDocProof, argPrivateKey)
+			signature, err := ssicli.GetDocumentSignature(&didDoc, &didDocProof, argPrivateKey)
 			if err != nil {
 				return err
 			}
@@ -373,7 +374,7 @@ func signSchemaDocCmd() *cobra.Command {
 			}
 
 			// Sign Schema Document
-			signature, err := getDocumentSignature(&credSchemaDoc, &credSchemaDocProof, argPrivateKey)
+			signature, err := ssicli.GetDocumentSignature(&credSchemaDoc, &credSchemaDocProof, argPrivateKey)
 			if err != nil {
 				return err
 			}
@@ -415,7 +416,7 @@ func signCredStatusDocCmd() *cobra.Command {
 			}
 
 			// Sign Credential Status Document
-			signature, err := getDocumentSignature(&credStatusDoc, &credStatusDocProof, argPrivateKey)
+			signature, err := ssicli.GetDocumentSignature(&credStatusDoc, &credStatusDocProof, argPrivateKey)
 			if err != nil {
 				return err
 			}

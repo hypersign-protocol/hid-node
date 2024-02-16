@@ -51,7 +51,7 @@ func (k msgServer) RegisterDID(goCtx context.Context, msg *types.MsgRegisterDID)
 	// Check if any of the blockchainAccountId is present in any registered DID Document. If so, throw error
 	for _, vm := range msgDidDocument.VerificationMethod {
 		if vm.BlockchainAccountId != "" {
-			if existingDidDocId := k.getBlockchainAddressFromStore(&ctx, vm.BlockchainAccountId); len(existingDidDocId) != 0 {
+			if existingDidDocId := k.GetBlockchainAddressFromStore(&ctx, vm.BlockchainAccountId); len(existingDidDocId) != 0 {
 				return nil, errors.Wrapf(
 					types.ErrInvalidDidDoc,
 					"blockchainAccountId %v of verification method %v is already part of DID Document %v",

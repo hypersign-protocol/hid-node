@@ -12,6 +12,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/types/bech32"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
+	"github.com/hypersign-protocol/hid-node/x/ssi/ld-context"
 	"github.com/multiformats/go-multibase"
 	"golang.org/x/crypto/ripemd160" // nolint: staticcheck
 
@@ -175,4 +176,71 @@ func validateDidAliasSignerAddress(fromSignerAddress, publicKeyMultibase string)
 	}
 
 	return nil
+}
+
+// GetDocumentSignature returns signature for the input SSI Document
+func GetDocumentSignature(doc types.SsiMsg, docProof *types.DocumentProof, privateKey string) (string, error) {
+	var signature string
+
+	switch docProof.Type {
+	case types.Ed25519Signature2020:
+		var docBytes []byte
+		docBytes, err := ldcontext.Ed25519Signature2020Normalize(doc, docProof)
+		if err != nil {
+			return "", err
+		}
+
+		signature, err = GetEd25519Signature2020(privateKey, docBytes)
+		if err != nil {
+			return "", err
+		}
+	case types.EcdsaSecp256k1Signature2019:
+		var docBytes []byte
+		docBytes, err := ldcontext.EcdsaSecp256k1Signature2019Normalize(doc, docProof)
+		if err != nil {
+			return "", err
+		}
+
+		signature, err = GetEcdsaSecp256k1Signature2019(privateKey, docBytes)
+		if err != nil {
+			return "", err
+		}
+	case types.EcdsaSecp256k1RecoverySignature2020:
+		var docBytes []byte
+		docBytes, err := ldcontext.EcdsaSecp256k1RecoverySignature2020Normalize(doc, docProof)
+		if err != nil {
+			return "", err
+		}
+
+		signature, err = GetEcdsaSecp256k1RecoverySignature2020(privateKey, docBytes)
+		if err != nil {
+			return "", err
+		}
+	case types.BbsBlsSignature2020:
+		var docBytes []byte
+		docBytes, err := ldcontext.BbsBlsSignature2020Normalize(doc, docProof)
+		if err != nil {
+			return "", err
+		}
+
+		signature, err = GetBbsBlsSignature2020(privateKey, docBytes)
+		if err != nil {
+			return "", err
+		}
+	case types.BJJSignature2021:
+		var docBytes []byte
+		docBytes, err := ldcontext.BJJSignature2021Normalize(doc)
+		if err != nil {
+			return "", err
+		}
+
+		signature, err = GetBJJSignature2021(privateKey, docBytes)
+		if err != nil {
+			return "", err
+		}
+	default:
+		panic("recieved unsupported signing-algo. Supported algorithms are: [Ed25519Signature2020, EcdsaSecp256k1Signature2019, EcdsaSecp256k1RecoverySignature2020, BbsBlsSignature2020, BJJSignature2021]")
+	}
+
+	return signature, nil
 }

@@ -320,7 +320,7 @@ func processBlockchainAccountIdForUpdateDID(k msgServer, ctx sdk.Context, existi
 		// Add the VM to "required" group
 		if _, present := existingVmMap[vm.Id]; !present {
 			if vm.BlockchainAccountId != "" {
-				if didIdBytes := k.getBlockchainAddressFromStore(&ctx, vm.BlockchainAccountId); len(didIdBytes) != 0 {
+				if didIdBytes := k.GetBlockchainAddressFromStore(&ctx, vm.BlockchainAccountId); len(didIdBytes) != 0 {
 					return nil, nil, fmt.Errorf(
 						"blockchainAccountId %v of verification method %v is already part of DID Document %v",
 						vm.BlockchainAccountId,

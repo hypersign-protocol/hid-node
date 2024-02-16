@@ -95,31 +95,41 @@ func CmdRegisterDID() *cobra.Command {
 						ProofPurpose:       "assertionMethod",
 						Created:            time.Now().Format("2006-01-02T15:04:00Z"), // RFC3339 format
 					},
+					{
+						Type:               types.EcdsaSecp256k1Signature2019,
+						VerificationMethod: didDoc.VerificationMethod[1].Id,
+						ProofPurpose:       "assertionMethod",
+						Created:            time.Now().Format("2006-01-02T15:04:00Z"), // RFC3339 format
+					},
 				}
 
-				didDocCanonizedHash, err := ldcontext.EcdsaSecp256k1Signature2019Normalize(&didDoc, didDocumentProofs[0])
-				if err != nil {
-					return err
-				}
+				// REVERT: get signature for every VM
+				for i := 0; i < len(didDocumentProofs); i++ {
+					didDocCanonizedHash, err := ldcontext.EcdsaSecp256k1Signature2019Normalize(&didDoc, didDocumentProofs[i])
+					if err != nil {
+						return err
+					}
 
-				keyringBackend, err := cmd.Flags().GetString(flags.FlagKeyringBackend)
-				if err != nil {
-					return err
-				}
-				if keyringBackend != "test" {
-					return fmt.Errorf("unsupported keyring backend for DID Document Alias Signing: %v", keyringBackend)
-				}
+					keyringBackend, err := cmd.Flags().GetString(flags.FlagKeyringBackend)
+					if err != nil {
+						return err
+					}
+					if keyringBackend != "test" {
+						return fmt.Errorf("unsupported keyring backend for DID Document Alias Signing: %v", keyringBackend)
+					}
 
-				kr, err := keyring.New("hid-node-app", keyringBackend, didAliasConfig.HidNodeConfigDir, nil, nil)
-				if err != nil {
-					return err
-				}
+					kr, err := keyring.New("hid-node-app", keyringBackend, didAliasConfig.HidNodeConfigDir, nil, clientCtx.Codec)
+					if err != nil {
+						return err
+					}
 
-				signatureBytes, _, err := kr.SignByAddress(txAuthorAddr, didDocCanonizedHash)
-				if err != nil {
-					return err
+					signatureBytes, _, err := kr.SignByAddress(txAuthorAddr, didDocCanonizedHash)
+					if err != nil {
+						return err
+					}
+					didDocumentProofs[i].ProofValue = base64.StdEncoding.EncodeToString(signatureBytes)
+
 				}
-				didDocumentProofs[0].ProofValue = base64.StdEncoding.EncodeToString(signatureBytes)
 			}
 
 			// Submit RegisterDID Tx
