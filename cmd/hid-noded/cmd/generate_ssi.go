@@ -189,7 +189,7 @@ func generateDidCmd() *cobra.Command {
 
 			switch keyringBackend {
 			case "test":
-				kr, err = keyring.New(appName, "test", didAliasConfig.HidNodeConfigDir, nil, nil)
+				kr, err = keyring.New(appName, "test", didAliasConfig.HidNodeConfigDir, nil, app.MakeEncodingConfig().Codec)
 				if err != nil {
 					return err
 				}
