@@ -10,6 +10,7 @@ const X25519KeyAgreementKeyEIP5630Context string = "https://raw.githubuserconten
 const CredentialStatusContext string = "https://raw.githubusercontent.com/hypersign-protocol/hypersign-contexts/main/CredentialStatus.jsonld"
 const CredentialSchemaContext string = "https://raw.githubusercontent.com/hypersign-protocol/hypersign-contexts/main/CredentialSchema.jsonld"
 const BabyJubJubKey2021Context string = "https://raw.githubusercontent.com/hypersign-protocol/hypersign-contexts/main/BabyJubJubKey2021.jsonld"
+const BJJSignature2021Context string = "https://raw.githubusercontent.com/hypersign-protocol/hypersign-contexts/main/BJJSignature2021.jsonld"
 
 // As hid-node is not supposed to perform any GET request, the complete Context body of their
 // respective Context urls has been maintained below.
@@ -741,6 +742,102 @@ var ContextUrlMap map[string]contextObject = map[string]contextObject{
 				"publicKeyMultibase": map[string]interface{}{
 					"@id":   "https://w3id.org/security#publicKeyMultibase",
 					"@type": "https://w3id.org/security#multibase",
+				},
+			},
+		},
+	},
+
+	BJJSignature2021Context: {
+		"@version": 1.1,
+		"id":       "@id",
+		"type":     "@type",
+		"proof": map[string]interface{}{
+			"@id":        "https://w3id.org/security#proof",
+			"@type":      "@id",
+			"@container": "@graph",
+		},
+		"BJJSignature2021": map[string]interface{}{
+			"@id": "https://w3id.org/security#BJJSignature2021",
+			"@context": map[string]interface{}{
+				"@version":   1.1,
+				"@protected": true,
+				"id":         "@id",
+				"type":       "@type",
+				"challenge":  "https://w3id.org/security#challenge",
+				"created": map[string]interface{}{
+					"@id":   "http://purl.org/dc/terms/created",
+					"@type": "http://www.w3.org/2001/XMLSchema#dateTime",
+				},
+				"domain":         "https://w3id.org/security#domain",
+				"proofValue":     "https://w3id.org/security#proofValue",
+				"credentialRoot": "https://w3id.org/security#credentialRoot",
+				"nonce":          "https://w3id.org/security#nonce",
+				"proofPurpose": map[string]interface{}{
+					"@id":   "https://w3id.org/security#proofPurpose",
+					"@type": "@vocab",
+					"@context": map[string]interface{}{
+						"@version":   1.1,
+						"@protected": true,
+						"id":         "@id",
+						"type":       "@type",
+						"assertionMethod": map[string]interface{}{
+							"@id":        "https://w3id.org/security#assertionMethod",
+							"@type":      "@id",
+							"@container": "@set",
+						},
+						"authentication": map[string]interface{}{
+							"@id":        "https://w3id.org/security#authenticationMethod",
+							"@type":      "@id",
+							"@container": "@set",
+						},
+					},
+				},
+				"verificationMethod": map[string]interface{}{
+					"@id":   "https://w3id.org/security#verificationMethod",
+					"@type": "@id",
+				},
+			},
+		},
+		"BabyJubJubSignatureProof2021": map[string]interface{}{
+			"@id": "https://w3id.org/security#BabyJubJubSignatureProof2021",
+			"@context": map[string]interface{}{
+				"@version":   1.1,
+				"@protected": true,
+				"id":         "@id",
+				"type":       "@type",
+				"challenge":  "https://w3id.org/security#challenge",
+				"created": map[string]interface{}{
+					"@id":   "http://purl.org/dc/terms/created",
+					"@type": "http://www.w3.org/2001/XMLSchema#dateTime",
+				},
+				"domain": "https://w3id.org/security#domain",
+				"nonce":  "https://w3id.org/security#nonce",
+				"proofPurpose": map[string]interface{}{
+					"@id":   "https://w3id.org/security#proofPurpose",
+					"@type": "@vocab",
+					"@context": map[string]interface{}{
+						"@version":   1.1,
+						"@protected": true,
+						"id":         "@id",
+						"type":       "@type",
+						"sec":        "https://w3id.org/security#",
+						"assertionMethod": map[string]interface{}{
+							"@id":        "https://w3id.org/security#assertionMethod",
+							"@type":      "@id",
+							"@container": "@set",
+						},
+						"authentication": map[string]interface{}{
+							"@id":        "https://w3id.org/security#authenticationMethod",
+							"@type":      "@id",
+							"@container": "@set",
+						},
+					},
+				},
+				"proofValue":     "https://w3id.org/security#proofValue",
+				"credentialRoot": "https://w3id.org/security#credentialRoot",
+				"verificationMethod": map[string]interface{}{
+					"@id":   "https://w3id.org/security#verificationMethod",
+					"@type": "@id",
 				},
 			},
 		},

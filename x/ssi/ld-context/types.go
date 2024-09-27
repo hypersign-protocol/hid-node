@@ -81,6 +81,22 @@ func (doc *JsonLdCredentialStatus) GetContext() []contextObject {
 	return doc.Context
 }
 
+type JsonLdCredentialStatusBJJ struct {
+	Context                  []contextObject     `json:"@context,omitempty"`
+	Id                       string              `json:"id,omitempty"`
+	Revoked                  bool                `json:"revoked,omitempty"`
+	Suspended                bool                `json:"suspended,omitempty"`
+	Remarks                  string              `json:"remarks,omitempty"`
+	Issuer                   string              `json:"issuer,omitempty"`
+	IssuanceDate             string              `json:"issuanceDate,omitempty"`
+	CredentialMerkleRootHash string              `json:"credentialMerkleRootHash,omitempty"`
+	Proof                    JsonLdDocumentProof `json:"proof,omitempty"`
+}
+
+func (doc *JsonLdCredentialStatusBJJ) GetContext() []contextObject {
+	return doc.Context
+}
+
 // NewJsonLdCredentialStatus returns a new JsonLdCredentialStatus struct from input Credential Status
 func NewJsonLdCredentialStatus(credStatusDoc *types.CredentialStatusDocument) *JsonLdCredentialStatus {
 	if len(credStatusDoc.Context) == 0 {
@@ -104,6 +120,37 @@ func NewJsonLdCredentialStatus(credStatusDoc *types.CredentialStatusDocument) *J
 	jsonLdCredentialStatus.Issuer = credStatusDoc.Issuer
 	jsonLdCredentialStatus.IssuanceDate = credStatusDoc.IssuanceDate
 	jsonLdCredentialStatus.CredentialMerkleRootHash = credStatusDoc.CredentialMerkleRootHash
+
+	return jsonLdCredentialStatus
+}
+
+func NewJsonLdCredentialStatusBJJ(credStatusDoc *types.CredentialStatusDocument, docProof *types.DocumentProof) *JsonLdCredentialStatusBJJ {
+	if len(credStatusDoc.Context) == 0 {
+		panic("atleast one context url must be provided in the Credential Status Document for Canonization")
+	}
+
+	var jsonLdCredentialStatus *JsonLdCredentialStatusBJJ = &JsonLdCredentialStatusBJJ{}
+
+	for _, url := range credStatusDoc.Context {
+		contextObj, ok := ContextUrlMap[url]
+		if !ok {
+			panic(fmt.Sprintf("invalid or unsupported context url: %v", url))
+		}
+		jsonLdCredentialStatus.Context = append(jsonLdCredentialStatus.Context, contextObj)
+	}
+
+	jsonLdCredentialStatus.Id = credStatusDoc.Id
+	jsonLdCredentialStatus.Revoked = credStatusDoc.Revoked
+	jsonLdCredentialStatus.Remarks = credStatusDoc.Remarks
+	jsonLdCredentialStatus.Suspended = credStatusDoc.Suspended
+	jsonLdCredentialStatus.Issuer = credStatusDoc.Issuer
+	jsonLdCredentialStatus.IssuanceDate = credStatusDoc.IssuanceDate
+	jsonLdCredentialStatus.CredentialMerkleRootHash = credStatusDoc.CredentialMerkleRootHash
+
+	jsonLdCredentialStatus.Proof.Type = docProof.Type
+	jsonLdCredentialStatus.Proof.Created = docProof.Created
+	jsonLdCredentialStatus.Proof.ProofPurpose = docProof.ProofPurpose
+	jsonLdCredentialStatus.Proof.VerificationMethod = docProof.VerificationMethod
 
 	return jsonLdCredentialStatus
 }
@@ -163,6 +210,22 @@ func (doc *JsonLdCredentialSchema) GetContext() []contextObject {
 	return doc.Context
 }
 
+type JsonLdCredentialSchemaBJJ struct {
+	Context      []contextObject                 `json:"@context,omitempty"`
+	Type         string                          `json:"type,omitempty"`
+	ModelVersion string                          `json:"modelVersion,omitempty"`
+	Id           string                          `json:"id,omitempty"`
+	Name         string                          `json:"name,omitempty"`
+	Author       string                          `json:"author,omitempty"`
+	Authored     string                          `json:"authored,omitempty"`
+	Schema       *types.CredentialSchemaProperty `json:"schema,omitempty"`
+	Proof        JsonLdDocumentProof             `json:"proof,omitempty"`
+}
+
+func (doc *JsonLdCredentialSchemaBJJ) GetContext() []contextObject {
+	return doc.Context
+}
+
 func NewJsonLdCredentialSchema(credSchema *types.CredentialSchemaDocument) *JsonLdCredentialSchema {
 	if len(credSchema.Context) == 0 {
 		panic("atleast one context url must be provided for DID Document for Canonization")
@@ -189,6 +252,37 @@ func NewJsonLdCredentialSchema(credSchema *types.CredentialSchemaDocument) *Json
 	return jsonLdDoc
 }
 
+func NewJsonLdCredentialSchemaBJJ(credSchema *types.CredentialSchemaDocument, docProof *types.DocumentProof) *JsonLdCredentialSchemaBJJ {
+	if len(credSchema.Context) == 0 {
+		panic("atleast one context url must be provided for DID Document for Canonization")
+	}
+
+	var jsonLdDoc *JsonLdCredentialSchemaBJJ = &JsonLdCredentialSchemaBJJ{}
+
+	for _, url := range credSchema.Context {
+		contextObj, ok := ContextUrlMap[url]
+		if !ok {
+			panic(fmt.Sprintf("invalid or unsupported context url: %v", url))
+		}
+		jsonLdDoc.Context = append(jsonLdDoc.Context, contextObj)
+	}
+
+	jsonLdDoc.Type = credSchema.Type
+	jsonLdDoc.ModelVersion = credSchema.ModelVersion
+	jsonLdDoc.Id = credSchema.Id
+	jsonLdDoc.Name = credSchema.Name
+	jsonLdDoc.Author = credSchema.Author
+	jsonLdDoc.Authored = credSchema.Authored
+	jsonLdDoc.Schema = credSchema.Schema
+
+	jsonLdDoc.Proof.Type = docProof.Type
+	jsonLdDoc.Proof.Created = docProof.Created
+	jsonLdDoc.Proof.ProofPurpose = docProof.ProofPurpose
+	jsonLdDoc.Proof.VerificationMethod = docProof.VerificationMethod
+
+	return jsonLdDoc
+}
+
 // It is a similar to `Did` struct, with the exception that the `context` attribute is of type
 // `contextObject` instead of `[]string`, which is meant for accomodating Context JSON body
 // having arbritrary attributes. It should be used for performing Canonization.
@@ -199,6 +293,7 @@ type JsonLdDidDocumentWithoutVM struct {
 	AlsoKnownAs     []string                              `json:"alsoKnownAs,omitempty"`
 	Authentication  []verificationMethodWithoutController `json:"authentication,omitempty"`
 	AssertionMethod []verificationMethodWithoutController `json:"assertionMethod,omitempty"`
+	Proof           JsonLdDocumentProof                   `json:"proof,omitempty"`
 }
 
 func (doc *JsonLdDidDocumentWithoutVM) GetContext() []contextObject {
@@ -206,7 +301,7 @@ func (doc *JsonLdDidDocumentWithoutVM) GetContext() []contextObject {
 }
 
 // NewJsonLdDidDocument returns a new JsonLdDid struct from input Did
-func NewJsonLdDidDocumentWithoutVM(didDoc *types.DidDocument) *JsonLdDidDocumentWithoutVM {
+func NewJsonLdDidDocumentWithoutVM(didDoc *types.DidDocument, docProof *types.DocumentProof) *JsonLdDidDocumentWithoutVM {
 	if len(didDoc.Context) == 0 {
 		panic("atleast one context url must be provided for DID Document for Canonization")
 	}
@@ -252,6 +347,10 @@ func NewJsonLdDidDocumentWithoutVM(didDoc *types.DidDocument) *JsonLdDidDocument
 		}
 	}
 
+	jsonLdDoc.Proof.Type = docProof.Type
+	jsonLdDoc.Proof.Created = docProof.Created
+	jsonLdDoc.Proof.ProofPurpose = docProof.ProofPurpose
+	jsonLdDoc.Proof.VerificationMethod = docProof.VerificationMethod + docProof.ProofPurpose
 	return jsonLdDoc
 }
 
