@@ -3,7 +3,7 @@ package ssi
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/hypersign-protocol/hid-node/x/ssi/keeper"
-	
+
 	testconstants "github.com/hypersign-protocol/hid-node/x/ssi/tests/constants"
 	testcrypto "github.com/hypersign-protocol/hid-node/x/ssi/tests/crypto"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
@@ -83,7 +83,7 @@ func GenerateDidDoc(keyPair testcrypto.IKeyPair) *types.DidDocument {
 
 	var verificationMethodId string = didId + "#" + "key-1"
 
-	var vmType string = keyPair.GetType() 
+	var vmType string = keyPair.GetType()
 
 	var vm = &types.VerificationMethod{
 		Id:                 verificationMethodId,
@@ -101,12 +101,11 @@ func GenerateDidDoc(keyPair testcrypto.IKeyPair) *types.DidDocument {
 			vm.BlockchainAccountId = "cosmos:prajna:" + optionalID
 		}
 	}
- 
-	vmContextUrl := GetContextFromKeyPair(keyPair)
+
+	vmContextUrls := GetContextFromKeyPair(keyPair)
 	var didDocument *types.DidDocument = &types.DidDocument{
 		Context: []string{
 			"https://www.w3.org/ns/did/v1",
-			vmContextUrl,
 		},
 		Id:         didId,
 		Controller: []string{},
@@ -114,7 +113,7 @@ func GenerateDidDoc(keyPair testcrypto.IKeyPair) *types.DidDocument {
 			vm,
 		},
 	}
-
+	didDocument.Context = append(didDocument.Context, vmContextUrls...)
 	return didDocument
 }
 

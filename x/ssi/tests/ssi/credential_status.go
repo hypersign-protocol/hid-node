@@ -14,12 +14,11 @@ import (
 func GenerateCredentialStatus(keyPair testcrypto.IKeyPair, issuerId string) *types.CredentialStatusDocument {
 	var credentialId = "vc:" + testconstants.DidMethod + ":" + testconstants.ChainNamespace + ":" + strings.Split(issuerId, ":")[3]
 	var credHash = sha256.Sum256([]byte("Hash1234"))
-	var vmContextUrl = GetContextFromKeyPair(keyPair)
+	var vmContextUrls = GetContextFromKeyPair(keyPair)
 
 	var credentialStatus *types.CredentialStatusDocument = &types.CredentialStatusDocument{
 		Context: []string{
 			ldcontext.CredentialStatusContext,
-			vmContextUrl,
 		},
 		Id:                       credentialId,
 		Remarks:                  "Live",
@@ -29,6 +28,7 @@ func GenerateCredentialStatus(keyPair testcrypto.IKeyPair, issuerId string) *typ
 		IssuanceDate:             "2022-04-10T04:07:12Z",
 		CredentialMerkleRootHash: hex.EncodeToString(credHash[:]),
 	}
+	credentialStatus.Context = append(credentialStatus.Context, vmContextUrls...)
 	return credentialStatus
 }
 

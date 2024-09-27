@@ -12,12 +12,11 @@ import (
 
 func GenerateSchema(keyPair testcrypto.IKeyPair, authorId string) *types.CredentialSchemaDocument {
 	var schemaId = "sch:" + testconstants.DidMethod + ":" + testconstants.ChainNamespace + ":" + strings.Split(authorId, ":")[3] + ":" + "1.0"
-	var vmContextUrl = GetContextFromKeyPair(keyPair)
+	var vmContextUrls = GetContextFromKeyPair(keyPair)
 
 	var credentialSchema *types.CredentialSchemaDocument = &types.CredentialSchemaDocument{
-		Context:      []string{
+		Context: []string{
 			ldcontext.CredentialSchemaContext,
-			vmContextUrl,
 		},
 		Type:         "https://w3c-ccg.github.io/vc-json-schemas/v1/schema/1.0/schema.json",
 		ModelVersion: "1.0",
@@ -34,6 +33,7 @@ func GenerateSchema(keyPair testcrypto.IKeyPair, authorId string) *types.Credent
 			AdditionalProperties: false,
 		},
 	}
+	credentialSchema.Context = append(credentialSchema.Context, vmContextUrls...)
 
 	return credentialSchema
 }
