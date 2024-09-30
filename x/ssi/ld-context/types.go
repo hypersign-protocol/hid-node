@@ -287,13 +287,16 @@ func NewJsonLdCredentialSchemaBJJ(credSchema *types.CredentialSchemaDocument, do
 // `contextObject` instead of `[]string`, which is meant for accomodating Context JSON body
 // having arbritrary attributes. It should be used for performing Canonization.
 type JsonLdDidDocumentWithoutVM struct {
-	Context         []contextObject                       `json:"@context,omitempty"`
-	Id              string                                `json:"id,omitempty"`
-	Controller      []string                              `json:"controller,omitempty"`
-	AlsoKnownAs     []string                              `json:"alsoKnownAs,omitempty"`
-	Authentication  []verificationMethodWithoutController `json:"authentication,omitempty"`
-	AssertionMethod []verificationMethodWithoutController `json:"assertionMethod,omitempty"`
-	Proof           JsonLdDocumentProof                   `json:"proof,omitempty"`
+	Context    []contextObject `json:"@context,omitempty"`
+	Id         string          `json:"id,omitempty"`
+	Controller []string        `json:"controller,omitempty"`
+	// AlsoKnownAs     []string                              `json:"alsoKnownAs,omitempty"`
+	Authentication       []verificationMethodWithoutController `json:"authentication,omitempty"`
+	AssertionMethod      []verificationMethodWithoutController `json:"assertionMethod,omitempty"`
+	CapabilityDelegation []verificationMethodWithoutController `json:"capabilityDelegation,omitempty"`
+	CapabilityInvocation []verificationMethodWithoutController `json:"capabilityInvocation,omitempty"`
+	KeyAgreement         []verificationMethodWithoutController `json:"keyAgreement,omitempty"`
+	Proof                JsonLdDocumentProof                   `json:"proof,omitempty"`
 }
 
 func (doc *JsonLdDidDocumentWithoutVM) GetContext() []contextObject {
@@ -318,8 +321,6 @@ func NewJsonLdDidDocumentWithoutVM(didDoc *types.DidDocument, docProof *types.Do
 
 	jsonLdDoc.Id = didDoc.Id
 	jsonLdDoc.Controller = didDoc.Controller
-	jsonLdDoc.AlsoKnownAs = didDoc.AlsoKnownAs
-
 	// Replace verification method ids with their corresponding Verification Method object
 	var vmMap map[string]verificationMethodWithoutController = map[string]verificationMethodWithoutController{}
 
@@ -344,6 +345,24 @@ func NewJsonLdDidDocumentWithoutVM(didDoc *types.DidDocument, docProof *types.Do
 			vmObj := vmMap[vmId]
 			jsonLdDoc.AssertionMethod = append(jsonLdDoc.AssertionMethod, vmObj)
 			jsonLdDoc.AssertionMethod[len(jsonLdDoc.AssertionMethod)-1].Id = jsonLdDoc.AssertionMethod[len(jsonLdDoc.AssertionMethod)-1].Id + "assertionMethod"
+		}
+
+		for _, vmId := range didDoc.CapabilityDelegation {
+			vmObj := vmMap[vmId]
+			jsonLdDoc.CapabilityDelegation = append(jsonLdDoc.CapabilityDelegation, vmObj)
+			jsonLdDoc.CapabilityDelegation[len(jsonLdDoc.CapabilityDelegation)-1].Id = jsonLdDoc.CapabilityDelegation[len(jsonLdDoc.CapabilityDelegation)-1].Id + "capabilityDelegation"
+		}
+
+		for _, vmId := range didDoc.CapabilityInvocation {
+			vmObj := vmMap[vmId]
+			jsonLdDoc.CapabilityInvocation = append(jsonLdDoc.CapabilityInvocation, vmObj)
+			jsonLdDoc.CapabilityInvocation[len(jsonLdDoc.CapabilityInvocation)-1].Id = jsonLdDoc.CapabilityInvocation[len(jsonLdDoc.CapabilityInvocation)-1].Id + "capabilityInvocation"
+		}
+
+		for _, vmId := range didDoc.KeyAgreement {
+			vmObj := vmMap[vmId]
+			jsonLdDoc.KeyAgreement = append(jsonLdDoc.KeyAgreement, vmObj)
+			jsonLdDoc.KeyAgreement[len(jsonLdDoc.KeyAgreement)-1].Id = jsonLdDoc.KeyAgreement[len(jsonLdDoc.KeyAgreement)-1].Id + "keyAgreement"
 		}
 	}
 

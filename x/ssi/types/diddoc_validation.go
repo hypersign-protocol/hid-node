@@ -470,10 +470,5 @@ func (didDoc *DidDocument) ValidateDidDocument() error {
 		return err
 	}
 
-	// TODO: This is a temporary measure due to technical challenges in merklizing DID Document
-	if err := isBabyJubJubKey2021PresentAlongWithOtherVMTypes(didDoc.VerificationMethod); err != nil {
-		return err
-	}
-
 	return nil
 }
