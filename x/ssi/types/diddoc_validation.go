@@ -228,15 +228,15 @@ func validateServices(services []*Service) error {
 		}
 
 		// validate service Type
-		foundType := false
-		for _, sType := range SupportedServiceTypes {
-			if service.Type == sType {
-				foundType = true
-			}
-		}
-		if !foundType {
-			return fmt.Errorf("service Type %s is Invalid", service.Type)
-		}
+		// foundType := false
+		// for _, sType := range SupportedServiceTypes {
+		// 	if service.Type == sType {
+		// 		foundType = true
+		// 	}
+		// }
+		// if !foundType {
+		// 	return fmt.Errorf("service Type %s is Invalid", service.Type)
+		// }
 	}
 
 	// check if any duplicate service id exists
