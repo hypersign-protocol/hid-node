@@ -260,7 +260,7 @@ func TestBJJAndEd25519(t *testing.T) {
 
 	var service types.Service
 	service.Id = alice_didDoc.Id + "#ServiceTypeAny"
-	service.Type = "ServiceTypeAny"
+	service.Type = "service"
 	service.ServiceEndpoint = "https://example.com"
 	alice_didDoc.Service = append(alice_didDoc.Service, &service)
 
@@ -310,7 +310,7 @@ func TestEd25519AndBJJ(t *testing.T) {
 	alice_kp.VerificationMethodId = alice_didDoc.VerificationMethod[0].Id
 	var service types.Service
 	service.Id = alice_didDoc.Id + "#ServiceType"
-	service.Type = "ServiceType"
+	service.Type = "service"
 	service.ServiceEndpoint = "https://example.com"
 	alice_didDoc.Service = append(alice_didDoc.Service, &service)
 

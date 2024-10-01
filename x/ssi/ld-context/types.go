@@ -297,6 +297,7 @@ type JsonLdDidDocumentWithoutVM struct {
 	CapabilityInvocation []verificationMethodWithoutController `json:"capabilityInvocation,omitempty"`
 	KeyAgreement         []verificationMethodWithoutController `json:"keyAgreement,omitempty"`
 	Proof                JsonLdDocumentProof                   `json:"proof,omitempty"`
+	Service              []*types.Service                      `protobuf:"bytes,11,rep,name=service,proto3" json:"service,omitempty"`
 }
 
 func (doc *JsonLdDidDocumentWithoutVM) GetContext() []contextObject {
@@ -370,6 +371,7 @@ func NewJsonLdDidDocumentWithoutVM(didDoc *types.DidDocument, docProof *types.Do
 	jsonLdDoc.Proof.Created = docProof.Created
 	jsonLdDoc.Proof.ProofPurpose = docProof.ProofPurpose
 	jsonLdDoc.Proof.VerificationMethod = docProof.VerificationMethod + docProof.ProofPurpose
+	jsonLdDoc.Service = didDoc.Service
 	return jsonLdDoc
 }
 
