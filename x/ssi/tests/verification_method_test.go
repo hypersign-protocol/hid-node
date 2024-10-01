@@ -25,7 +25,11 @@ func TestEcdsaSecp256k1VerificationKey2019(t *testing.T) {
 
 	alice_didDoc := testssi.GenerateDidDoc(alice_kp)
 	alice_didDoc.Controller = append(alice_didDoc.Controller, alice_didDoc.Id)
-
+	var service types.Service
+	service.Id = alice_didDoc.Id + "#ServiceType"
+	service.Type = "ServiceType"
+	service.ServiceEndpoint = "https://example.com"
+	alice_didDoc.Service = append(alice_didDoc.Service, &service)
 	alice_kp.VerificationMethodId = alice_didDoc.VerificationMethod[0].Id
 
 	didDocTx := testssi.GetRegisterDidDocumentRPC(alice_didDoc, []testcrypto.IKeyPair{alice_kp})
@@ -254,6 +258,12 @@ func TestBJJAndEd25519(t *testing.T) {
 	alice_didDoc := testssi.GenerateDidDoc(alice_kp)
 	alice_didDoc.Controller = append(alice_didDoc.Controller, alice_didDoc.Id)
 
+	var service types.Service
+	service.Id = alice_didDoc.Id + "#ServiceTypeAny"
+	service.Type = "ServiceTypeAny"
+	service.ServiceEndpoint = "https://example.com"
+	alice_didDoc.Service = append(alice_didDoc.Service, &service)
+
 	alice_kp.VerificationMethodId = alice_didDoc.VerificationMethod[0].Id
 
 	bob_kp := testcrypto.GenerateEd25519KeyPair()
@@ -298,6 +308,11 @@ func TestEd25519AndBJJ(t *testing.T) {
 	alice_didDoc.Controller = append(alice_didDoc.Controller, alice_didDoc.Id)
 
 	alice_kp.VerificationMethodId = alice_didDoc.VerificationMethod[0].Id
+	var service types.Service
+	service.Id = alice_didDoc.Id + "#ServiceType"
+	service.Type = "ServiceType"
+	service.ServiceEndpoint = "https://example.com"
+	alice_didDoc.Service = append(alice_didDoc.Service, &service)
 
 	bob_kp := testcrypto.GenerateBabyJubJubKeyPair()
 	bob_kp.VerificationMethodId = alice_didDoc.Id + "#key-2"
