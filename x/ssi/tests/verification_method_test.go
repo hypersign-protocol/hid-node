@@ -5,6 +5,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/hypersign-protocol/hid-node/x/ssi/keeper"
+	ldcontext "github.com/hypersign-protocol/hid-node/x/ssi/ld-context"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 
 	testcrypto "github.com/hypersign-protocol/hid-node/x/ssi/tests/crypto"
@@ -253,17 +254,10 @@ func TestBJJAndEd25519(t *testing.T) {
 
 	alice_kp := testcrypto.GenerateBabyJubJubKeyPair()
 
-	t.Log("Register DID Document")
+	t.Log("Register DID Document BJJ,Ed25519 Keys")
 
 	alice_didDoc := testssi.GenerateDidDoc(alice_kp)
 	alice_didDoc.Controller = append(alice_didDoc.Controller, alice_didDoc.Id)
-
-	var service types.Service
-	service.Id = alice_didDoc.Id + "#ServiceTypeAny"
-	service.Type = "service"
-	service.ServiceEndpoint = "https://example.com"
-	alice_didDoc.Service = append(alice_didDoc.Service, &service)
-
 	alice_kp.VerificationMethodId = alice_didDoc.VerificationMethod[0].Id
 
 	bob_kp := testcrypto.GenerateEd25519KeyPair()
@@ -302,18 +296,12 @@ func TestEd25519AndBJJ(t *testing.T) {
 
 	alice_kp := testcrypto.GenerateEd25519KeyPair()
 
-	t.Log("Register DID Document")
+	t.Log("Register DID Document Ed25519,BJJ Keys")
 
 	alice_didDoc := testssi.GenerateDidDoc(alice_kp)
 	alice_didDoc.Controller = append(alice_didDoc.Controller, alice_didDoc.Id)
 
 	alice_kp.VerificationMethodId = alice_didDoc.VerificationMethod[0].Id
-	var service types.Service
-	service.Id = alice_didDoc.Id + "#ServiceType"
-	service.Type = "service"
-	service.ServiceEndpoint = "https://example.com"
-	alice_didDoc.Service = append(alice_didDoc.Service, &service)
-
 	bob_kp := testcrypto.GenerateBabyJubJubKeyPair()
 	bob_kp.VerificationMethodId = alice_didDoc.Id + "#key-2"
 
@@ -341,4 +329,98 @@ func TestEd25519AndBJJ(t *testing.T) {
 
 	didDocFromState := testssi.QueryDid(k, ctx, alice_didDoc.Id)
 	t.Log("Did from state", didDocFromState)
+}
+
+func TestBJJAndEd25519WithService(t *testing.T) {
+	k, ctx := TestKeeper(t)
+	msgServer := keeper.NewMsgServerImpl(*k)
+	goCtx := sdk.WrapSDKContext(ctx)
+
+	alice_kp := testcrypto.GenerateBabyJubJubKeyPair()
+
+	t.Log("Register DID Document BJJ,Ed25519 Keys and With Service attached")
+
+	alice_didDoc := testssi.GenerateDidDoc(alice_kp)
+	alice_didDoc.Controller = append(alice_didDoc.Controller, alice_didDoc.Id)
+
+	var service types.Service
+	service.Id = alice_didDoc.Id + "#ServiceTypeAny"
+	service.Type = "LinkedDomains"
+	service.ServiceEndpoint = "https://example.com"
+	alice_didDoc.Service = append(alice_didDoc.Service, &service)
+
+	alice_kp.VerificationMethodId = alice_didDoc.VerificationMethod[0].Id
+
+	bob_kp := testcrypto.GenerateEd25519KeyPair()
+	bob_kp.VerificationMethodId = alice_didDoc.Id + "#key-2"
+
+	var vm types.VerificationMethod
+	vm.Id = alice_didDoc.Id + "#key-2"
+	vm.Controller = alice_didDoc.Id
+	vm.Type = bob_kp.Type
+	vm.PublicKeyMultibase = bob_kp.PublicKey
+	alice_didDoc.CapabilityDelegation = []string{}
+	alice_didDoc.CapabilityInvocation = []string{}
+	alice_didDoc.AlsoKnownAs = []string{}
+
+	alice_didDoc.AssertionMethod = append(alice_didDoc.AssertionMethod, alice_didDoc.Id+"#key-2")
+	alice_didDoc.Authentication = append(alice_didDoc.Authentication, alice_didDoc.Id+"#key-2")
+
+	alice_didDoc.VerificationMethod = append(alice_didDoc.VerificationMethod, &vm)
+	context25519 := testssi.GetContextFromKeyPair(bob_kp)
+	alice_didDoc.Context = append(alice_didDoc.Context, context25519...)
+	alice_didDoc.Context = append(alice_didDoc.Context, ldcontext.LinkedDomainsContext)
+	didDocTx := testssi.GetRegisterDidDocumentRPC(alice_didDoc, []testcrypto.IKeyPair{bob_kp, alice_kp})
+	_, err := msgServer.RegisterDID(goCtx, didDocTx)
+	if err != nil {
+		t.Log(err)
+		t.FailNow()
+	}
+
+}
+func TestEd25519AndBJJWithService(t *testing.T) {
+	k, ctx := TestKeeper(t)
+	msgServer := keeper.NewMsgServerImpl(*k)
+	goCtx := sdk.WrapSDKContext(ctx)
+
+	alice_kp := testcrypto.GenerateEd25519KeyPair()
+
+	t.Log("Register DID Document Ed25519,BJJ Keys and With Service attached")
+
+	alice_didDoc := testssi.GenerateDidDoc(alice_kp)
+	alice_didDoc.Controller = append(alice_didDoc.Controller, alice_didDoc.Id)
+
+	alice_kp.VerificationMethodId = alice_didDoc.VerificationMethod[0].Id
+	var service types.Service
+	service.Id = alice_didDoc.Id + "#ServiceType"
+	service.Type = "LinkedDomains"
+	service.ServiceEndpoint = "https://example.com"
+	alice_didDoc.Service = append(alice_didDoc.Service, &service)
+
+	bob_kp := testcrypto.GenerateBabyJubJubKeyPair()
+	bob_kp.VerificationMethodId = alice_didDoc.Id + "#key-2"
+
+	var vm types.VerificationMethod
+	vm.Id = alice_didDoc.Id + "#key-2"
+	vm.Controller = alice_didDoc.Id
+	vm.Type = bob_kp.Type
+	vm.PublicKeyMultibase = bob_kp.PublicKey
+	alice_didDoc.CapabilityDelegation = []string{}
+	alice_didDoc.CapabilityInvocation = []string{}
+	alice_didDoc.AlsoKnownAs = []string{}
+
+	alice_didDoc.AssertionMethod = append(alice_didDoc.AssertionMethod, alice_didDoc.Id+"#key-2")
+	alice_didDoc.Authentication = append(alice_didDoc.Authentication, alice_didDoc.Id+"#key-2")
+
+	alice_didDoc.VerificationMethod = append(alice_didDoc.VerificationMethod, &vm)
+	bjjContext := testssi.GetContextFromKeyPair(bob_kp)
+	alice_didDoc.Context = append(alice_didDoc.Context, bjjContext...)
+	alice_didDoc.Context = append(alice_didDoc.Context, ldcontext.LinkedDomainsContext)
+	didDocTx := testssi.GetRegisterDidDocumentRPC(alice_didDoc, []testcrypto.IKeyPair{bob_kp, alice_kp})
+	_, err := msgServer.RegisterDID(goCtx, didDocTx)
+	if err != nil {
+		t.Log(err)
+		t.FailNow()
+	}
+
 }
