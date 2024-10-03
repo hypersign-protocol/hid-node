@@ -36,7 +36,7 @@ func NormalizeByProofType(ssiMsg types.SsiMsg, didDocumentProof *types.DocumentP
 		}
 		return msgBytes, nil
 	case types.BJJSignature2021:
-		msgBytes, err := BJJSignature2021Normalize(ssiMsg)
+		msgBytes, err := BJJSignature2021Normalize(ssiMsg, didDocumentProof)
 		if err != nil {
 			return nil, err
 		}

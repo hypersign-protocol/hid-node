@@ -129,23 +129,25 @@ func EcdsaSecp256k1Signature2019Normalize(ssiMsg types.SsiMsg, docProof *types.D
 
 // BJJSignature2021Normalize performs canonization of SSI documents
 // based on the spec: https://iden3-communication.io/BJJSignature2021/
-func BJJSignature2021Normalize(ssiMsg types.SsiMsg) ([]byte, error) {
+func BJJSignature2021Normalize(ssiMsg types.SsiMsg, docProof *types.DocumentProof) ([]byte, error) {
 	var jsonLDString string
 	switch doc := ssiMsg.(type) {
 	case *types.DidDocument:
-		jsonLDBytes, err := json.Marshal(NewJsonLdDidDocumentWithoutVM(doc))
+		jsonLDBytes, err := json.Marshal(NewJsonLdDidDocumentWithoutVM(doc, docProof))
 		if err != nil {
 			return nil, err
 		}
 		jsonLDString = string(jsonLDBytes)
 	case *types.CredentialSchemaDocument:
-		jsonLDBytes, err := json.Marshal(NewJsonLdCredentialSchema(doc))
+		credentialSchemaDocument := NewJsonLdCredentialSchemaBJJ(doc, docProof)
+		jsonLDBytes, err := json.Marshal(credentialSchemaDocument)
 		if err != nil {
 			return nil, err
 		}
 		jsonLDString = string(jsonLDBytes)
 	case *types.CredentialStatusDocument:
-		jsonLDBytes, err := json.Marshal(NewJsonLdCredentialStatus(doc))
+		credentialStatusDocument := NewJsonLdCredentialStatusBJJ(doc, docProof)
+		jsonLDBytes, err := json.Marshal(credentialStatusDocument)
 		if err != nil {
 			return nil, err
 		}
