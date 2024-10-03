@@ -11,6 +11,7 @@ const CredentialStatusContext string = "https://raw.githubusercontent.com/hypers
 const CredentialSchemaContext string = "https://raw.githubusercontent.com/hypersign-protocol/hypersign-contexts/main/CredentialSchema.jsonld"
 const BabyJubJubKey2021Context string = "https://raw.githubusercontent.com/hypersign-protocol/hypersign-contexts/main/BabyJubJubKey2021.jsonld"
 const BJJSignature2021Context string = "https://raw.githubusercontent.com/hypersign-protocol/hypersign-contexts/main/BJJSignature2021.jsonld"
+const LinkedDomainsContext string = "https://raw.githubusercontent.com/hypersign-protocol/hypersign-contexts/main/LinkedDomains.jsonld"
 
 // As hid-node is not supposed to perform any GET request, the complete Context body of their
 // respective Context urls has been maintained below.
@@ -837,6 +838,25 @@ var ContextUrlMap map[string]contextObject = map[string]contextObject{
 				"credentialRoot": "https://w3id.org/security#credentialRoot",
 				"verificationMethod": map[string]interface{}{
 					"@id":   "https://w3id.org/security#verificationMethod",
+					"@type": "@id",
+				},
+			},
+		},
+	},
+	LinkedDomainsContext: {
+
+		"@protected": true,
+		"id":         "@id",
+		"type":       "@type",
+		"LinkedDomains": map[string]interface{}{
+			"@id":   "https://www.w3.org/ns/did#LinkedDomains",
+			"@type": "@id",
+			"@context": map[string]interface{}{
+				"@protected": true,
+				"id":         "@id",
+				"type":       "@type",
+				"serviceEndpoint": map[string]interface{}{
+					"@id":   "https://www.w3.org/ns/did#serviceEndpoint",
 					"@type": "@id",
 				},
 			},
