@@ -1,8 +1,8 @@
 package crypto
 
 import (
-	ldcontext "github.com/hypersign-protocol/hid-node/x/ssi/ld-context"
 	cli "github.com/hypersign-protocol/hid-node/x/ssi/client/cli"
+	ldcontext "github.com/hypersign-protocol/hid-node/x/ssi/ld-context"
 	"github.com/hypersign-protocol/hid-node/x/ssi/types"
 )
 
@@ -70,7 +70,7 @@ func GetDocumentSignature(doc types.SsiMsg, docProof *types.DocumentProof, priva
 		}
 	case types.BJJSignature2021:
 		var docBytes []byte
-		docBytes, err := ldcontext.BJJSignature2021Normalize(doc)
+		docBytes, err := ldcontext.BJJSignature2021Normalize(doc, docProof)
 		if err != nil {
 			return "", err
 		}

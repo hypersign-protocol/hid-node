@@ -16,7 +16,7 @@ The Hypersign Identity Network is a permissionless blockchain network to manage 
 - Stake `$HID` tokens
 - Submit Governance Proposals
 - Transfer `$HID` tokens within and across different Tendermint-based blockchains using IBC
-- Deploy CosmWasm Smart Contracts (Governance Based)
+- Deploy CosmWasm Smart Contracts
 
 ## Prerequisite
 

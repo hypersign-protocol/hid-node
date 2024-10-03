@@ -42,9 +42,9 @@ var supportedVerificationMethodTypes []string = func() []string {
 }()
 
 // Supported Service Types
-var SupportedServiceTypes = []string{
-	"LinkedDomains",
-}
+// var SupportedServiceTypes = []string{
+// 	"LinkedDomains",
+// }
 
 // Did Document ID
 const DocumentIdentifierDid = "did"

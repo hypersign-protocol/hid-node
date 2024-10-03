@@ -84,7 +84,7 @@ func getDocumentSignature(doc types.SsiMsg, docProof *types.DocumentProof, priva
 		}
 	case types.BJJSignature2021:
 		var docBytes []byte
-		docBytes, err := ldcontext.BJJSignature2021Normalize(doc)
+		docBytes, err := ldcontext.BJJSignature2021Normalize(doc, docProof)
 		if err != nil {
 			return "", err
 		}
