@@ -455,6 +455,11 @@ func NewHypersignApp(
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
+	app.UpgradeKeeper.SetUpgradeHandler("v030", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+		ctx.Logger().Info("v0.3.0 upgrade")
+		return fromVM, nil
+	})
+
 	app.IBCKeeper = ibckeeper.NewKeeper(
 		appCodec,
 		keys[ibcexported.StoreKey],
