@@ -25,11 +25,11 @@ func (gs GenesisState) Validate() error {
 	maxChainNamespaceLength := 10
 
 	if len(namespace) > maxChainNamespaceLength {
-		return fmt.Errorf("chain namespace shouldn't shouldn't be more than 10, namespace recieved %s", namespace)
+		return fmt.Errorf("chain namespace shouldn't shouldn't be more than 10, namespace received %s", namespace)
 	}
 
 	if !regexPattern.MatchString(namespace) && len(namespace) != 0 {
-		return fmt.Errorf("chain namespace should be in alphanumeric format, namespace recieved %s", namespace)
+		return fmt.Errorf("chain namespace should be in alphanumeric format, namespace received %s", namespace)
 	}
 
 	return nil
