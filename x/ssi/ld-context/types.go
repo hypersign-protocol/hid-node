@@ -13,8 +13,8 @@ type JsonLdDocument interface {
 }
 
 // It is a similar to `Did` struct, with the exception that the `context` attribute is of type
-// `contextObject` instead of `[]string`, which is meant for accomodating Context JSON body
-// having arbritrary attributes. It should be used for performing Canonization.
+// `contextObject` instead of `[]string`, which is meant for accommodating Context JSON body
+// having arbitrary attributes. It should be used for performing Canonization.
 type JsonLdDidDocument struct {
 	Context              []contextObject             `json:"@context,omitempty"`
 	Id                   string                      `json:"id,omitempty"`
@@ -36,7 +36,7 @@ func (doc *JsonLdDidDocument) GetContext() []contextObject {
 // NewJsonLdDidDocument returns a new JsonLdDid struct from input Did
 func NewJsonLdDidDocument(didDoc *types.DidDocument) *JsonLdDidDocument {
 	if len(didDoc.Context) == 0 {
-		panic("atleast one context url must be provided for DID Document for Canonization")
+		panic("at least one context url must be provided for DID Document for Canonization")
 	}
 
 	var jsonLdDoc *JsonLdDidDocument = &JsonLdDidDocument{}
@@ -64,8 +64,8 @@ func NewJsonLdDidDocument(didDoc *types.DidDocument) *JsonLdDidDocument {
 }
 
 // It is a similar to `CredentialStatusDocument` struct, with the exception that the `context` attribute is of type
-// `contextObject` instead of `[]string`, which is meant for accomodating Context JSON body
-// having arbritrary attributes. It should be used for performing Canonization.
+// `contextObject` instead of `[]string`, which is meant for accommodating Context JSON body
+// having arbitrary attributes. It should be used for performing Canonization.
 type JsonLdCredentialStatus struct {
 	Context                  []contextObject `json:"@context,omitempty"`
 	Id                       string          `json:"id,omitempty"`
@@ -100,7 +100,7 @@ func (doc *JsonLdCredentialStatusBJJ) GetContext() []contextObject {
 // NewJsonLdCredentialStatus returns a new JsonLdCredentialStatus struct from input Credential Status
 func NewJsonLdCredentialStatus(credStatusDoc *types.CredentialStatusDocument) *JsonLdCredentialStatus {
 	if len(credStatusDoc.Context) == 0 {
-		panic("atleast one context url must be provided in the Credential Status Document for Canonization")
+		panic("at least one context url must be provided in the Credential Status Document for Canonization")
 	}
 
 	var jsonLdCredentialStatus *JsonLdCredentialStatus = &JsonLdCredentialStatus{}
@@ -126,7 +126,7 @@ func NewJsonLdCredentialStatus(credStatusDoc *types.CredentialStatusDocument) *J
 
 func NewJsonLdCredentialStatusBJJ(credStatusDoc *types.CredentialStatusDocument, docProof *types.DocumentProof) *JsonLdCredentialStatusBJJ {
 	if len(credStatusDoc.Context) == 0 {
-		panic("atleast one context url must be provided in the Credential Status Document for Canonization")
+		panic("at least one context url must be provided in the Credential Status Document for Canonization")
 	}
 
 	var jsonLdCredentialStatus *JsonLdCredentialStatusBJJ = &JsonLdCredentialStatusBJJ{}
@@ -171,7 +171,7 @@ func (doc *JsonLdDocumentProof) GetContext() []contextObject {
 
 func NewJsonLdDocumentProof(didDocProof *types.DocumentProof, didContexts []string) *JsonLdDocumentProof {
 	if len(didContexts) == 0 {
-		panic("atleast one context url must be provided for DID Document for Canonization")
+		panic("at least one context url must be provided for DID Document for Canonization")
 	}
 
 	var jsonLdDoc *JsonLdDocumentProof = &JsonLdDocumentProof{}
@@ -193,8 +193,8 @@ func NewJsonLdDocumentProof(didDocProof *types.DocumentProof, didContexts []stri
 }
 
 // It is a similar to `CredentialSchemaDocument` struct, with the exception that the `context` attribute is of type
-// `contextObject` instead of `[]string`, which is meant for accomodating Context JSON body
-// having arbritrary attributes. It should be used for performing Canonization.
+// `contextObject` instead of `[]string`, which is meant for accommodating Context JSON body
+// having arbitrary attributes. It should be used for performing Canonization.
 type JsonLdCredentialSchema struct {
 	Context      []contextObject                 `json:"@context,omitempty"`
 	Type         string                          `json:"type,omitempty"`
@@ -228,7 +228,7 @@ func (doc *JsonLdCredentialSchemaBJJ) GetContext() []contextObject {
 
 func NewJsonLdCredentialSchema(credSchema *types.CredentialSchemaDocument) *JsonLdCredentialSchema {
 	if len(credSchema.Context) == 0 {
-		panic("atleast one context url must be provided for DID Document for Canonization")
+		panic("at least one context url must be provided for DID Document for Canonization")
 	}
 
 	var jsonLdDoc *JsonLdCredentialSchema = &JsonLdCredentialSchema{}
@@ -254,7 +254,7 @@ func NewJsonLdCredentialSchema(credSchema *types.CredentialSchemaDocument) *Json
 
 func NewJsonLdCredentialSchemaBJJ(credSchema *types.CredentialSchemaDocument, docProof *types.DocumentProof) *JsonLdCredentialSchemaBJJ {
 	if len(credSchema.Context) == 0 {
-		panic("atleast one context url must be provided for DID Document for Canonization")
+		panic("at least one context url must be provided for DID Document for Canonization")
 	}
 
 	var jsonLdDoc *JsonLdCredentialSchemaBJJ = &JsonLdCredentialSchemaBJJ{}
@@ -284,8 +284,8 @@ func NewJsonLdCredentialSchemaBJJ(credSchema *types.CredentialSchemaDocument, do
 }
 
 // It is a similar to `Did` struct, with the exception that the `context` attribute is of type
-// `contextObject` instead of `[]string`, which is meant for accomodating Context JSON body
-// having arbritrary attributes. It should be used for performing Canonization.
+// `contextObject` instead of `[]string`, which is meant for accommodating Context JSON body
+// having arbitrary attributes. It should be used for performing Canonization.
 type JsonLdDidDocumentWithoutVM struct {
 	Context    []contextObject `json:"@context,omitempty"`
 	Id         string          `json:"id,omitempty"`
@@ -307,7 +307,7 @@ func (doc *JsonLdDidDocumentWithoutVM) GetContext() []contextObject {
 // NewJsonLdDidDocument returns a new JsonLdDid struct from input Did
 func NewJsonLdDidDocumentWithoutVM(didDoc *types.DidDocument, docProof *types.DocumentProof) *JsonLdDidDocumentWithoutVM {
 	if len(didDoc.Context) == 0 {
-		panic("atleast one context url must be provided for DID Document for Canonization")
+		panic("at least one context url must be provided for DID Document for Canonization")
 	}
 
 	var jsonLdDoc *JsonLdDidDocumentWithoutVM = &JsonLdDidDocumentWithoutVM{}
