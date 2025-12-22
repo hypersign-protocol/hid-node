@@ -14,7 +14,7 @@ func GetElementsFromDidUrl(didUrl string) (string, string) {
 	return didId, fragment
 }
 
-// splitDidUrl returns the elements of a DID URL. It returns the element in order:
+// SplitDidUrl returns the elements of a DID URL. It returns the element in order:
 // didId, fragment
 func SplitDidUrl(didUrl string) (string, string) {
 	didUrlElements := strings.Split(didUrl, "#")

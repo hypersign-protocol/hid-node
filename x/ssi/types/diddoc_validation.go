@@ -5,7 +5,7 @@ import (
 	"regexp"
 )
 
-// isValidDidDoc checks if the DID Id is valid
+// isValidDidDocId checks if the DID Id is valid
 func isValidDidDocId(id string) error {
 	inputDocumentIdentifier, err := getDocumentIdentifier(id)
 	if err != nil {
