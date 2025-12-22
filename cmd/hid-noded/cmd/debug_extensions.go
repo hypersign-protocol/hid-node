@@ -34,7 +34,7 @@ func extendDebug(debugCmd *cobra.Command) *cobra.Command {
 func bjjCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "bjj",
-		Short: "BabyJubJub commonds",
+		Short: "BabyJubJub commands, commons, commends",
 	}
 
 	cmd.AddCommand(bjjRandomCmd())

@@ -822,7 +822,7 @@ type QueryClient interface {
 	DidDocuments(ctx context.Context, in *QueryDidDocumentsRequest, opts ...grpc.CallOption) (*QueryDidDocumentsResponse, error)
 	// Get the Credential Status for a given credential id
 	CredentialStatusByID(ctx context.Context, in *QueryCredentialStatusRequest, opts ...grpc.CallOption) (*QueryCredentialStatusResponse, error)
-	// Get all the registed Credential Statuses
+	// Get all the registered Credential Statuses
 	CredentialStatuses(ctx context.Context, in *QueryCredentialStatusesRequest, opts ...grpc.CallOption) (*QueryCredentialStatusesResponse, error)
 	// Get the list of fixed fees for every x/ssi module transactions
 	QuerySSIFee(ctx context.Context, in *QuerySSIFeeRequest, opts ...grpc.CallOption) (*QuerySSIFeeResponse, error)
@@ -911,7 +911,7 @@ type QueryServer interface {
 	DidDocuments(context.Context, *QueryDidDocumentsRequest) (*QueryDidDocumentsResponse, error)
 	// Get the Credential Status for a given credential id
 	CredentialStatusByID(context.Context, *QueryCredentialStatusRequest) (*QueryCredentialStatusResponse, error)
-	// Get all the registed Credential Statuses
+	// Get all the registered Credential Statuses
 	CredentialStatuses(context.Context, *QueryCredentialStatusesRequest) (*QueryCredentialStatusesResponse, error)
 	// Get the list of fixed fees for every x/ssi module transactions
 	QuerySSIFee(context.Context, *QuerySSIFeeRequest) (*QuerySSIFeeResponse, error)

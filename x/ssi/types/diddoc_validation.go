@@ -46,7 +46,7 @@ func isValidDidDocId(id string) error {
 		}
 	case MSINonBlockchainAccountId:
 		// Non Blockchain Account ID should be a string that supports alphanumeric characters,
-		// and dot (.) and hypen (-). The first character MUST NOT be dot (.) or hyphen (-).
+		// and dot (.) and hyphen (-). The first character MUST NOT be dot (.) or hyphen (-).
 		isValidMSI, err := regexp.MatchString(
 			"^[a-zA-Z0-9][a-zA-Z0-9.-]*$",
 			inputMSI,

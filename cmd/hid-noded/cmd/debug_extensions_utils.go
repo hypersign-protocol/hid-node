@@ -94,7 +94,7 @@ func getDocumentSignature(doc types.SsiMsg, docProof *types.DocumentProof, priva
 			return "", err
 		}
 	default:
-		panic("recieved unsupported signing-algo. Supported algorithms are: [Ed25519Signature2020, EcdsaSecp256k1Signature2019, EcdsaSecp256k1RecoverySignature2020, BbsBlsSignature2020, BJJSignature2021]")
+		panic("received unsupported signing-algo. Supported algorithms are: [Ed25519Signature2020, EcdsaSecp256k1Signature2019, EcdsaSecp256k1RecoverySignature2020, BbsBlsSignature2020, BJJSignature2021]")
 	}
 
 	return signature, nil
