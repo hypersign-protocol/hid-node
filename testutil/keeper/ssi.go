@@ -36,6 +36,7 @@ func SsiKeeper(t testing.TB) (*keeper.Keeper, sdk.Context) {
 		memStoreKey,
 		"SsiParams",
 	)
+	paramsSubspace = paramsSubspace.WithKeyTable(types.ParamKeyTable())
 	k := keeper.NewKeeper(
 		cdc,
 		storeKey,
