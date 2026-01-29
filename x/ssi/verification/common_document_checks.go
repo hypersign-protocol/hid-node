@@ -20,7 +20,7 @@ func documentIdentifier(docType string) string {
 }
 
 func returnVersionNumIdx(namespace string) int {
-	if namespace == "mainnet" {
+	if namespace == "" {
 		return 3
 	} else {
 		return 4
@@ -71,16 +71,30 @@ func IsValidID(Id string, namespace string, docType string) error {
 
 	// Mainnet Chain namespace check. If the document is registered on the mainnet chain,
 	// the namespace should be empty
+	var expectedLength int
 	if namespace == "" {
-		if len(docElements) != 3 {
-			return fmt.Errorf("expected number of did id elements for mainnet to be 3, got %s", fmt.Sprint(len(docElements)))
+		if docIdentifier == "sch" {
+			expectedLength = 4
+		} else {
+			expectedLength = 3
 		}
 		docMethodSpecificId = 2
 	} else {
+		if docIdentifier == "sch" {
+			expectedLength = 5
+		} else {
+			expectedLength = 4
+		}
+		docMethodSpecificId = 3
+
 		docNamespace := docElements[docNamespaceIndex]
 		if namespace != docNamespace {
 			return fmt.Errorf("expected did namespace %s, got %s", namespace, docNamespace)
 		}
+	}
+
+	if len(docElements) != expectedLength {
+		return fmt.Errorf("expected %s id elements, got %s", fmt.Sprintf("%d", expectedLength), fmt.Sprintf("%d", len(docElements)))
 	}
 
 	// Check if method-specific-id string is alphanumeric and
